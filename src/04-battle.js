@@ -165,6 +165,7 @@ function fire(c,depth){
   if(it.dmg>0)attack(c,st);
   if(it.charge)for(const n of c.nb)chargeCard(n,chargeAmt(c),c);
   if(it.chargeAll)for(const o of boardCards())if(o!==c)chargeCard(o,it.chargeAll+.07*stepOf(c),null);
+  if(it.chargeSmall)for(const o of boardCards())if(o!==c&&o.size===1)chargeCard(o,it.chargeSmall*(1+.25*stepOf(c))*(1+mv('support')),c);
   if(it.buff)for(const n of c.nb){n.anvil=true;FX.link(c.el,n.el,'#e3e9f0',.22);}
   if(it.horn&&depth<10)for(const n of c.nb){if(n.frozen>0)continue;later(.1,()=>{if(B.over)return;FX.link(c.el,n.el,'#ffd166',.25);showChain(depth+2);if(depth+2>B.maxChain)B.maxChain=depth+2;trigger(n,depth+1);});}
   if(it.prism)for(const n of c.nb){if(!['火','冰','电'].includes(ITEMS[n.key].tag))continue;chargeCard(n,.25,c);n.anvil=true;FX.link(c.el,n.el,'#73eff7',.25);}
@@ -193,6 +194,12 @@ function attack(c,st){
   const H=(e,m,extra)=>hurt(e,dmg*(m||1),c,crit,Object.assign({},mods,extra||{}));
   switch(it.fx){
     case'knife':proj(o,t,{spd:320,kind:'knife'},e=>H(e));break;
+    case'firefly':{const ts=B.en.filter(e=>!e.dead&&e.y>=RANGE&&!phased(e)).sort((a,b)=>b.y-a.y).slice(0,3);
+      ts.forEach((e,i)=>later(i*.06,()=>{if(B.over)return;proj({x:o.x+(i-1)*4,y:o.y},e.dead?front()||e:e,{spd:190,kind:'fly'},x2=>H(x2));}));break;}
+    case'sweep':{const y0=ey(t),band=10*K();const swing=B.t%2<1?1:-1;
+      bolt([[swing>0?0:F.W,y0-4],[F.W/2,y0+2],[swing>0?F.W:0,y0-4]],'#ffd166',.2,false);ring(ex(t),y0-4,2,18*K(),'#ffcd75',.3);SFX.play('boom');
+      for(let i=0;i<14;i++)part(rnd(0,F.W),y0-4+rnd(-2,2),swing*rnd(30,80),rnd(-10,10),.3,'#ffe79a',1);
+      for(const en of B.en)if(!en.dead&&en.y>=RANGE-.05&&Math.abs(ey(en)-y0)<=band)H(en);break;}
     case'slash':{const x0=ex(t),y0=ey(t);let n2=null,bd=22*K();for(const e of B.en)if(!e.dead&&e!==t){const d=Math.hypot(ex(e)-x0,ey(e)-y0);if(d<bd){bd=d;n2=e;}}
       bolt([[x0-8,y0-9],[x0+8,y0-1]],'#fff4cf',.14,true);H(t);if(n2){bolt([[ex(n2)-7,ey(n2)-8],[ex(n2)+7,ey(n2)-2]],'#ffe79a',.14,true);H(n2,.8);}
       for(let i=0;i<6;i++)part(x0,y0-5,rnd(-40,40),rnd(-30,10),.25,'#fff4cf',1);break;}
@@ -362,6 +369,7 @@ function drawField(dt){
       else if(p.kind==='arrow'){const vx=p.vx||0,vy=p.vy||-1;pline(x,p.x-vx*7,p.y-vy*7,p.x,p.y,'#c28a4d');x.fillStyle='#f4f4f4';x.fillRect(Math.round(p.x),Math.round(p.y),1,1);}
       else if(p.kind==='spark'){x.fillStyle='#ef7d57';x.fillRect(Math.round(p.x)-1,Math.round(p.y)-1,3,3);x.fillStyle='#fee761';x.fillRect(Math.round(p.x),Math.round(p.y),1,1);}
       else if(p.kind==='ice'){x.fillStyle='#41a6f6';x.fillRect(Math.round(p.x)-1,Math.round(p.y)-1,3,3);x.fillStyle='#f4f4f4';x.fillRect(Math.round(p.x),Math.round(p.y),1,1);}
+      else if(p.kind==='fly'){const px=Math.round(p.x),py=Math.round(p.y);x.fillStyle='#a7f070';x.fillRect(px-1,py-1,3,3);x.fillStyle='#fee761';x.fillRect(px,py,1,1);if(Math.random()<.5)part(p.x,p.y,rnd(-5,5),rnd(-5,5),.3,'#a7f070',1);}
       else if(p.kind==='rock'){x.fillStyle='#566c86';x.fillRect(Math.round(p.x)-1,Math.round(p.y)-1,3,3);x.fillStyle='#94b0c2';x.fillRect(Math.round(p.x)-1,Math.round(p.y)-1,1,1);}
       else if(p.kind==='axe'){const f=Math.floor(p.age*24)%4;const px=Math.round(p.x),py=Math.round(p.y);x.fillStyle='#1a1c2c';x.fillRect(px-2,py-2,5,5);x.fillStyle='#dfe6ee';
         if(f%2){x.fillRect(px-2,py,5,1);x.fillRect(px,py-2,1,2);}else{x.fillRect(px,py-2,1,5);x.fillRect(px+1,py,2,1);}x.fillStyle='#c28a4d';x.fillRect(px,py,1,1);}
