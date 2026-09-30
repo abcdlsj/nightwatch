@@ -128,7 +128,7 @@ function paintCard(el,c,extra){const it=ITEMS[c.key];const ad=c.adj?ADJ[c.adj]:n
   el.style.setProperty('--sz',c.size);el.style.setProperty('--tagc',TAGC[it.tag]);el.style.setProperty('--ac',ad?ad.c:'transparent');
   el.style.setProperty('--tc',T.c);el.style.setProperty('--tbg',T.bg);
   el.innerHTML=cardHTML(c);setNum(el,c);}
-function numText(c){const it=ITEMS[c.key];if(it.charge)return'+'+Math.round(chargeAmt(c)*100)+'%';if(it.buff)return'+50%';if(it.prism)return'+25%';if(it.horn)return'齐鸣';const v=Math.round(stats(c,null).total);return v>=10000?(v/1000).toFixed(1)+'k':String(v);}
+function numText(c){const it=ITEMS[c.key];if(it.charge)return'+'+Math.round(chargeAmt(c)*100)+'%';if(it.buff)return'+50%';if(it.prism)return'+25%';if(it.chargeSmall)return'+'+Math.round(it.chargeSmall*(1+.25*stepOf(c))*100)+'%';if(it.horn)return'齐鸣';const v=Math.round(stats(c,null).total);return v>=10000?(v/1000).toFixed(1)+'k':String(v);}
 function setNum(el,c){const n=el.querySelector('.num');if(n)n.textContent=numText(c);}
 function renderOwned(){
   for(const c of G.cards){
