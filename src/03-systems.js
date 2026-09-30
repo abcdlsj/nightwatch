@@ -231,7 +231,7 @@ function rollDoors(){
 }
 function renderPreview(){
   const w=G.nextWave;const cnt={};w.forEach(s=>cnt[s.type]=(cnt[s.type]||0)+1);
-  const R=G.round;$('#pvTitle').textContent='第'+R+'波'+(R===4?' · 精英':R===8?' · 首领':'');
+  const R=G.round;$('#pvTitle').textContent=(NIGHTS[R-1]||{title:'第'+R+'夜'}).title;
   $('#pvList').innerHTML=Object.keys(cnt).map(k=>{const d=EN[k];return `<span class="pv${d.elite||d.boss?' elite':''}"><img src="${SPR[d.spr].url}" alt="">${d.elite||d.boss?d.n:'×'+cnt[k]}</span>`;}).join('');
   const boss=Object.keys(cnt).map(k=>EN[k]).find(d=>d.intents);
   $('#pvNote').innerHTML=boss?boss.intents.map(t=>`【${t.n}】${t.d}`).join('<br>'):(cnt.golem?'石魔像护甲很厚：飞斧和高品质大件更有效。':cnt.skel?'骷髅兵带护甲，会减免每次命中的伤害。':'');
@@ -522,6 +522,7 @@ function drawScene(cv,mode){const x=cv.getContext('2d');const W=cv.width,H=cv.he
   x.fillStyle=mode==='dawn'?'#7a5a60':'#4a3a40';for(let bx=0;bx<W;bx+=8)x.fillRect(bx+1,H-9,6,2);
   for(let t=10;t<W;t+=28){x.fillStyle='#ffcd75';x.fillRect(t,H-18,1,2);x.fillStyle='#ef7d57';x.fillRect(t,H-19,1,1);}
   if(mode==='fall'){for(let i=0;i<40;i++){x.fillStyle=r()<.5?'#ef7d57':'#ffcd75';x.fillRect(Math.floor(r()*W),H-20-Math.floor(r()*30),1,1);}}}
-function nightStory(done){const N=STORY.nights[G.round-1];const act=G.round<=3?'第一幕 · 边境':G.round<=6?'第二幕 · 城下':'第三幕 · 深渊';
+function nightStory(done){done&&done();}
+function _oldNightStory(done){const N=STORY.nights[G.round-1];const act=G.round<=3?'第一幕 · 边境':G.round<=6?'第二幕 · 城下':'第三幕 · 深渊';
   const pages=[{title:N.title,act},{who:'narr',t:N.narr},{who:'hero',t:N[G.hero]}];if(N.foe)pages.push(N.foe);playStory(pages,done);}
 function closeSheet(){$('#sheet').hidden=true;}

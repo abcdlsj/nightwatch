@@ -1,0 +1,139 @@
+
+/* ================= 敌人图鉴：阵营 / 新敌人 / 首次登场台词 =================
+ * 每个敌人是一份纯数据：数值 + 行为开关（aura/heal/guard/haste/bomb/phase/raise/cargo/mimic/rage/lob）。
+ * 行为在 04-battle.js 里按开关实现，以后做“杀戮尖塔式”遭遇/地图时可直接组合这些数据。
+ */
+function addSprites(o){for(const k in o){SPRITES[k]=o[k];const cv=mkSprite(o[k]);
+  SPR[k]={cv,w:cv.width,h:cv.height,white:mkSprite(o[k],'#ffffff'),ice:mkSprite(o[k],'#8fe3ff'),url:upURL(cv,4)};}}
+addSprites({
+p_soldier:[
+"...kkkkkk...",
+"..kssssssk..",
+".ksggggssssk",
+".kkkkkkkkkk.",
+"..kffffffk..",
+"..kfkffkfk..",
+"..kffffffk..",
+"...kfFFfk...",
+"..kkkkkkkk..",
+".kbbbbbbbbk.",
+".kbbybbybbk.",
+".kkkkkkkkkk."],
+bomber:[
+"........yo..",
+"........k...",
+"......kNNk..",
+".....kNnnNk.",
+"..kk.kNnnNk.",
+".kggk.kNNk..",
+"kgggggkkk...",
+"kgkggggggk..",
+"kggggggggkk.",
+".kgRgggggk.k",
+"..kk.kk.kk..",
+"............"],
+ghost:[
+"....kkkk....",
+"...kCwwCk...",
+"..kCwwwwCk..",
+"..kwkwwkwk..",
+"..kwkwwkwk..",
+"..kwwwwwwk..",
+"..kwwkkwwk..",
+"..kCwwwwCk..",
+".kCwwwwwwCk.",
+".kwwCwwCwwk.",
+".kwk.kk.kwk.",
+"..k......k.."],
+necro:[
+"....kkkk.kk.",
+"...kppppkkwk",
+"..kppppppkkk",
+"..kpkPPkpk.n",
+"..kpPYYPpk.n",
+"..kppPPppk.n",
+".kppppppppkn",
+".kpPppppPpkn",
+".kpPPppPPpkn",
+".kppppppppkn",
+"..kkkkkkkk.n",
+"...........n"],
+siege:[
+"..kkkkkkkk..",
+"..knNnNnNk..",
+"..kkkkkkkk..",
+"..kNNNNNNk..",
+"..kNkkkkNk..",
+"..kNkRRkNk..",
+"..kNkkkkNk..",
+"..kNNNNNNk..",
+"..kNnNNnNk..",
+".kkkkkkkkkk.",
+".kgk.kk.kgk.",
+"..k......k.."],
+mimic:[
+"............",
+"..kkkkkkkk..",
+".kNNNNNNNNk.",
+"kNnnnnnnnnNk",
+"kwkwkwkwkwkk",
+"kRRRRRRRRRRk",
+"kkwkwkwkwkwk",
+"kNnnnRRnnnNk",
+"kNnnnnnnnnNk",
+"kkkkkkkkkkkk",
+".kk......kk.",
+"............"],
+berserker:[
+"...kkkkk....",
+"..kRRRRRk.kk",
+"..kRkRkRkkgk",
+"..kRRRRRkkgk",
+"...kRwwRk.k.",
+".kkkRRRRkkN.",
+"kRRRRRRRRRNk",
+"kRkRRRRRRkN.",
+"kk.kRRRRk.N.",
+"...kRkkRk...",
+"...kRk.kRk..",
+"...kk...kk.."],
+catapult:[
+".........kk.",
+"........kggk",
+".......kNkk.",
+"......kNk...",
+".....kNk....",
+"....kNk.....",
+"...kNk......",
+"..kkkkkkkkk.",
+".knNNNNNNNnk",
+".kkkkkkkkkkk",
+".kgk....kgk.",
+"..k......k.."]
+});
+/* 阵营 */
+const FACTIONS={swamp:'沼地孳生',wing:'夜翼',dead:'亡者军团',cult:'灰袍教团',war:'深渊战帮',abyss:'深渊本体'};
+const _F={slime:'swamp',bug:'swamp',mini:'swamp',bat:'wing',skel:'dead',shieldb:'dead',knight:'dead',shaman:'cult',drummer:'war',golem:'war',eye:'abyss'};
+for(const k in _F)if(EN[k])EN[k].faction=FACTIONS[_F[k]];
+Object.assign(EN,{
+  bomber:{n:'火药鼠',hp:10,spd:.085,armor:0,wall:3,spr:'bomber',sc:1,col:'#ef7d57',bomb:.45,faction:FACTIONS.war,
+    tip:'撞墙造成3点伤害；被击杀时爆炸，会炸伤身边的敌人。',intro:['soldier','老鼠背着火药桶！打爆它们——它们会炸到自己人！']},
+  ghost:{n:'游魂',hp:16,spd:.05,armor:0,wall:1,spr:'ghost',sc:1,col:'#73eff7',phase:1,faction:FACTIONS.dead,
+    tip:'周期性虚化：虚化时无法被选中，也不会受到伤害。',intro:['soldier','箭从它身上穿过去了！那是……老汉斯？']},
+  necro:{n:'死灵法师',hp:34,spd:.03,armor:0,wall:3,spr:'necro',sc:1,col:'#b77cff',raise:2,faction:FACTIONS.cult,
+    tip:'每5秒让附近倒下的敌人以骷髅兵的身份站起来。优先击杀！',intro:['necro','起来吧，我的同胞。灰袍的恩典还没有结束。']},
+  siege:{n:'攻城塔',hp:240,spd:.02,armor:3,wall:8,spr:'siege',sc:2,col:'#c28a4d',cargo:['skel',5],faction:FACTIONS.war,
+    tip:'又慢又硬，撞墙8点伤害；被摧毁时放出一队骷髅兵。',intro:['soldier','攻城塔！它们学会造攻城塔了！']},
+  mimic:{n:'宝箱怪',hp:60,spd:.028,armor:1,wall:3,spr:'chest',spr2:'mimic',sc:1,col:'#ffcd75',mimic:3,faction:FACTIONS.swamp,
+    tip:'伪装成宝箱。挨打后露出獠牙狂奔，击杀掉落3金币。',intro:['soldier','那个宝箱……在走路？']},
+  berserker:{n:'狂战士',hp:50,spd:.04,armor:1,wall:3,spr:'berserker',sc:1,col:'#e43b44',rage:1.8,faction:FACTIONS.war,
+    tip:'生命越低，冲得越快。别给它留一口气。',intro:['soldier','那个红皮的越打越快了！']},
+  catapult:{n:'投石车',hp:70,spd:.03,armor:2,wall:3,spr:'catapult',sc:1,col:'#c28a4d',stopAt:.3,lob:[4.5,1],faction:FACTIONS.war,
+    tip:'停在射程内，每4.5秒向城墙投石（1点伤害）。',intro:['soldier','投石车！石头要来了——趴下！']}
+});
+Object.assign(EN.shaman,{tip:'每3秒治疗附近的敌人。',intro:['soldier','后面那个在唱歌——它们的伤口在愈合！']});
+Object.assign(EN.shieldb,{tip:'为附近的敌人提供护甲。',intro:['soldier','盾墙！它们在互相掩护！']});
+Object.assign(EN.drummer,{tip:'让附近的敌人加速。',intro:['soldier','听那鼓声！它们越走越快了！']});
+Object.assign(EN.golem,{tip:'护甲很厚，普通攻击几乎打不动。',intro:['soldier','石头……石头在走路！']});
+Object.assign(EN.bug,{tip:'死亡时分裂成两只幼虫。',intro:['soldier','砍成两半它还在动！']});
+Object.assign(EN.skel,{tip:'带护甲，会减免每次命中的伤害。'});
