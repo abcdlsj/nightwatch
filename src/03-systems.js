@@ -122,7 +122,7 @@ function sellValue(c){return Math.max(1,Math.floor(basePrice(c.key,c.adj,c.tier)
 
 /* ================= 卡牌 DOM ================= */
 function cardHTML(c){const it=ITEMS[c.key];const ad=c.adj?ADJ[c.adj]:null;
-  return `<div class="inner" style="--dl:${c.dl||0}s"><div class="face"><div class="band"></div><div class="nm">${it.n}</div><img class="spr" src="${SPR[c.key].url}" alt="${it.n}" draggable="false"><div class="num"></div><div class="cdv"></div><div class="holo"></div><div class="flash"></div></div><div class="tb">${TIERS[c.tier].n}</div>${ad?`<div class="adj">${ad.ch}</div>`:''}</div>`;}
+  return `<div class="inner" style="--dl:${c.dl||0}s"><div class="face"><div class="band"></div><div class="nm${cardName(c).length>3?' long':''}">${cardName(c)}</div><img class="spr" src="${SPR[c.key].url}" alt="${it.n}" draggable="false"><div class="num"></div><div class="cdv"></div><div class="holo"></div><div class="flash"></div></div><div class="tb">${TIERS[c.tier].n}</div>${ad?`<div class="adj">${ad.ch}</div>`:''}</div>`;}
 function paintCard(el,c,extra){const it=ITEMS[c.key];const ad=c.adj?ADJ[c.adj]:null;const T=TIERS[c.tier];
   el.className='card s'+c.size+' t'+c.tier+(ad&&ad.r===2?' rare':'')+(extra?' '+extra:'');
   el.style.setProperty('--sz',c.size);el.style.setProperty('--tagc',TAGC[it.tag]);el.style.setProperty('--ac',ad?ad.c:'transparent');
@@ -462,10 +462,11 @@ function openSheet(src){
   if(own&&c.bTrig)rows+=`<div><span>上一场</span><span>${Math.round(c.bDmg)} 伤害 · 触发${c.bTrig}次</span></div>`;
   if(own)rows+=`<div><span>出售价</span><span>${sellValue(c)}</span></div>`;
   const sh=$('#sheet');
-  sh.innerHTML=`<div class="sh" role="dialog" aria-label="${it.n}"><div class="sh-top"><div id="shCard"></div><div><h3>${ad?`<span style="color:${ad.c}">${ad.n}的</span>`:''}${it.n}</h3>
+  sh.innerHTML=`<div class="sh" role="dialog" aria-label="${it.n}"><div class="sh-top"><div id="shCard"></div><div><h3>${ad?`<span style="color:${ad.c}">${ad.n}的</span>`:''}${c.tier>=3&&it.dn?`<span class="dn">「${it.dn}」</span><small class="bn">${it.n}</small>`:it.n}</h3>
     <div class="tags"><span class="tag" style="background:${T.c}33;color:${T.c}">${T.n}品质</span><span class="tag" style="background:${TAGC[it.tag]}33;color:${TAGC[it.tag]}">${it.tag}</span><span class="tag">${SIZEN[c.size]}型·占${c.size}格</span></div>
     <p>${it.d}<br><small style="color:var(--muted)">${UPS[it.up].t}；两张同名同品质的卡合成下一品质。</small></p></div></div>
     <p class="flav">“${it.f}”</p>
+    ${it.lore?(c.tier>=2?`<div class="lore${c.tier>=3?' dia':''}"><small>传闻</small><p>${it.lore}</p>${c.tier>=3?`<p class="dl">—— ${it.dl}</p>`:''}</div>`:`<div class="lore locked"><small>传闻</small><p>这张卡的故事，只讲给金品质的主人听。</p></div>`):''}
     ${ad?`<div class="adjbox" style="--ac:${ad.c}"><b>${ad.n}</b><span>${ad.d}</span></div>`:''}
     <div class="stat">${rows}</div>
     <div class="sh-btns" id="shBtns"></div></div>`;
