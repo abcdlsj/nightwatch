@@ -85,7 +85,7 @@ let M={};function recalcMods(){M={};const add=m=>{for(const k in m)M[k]=(M[k]||0
   for(const s of G.skills){const[b,i]=s.split('.');add(TREES[G.hero][b].nodes[i].m);}}
 const mv=k=>M[k]||0;
 
-function newCard(key,tier,adj){return{id:UID++,key,tier:tier==null?ITEMS[key].t:tier,adj:adj||null,size:ITEMS[key].size,loc:null,idx:-1,hoard:0,el:null,
+function newCard(key,tier,adj){return{id:UID++,key,tier:tier==null?ITEMS[key].t:tier,adj:adj||null,size:ITEMS[key].size,loc:null,idx:-1,hoard:0,grow:0,qp:0,el:null,
   charge:0,mom:0,bDmg:0,bTrig:0,frozen:0,echoLog:[],nb:null,right:null,ox:0,anvil:false,dl:(Math.random()*-3.4).toFixed(2)};}
 function zoneN(z){return z==='board'?8:4;}
 function occ(z){const a=Array(zoneN(z)).fill(null);for(const c of G.cards)if(c.loc===z)for(let i=0;i<c.size;i++)a[c.idx+i]=c;return a;}
@@ -100,21 +100,44 @@ function dmgMul(c){return UPS[ITEMS[c.key].up].d[stepOf(c)];}
 function chainOf(c){return(ITEMS[c.key].chain||0)+stepOf(c)+mv('chain');}
 function chargeAmt(c){return ITEMS[c.key].charge*[1,1.5,2,2.7][stepOf(c)];}
 
+/* ---- 事件触发：卡牌 / 物品在数据里声明 on:{事件:(卡,上下文)=>{}}，引擎在对应时机 emit ---- */
+function evOk(log,k,cap){const a=(log[k]=(log[k]||[]).filter(t=>t>B.t-1));if(a.length>=cap)return false;a.push(B.t);return true;}
+function emit(ev,x){
+  if(!B||B.over||G.phase!=='battle')return;x=x||{};
+  for(const c of boardCards()){const h=ITEMS[c.key].on;if(!h||!h[ev]||c.frozen>0)continue;if(!evOk(c.evLog||(c.evLog={}),ev,8))continue;h[ev](c,x);if(B.over)return;}
+  for(const r of new Set(G.relics)){const h=RELICS[r].on;if(!h||!h[ev])continue;if(!evOk(B.rlog,r+ev,8))continue;h[ev](G.relics.filter(y=>y===r).length,x);if(B.over)return;}
+}
+const kindOf=c=>ITEMS[c.key].kind||'';
+function countKind(k,ex){return boardCards().filter(o=>o!==ex&&kindOf(o)===k).length;}
+function countTag(t,ex){return boardCards().filter(o=>o!==ex&&ITEMS[o.key].tag===t).length;}
+function maxAmmo(c){const a=ITEMS[c.key].ammo;return a==null?null:a+stepOf(c)+mv('ammo');}
+function buffAmt(c){const it=ITEMS[c.key];let a=it.buff*(1+.2*stepOf(c))+(c.rage||0);if(it.buffKind)a+=it.buffKind.amt*countKind(it.buffKind.kind);return a;}
+function growCard(c,v){c.grow=(c.grow||0)+v*(1+mv('t_photo'));if(c.el)setNum(c.el,c);}
+function questN(c){const q=ITEMS[c.key].quest;return q?Math.ceil(q.n*(mv('t_map')?.5:1)):0;}
+function questAdd(c,v){if(ITEMS[c.key].quest)c.qp=(c.qp||0)+(v||1);}
+function finishQuests(){for(const c of G.cards){const q=ITEMS[c.key].quest;if(!q||(c.qp||0)<questN(c))continue;
+  const from=ITEMS[c.key].n;c.key=q.into;c.qp=0;if(mv('t_map'))c.tier=Math.min(3,c.tier+1);repaint(c);toast('【任务完成】'+from+' 变成了 '+ITEMS[c.key].n);
+  if(c.el)setTimeout(()=>{if(!c.el)return;restart(c.el,'merge');const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,'#ffd166',30);},60);}}
 function stats(c,t){
   const it=ITEMS[c.key],a=c.adj,s=stepOf(c),U=UPS[it.up];
-  const base=Math.round(it.dmg*U.d[s]*10)/10;
+  const base=Math.round((it.dmg*U.d[s]+(it.dmg>0?(c.grow||0)+(c.stk||0):0))*10)/10;
   const flat=(a==='sharp'&&it.dmg>0)?4*it.size*(c.tier+1):0;
   const pct=[];
   if(a==='fervor')pct.push(['狂热',.3]);if(a==='heavy')pct.push(['沉重',.5]);
   if(a==='resonance'){const nb=c.nb||neighbors(c);const n=nb.filter(x=>ITEMS[x.key].tag===it.tag).length;if(n)pct.push(['共鸣×'+n,.25*n]);}
   const mp=(k,l)=>{const v=mv(k);if(v)pct.push([l,v]);};
+  if(it.per&&c.loc==='board'){const P=it.per;let n=0;
+    if(P.elem)n=new Set(boardCards().map(o=>ITEMS[o.key].tag)).size;else if(P.kind)n=countKind(P.kind,c);else if(P.tag)n=countTag(P.tag,c);
+    if(n)pct.push([(P.elem?'元素':P.kind||P.tag)+'×'+n,P.pct*n]);}
+  if(mv('t_alch')&&c.loc==='board'){const n=countKind('药剂');if(n)pct.push(['炼金手册×'+n,.04*n*mv('t_alch')]);}
   mp('dmg','物品');mp('tag_'+it.tag,'物品·'+it.tag);mp('s'+it.size,'物品·'+SIZEN[it.size]+'型');
   if(c.loc==='board'){const bc=boardCards();if(bc[0]===c)mp('left','最左');if(bc[bc.length-1]===c)mp('right','最右');
     if(mv('lonely')&&!(c.nb||neighbors(c)).length)mp('lonely','孤狼');if(mv('full')&&occ('board').every(Boolean))mp('full','满员');}
   const psum=pct.reduce((s,p)=>s+p[1],0);const mult=a==='deadly'?1.5:1;
   const total=(base+flat)*Math.max(.1,1+psum)*mult;
   let cd=it.cd*U.c[s];if(a==='twin')cd*=1.6;if(a==='heavy')cd*=1.3;
-  let spd=1;if(a==='swift')spd+=.25;if(a==='momentum'&&c.mom)spd+=.05*c.mom;if(a==='rush'&&t!=null&&t<5)spd+=1;spd=Math.max(.3,spd+mv('spd'));
+  let spd=1;if(a==='swift')spd+=.25;if(a==='momentum'&&c.mom)spd+=.05*c.mom;if(a==='rush'&&t!=null&&t<5)spd+=1;if(it.kind==='药剂'&&c.loc==='board'){const j=boardCards().filter(o=>ITEMS[o.key].kindHaste).length;if(j)spd+=.06*j*countKind('药剂');}
+  spd=Math.max(.3,spd+mv('spd'));
   return{base,flat,pct,psum,mult,total,cd:Math.max(.25,cd/spd),cdRaw:it.cd,crit:.05+(a==='precise'?.2:0)+mv('crit')};
 }
 function basePrice(k,adj,tier){return[3,6,10,16][tier]+(ITEMS[k].size-1)+(adj?[1,2,3][ADJ[adj].r]:0);}
@@ -122,13 +145,13 @@ function sellValue(c){return Math.max(1,Math.floor(basePrice(c.key,c.adj,c.tier)
 
 /* ================= 卡牌 DOM ================= */
 function cardHTML(c){const it=ITEMS[c.key];const ad=c.adj?ADJ[c.adj]:null;
-  return `<div class="inner" style="--dl:${c.dl||0}s"><div class="face"><div class="band"></div><div class="nm${cardName(c).length>3?' long':''}">${cardName(c)}</div><img class="spr" src="${SPR[c.key].url}" alt="${it.n}" draggable="false"><div class="num"></div><div class="cdv"></div><div class="holo"></div><div class="flash"></div></div><div class="tb">${TIERS[c.tier].n}</div>${ad?`<div class="adj">${ad.ch}</div>`:''}</div>`;}
+  return `<div class="inner" style="--dl:${c.dl||0}s"><div class="face"><div class="band"></div><div class="nm${cardName(c).length>3?' long':''}">${cardName(c)}</div><img class="spr" src="${SPR[c.key].url}" alt="${it.n}" draggable="false"><div class="num"></div>${it.ammo!=null?'<div class="am"></div>':''}<div class="cdv"></div><div class="holo"></div><div class="flash"></div></div><div class="tb">${TIERS[c.tier].n}</div>${ad?`<div class="adj">${ad.ch}</div>`:''}</div>`;}
 function paintCard(el,c,extra){const it=ITEMS[c.key];const ad=c.adj?ADJ[c.adj]:null;const T=TIERS[c.tier];
   el.className='card s'+c.size+' t'+c.tier+(ad&&ad.r===2?' rare':'')+(extra?' '+extra:'');
   el.style.setProperty('--sz',c.size);el.style.setProperty('--tagc',TAGC[it.tag]);el.style.setProperty('--ac',ad?ad.c:'transparent');
   el.style.setProperty('--tc',T.c);el.style.setProperty('--tbg',T.bg);
-  el.innerHTML=cardHTML(c);setNum(el,c);}
-function numText(c){const it=ITEMS[c.key];if(it.charge)return'+'+Math.round(chargeAmt(c)*100)+'%';if(it.buff)return'+50%';if(it.prism)return'+25%';if(it.chargeSmall)return'+'+Math.round(it.chargeSmall*(1+.25*stepOf(c))*100)+'%';if(it.horn)return'齐鸣';const v=Math.round(stats(c,null).total);return v>=10000?(v/1000).toFixed(1)+'k':String(v);}
+  el.innerHTML=cardHTML(c);setNum(el,c);if(it.ammo!=null){const a=el.querySelector('.am');if(a)a.textContent='弹'+(c.ammo!=null&&G.phase==='battle'?c.ammo:maxAmmo(c));}}
+function numText(c){const it=ITEMS[c.key];if(it.numT)return it.numT(c);if(it.charge)return'+'+Math.round(chargeAmt(c)*100)+'%';if(it.buff)return'+50%';if(it.prism)return'+25%';if(it.chargeSmall)return'+'+Math.round(it.chargeSmall*(1+.25*stepOf(c))*100)+'%';if(it.horn)return'齐鸣';const v=Math.round(stats(c,null).total);return v>=10000?(v/1000).toFixed(1)+'k':String(v);}
 function setNum(el,c){const n=el.querySelector('.num');if(n)n.textContent=numText(c);}
 function renderOwned(){
   for(const c of G.cards){
@@ -199,9 +222,9 @@ function rollAdj(key,force,exclude,maxTier){
 }
 function rollItem(filter){
   const R=G.round;const pool=[];
-  for(const k in ITEMS){const it=ITEMS[k];if(it.hero&&it.hero!==G.hero)continue;if(filter&&!filter(it))continue;if(it.t===2&&R<2)continue;
+  for(const k in ITEMS){const it=ITEMS[k];if(it.noPool||(it.hero&&it.hero!==G.hero))continue;if(filter&&!filter(it))continue;if(it.t===2&&R<2)continue;
     const w=(it.size===1?4:it.size===2?3:R>=4?2.5:1.3)*(it.hero?1.4:1);pool.push([k,w]);}
-  if(!pool.length)return pick(Object.keys(ITEMS));
+  if(!pool.length)return pick(Object.keys(ITEMS).filter(k=>!ITEMS[k].noPool&&!ITEMS[k].hero));
   let t=Math.random()*pool.reduce((a,b)=>a+b[1],0);for(const[k,w]of pool){t-=w;if(t<=0)return k;}return pool[0][0];
 }
 function makeOffer(filter,opt){opt=opt||{};
@@ -368,7 +391,7 @@ function checkMerges(){
       const rank=c=>c.loc==='board'?0:c.loc==='stash'?1:2;
       g.sort((a,b)=>rank(a)-rank(b)||a.idx-b.idx);const[t,a]=g;
       const adjs=[t,a].map(x=>x.adj).filter(Boolean).sort((x,y)=>ADJ[y].r-ADJ[x].r);if(adjs.length)t.adj=adjs[0];
-      t.hoard+=a.hoard;removeCard(a);t.tier++;
+      t.hoard+=a.hoard;t.grow=(t.grow||0)+(a.grow||0);t.qp=Math.max(t.qp||0,a.qp||0);removeCard(a);t.tier++;
       if(t.loc==='temp'){const f=firstFit(t.size);if(f){t.loc=f.z;t.idx=f.i;}}
       repaint(t);any=t;did=true;break;}
     if(!did)break;
@@ -456,20 +479,25 @@ function openSheet(src){
     rows+=`<div><span>单次伤害</span><span>${Math.round(st.total)}</span></div><div><span></span><span class="f">${f}</span></div>`;
     rows+=`<div><span>暴击率</span><span>${Math.round(st.crit*100)}%（伤害×2）</span></div>`;
     if(it.chain)rows+=`<div><span>弹跳次数</span><span>${chainOf(c)}</span></div>`;
+    if(it.multi)rows+=`<div><span>多重</span><span>每次触发打出 ${it.multi} 次</span></div>`;
   }else if(it.charge)rows+=`<div><span>充能相邻</span><span>+${Math.round(chargeAmt(c)*100)}%</span></div>`;
-  else rows+=`<div><span>相邻增伤</span><span>下一击 +50%</span></div>`;
-  rows+=`<div><span>冷却</span><span>${st.cd.toFixed(2)}s${Math.abs(st.cd-st.cdRaw)>.01?' <small style="color:var(--muted)">（原'+st.cdRaw.toFixed(1)+'s）</small>':''}</span></div>`;
+  else if(it.buff)rows+=`<div><span>相邻增伤</span><span>下一击 +${Math.round(buffAmt(c)*100)}%</span></div>`;
+  if(it.ammo!=null)rows+=`<div><span>弹药</span><span>每场 ${maxAmmo(c)} 发</span></div>`;
+  if(c.grow)rows+=`<div><span>成长</span><span>基础伤害 +${Math.round(c.grow*10)/10}</span></div>`;
+  if(it.quest)rows+=`<div><span>任务</span><span>${it.quest.t} ${Math.min(c.qp||0,questN(c))} / ${questN(c)}</span></div>`;
+  rows+=it.passive?`<div><span>冷却</span><span>无 <small style="color:var(--muted)">（只靠事件充能）</small></span></div>`:`<div><span>冷却</span><span>${st.cd.toFixed(2)}s${Math.abs(st.cd-st.cdRaw)>.01?' <small style="color:var(--muted)">（原'+st.cdRaw.toFixed(1)+'s）</small>':''}</span></div>`;
   if(c.tier<3){const nx=Object.assign({},c,{tier:c.tier+1});const b=stats(nx,null);
     rows+=`<div><span>升到${TIERS[c.tier+1].n}</span><span>${it.dmg?'伤害 '+Math.round(b.total)+' · ':''}冷却 ${b.cd.toFixed(2)}s</span></div>`;}
   if(own&&c.bTrig)rows+=`<div><span>上一场</span><span>${Math.round(c.bDmg)} 伤害 · 触发${c.bTrig}次</span></div>`;
   if(own)rows+=`<div><span>出售价</span><span>${sellValue(c)}</span></div>`;
   const sh=$('#sheet');
   sh.innerHTML=`<div class="sh" role="dialog" aria-label="${it.n}"><div class="sh-top"><div id="shCard"></div><div><h3>${ad?`<span style="color:${ad.c}">${ad.n}的</span>`:''}${c.tier>=3&&it.dn?`<span class="dn">「${it.dn}」</span><small class="bn">${it.n}</small>`:it.n}</h3>
-    <div class="tags"><span class="tag" style="background:${T.c}33;color:${T.c}">${T.n}品质</span><span class="tag" style="background:${TAGC[it.tag]}33;color:${TAGC[it.tag]}">${it.tag}</span><span class="tag">${SIZEN[c.size]}型·占${c.size}格</span></div>
+    <div class="tags"><span class="tag" style="background:${T.c}33;color:${T.c}">${T.n}品质</span><span class="tag" style="background:${TAGC[it.tag]}33;color:${TAGC[it.tag]}">${it.tag}</span>${it.kind?`<span class="tag">${it.kind}</span>`:''}<span class="tag">${SIZEN[c.size]}型·占${c.size}格</span></div>
     <p>${it.d}<br><small style="color:var(--muted)">${UPS[it.up].t}；两张同名同品质的卡合成下一品质。</small></p></div></div>
     <p class="flav">“${it.f}”</p>
     ${it.lore?(c.tier>=2?`<div class="lore${c.tier>=3?' dia':''}"><small>传闻</small><p>${it.lore}</p>${c.tier>=3?`<p class="dl">—— ${it.dl}</p>`:''}</div>`:`<div class="lore locked"><small>传闻</small><p>这张卡的故事，只讲给金品质的主人听。</p></div>`):''}
     ${ad?`<div class="adjbox" style="--ac:${ad.c}"><b>${ad.n}</b><span>${ad.d}</span></div>`:''}
+    ${kwBox(it.d)}
     <div class="stat">${rows}</div>
     <div class="sh-btns" id="shBtns"></div></div>`;
   const ce=document.createElement('div');paintCard(ce,c,'static');$('#shCard').appendChild(ce);
@@ -480,6 +508,7 @@ function openSheet(src){
   mk('关闭','',closeSheet);
   sh.hidden=false;sh.onclick=e=>{if(e.target===sh)closeSheet();};
 }
+function kwBox(d){const ks=Object.keys(KW).filter(k=>d.includes('【'+k));return ks.length?`<div class="kwbox">${ks.map(k=>`<div><b>${k}</b><span>${KW[k]}</span></div>`).join('')}</div>`:'';}
 function openRelicSheet(r){const R0=RELICS[r];SFX.play('ui');const sh=$('#sheet');const n=G.relics.filter(x=>x===r).length;
   sh.innerHTML=`<div class="sh" role="dialog" aria-label="${R0.n}"><div class="sh-top"><img class="ricon big" src="${icon(R0.ico).url}" alt="" style="--gc:${GT[R0.t].c}"><div><h3 style="color:${GT[R0.t].c}">${R0.n}${n>1?' ×'+n:''}</h3><div class="tags"><span class="tag" style="background:${GT[R0.t].c}33;color:${GT[R0.t].c}">${GT[R0.t].n}物品</span><span class="tag">${R0.u?'唯一':'可叠加'}</span></div><p class="mods">${modText(R0.m)}</p></div></div><p class="flav">“${R0.f}”</p><div class="sh-btns"><button class="btn" id="rClose">关闭</button></div></div>`;
   sh.hidden=false;$('#rClose').onclick=closeSheet;sh.onclick=e=>{if(e.target===sh)closeSheet();};}

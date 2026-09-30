@@ -213,6 +213,120 @@ def card_art():
     c = Cv(); c.rect(3, 0, 12, 1, 'n'); c.line(8, 1, 8, 10, 'y', 1); c.ell(8, 12, 3.6, 3.1, 'y'); c.ell(7.3, 11.3, 1, 1, 'w', True)
     for x, y in ((2, 8), (1, 11), (14, 8), (15, 11)): c.px(x, y, 'g', True)
     A['pendulum'] = c.done()
+
+    # ---- 触发框架新卡（通用）
+    c = Cv(); c.rect(7, 7, 8, 15, 'N'); c.line(7, 9, 8, 10, 'n', 1, True); c.line(7, 12, 8, 13, 'n', 1, True); c.rect(5, 14, 10, 15, 's')
+    c.poly([(8, 0), (11, 4), (10.5, 7), (5.5, 7), (5, 4)], 'o'); c.ell(8, 5, 1.3, 1.8, 'Y', True); A['sparkwick'] = c.done()
+
+    c = Cv(); c.rect(3, 1, 12, 14, 'C'); c.rect(3, 1, 12, 2, 'R'); c.line(7.5, 4, 7.5, 12, 'b', 1, True)
+    c.line(5, 6, 10, 10, 'b', 1, True); c.line(10, 6, 5, 10, 'b', 1, True); c.px(7, 8, 'w', True); c.px(8, 8, 'w', True); A['frostseal'] = c.done()
+
+    c = Cv(); c.poly([(3, 3), (13, 2), (15, 11), (8, 15), (1, 11)], 'c'); c.poly([(3, 3), (13, 2), (8, 7)], 'C')
+    c.line(8, 7, 5, 11, 'w', 1, True); c.line(8, 7, 12, 10, 'w', 1, True); c.line(5, 11, 4, 14, 'w', 1, True); c.line(8, 7, 8, 3, 'w', 1, True); A['rime'] = c.done()
+
+    c = Cv(); c.poly([(0, 15), (6, 3), (9, 7), (11, 5), (16, 15)], 's'); c.poly([(4, 7), (6, 3), (8, 6), (7, 8), (5, 7)], 'w')
+    c.poly([(10, 6), (11, 5), (13, 9), (11, 9)], 'w'); c.ell(4, 12, 1.8, 1.6, 'C'); c.ell(9, 13, 2.2, 1.8, 'C'); c.ell(13, 12, 1.4, 1.3, 'C'); A['avalanche'] = c.done()
+
+    c = Cv()
+    for i in (2, 6, 10, 14): c.line(i, 1, i, 14, 'N', 1); c.line(1, i - 1, 14, i - 1, 'N', 1)
+    c.poly([(9, 3), (5, 8), (8, 8), (6, 13), (11, 7), (8, 7), (10, 3)], 'Y'); A['netcoil'] = c.done(shade=False)
+
+    c = Cv(); c.line(2, 15, 10, 6, 'n', 2); c.ell(11.5, 4.5, 2.6, 2.6, 'c'); c.px(10.5, 3.5, 'w', True)
+    c.line(14, 1, 15, 0, 'Y', 1, True); c.line(14, 7, 16, 8, 'Y', 1, True); c.px(9, 1, 'Y', True); A['appwand'] = c.done()
+
+    c = Cv(); c.line(2, 15, 9, 7, 'y', 2); c.rect(8, 6, 10, 8, 'N'); c.ell(11.5, 4.5, 3.2, 3.2, 'Y'); c.ell(11, 4, 1.2, 1.2, 'w', True)
+    c.poly([(3, 0), (1, 4), (3, 4), (1, 8), (5, 3), (3, 3), (5, 0)], 'Y', True); c.line(15, 9, 13, 12, 'Y', 1, True); A['thunderking'] = c.done()
+
+    c = Cv(); c.line(1, 8, 14, 8, 'g', 1); c.poly([(0, 10), (3, 5), (8, 3), (13, 5), (16, 10), (13, 7), (8, 5), (3, 7)], 'r')
+    c.rect(7, 4, 8, 15, 'n'); c.rect(5, 11, 10, 13, 'x'); c.rect(7, 0, 8, 7, 'g'); c.poly([(6, 0), (9.5, 0), (7.5, -2)], 'w', True); c.px(7, 0, 'w', True); A['headxbow'] = c.done()
+
+    c = Cv(); c.rect(2, 8, 13, 15, 'n'); c.rect(2, 8, 13, 9, 'N'); c.rect(2, 12, 13, 12, 'm')
+    for x in (4, 7, 10): c.line(x, 1, x + 1, 8, 'g', 1); c.poly([(x - 1, 1), (x + 1, 1), (x, -1)], 'w', True); c.px(x + 1, 7, 'R', True)
+    A['armorer'] = c.done()
+
+    c = Cv()
+    for i, y in enumerate((4, 8, 12)): c.line(1, y + 1, 11, y - 1, 's', 2); c.ell(13, y - 1.3, 1.6, 1.4, 'o'); c.px(14, y - 2, 'Y', True)
+    c.rect(0, 3, 3, 14, 'n'); A['volley'] = c.done()
+
+    c = Cv(); c.ell(7, 10, 5, 5, 'r'); c.rect(6, 3, 8, 5, 's'); c.line(8, 3, 11, 0, 'N', 1); c.px(12, 0, 'Y', True)
+    c.ell(12.5, 5, 2.4, 2, 'P'); c.ell(14, 2.5, 1.6, 1.4, 'P'); c.px(5, 8, 'w', True); A['smokebomb'] = c.done()
+
+    c = Cv(); c.rect(1, 0, 3, 15, 'n'); c.rect(12, 0, 14, 15, 'n'); c.rect(1, 0, 14, 1, 'N'); c.poly([(4, 2), (11, 2), (11, 6), (4, 8)], 'g')
+    c.line(4, 8, 11, 6, 'w', 1, True); c.rect(4, 12, 11, 13, 'm'); c.ell(7.5, 12.5, 1.8, 1.5, '.'); A['guillotine'] = c.done()
+
+    c = Cv(); c.rect(0, 12, 9, 15, 's'); c.line(1, 12, 8, 12, 'g', 1, True); c.poly([(5, 9), (13, 1), (15, 0), (14, 2), (7, 11)], 'g')
+    c.line(6, 9, 13, 2, 'w', 1, True); c.line(3, 8, 7, 12, 'y', 2); c.px(12, 5, 'Y', True); c.px(10, 2, 'Y', True); A['honeblade'] = c.done()
+
+    c = Cv(); c.poly([(6, 2), (10, 2), (11, 4), (12, 10), (14, 12), (2, 12), (4, 10), (5, 4)], 'y'); c.rect(2, 12, 13, 13, 'N')
+    c.ell(8, 14.5, 1.2, 1.2, 'n'); c.line(6, 4, 5, 10, 'w', 1, True); c.line(0, 3, 2, 5, 'R', 1, True); c.line(15, 3, 13, 5, 'R', 1, True); c.line(0, 8, 2, 8, 'R', 1, True); c.line(14, 8, 16, 8, 'R', 1, True)
+    A['alarmbell'] = c.done()
+
+    # ---- 艾拉
+    c = Cv(); c.rect(2, 6, 13, 13, 'R'); c.ell(7.5, 6, 5.8, 2.2, 'y'); c.ell(7.5, 13, 5.8, 1.8, 'r')
+    for x in (4, 8, 11): c.line(x, 7, x + 1, 13, 'y', 1, True)
+    c.line(1, 0, 6, 5, 'N', 1); c.line(14, 0, 9, 5, 'N', 1); c.ell(1, 0, 1, 1, 'w'); c.ell(14, 0, 1, 1, 'w'); A['wardrum'] = c.done()
+
+    c = Cv(); c.poly([(3, 12), (12, 3), (14, 5), (5, 14)], 'n'); c.line(5, 12, 12, 5, 'N', 1, True); c.poly([(12, 3), (14.5, 0.5), (15.5, 1.5), (14, 5)], 'g')
+    c.line(1, 11, 5, 15, 'y', 2); c.line(2, 14, 0, 16, 'n', 2); c.px(8, 8, 'y', True); A['vetblade'] = c.done()
+
+    c = Cv(); c.line(1, 15, 12, 4, 'N', 1); c.poly([(11, 3), (15, 0), (13, 5), (12, 6), (10, 4)], 'g'); c.line(13, 2, 14, 1, 'w', 1, True)
+    c.line(3, 12, 5, 14, 'R', 1, True); c.line(2, 13, 4, 15, 'R', 1, True); A['javelin'] = c.done()
+
+    c = Cv(); c.ell(8, 12, 7, 3.2, 'm'); c.ell(8, 12, 5.5, 2, 'x'); c.poly([(3, 12), (4, 6), (6, 9), (8, 3), (10, 8), (12, 5), (13, 12)], 'o')
+    c.poly([(5, 12), (6, 9), (8, 6), (10, 9), (11, 12)], 'Y'); c.line(1, 14, 3, 11, 's', 1, True); c.line(15, 14, 13, 11, 's', 1, True); A['oiltrap'] = c.done()
+
+    c = Cv(); c.rect(3, 1, 4, 15, 'n'); c.poly([(5, 1), (14, 2), (12, 5), (14, 8), (5, 8)], 'R'); c.line(6, 3, 11, 3, 'y', 1, True)
+    c.ell(3.5, 0.5, 1.2, 1, 'y'); c.rect(1, 14, 6, 15, 's'); A['flagpole'] = c.done()
+
+    c = Cv(); c.poly([(7, 0.5), (9, 0.5), (9, 10), (7, 10)], 'C'); c.rect(2, 10, 13, 11, 'y'); c.rect(7, 12, 8, 14, 'n'); c.rect(6, 15, 9, 15, 'Y')
+    c.line(7, 1, 7, 9, 'w', 1, True); c.px(1, 3, 'C', True); c.px(14, 5, 'C', True); c.px(12, 1, 'w', True); A['nightsword'] = c.done()
+
+    # ---- 墨
+    c = Cv(); c.poly([(1, 6), (15, 6), (13, 13), (3, 13)], 's'); c.rect(0, 5, 15, 6, 'g'); c.rect(4, 13, 5, 15, 'd'); c.rect(10, 13, 11, 15, 'd')
+    c.ell(4, 3, 1.6, 1.6, 'R'); c.ell(8, 2, 1.6, 1.6, 'c'); c.ell(12, 3.5, 1.4, 1.4, 'Y'); c.ell(7, 4.5, 1, 1, 'l'); A['crucible'] = c.done()
+
+    c = Cv(); c.rect(6, 0, 9, 1, 'N'); c.rect(7, 2, 8, 5, 'C'); c.ell(7.5, 10.5, 5.2, 5, 'C'); c.ell(7.5, 12, 4.6, 3.2, 'b')
+    c.line(7.5, 8, 7.5, 14, 'w', 1, True); c.line(5, 11, 10, 11, 'w', 1, True); c.px(5, 7, 'w', True); A['condenser'] = c.done()
+
+    c = Cv(); c.rect(6, 0, 9, 1, 'N'); c.rect(7, 2, 8, 5, 'C'); c.ell(7.5, 10.5, 5.2, 5, 'C'); c.ell(7.5, 12, 4.6, 3.2, 'G')
+    c.poly([(9, 6), (5, 11), (8, 11), (6, 15), (11, 9), (8, 9), (10, 6)], 'Y', True); A['shockvenom'] = c.done()
+
+    c = Cv(); c.rect(6, 0, 9, 1, 'N'); c.rect(7, 2, 8, 5, 'C'); c.ell(7.5, 10.5, 5.2, 5, 'C'); c.ell(7.5, 12, 4.6, 3.2, 'y')
+    c.ell(12.5, 12.5, 3, 3, 'Y'); c.rect(12, 11, 13, 14, 'N', True); c.px(5, 7, 'w', True); A['midas'] = c.done()
+
+    c = Cv(); c.rect(0, 7, 4, 15, 'R'); c.rect(1, 5, 3, 6, 'n'); c.rect(5, 3, 10, 15, 'c'); c.rect(6, 1, 9, 2, 'n'); c.rect(11, 9, 15, 15, 'l'); c.rect(12, 7, 14, 8, 'n')
+    c.px(6, 5, 'w', True); c.px(1, 9, 'w', True); c.px(12, 11, 'w', True); A['jars'] = c.done()
+
+    c = Cv(); c.rect(6, 0, 9, 1, 'N'); c.rect(7, 2, 8, 5, 'C'); c.ell(7.5, 10.5, 5.2, 5, 'C'); c.ell(7.5, 11.5, 4.6, 3.6, 'l')
+    c.poly([(5, 14), (6, 10), (7, 14)], 'w', True); c.poly([(8, 14), (9.5, 9), (11, 14)], 'w', True); c.px(4, 8, 'w', True); A['supersat'] = c.done()
+
+    c = Cv(); c.poly([(8, 0), (12, 7), (13, 10), (11, 14), (5, 14), (3, 10), (4, 7)], 'P'); c.ell(8, 10.5, 3, 3, 'p')
+    c.ell(6.5, 8, 1.2, 1.6, 'w', True); c.px(1, 3, 'P', True); c.px(14, 2, 'P', True); c.px(15, 12, 'Y', True); A['sagedrop'] = c.done()
+
+    # ---- 萤
+    c = Cv(); c.rect(6, 0, 9, 1, 'd'); c.poly([(2, 3), (13, 3), (15, 8), (13, 13), (2, 13), (0, 8)], 'y'); c.rect(2, 14, 13, 15, 'd')
+    c.rect(4, 6, 5, 11, 'n', True); c.ell(8, 7, 1, 1, 'n', True); c.rect(7, 8, 8, 11, 'n', True); c.rect(11, 7, 12, 11, 'n', True); A['marquee'] = c.done()
+
+    c = Cv(); c.line(0, 1, 15, 14, 'N', 1)
+    for k in range(4):
+        x, y = 2 + k * 3.5, 3 + k * 3.2; c.rect(int(x) - 1, int(y), int(x) + 1, int(y) + 3, 'R'); c.px(int(x), int(y), 'y', True)
+    c.px(15, 15, 'Y', True); c.px(14, 15, 'o', True); A['crackers'] = c.done()
+
+    c = Cv(); c.line(3, 1, 11, 10, 'g', 2); c.line(12, 1, 4, 10, 'g', 2); c.ell(3.5, 12.5, 2.5, 2.5, 'R'); c.ell(3.5, 12.5, 1, 1, '.')
+    c.ell(12, 12.5, 2.5, 2.5, 'R'); c.ell(12, 12.5, 1, 1, '.'); c.px(7.5, 6, 'y', True); A['wickcut'] = c.done()
+
+    c = Cv(); c.line(0, 2, 15, 2, 'n', 1)
+    for x, col in ((2, 'R'), (7, 'y'), (12, 'R')):
+        c.line(x, 2, x, 4, 'n', 1); c.ell(x, 8, 2.4, 3.3, col); c.rect(x - 1, 11, x + 1, 12, 'N'); c.px(x, 7, 'Y', True)
+    c.ell(5, 14, 1, 1, 'Y'); c.ell(10, 14.5, 1, 1, 'Y'); A['lamps'] = c.done()
+
+    c = Cv(); c.rect(4, 0, 11, 2, 'n'); c.rect(2, 3, 13, 15, 'C'); c.rect(3, 4, 12, 14, 't')
+    for x, y in ((5, 6), (9, 5), (7, 9), (11, 10), (5, 12)): c.px(x, y, 'l', True); c.px(x + 1, y, 'Y', True)
+    c.line(3, 4, 3, 13, 'w', 1, True); A['ffjar'] = c.done()
+
+    c = Cv(); c.ell(8, 9.5, 6, 6, 'y'); c.ell(8, 9.5, 4.5, 4.5, 'w'); c.rect(7, 1, 8, 3, 'y'); c.ell(7.5, 1, 1.5, 1, 'N')
+    c.line(8, 9.5, 8, 6, 'k', 1, True); c.line(8, 9.5, 10.5, 10.5, 'k', 1, True); c.px(8, 5, 's', True); c.px(8, 14, 's', True); c.px(3.5, 9.5, 's', True); c.px(12.5, 9.5, 's', True)
+    c.line(1, 0, 6, 2, 'y', 1); A['pocketwatch'] = c.done()
     return A
 
 
