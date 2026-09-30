@@ -186,10 +186,11 @@ function toast(msg){const t=$('#toast');t.textContent=msg;restart(t,'show');}
 function banner(msg,col){const b=$('#banner');b.textContent=msg;b.style.color=col||'#fff';restart(b,'show');}
 
 /* ================= 卡牌生成 ================= */
-function rollAdj(key,force,exclude){
+function rollAdj(key,force,exclude,maxTier){
   if(!force&&Math.random()>.2)return null;
   const r=Math.random();const rare=.06+.025*G.round;const unc=.3;
-  const tier=r<rare?2:r<rare+unc?1:0;
+  let tier=r<rare?2:r<rare+unc?1:0;
+  if(maxTier!==undefined)tier=Math.min(tier,maxTier);
   let pool=Object.keys(ADJ).filter(k=>ADJ[k].r===tier);
   if(ITEMS[key].dmg===0)pool=pool.filter(k=>ADJ_NODMG.includes(k));
   if(exclude)pool=pool.filter(k=>k!==exclude);
@@ -205,7 +206,7 @@ function rollItem(filter){
 }
 function makeOffer(filter,opt){opt=opt||{};
   const key=rollItem(filter);let tier=ITEMS[key].t;
-  if(opt.black||Math.random()<(G.round>=5?.18:G.round>=3?.08:0))tier=Math.min(3,tier+1);
+  if(opt.black||Math.random()<(G.round>=5?.18:G.round>=3?.08:0))tier=Math.min(opt.free?2:3,tier+1);
   const adj=rollAdj(key,!!opt.black);
   let price=basePrice(key,adj,tier);if(opt.black)price=Math.round(price*1.5);if(opt.free)price=0;
   return{card:{key,tier,adj,size:ITEMS[key].size,dl:0,hoard:0},price,sold:false};
@@ -286,7 +287,7 @@ function renderPrep(){
     body.insertAdjacentHTML('beforeend',`<div class="big-res">${cur.result||'掷一次骰子？'}</div>`);
     body.appendChild(btnRow(cur.result?[['继续','green',finishStep]]:[['下注 <img class="ico" src="'+SPR.coin.url+'" alt=""><b>3</b>','gold',()=>{
       if(G.gold<3){toast('金币不足');return;}G.gold-=3;const win=Math.random()<.5;
-      if(win){G.gold+=9;SFX.play('coin');const r=$('#pbody').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,9);cur.result='赢了！<b>+9</b> 金币';}
+      if(win){G.gold+=6;SFX.play('coin');const r=$('#pbody').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,6);cur.result='赢了！<b>+6</b> 金币';}
       else{SFX.play('bad');cur.result='骰子背叛了你。<br><small>3金币没了</small>';}updateHUD();renderPrep();}],['离开','',finishStep]]));
   }else if(cur.mode==='reward'){
     body.insertAdjacentHTML('beforeend',`<div class="big-res">${cur.text}</div>`);
@@ -307,14 +308,14 @@ function enterEvent(id){
   if(ev.cat==='shop'){cur.mode='shop';cur.refresh=1;cur.offers=[0,1,2].map(()=>makeOffer(ev.filter,{black:ev.black}));}
   else if(id==='chest'){cur.mode='gift';cur.offers=[makeOffer(null,{free:1})];}
   else if(id==='field'){cur.mode='pick';cur.offers=[0,1,2].map(()=>makeOffer(null,{free:1}));}
-  else if(id==='altar'){relicChoice(cur,'选择一件物品，效果永久生效，可叠加',rollGear(3,0));}
-  else if(id==='parcel'){relicChoice(cur,'包裹里装着……',rollGear(1,1));}
+  else if(id==='altar'){relicChoice(cur,'选择一件物品，效果永久生效，可叠加',rollGear(3,0,2));}
+  else if(id==='parcel'){relicChoice(cur,'包裹里装着……',rollGear(1,1,2));}
   else if(id==='grocer'){cur.mode='gshop';cur.refresh=1;cur.goods=rollGear(3,1).map(k=>({k,price:gearPrice(k),sold:false}));}
   else if(id==='enchant'){cur.mode='choice';cur.hint='选一项附魔（会替换原有词缀）';
-    cur.opts=shuffled(G.cards).slice(0,3).map(c=>{const a=rollAdj(c.key,true,c.adj);return{card:c,label:ITEMS[c.key].n+' → 【'+ADJ[a].n+'】',sub:ADJ[a].d,
+    cur.opts=shuffled(G.cards).slice(0,3).map(c=>{const a=rollAdj(c.key,true,c.adj,1);return{card:c,label:ITEMS[c.key].n+' → 【'+ADJ[a].n+'】',sub:ADJ[a].d,
       act:()=>{c.adj=a;repaint(c);renderOwned();SFX.play('merge');const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,ADJ[a].c,20);restart(c.el,'merge');finishStep();}};});}
   else if(id==='train'){cur.mode='choice';cur.hint='选一张卡提升品质';
-    cur.opts=shuffled(G.cards.filter(c=>c.tier<3)).slice(0,3).map(c=>{const nx=Object.assign({},c,{tier:c.tier+1});const a=stats(c,null),b=stats(nx,null);
+    cur.opts=shuffled(G.cards.filter(c=>c.tier<2)).slice(0,3).map(c=>{const nx=Object.assign({},c,{tier:c.tier+1});const a=stats(c,null),b=stats(nx,null);
       return{card:c,label:ITEMS[c.key].n+'：'+TIERS[c.tier].n+' → '+TIERS[c.tier+1].n,sub:ITEMS[c.key].dmg?`伤害 ${Math.round(a.total)}→${Math.round(b.total)}　冷却 ${a.cd.toFixed(2)}→${b.cd.toFixed(2)}s`:UPS[ITEMS[c.key].up].t,
       act:()=>{c.tier++;repaint(c);checkMerges();renderOwned();SFX.play('merge');if(c.el){const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,TIERS[c.tier].c,24);restart(c.el,'merge');}finishStep();}};});}
   else if(id==='furnace'){cur.mode='choice';cur.hint='选一张卡投入熔炉';
@@ -322,12 +323,13 @@ function enterEvent(id){
       act:()=>{const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,'#ef7d57',26);SFX.play('boom');removeCard(c);renderOwned();relicChoice(cur,'熔炉吐出了三件物品，选一件',rollGear(3,3));renderPrep();}}));}
   else if(id==='gamble'){cur.mode='gamble';}
   else if(id==='spring'){const h=Math.min(8,G.wallMax-G.wall);cur.mode='reward';cur.text=`城墙修复 <b>+${h}</b>`;cur.apply=()=>{G.wall+=h;SFX.play('merge');};}
-  else if(id==='job'){cur.mode='reward';cur.text='工钱 <b>+4</b> 金币';cur.apply=()=>gainGold(4);}
+  else if(id==='job'){cur.mode='reward';cur.text='工钱 <b>+3</b> 金币';cur.apply=()=>gainGold(3);}
   else if(id==='bank'){const g=Math.max(2,Math.round(G.gold*.3));cur.mode='reward';cur.text=`利息 <b>+${g}</b> 金币`;cur.apply=()=>gainGold(g);}
   P.cur=cur;renderPrep();
 }
 function gainGold(n){G.gold+=n;SFX.play('coin');const r=$('#pbody').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,Math.min(n,8));}
-function rollGear(n,bonus){const R=G.round+(bonus||0);const w=[Math.max(10,62-8*R),24+2*R,R>=2?4+4*R:0,R>=4?2*R-4:0];
+function rollGear(n,bonus,maxTier){const R=G.round+(bonus||0);const w=[Math.max(10,62-8*R),24+2*R,R>=2?4+4*R:0,R>=4?2*R-4:0];
+  if(maxTier!==undefined)for(let i=maxTier+1;i<4;i++)w[i]=0;
   const out=[];let guard=0;while(out.length<n&&guard++<200){let t=Math.random()*w.reduce((a,b)=>a+b,0);let tier=0;for(let i=0;i<4;i++){t-=w[i];if(t<=0){tier=i;break;}}
     const pool=Object.keys(RELICS).filter(k=>RELICS[k].t===tier&&(!RELICS[k].hero||RELICS[k].hero===G.hero)&&!out.includes(k)&&!(RELICS[k].u&&G.relics.includes(k)));if(pool.length)out.push(pick(pool));}
   return out;}
