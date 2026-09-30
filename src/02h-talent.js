@@ -15,7 +15,7 @@ Object.assign(MODL,{
   t_bloodlust:['每杀12个敌人，所有卡充能15%',2],
   t_revenge:['城墙挨打时，最右边的卡充能40%（每秒最多一次）',2],
   t_last:['城墙不到35%时，攻击速度+25%',2],
-  t_echo:['连锁每到5层，城墙回1点',2]
+  t_echo:['连锁每到5层，城墙回1点（每2秒最多一次）',2]
 });
 const TALENTS={
   /* ---- 通用 ---- */
@@ -39,7 +39,7 @@ const TALENTS={
   pierce:{n:'找缝',cat:'tech',r:1,m:{pen:2},say:'再硬的壳也有接缝。'},
   crowd:{n:'人多好办事',cat:'tech',r:1,m:{full:.2},say:'墙上站满了，心里才踏实。'},
   echoer:{n:'回声',cat:'tech',r:2,m:{t_echo:1,chain:1},say:'一声接一声，停不下来。',
-    on:{chain:()=>{G.wall=Math.min(G.wallMax,G.wall+1);updateHUD();}}},
+    on:{chain:()=>{if(B.flags.echoT>B.t-2)return;B.flags.echoT=B.t;G.wall=Math.min(G.wallMax,G.wall+1);updateHUD();}}},
   thrift:{n:'抠门',cat:'eco',r:0,m:{interest:3},say:'一个铜板掰成两半花。'},
   wage:{n:'讨工钱',cat:'eco',r:0,m:{winGold:2},say:'守一夜是一夜的钱，少一个子儿都不行。'},
   loot:{n:'顺手牵羊',cat:'eco',r:1,m:{killGold:.05},say:'它们身上总揣着点什么。'}
@@ -52,10 +52,11 @@ for(const h in TREES)TREES[h].forEach((br,b)=>br.nodes.forEach((nd,i)=>{
 }));
 function talentOk(id){const T=TALENTS[id];return T&&!G.skills.includes(id)&&(!T.hero||T.hero===G.hero);}
 function rollTalents(n,bias){
-  const out=[];const pool=Object.keys(TALENTS).filter(talentOk);
+  const out=[];const pool=Object.keys(TALENTS).filter(k=>talentOk(k)&&!TALENTS[k].fit);
   const w=id=>{const T=TALENTS[id];return[6,3,1.3][T.r]*(T.hero?1.5:1)*(bias&&T.cat===bias?3:1)*(T.r===2&&G.round<3?.3:1);};
   while(out.length<n){const p=pool.filter(k=>!out.includes(k));if(!p.length)break;
     let t=Math.random()*p.reduce((s,k)=>s+w(k),0);let got=p[p.length-1];for(const k of p){t-=w(k);if(t<=0){got=k;break;}}out.push(got);}
+  if(typeof fitTalent==='function'){const f=fitTalent(out);if(f)out.push(f);}
   return out;
 }
 function learnTalent(id){if(!talentOk(id))return;G.skills.push(id);const w=TALENTS[id].m.wall;if(w){G.wallMax+=w;G.wall+=w;}

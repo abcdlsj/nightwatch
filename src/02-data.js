@@ -1186,7 +1186,7 @@ const ADJ={
   twin:{n:'双生',ch:'双',r:2,c:'#ff95dc',d:'每次触发两次，但冷却 +60%'},
   ignite:{n:'引燃',ch:'燃',r:1,c:'#ffa53b',d:'触发时，右边相邻的卡立即充能10%'},
   resonance:{n:'共鸣',ch:'鸣',r:1,c:'#6ab7ff',d:'每有一张同标签的相邻卡，伤害 +25%（百分比区）'},
-  greedy:{n:'贪婪',ch:'贪',r:0,c:'#f5d04a',d:'本卡每击杀一个敌人，获得1金币'},
+  greedy:{n:'贪婪',ch:'贪',r:0,c:'#f5d04a',d:'本卡每击杀一个敌人，有20%几率掉1金币'},
   hoard:{n:'珍藏',ch:'藏',r:0,c:'#e8b86b',d:'每场战斗结束后，售价 +1'},
   chill:{n:'冰冷',ch:'冷',r:0,c:'#9fe8ff',d:'命中的敌人减速30%，持续2秒'},
   sturdy:{n:'坚固',ch:'固',r:0,c:'#b3c2d2',d:'触发时为城墙提供护盾（尺寸×品质）'},
@@ -1267,7 +1267,7 @@ const MODL={dmg:['全部伤害',1],'tag_刃':['【刃】卡伤害',1],'tag_火':
   chain:['【电】卡弹跳次数',0],slow:['减速效果',1],slowVuln:['被减速的敌人受到伤害',1],pen:['护甲穿透',0],wall:['城墙上限',0],shieldStart:['开战时城墙护盾',0],
   regen:['每胜一场修复城墙',0],interest:['利息上限',0],winGold:['每胜一场金币',0],killGold:['击杀掉落金币几率',1],startCharge:['开战时所有卡充能',1],
   left:['最左边的卡伤害',1],right:['最右边的卡伤害',1],range:['射程',1,1],aoe:['爆炸范围',1],lonely:['没有相邻卡的卡伤害',1],full:['棋盘满员时全部伤害',1],
-  enemySpd:['敌人移速',1,1],shellChain:['连锁每达到5层，城墙获得3点护盾',2]};
+  enemySpd:['敌人移速',1,1],shellChain:['连锁每达到5层，城墙获得3点护盾（每秒最多一次）',2]};
 function modText(m){return Object.keys(m).map(k=>{const[l,p,inv]=MODL[k];if(p===2)return `<i class="mg">${l}</i>`;
   const v=m[k];const good=inv?v<0:v>0;const sv=k==='range'?-v:v;
   return `<i class="${good?'mg':'mb'}">${l} ${sv>0?'+':''}${p?Math.round(sv*100)+'%':sv}</i>`;}).join('');}
@@ -1290,7 +1290,7 @@ const EVENTS={
   spring:{n:'清泉',ico:'drop',cat:'misc',w:.9,d:'补墙8点',f:'井水有股铁锈味，但能用。',need:()=>G.wall<G.wallMax},
   job:{n:'守夜轮值',ico:'lantern',cat:'misc',w:1,d:'替人值一班，挣3金',f:'长夜漫漫，工钱照付。'},
   furnace:{n:'熔炉',ico:'furnace',cat:'relic',w:.7,minR:2,d:'扔进去一张卡，换一件好遗物',f:'火焰只收最好的供品。',need:()=>G.cards.length>=2},
-  bank:{n:'钱庄',ico:'r_purse',cat:'misc',w:.8,minR:2,d:'存钱吃利息：金币+30%（最少+2）',f:'账房先生从来不抬头。'}
+  bank:{n:'钱庄',ico:'r_purse',cat:'misc',w:.8,minR:2,d:'存钱吃利息：金币+30%（最少2，最多10）',f:'账房先生从来不抬头。'}
 };
 const EN={
   slime:{n:'史莱姆',hp:16,spd:.055,armor:0,wall:1,spr:'slime',sc:1,col:'#a7f070'},

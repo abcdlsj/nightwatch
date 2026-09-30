@@ -151,7 +151,7 @@ ITEMS.whetstone.n='磨刀轮';
 /* ---------------- 触发型物品 ---------------- */
 Object.assign(MODL,{ammo:['弹药卡每场弹药',0],
   t_kindling:['每场第一次施加灼烧时，所有【火】卡充能30%',2],t_icechain:['被冻结的敌人死亡时，碎冰对周围造成8点伤害',2],
-  t_chain:['连锁每达到5层，最左边的卡触发一次',2],t_loot:['每击杀一名精英或首领，获得3金币',2],t_alch:['每有一张【药剂】卡，全部伤害+4%',2],
+  t_chain:['连锁每达到5层，最左边的卡触发一次（每0.5秒最多一次）',2],t_loot:['每击杀一名精英或首领，获得3金币',2],t_alch:['每有一张【药剂】卡，全部伤害+4%',2],
   t_photo:['【成长】卡的成长速度翻倍',2],t_drum:['城墙受击时，随机一张卡立即触发（每2秒最多一次）',2],
   t_nail:['暴击时使目标【易伤】2秒（+20%）',2],t_map:['【任务】条件减半，完成时额外升一个品质',2]});
 Object.assign(RELICS,{
@@ -159,7 +159,7 @@ Object.assign(RELICS,{
   icechain:{n:'冰锥项链',t:0,ico:'ring:C',m:{t_icechain:1},on:{kill:(n,x)=>{if(!x.frozen)return;const X=ex(x.e),Y=ey(x.e)-4,R=16*K();ring(X,Y,2,R,'#c2f4ff',.3);
     later(.03,()=>{for(const o of B.en)if(!o.dead&&Math.hypot(ex(o)-X,ey(o)-Y)<=R)hurt(o,8*n,null,false,{});});}},f:'每一颗冰锥里，都冻着一小声尖叫。'},
   magazine:{n:'弹匣',t:0,ico:'book:g',m:{ammo:1},f:'多一发，往往就是多一条命。'},
-  chaingear:{n:'连珠机括',t:1,ico:'ring:y',m:{t_chain:1},on:{chain:()=>{const[L]=lr();if(L)later(.1,()=>{if(!B.over)trigger(L,1,'连珠机括');});}},f:'咔、咔、咔——第五声之后，总会多出一声。'},
+  chaingear:{n:'连珠机括',t:1,ico:'ring:y',m:{t_chain:1},on:{chain:()=>{if(B.flags.cgT>B.t-.5)return;B.flags.cgT=B.t;const[L]=lr();if(L)later(.1,()=>{if(!B.over)trigger(L,1,'连珠机括');});}},f:'咔、咔、咔——第五声之后，总会多出一声。'},
   lootbag:{n:'战利品袋',t:1,ico:'book:N',m:{t_loot:1},on:{kill:(n,x)=>{if(!x.elite)return;G.gold+=3*n;const[cx,cy]=toClient(ex(x.e),ey(x.e));FX.coins(cx,cy,6);SFX.play('coin');updateHUD();}},f:'袋子底下有个洞。但大件的东西掉不出去。'},
   alchbook:{n:'炼金手册',t:1,ico:'book:P',m:{t_alch:1},f:'扉页写着：本书内容请勿在室内尝试。'},
   photo:{n:'师徒合照',t:1,ico:'scroll:y',m:{t_photo:1},u:1,f:'照片上的两个人都没在笑，但都站得很近。'},

@@ -4,10 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0f1c20">
-<title>代号：连锁 · 原型 Demo</title>
+<title>连锁 · 守到黎明</title>
+<meta name="description" content="竖屏像素风自动战斗构筑：摆卡、合成、连锁触发，守住最后一道城墙，撑过八个长夜。打开网页就能玩。">
+<meta property="og:title" content="连锁 · 守到黎明">
+<meta property="og:description" content="竖屏像素风自动战斗构筑：摆卡、合成、连锁触发，守住最后一道城墙，撑过八个长夜。">
+<meta property="og:type" content="website">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="连锁">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' rx='3' fill='%230f1c20'/%3E%3Crect x='7' y='1' width='2' height='2' fill='%239fb3ba'/%3E%3Crect x='5' y='3' width='6' height='1' fill='%237d6a5a'/%3E%3Crect x='4' y='4' width='8' height='8' fill='%237d6a5a'/%3E%3Crect x='5' y='5' width='6' height='6' fill='%23f2a93b'/%3E%3Crect x='6' y='6' width='4' height='4' fill='%23ffe79a'/%3E%3Crect x='5' y='12' width='6' height='1' fill='%237d6a5a'/%3E%3Crect x='4' y='14' width='8' height='1' fill='%23e2473b'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Silkscreen:wght@400;700&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
+<!-- 字体表不阻塞首屏：Google 字体连不上（比如国内网络）时直接用系统字体，不会白屏干等 -->
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Silkscreen:wght@400;700&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 :root{
   --bg:#0f1c20; --panel:#1c2a30; --panel2:#25363d; --edge:#3a525c; --ink:#fbf7ee; --muted:#9fb3ba;
@@ -340,6 +350,7 @@ button{font-family:inherit}
 .mg,.mb{display:block;font-style:normal;font-family:'PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif;font-size:13px;line-height:1.45}
 .mg{color:#8ff0b0}.mb{color:#ff8a80}
 .gt{font-size:11px;margin-left:6px;padding:1px 5px;border-radius:4px;background:rgba(255,255,255,.1);color:var(--gc,#c5d2d6);vertical-align:middle}
+.gt.fit{background:rgba(126,232,162,.18);color:#7ee8a2}
 .opt .price{margin:0 0 0 auto;flex:none;color:#ffd166;font-family:var(--px);font-size:16px}
 .opt .price.cant{color:#b08a70}
 .opt.sold{opacity:.45;cursor:default}
@@ -368,6 +379,8 @@ button{font-family:inherit}
 .hmeta{grid-column:1/-1;display:flex;align-items:center;gap:10px}
 .hero p{margin:2px 0 0;font-family:'PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif;font-size:12px;line-height:1.45;color:#d8e2e5}
 .hstat{display:flex;gap:14px;font-size:14px;color:var(--muted)}.hstat b{font-family:var(--px);color:#fff}
+.hmast b{color:#ffd166}.hmast small{margin-left:4px;font-size:11px}
+.mastline{margin:2px 0 0;font-size:12px;line-height:1.5;color:var(--muted);max-width:420px}
 .hcards{display:flex;gap:5px;margin-left:auto}.hcards img{width:26px;height:26px;image-rendering:pixelated;background:#efdfc8;border-radius:6px;padding:2px;box-shadow:0 0 0 2px #1b1224}
 .hcards img.ex{background:#2a2140;box-shadow:0 0 0 2px var(--hc)}
 .hero em{font-family:Georgia,'Songti SC','Noto Serif CJK SC',serif;font-size:12px;color:#8fa4ab}

@@ -143,7 +143,7 @@ function stats(c,t){
   let cd=it.cd*U.c[s];if(a==='twin')cd*=1.6;if(a==='heavy')cd*=1.3;
   let spd=1;if(a==='swift')spd+=.25;if(a==='momentum'&&c.mom)spd+=.05*c.mom;if(a==='rush'&&t!=null&&t<5)spd+=1;if(it.kind==='药剂'&&c.loc==='board'){const j=boardCards().filter(o=>ITEMS[o.key].kindHaste).length;if(j)spd+=.06*j*countKind('药剂');}
   if(mv('t_last')&&G.wall<G.wallMax*.35)spd+=.25;
-  spd=Math.max(.3,spd+mv('spd'));
+  spd=Math.max(.3,spd+mv('spd')+fitSpd(c));
   return{base,flat,pct,psum,mult,total,cd:Math.max(.25,cd/spd),cdRaw:it.cd,crit:.05+(a==='precise'?.2:0)+mv('crit')};
 }
 function basePrice(k,adj,tier){return[3,6,10,16][tier]+(ITEMS[k].size-1)+(adj?[1,2,3][ADJ[adj].r]:0);}
@@ -312,7 +312,7 @@ function renderPrep(){
       if(!g.sold)b.onclick=()=>{SFX.ensure();if(G.gold<g.price){toast('钱不够');restart($('#goldChip'),'shake');SFX.play('bad');return;}G.gold-=g.price;g.sold=true;gainRelic(g.k,true);renderPrep();};
       list.appendChild(b);});
     body.appendChild(list);
-    body.appendChild(btnRow([...(cur.refresh>0?[['刷新 <small>(剩'+cur.refresh+'次)</small>','blue',()=>{cur.refresh--;cur.goods=rollGear(3,1).map(k=>({k,price:gearPrice(k),sold:false}));SFX.play('buy');renderPrep();}]]:[]),['离开','',finishStep]]));
+    body.appendChild(btnRow([...(cur.refresh>0?[['刷新 <small>(剩'+cur.refresh+'次)</small>','blue',()=>{cur.refresh--;cur.goods=withFit(rollGear(3,1)).map(k=>({k,price:gearPrice(k),sold:false}));SFX.play('buy');renderPrep();}]]:[]),['离开','',finishStep]]));
   }else if(cur.mode==='gamble'){
     body.insertAdjacentHTML('beforeend',`<div class="big-res">${cur.result||'来一把？'}</div>`);
     body.appendChild(btnRow(cur.result?[['继续','green',finishStep]]:[['下注 <img class="ico" src="'+SPR.coin.url+'" alt=""><b>3</b>','gold',()=>{
@@ -339,9 +339,9 @@ function enterEvent(id){
   if(ev.cat==='shop'){cur.mode='shop';cur.refresh=1;cur.offers=[0,1,2].map(()=>makeOffer(ev.filter,{black:ev.black}));}
   else if(id==='chest'){cur.mode='gift';cur.offers=[makeOffer(null,{free:1})];}
   else if(id==='field'){cur.mode='pick';cur.offers=[0,1,2].map(()=>makeOffer(null,{free:1}));}
-  else if(id==='altar'){relicChoice(cur,'挑一件，一直生效，同名的能叠',rollGear(3,0,2));}
-  else if(id==='parcel'){relicChoice(cur,'包裹里装着……',rollGear(1,1,2));}
-  else if(id==='grocer'){cur.mode='gshop';cur.refresh=1;cur.goods=rollGear(3,1).map(k=>({k,price:gearPrice(k),sold:false}));}
+  else if(id==='altar'){relicChoice(cur,'挑一件，一直生效，同名的能叠',withFit(rollGear(3,0,2)));}
+  else if(id==='parcel'){relicChoice(cur,'包裹里装着……',withFit(rollGear(1,1,2),.3));}
+  else if(id==='grocer'){cur.mode='gshop';cur.refresh=1;cur.goods=withFit(rollGear(3,1)).map(k=>({k,price:gearPrice(k),sold:false}));}
   else if(id==='enchant'){cur.mode='choice';cur.hint='挑一个词缀（原来的会被换掉）';
     cur.opts=shuffled(G.cards).slice(0,3).map(c=>{const a=rollAdj(c.key,true,c.adj,1);return{card:c,label:ITEMS[c.key].n+' → 【'+ADJ[a].n+'】',sub:ADJ[a].d,
       act:()=>{c.adj=a;repaint(c);renderOwned();SFX.play('merge');const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,ADJ[a].c,20);restart(c.el,'merge');finishStep();}};});}
@@ -351,13 +351,13 @@ function enterEvent(id){
       act:()=>{c.tier++;repaint(c);checkMerges();renderOwned();SFX.play('merge');if(c.el){const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,TIERS[c.tier].c,24);restart(c.el,'merge');}finishStep();}};});}
   else if(id==='furnace'){cur.mode='choice';cur.hint='挑一张卡扔进去';
     cur.opts=shuffled(G.cards).slice(0,4).map(c=>({card:c,label:'献祭 '+ITEMS[c.key].n,sub:'这张卡就没了（值 '+sellValue(c)+' 金），换一件遗物',
-      act:()=>{const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,'#ef7d57',26);SFX.play('boom');removeCard(c);renderOwned();relicChoice(cur,'熔炉吐出三件遗物，选一件',rollGear(3,3));renderPrep();}}));}
+      act:()=>{const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,'#ef7d57',26);SFX.play('boom');removeCard(c);renderOwned();relicChoice(cur,'熔炉吐出三件遗物，选一件',withFit(rollGear(3,3)));renderPrep();}}));}
   else if(id==='gamble'){cur.mode='gamble';}
   else if(id==='mentor'||(id==='manual'&&Math.random()<.5)){const m=pick(MEETS);Object.assign(cur,{mode:'talent',who:m.who,intro:[[m.who,m.say]],picks:rollTalents(2),title:m.n});}
   else if(id==='manual'){cur.mode='pick';cur.offers=[0,1].map(()=>makeOffer(it=>it.hero===G.hero&&it.t>=1,{free:1}));}
   else if(id==='spring'){const h=Math.min(8,G.wallMax-G.wall);cur.mode='reward';cur.text=`墙补上了 <b>+${h}</b>`;cur.apply=()=>{G.wall+=h;SFX.play('merge');};}
   else if(id==='job'){cur.mode='reward';cur.text='工钱 <b>+3</b> 金';cur.apply=()=>gainGold(3);}
-  else if(id==='bank'){const g=Math.max(2,Math.round(G.gold*.3));cur.mode='reward';cur.text=`利息 <b>+${g}</b> 金`;cur.apply=()=>gainGold(g);}
+  else if(id==='bank'){const g=clamp(Math.round(G.gold*.3),2,10);cur.mode='reward';cur.text=`利息 <b>+${g}</b> 金`;cur.apply=()=>gainGold(g);}
   P.cur=cur;renderPrep();
 }
 /* ---- 夜谈 / 学天赋 ---- */
@@ -379,12 +379,12 @@ function renderTalk(cur,body){
     else{body.insertAdjacentHTML('beforeend',`<div class="ev-hint">${cur.sc.q}</div>`);
       cur.sc.ans.forEach((a,i)=>{const b=document.createElement('button');b.className='opt say';b.style.animationDelay=(i*.06)+'s';
         b.innerHTML=`<div><b>“${pickLine(a.t)}”</b></div>`;
-        b.onclick=()=>{SFX.ensure();SFX.play('ui');cur.ans=pickLine(a.t);cur.re=a.re;cur.mode='talent';cur.picks=rollTalents(heat(8)?2:3,a.cat);renderPrep();};list.appendChild(b);});
+        b.onclick=()=>{SFX.ensure();SFX.play('ui');cur.ans=pickLine(a.t);cur.re=a.re;cur.mode='talent';cur.picks=rollTalents((heat(8)?2:3)+(mastLv()>=2?1:0),a.cat);renderPrep();};list.appendChild(b);});
       body.appendChild(list);}
   }else{
     body.insertAdjacentHTML('beforeend',`<div class="ev-hint">${cur.picks.length?'挑一个学':'能学的都学会了'}</div>`);
     cur.picks.forEach((id,i)=>{const T=TALENTS[id],C=TCAT[T.cat];const b=document.createElement('button');b.className='opt';b.style.animationDelay=(i*.06)+'s';
-      b.innerHTML=`<img class="ricon" src="${icon(C.ico).url}" alt="" style="--gc:${C.c}"><div><b style="color:${C.c}">${T.n}<small class="gt" style="--gc:${C.c}">${C.n}</small>${T.hero?'<small class="gt">专属</small>':''}</b>${talentText(id)}${T.say?`<em>“${T.say}”</em>`:''}</div>`;
+      b.innerHTML=`<img class="ricon" src="${icon(C.ico).url}" alt="" style="--gc:${C.c}"><div><b style="color:${C.c}">${T.n}<small class="gt" style="--gc:${C.c}">${C.n}</small>${T.hero?'<small class="gt">专属</small>':''}${T.fit?FIT_TAG:''}</b>${talentText(id)}${T.say?`<em>“${T.say}”</em>`:''}</div>`;
       b.onclick=()=>{SFX.ensure();learnTalent(id);endTalk(cur);};list.appendChild(b);});
     body.appendChild(list);
     body.appendChild(btnRow(cur.picks.length?[['不学了 <small>拿 3 金</small>','',()=>{gainGold(3);endTalk(cur);}]]:[['拿 5 金走人','gold',()=>{gainGold(5);endTalk(cur);}]]));
@@ -396,10 +396,10 @@ function gainGold(n){G.gold+=n;SFX.play('coin');const r=$('#pbody').getBoundingC
 function rollGear(n,bonus,maxTier){const R=G.round+(bonus||0);const w=[Math.max(10,62-8*R),24+2*R,R>=2?4+4*R:0,R>=4?2*R-4:0];
   if(maxTier!==undefined)for(let i=maxTier+1;i<4;i++)w[i]=0;
   const out=[];let guard=0;while(out.length<n&&guard++<200){let t=Math.random()*w.reduce((a,b)=>a+b,0);let tier=0;for(let i=0;i<4;i++){t-=w[i];if(t<=0){tier=i;break;}}
-    const pool=Object.keys(RELICS).filter(k=>RELICS[k].t===tier&&(!RELICS[k].hero||RELICS[k].hero===G.hero)&&!out.includes(k)&&!(RELICS[k].u&&G.relics.includes(k)));if(pool.length)out.push(pick(pool));}
+    const pool=Object.keys(RELICS).filter(k=>RELICS[k].t===tier&&!RELICS[k].fit&&(!RELICS[k].hero||RELICS[k].hero===G.hero)&&!out.includes(k)&&!(RELICS[k].u&&G.relics.includes(k)));if(pool.length)out.push(pick(pool));}
   return out;}
 function gearPrice(k){return[5,9,14,20][RELICS[k].t]+Math.floor(G.round/2);}
-function gearLabel(k){const g=RELICS[k];const n=G.relics.filter(x=>x===k).length;return `<span style="color:${GT[g.t].c}">${g.n}</span><small class="gt" style="--gc:${GT[g.t].c}">${GT[g.t].n}</small>${n?'<small class="gt">已有'+n+'</small>':''}`;}
+function gearLabel(k){const g=RELICS[k];const n=G.relics.filter(x=>x===k).length;return `<span style="color:${GT[g.t].c}">${g.n}</span><small class="gt" style="--gc:${GT[g.t].c}">${GT[g.t].n}</small>${g.fit?FIT_TAG:''}${n?'<small class="gt">已有'+n+'</small>':''}`;}
 function relicChoice(cur,hint,list){cur.mode='relic';cur.hint=hint;
   cur.opts=list.map(r=>({ico:RELICS[r].ico,gt:RELICS[r].t,label:gearLabel(r),sub:modText(RELICS[r].m),flav:RELICS[r].f,act:()=>gainRelic(r)}));}
 function gainRelic(r,stay){G.relics.push(r);const w=RELICS[r].m.wall;if(w){G.wallMax=Math.max(5,G.wallMax+w);G.wall=w>0?G.wall+w:Math.min(G.wall,G.wallMax);}

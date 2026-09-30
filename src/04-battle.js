@@ -203,7 +203,7 @@ function fire(c,depth){
     if(n.adj!=='echo'||n.frozen>0)continue;
     n.echoLog=n.echoLog.filter(t=>t>B.t-1);if(n.echoLog.length>=6)continue;n.echoLog.push(B.t);
     later(.12,()=>{const d=depth+1;if(B.over||d>10)return;FX.link(c.el,n.el,ADJ.echo.c);
-      if(d+1>B.maxChain)B.maxChain=d+1;showChain(d+1);if(mv('shellChain')&&(d+1)%5===0){B.shield+=3;updateHUD();}SFX.play('echo',d);trigger(n,d,'回响');});
+      if(d+1>B.maxChain)B.maxChain=d+1;showChain(d+1);if(mv('shellChain')&&(d+1)%5===0&&!(B.flags.shellT>B.t-1)){B.flags.shellT=B.t;B.shield+=3;updateHUD();}SFX.play('echo',d);trigger(n,d,'回响');});
   }
 }
 function chargeCard(c,amt,from){if(c.frozen>0)return;c.charge=Math.min(1.5,c.charge+amt);if(from&&from!==c&&from.bSrc)from.bCh+=amt;if(from)FX.link(from.el,c.el,'#ffa53b',.16);emit('charge',{c,from});}
@@ -307,7 +307,7 @@ function hurt(e,amt,src,crit,o){
   if(o.poison){e.poisonT=Math.max(e.poisonT,o.poisonDur||3);e.poisonD+=o.poison;e.poisonSrc=src;emit('poison',{e,src});}
   if(o.freeze)freeze(e,o.freeze,src);
   if(o.vuln)vuln(e,o.vuln[0],o.vuln[1]);
-  if(!tick){emit('hit',{e,src,crit});if(crit)emit('crit',{e,src});}
+  if(!tick){emit('hit',{e,src,crit,a,splash:!!o.splash});if(crit)emit('crit',{e,src,a});}
   if(o.exec&&!e.dead&&e.hp>0&&!e.d.boss&&e.hp<e.maxHp*o.exec*(e.d.elite?.5:1)){num(ex(e),ey(e)-16,'处决','#ff5a5a',1);ring(ex(e),ey(e)-6,2,12*K(),'#ff5a5a',.3);e.hp=0;}
   if(o.kb&&!e.d.boss)e.y=Math.max(-.03,e.y-o.kb*(e.d.elite?.3:1));
   for(let i=0;i<3;i++)part(ex(e),ey(e)-5,rnd(-30,30),rnd(-40,5),.25,'#ffffff',1);
@@ -339,8 +339,8 @@ function kill(e,src){
   if(e.d.cargo){const[k,n]=e.d.cargo;for(let i=0;i<n;i++){const s=spawn(k,clamp(e.x+(i-(n-1)/2)*.06,.05,.95),Math.max(-.02,e.y-.01-rnd(0,.03)));s.x0=s.x;}ring(ex(e),ey(e)-6,3,26*K(),'#c28a4d',.4);SFX.play('boom');}
   if(e.d.mimic){G.gold+=e.d.mimic;const[cx,cy]=toClient(ex(e),ey(e));FX.coins(cx,cy,e.d.mimic);SFX.play('coin');updateHUD();}
   if(e.d.split){for(let i=0;i<e.d.split;i++){const m=spawn(e.d.splitInto||'mini',clamp(e.x+(i?.05:-.05),.04,.96),e.y-.01);m.x0=m.x;}}
-  if(src&&src.adj==='greedy'){G.gold++;B.greed++;const[cx,cy]=toClient(ex(e),ey(e));FX.coins(cx,cy,1);SFX.play('coin');updateHUD();}
-  if(mv('killGold')&&Math.random()<mv('killGold')){G.gold++;const[cx,cy]=toClient(ex(e),ey(e));FX.coins(cx,cy,1);updateHUD();}
+  if(src&&src.adj==='greedy'&&Math.random()<.2){G.gold++;B.greed++;const[cx,cy]=toClient(ex(e),ey(e));FX.coins(cx,cy,1);SFX.play('coin');updateHUD();}
+  if(mv('killGold')&&Math.random()<mv('killGold')){G.gold++;B.greed++;const[cx,cy]=toClient(ex(e),ey(e));FX.coins(cx,cy,1);updateHUD();}
   if(e.d.boss||e.d.elite){F.shake=6;B.slowT=.6;SFX.play('boom');if(FOEB[e.type])say(e.type,FOEB[e.type].die,3);if(!e.d.boss)say('hero',BARKS.killElite,2);ring(ex(e),ey(e),4,60,'#fee761',.6);B.boss=null;$('#bossbar').hidden=true;}
 }
 
@@ -478,7 +478,7 @@ function winBattle(){
   updateHUD();const winG=3+Math.floor(was/2)-(heat(6)?1:0);const rows=[['守夜工钱',winG]];if(was===4)rows.push(['打倒精英',4]);
   const interest=Math.min(3+mv('interest'),Math.floor(G.gold/6));if(mv('winGold'))rows.push(['遗物/天赋',mv('winGold')]);if(mv('regen'))G.wall=Math.min(G.wallMax,G.wall+mv('regen'));if(interest)rows.push(['利息（每6金+1）',interest]);
   if(B.wallLost===0)rows.push(['墙没掉砖',1]);
-  if(B.greed)rows.push(['贪婪（已到账）',0,B.greed]);
+  if(B.greed)rows.push(['打怪掉的金币（已到账）',0,B.greed]);
   rows.push(...wagerPay());
   const total=rows.reduce((s,r)=>s+r[1],0);
   showReport(was,rows,total);
@@ -501,7 +501,7 @@ function showReport(was,rows,total){
 function loseBattle(){B.over=true;if(G.run)G.run.kills+=B.kills;G.phase='over';SFX.play('lose');G.bestChain=Math.max(G.bestChain,B.maxChain);banner(pickLine(RPT.fall),'#ff6b5b');setTimeout(()=>playStory(STORY.lose,()=>endScreen(false)),1400);}
 function endScreen(win){
   const sc=$('#screen');BG.set(win?'shop':'over');
-  const best=G.cards.slice().sort((a,b)=>b.bDmg-a.bDmg)[0];const R=G.run||freshRun();META.runs++;saveMeta();
+  const best=G.cards.slice().sort((a,b)=>b.bDmg-a.bDmg)[0];const R=G.run||freshRun();META.runs++;saveMeta();const mg=mastGain(win);
   const got=R.got.map(id=>ACHM[id]).filter(Boolean);
   sc.innerHTML=`<div class="scr"><img class="por-big" src="${SPR[HEROES[G.hero].portrait].url}" alt=""><h1 style="color:${win?'#ffe79a':'#ff8a80'}">${win?'黎明到来':'长夜未尽'}</h1><div class="logo-sub">${HEROES[G.hero].n} · ${HEROES[G.hero].title}</div>
   <div class="rules res"><div><span>坚守到</span><i style="margin-left:auto">第 ${Math.min(G.round,8)} 夜 / 8</i></div>
@@ -511,6 +511,7 @@ function endScreen(win){
   <div><span>杀敌 / 最长连杀</span><i style="margin-left:auto">${R.kills} / ${R.maxCombo}</i></div>
   ${best?`<div><span>最后的王牌</span><i style="margin-left:auto">${best.adj?ADJ[best.adj].n+'的':''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}</i></div>`:''}</div>
   ${win?'':loseNote()}
+  ${mastNote(mg)}
   ${R.newHeat?`<div class="newheat">解锁了 <b>长夜 ${R.newHeat}</b>：${HEATS[R.newHeat]}</div>`:''}
   ${got.length?`<div class="rules res achgot"><div><span>这局解锁的成就</span></div>${got.map(a=>`<div><i>★</i><span><b>${a.n}</b> ${a.d}</span></div>`).join('')}</div>`:''}
   <button class="btn red big" id="againBtn">再守一次</button></div>`;
@@ -518,7 +519,7 @@ function endScreen(win){
 }
 function titleScreen(){
   const sc=$('#screen');BG.set('title');
-  sc.innerHTML=`<div class="scr"><div class="logo" aria-label="连锁"><span>连</span><span>锁</span></div><div class="logo-sub">PROJECT CHAIN · 原型</div>
+  sc.innerHTML=`<div class="scr"><div class="logo" aria-label="连锁"><span>连</span><span>锁</span></div><div class="logo-sub">PROJECT CHAIN</div>
   <p class="tagline">长夜第七百年。守住最后一道城墙，直到黎明。</p>
   <div class="rules"><div><i>1</i><span>每夜之前能走三个地方：逛店、开箱子、捡遗物……</span></div>
   <div><i>2</i><span>卡拖上棋盘就自己打，挨着的卡会互相带动</span></div>
@@ -535,9 +536,9 @@ function heroSelect(){
   const sc=$('#screen');BG.set('title');
   sc.innerHTML=`<div class="scr"><h1 style="font-size:32px">选择守夜人</h1>${heatBar()}<div class="heroes">${Object.keys(HEROES).map(k=>{const H=HEROES[k];
     return `<button class="hero" data-h="${k}" style="--hc:${H.col}"><img class="por" src="${SPR[H.portrait].url}" alt=""><div class="hn"><b>${H.n}</b><small>${H.title}</small></div>
-    <div class="htag">${H.tag}</div><div class="hstat"><span>城墙 <b>${H.wall}</b></span><span>金币 <b>${H.gold}</b></span></div><p>${H.desc}</p>
+    <div class="htag">${H.tag}</div><div class="hstat"><span>城墙 <b>${H.wall}</b></span><span>金币 <b>${H.gold}</b></span>${mastHtml(k)}</div><p>${H.desc}</p>
     <div class="hmeta"><div class="hcards">${H.start.map(s=>`<img src="${SPR[s[0]].url}" alt="${ITEMS[s[0]].n}">`).join('')}</div></div>
-    <em>“${H.intro}”</em></button>`;}).join('')}</div><button class="btn alt sm" id="cdxBtn2">每个人的专属卡，去卡牌图鉴里翻</button></div>`;
+    <em>“${H.intro}”</em></button>`;}).join('')}</div><p class="mastline">熟练：守住一夜 +1。${MAST_SHORT.map((p,i)=>`${i+1}级${p}`).join(' · ')}</p><button class="btn alt sm" id="cdxBtn2">每个人的专属卡，去卡牌图鉴里翻</button></div>`;
   sc.hidden=false;bindHeat();$('#cdxBtn2').onclick=()=>{SFX.ensure();openCodex(Object.keys(HEROES)[0]);};
   sc.querySelectorAll('.hero').forEach(b=>b.onclick=()=>{SFX.ensure();SFX.play('merge');sc.hidden=true;newGame(b.dataset.h);});
 }
@@ -556,6 +557,7 @@ function newGame(hero){
   G.hero=hero||G.hero;const H=HEROES[G.hero];const hh=Math.min(META.heatSel||0,META.heatMax||0);const w0=Math.round(H.wall*(hh>=4?.85:1));
   Object.assign(G,{heat:hh,run:freshRun(),round:1,gold:H.gold,wall:w0,wallMax:w0,cards:[],relics:[],skills:[],bestChain:0,foeSet:pick(Object.keys(FOESETS))});recalcMods();renderRelics();
   for(const[k,t,i]of H.start){const c=newCard(k,t);c.loc='board';c.idx=i;G.cards.push(c);}
+  mastStart();
   shownGold=null;renderOwned();updateHUD();
   G.firstPrep=true;playStory(STORY.prologue,()=>nightStory(()=>toPrep()));
 }
@@ -594,7 +596,7 @@ function loop(now){
   requestAnimationFrame(loop);
 }
 layout();titleScreen();requestAnimationFrame(loop);
-window.__game={heroSelect,setDrawer,openTree,G,get B(){return B;},startBattle,acquire,toPrep,newGame,boardCards,newCard,afterChange,renderPreview,makeWave,enterEvent,finishStep,renderRelics,gainRelic,MUSIC,rollGear};
+window.__game={heroSelect,setDrawer,openTree,G,get B(){return B;},startBattle,acquire,toPrep,newGame,boardCards,newCard,afterChange,renderPreview,makeWave,enterEvent,finishStep,renderRelics,gainRelic,MUSIC,rollGear,withFit,rollTalents,stats,TALENTS,mastLv};
 })();
 </script>
 </body>
