@@ -279,8 +279,124 @@ def portraits():
     return P
 
 
+# ---------------------------------------------------------------- 敌人 16×16（大型 20/24，首领 32）
+def mirror(c, cx=None):
+    """把左半边镜像到右半边（对称生物用）。"""
+    cx = cx if cx is not None else c.w // 2
+    for y in range(c.h):
+        for x in range(cx):
+            v = c.g[y][x]; xx = c.w - 1 - x
+            if v != '.': c.g[y][xx] = v
+            if (x, y) in c.lock: c.lock.add((xx, y))
+
+
+def enemies():
+    E = {}
+
+    c = Cv(); c.ell(8, 10, 6.5, 5.2, 'l'); c.rect(2, 11, 13, 14, 'l'); c.ell(8, 7, 4, 2.5, 'l')
+    c.rect(5, 8, 6, 10, 'k', True); c.rect(10, 8, 11, 10, 'k', True); c.px(5, 8, 'w', True); c.px(10, 8, 'w', True)
+    c.line(7, 12, 9, 12, 'G', 1, True); c.px(4, 6, 'w', True); c.px(5, 5, 'w', True); c.px(3, 15, 'G'); c.px(12, 15, 'G')
+    E['slime'] = c.done()
+
+    c = Cv(); c.poly([(6, 7), (0, 2), (0, 7), (1, 12), (4, 10), (6, 11)], 'p'); c.line(1, 3, 1, 11, 'P', 1); c.line(3, 5, 3, 10, 'P', 1)
+    mirror(c); c.ell(8, 8.5, 3, 3.8, 'P'); c.poly([(5, 5), (6, 2), (7, 5)], 'P'); c.poly([(9, 5), (10, 2), (11, 5)], 'P')
+    c.px(7, 8, 'Y', True); c.px(9, 8, 'Y', True); c.px(7, 11, 'w', True); c.px(9, 11, 'w', True); E['bat'] = c.done()
+
+    c = Cv(); c.ell(8, 4.5, 3.8, 3.4, 'w'); c.rect(6, 7, 10, 8, 'w'); c.poly([(4, 3), (8, 0), (12, 3), (12, 4), (4, 4)], 'n')
+    c.rect(6, 5, 7, 6, 'k', True); c.rect(9, 5, 10, 6, 'k', True); c.px(7, 8, 'k', True); c.px(9, 8, 'k', True)
+    c.rect(5, 9, 11, 12, 'g'); c.line(6, 10, 10, 10, 'd', 1, True); c.line(6, 12, 10, 12, 'd', 1, True); c.line(8, 9, 8, 13, 'w', 1)
+    c.line(4, 9, 2, 13, 'w', 1); c.line(12, 9, 14, 12, 'w', 1); c.line(14, 12, 15, 5, 'g', 1); c.px(15, 4, 'w', True)
+    c.line(6, 13, 5, 15, 'w', 1); c.line(10, 13, 11, 15, 'w', 1); E['skel'] = c.done()
+
+    c = Cv()
+    for x0, y0, x1, y1 in ((4, 5, 1, 3), (4, 8, 1, 9), (4, 11, 1, 14)): c.line(x0, y0, x1, y1, 'k', 1, True)
+    mirror(c); c.ell(8, 4.5, 3.4, 3, 'G'); c.ell(8, 8.5, 4.3, 2.6, 'G'); c.ell(8, 12.5, 3.6, 2.4, 'G')
+    c.line(8, 6, 8, 14, 'l', 1); c.px(6, 4, 'R', True); c.px(10, 4, 'R', True); c.line(6, 1, 5, 0, 'G', 1); c.line(10, 1, 11, 0, 'G', 1)
+    E['bug'] = c.done()
+
+    c = Cv(12, 12); c.ell(6, 4.5, 3, 2.6, 'l'); c.ell(6, 8.5, 3.4, 2.4, 'G'); c.px(5, 4, 'R', True); c.px(7, 4, 'R', True)
+    c.line(2, 7, 0, 6, 'k', 1, True); c.line(10, 7, 11, 6, 'k', 1, True); c.line(3, 10, 1, 11, 'k', 1, True); c.line(9, 10, 10, 11, 'k', 1, True)
+    E['mini'] = c.done()
+
+    c = Cv(20, 20); c.poly([(3, 7), (7, 5), (13, 5), (17, 7), (18, 14), (15, 18), (5, 18), (2, 14)], 'g'); c.ell(10, 5, 4.5, 3.8, 'g')
+    c.ell(2.5, 12, 2.5, 3.2, 's'); c.ell(17.5, 12, 2.5, 3.2, 's'); c.rect(5, 17, 8, 19, 's'); c.rect(12, 17, 15, 19, 's')
+    c.rect(7, 4, 8, 5, 'Y', True); c.rect(12, 4, 13, 5, 'Y', True); c.line(8, 8, 12, 8, 'd', 1, True)
+    c.line(6, 10, 9, 14, 'd', 1, True); c.line(13, 11, 15, 15, 'd', 1, True); c.px(10, 12, 'Y', True)
+    for x, y in ((4, 7), (5, 7), (14, 6), (11, 2), (16, 16)): c.px(x, y, 'G', True)
+    E['golem'] = c.done()
+
+    c = Cv(24, 24); c.poly([(5, 10), (19, 10), (22, 23), (2, 23)], 'p')
+    c.poly([(7, 9), (17, 9), (18, 20), (6, 20)], 'd'); c.ell(4.5, 10.5, 3.5, 2.8, 's'); c.ell(19.5, 10.5, 3.5, 2.8, 's')
+    c.ell(12, 5, 4.5, 4.5, 's'); c.rect(8, 5, 16, 6, 'k', True); c.rect(9, 5, 10, 5, 'R', True); c.rect(14, 5, 15, 5, 'R', True)
+    c.poly([(11, 0), (13, 0), (12, 2)], 'P'); c.rect(11, 12, 13, 17, 'P'); c.rect(9, 13, 15, 14, 'P')
+    c.line(21, 4, 21, 19, 'g', 2); c.rect(19, 18, 23, 18, 'y'); c.rect(21, 19, 21, 21, 'n'); c.px(21, 3, 'w', True)
+    c.rect(8, 20, 10, 23, 'd'); c.rect(14, 20, 16, 23, 'd'); E['knight'] = c.done()
+
+    c = Cv(32, 32)
+    for i, (x0, dx) in enumerate(((7, -3), (11, -1), (16, 0), (21, 1), (25, 3))):
+        for j in range(9):
+            t = j / 8; x = x0 + dx * t * 2 + math.sin(t * 3 + i) * 1.5; c.ell(x, 20 + j * 1.3, 1.6 - t * .7, 1.2, 'e' if j % 2 else 'r')
+    c.ell(16, 13, 13.5, 11, 'r'); c.ell(16, 13, 11, 8.2, 'w')
+    for (x0, y0, x1, y1) in ((6, 10, 10, 12), (5, 15, 9, 14), (26, 9, 22, 12), (27, 15, 23, 14)): c.line(x0, y0, x1, y1, 'R', 1, True)
+    c.ell(16, 13, 5.5, 5.5, 'R'); c.ell(16, 13, 4, 4, 'o'); c.rect(15, 9, 17, 17, 'k', True); c.px(13, 10, 'w', True); c.px(14, 10, 'w', True)
+    for x in range(4, 29, 4): c.poly([(x - 1.5, 4 + abs(x - 16) * .25), (x, 0 + abs(x - 16) * .3), (x + 1.5, 4 + abs(x - 16) * .25)], 'e')
+    E['eye'] = c.done()
+
+    c = Cv(); c.poly([(4, 15), (5, 5), (8, 1), (11, 5), (12, 15)], 't'); c.ell(8, 6, 2.5, 2.2, 'k', True)
+    c.px(7, 6, 'l', True); c.px(9, 6, 'l', True); c.rect(6, 10, 10, 11, 'G'); c.line(13, 2, 13, 15, 'n', 1)
+    c.ell(13, 2, 1.8, 1.8, 'l'); c.px(13, 2, 'w', True); c.line(3, 7, 1, 5, 'o', 1); c.px(1, 4, 'R'); E['shaman'] = c.done()
+
+    c = Cv(); c.ell(8, 3.5, 3, 2.8, 'g'); c.rect(5, 3, 11, 4, 'g'); c.line(6, 3, 10, 3, 'k', 1, True)
+    c.line(14, 0, 14, 15, 'n', 1); c.px(14, 0, 'w', True); c.poly([(2, 6), (12, 6), (12, 12), (7, 16), (2, 12)], 'c')
+    c.rect(6, 8, 8, 12, 'Y'); c.rect(4, 9, 10, 10, 'Y'); c.rect(4, 15, 5, 15, 's'); c.rect(9, 15, 10, 15, 's'); E['shieldb'] = c.done()
+
+    c = Cv(); c.ell(8, 4, 3.5, 3, 'G'); c.poly([(3, 2), (4, 5), (1, 4)], 'G'); c.poly([(13, 2), (12, 5), (15, 4)], 'G')
+    c.px(7, 4, 'R', True); c.px(9, 4, 'R', True); c.line(7, 6, 9, 6, 'k', 1, True); c.rect(6, 7, 10, 9, 'G')
+    c.ell(8, 12, 5.5, 3.5, 'R'); c.rect(3, 10, 13, 10, 'N'); c.rect(3, 14, 13, 14, 'N'); c.line(4, 11, 12, 13, 'y', 1, True)
+    c.line(2, 5, 5, 9, 'N', 1); c.line(14, 5, 11, 9, 'N', 1); c.px(2, 5, 'w', True); c.px(14, 5, 'w', True); E['drummer'] = c.done()
+
+    c = Cv(); c.ell(7, 11, 5, 3.5, 'g'); c.ell(3.5, 9, 2.8, 2.4, 'g'); c.poly([(1, 7), (2, 5), (3, 7)], 'g'); c.px(2, 9, 'R', True)
+    c.px(0, 10, 'r'); c.line(11, 12, 15, 9, 'r', 1); c.ell(9, 6.5, 3.5, 3, 'n'); c.line(6, 6, 12, 6, 'x', 1, True)
+    c.line(10, 3, 12, 1, 'N', 1); c.px(13, 0, 'Y', True); c.px(12, 0, 'o', True); c.px(3, 14, 'g'); c.px(9, 14, 'g'); E['bomber'] = c.done()
+
+    c = Cv(); c.ell(8, 6, 5, 5, 'C'); c.poly([(3, 6), (13, 6), (13, 12), (11, 15), (9, 12), (7, 15), (5, 12), (3, 14)], 'C')
+    c.rect(5, 5, 6, 7, 'b', True); c.rect(10, 5, 11, 7, 'b', True); c.rect(7, 10, 8, 11, 'b', True); c.px(6, 3, 'w', True); c.px(5, 4, 'w', True)
+    E['ghost'] = c.done()
+
+    c = Cv(); c.poly([(3, 15), (5, 5), (8, 1), (11, 5), (13, 15)], 'p'); c.ell(8, 6, 2.4, 2.4, 'w'); c.px(7, 6, 'l', True); c.px(9, 6, 'l', True)
+    c.px(8, 8, 'k', True); c.rect(5, 10, 11, 10, 'P'); c.line(14, 3, 14, 15, 'x', 1); c.ell(14, 2.5, 1.5, 2, 'w'); c.px(14, 0, 'l', True)
+    c.px(13, 0, 'l', True); c.px(15, 1, 'l', True); E['necro'] = c.done()
+
+    c = Cv(24, 24); c.rect(4, 5, 19, 20, 'n'); c.poly([(3, 5), (12, 0), (21, 5)], 'N'); c.line(12, 0, 12, -2, 'x', 1)
+    for y in (8, 12, 16): c.line(4, y, 19, y, 'x', 1, True)
+    c.rect(9, 9, 14, 12, 'k', True); c.px(10, 10, 'Y', True); c.px(13, 10, 'Y', True); c.line(12, 0, 16, 1, 'R', 1)
+    c.ell(6, 21, 2.5, 2.5, 's'); c.ell(17, 21, 2.5, 2.5, 's'); c.rect(2, 12, 3, 20, 'x'); c.rect(20, 12, 21, 20, 'x'); E['siege'] = c.done()
+
+    c = Cv(); c.rect(1, 6, 14, 14, 'n'); c.poly([(1, 6), (14, 6), (13, 2), (2, 2)], 'N'); c.rect(1, 6, 14, 6, 'y')
+    c.rect(7, 7, 8, 9, 'y'); c.rect(1, 11, 14, 11, 'x'); E['chest_m'] = c.done()
+
+    c = Cv(); c.poly([(1, 1), (14, 1), (15, 5), (0, 5)], 'N'); c.rect(1, 9, 14, 14, 'n'); c.rect(1, 6, 14, 8, 'R')
+    for x in range(2, 14, 2): c.px(x, 5, 'w', True); c.px(x + 1, 9, 'w', True)
+    c.px(5, 3, 'Y', True); c.px(10, 3, 'Y', True); c.poly([(6, 7), (11, 7), (10, 12), (7, 12)], 'r'); c.rect(1, 13, 14, 13, 'x')
+    E['mimic'] = c.done()
+
+    c = Cv(); c.ell(8, 4.5, 3.4, 3, 'R'); c.poly([(4, 3), (1, 0), (3, 4)], 'g'); c.poly([(12, 3), (15, 0), (13, 4)], 'g')
+    c.rect(6, 4, 7, 4, 'Y', True); c.rect(9, 4, 10, 4, 'Y', True); c.line(7, 6, 9, 6, 'k', 1, True)
+    c.poly([(3, 8), (13, 8), (12, 12), (4, 12)], 'R'); c.rect(5, 12, 11, 13, 'n'); c.line(5, 14, 4, 15, 'r', 1); c.line(11, 14, 12, 15, 'r', 1)
+    c.line(2, 8, 1, 12, 'R', 1); c.line(14, 8, 15, 6, 'R', 1); c.line(15, 6, 15, 0, 'n', 1); c.poly([(13, 0), (16, 0), (16, 4), (14, 3)], 'g')
+    E['berserker'] = c.done()
+
+    c = Cv(); c.rect(2, 11, 13, 13, 'n'); c.line(3, 11, 7, 6, 'x', 1); c.line(12, 11, 8, 6, 'x', 1); c.line(7, 7, 14, 1, 'N', 1)
+    c.ell(14, 1.5, 1.8, 1.4, 'n'); c.ell(14, 0.5, 1.2, 1, 's'); c.ell(4, 13.5, 2, 2, 's'); c.ell(11, 13.5, 2, 2, 's'); c.px(7, 7, 'y', True)
+    E['catapult'] = c.done()
+
+    c = Cv(); c.poly([(3, 6), (4, 2), (8, 0), (12, 2), (13, 6)], 'g'); c.rect(2, 6, 14, 6, 's'); c.ell(8, 9, 4, 3.5, 'f')
+    c.px(6, 8, 'k', True); c.px(10, 8, 'k', True); c.line(6, 11, 10, 11, 'n', 1, True); c.poly([(1, 16), (3, 13), (13, 13), (15, 16)], 'b')
+    c.rect(7, 13, 9, 16, 'y'); E['p_soldier'] = c.done(hl=HLP)
+    return E
+
 def write_js(path):
-    A = card_art(); P = portraits()
+    A = card_art(); P = {**portraits(), **enemies()}
     for k, rows in {**A, **P}.items():
         assert all(len(r) == len(rows[0]) for r in rows), k
     out = ['', '/* ================= 像素美术（由 tools/pixelgen.py 生成，勿手改） =================',
@@ -312,7 +428,9 @@ def preview(A, P, path):
 if __name__ == '__main__':
     root = os.path.join(os.path.dirname(__file__), '..')
     A, P = write_js(os.path.join(root, 'src', '02e-art.js'))
+    E = enemies()
     print('cards', len(A), 'portraits', len(P))
     if '--preview' in sys.argv:
         preview(A, P, os.path.join(root, 'shots', 'art_preview.png'))
-        preview({}, P, os.path.join(root, 'shots', 'portrait_preview.png'))
+        preview({}, {k: v for k, v in P.items() if k.startswith('p_')}, os.path.join(root, 'shots', 'portrait_preview.png'))
+        preview(E, {}, os.path.join(root, 'shots', 'enemy_preview.png'))
