@@ -404,17 +404,26 @@ function afterChange(placed){checkMerges();renderOwned();if(G.phase==='prep')ren
   if(placed&&placed.el&&G.cards.includes(placed))restart(placed.el,'land');}
 
 /* ================= 拖拽 ================= */
+/* 同一时间只允许一次拖拽；抬手、取消、切后台、失焦都会收尾，保证幽灵卡一定被清掉 */
 let D=null;
-function onDown(e,src){if(e.button>0)return;SFX.ensure();e.preventDefault();D={src,x0:e.clientX,y0:e.clientY,lx:e.clientX,tilt:0,started:false,tgt:null};}
-addEventListener('pointermove',e=>{if(!D)return;if(!D.started){if(G.phase==='prep'&&Math.hypot(e.clientX-D.x0,e.clientY-D.y0)>7)startDrag();else return;}moveDrag(e);});
-addEventListener('pointerup',()=>{if(!D)return;const d=D;D=null;if(!d.started){openSheet(d.src);return;}endDrag(d);});
-addEventListener('pointercancel',()=>{if(D&&D.started)endDrag(Object.assign(D,{tgt:null}));D=null;});
+function onDown(e,src){if(e.button>0)return;if(D)cancelDrag();SFX.ensure();e.preventDefault();
+  D={src,pid:e.pointerId,x0:e.clientX,y0:e.clientY,lx:e.clientX,tilt:0,started:false,tgt:null};
+  try{src.el.setPointerCapture(e.pointerId);}catch(_){}}
+addEventListener('pointermove',e=>{if(!D||e.pointerId!==D.pid)return;if(!D.started){if(G.phase==='prep'&&Math.hypot(e.clientX-D.x0,e.clientY-D.y0)>7)startDrag();else return;}moveDrag(e);});
+addEventListener('pointerup',e=>{if(!D||e.pointerId!==D.pid)return;const d=D;D=null;if(!d.started){openSheet(d.src);return;}endDrag(d);});
+addEventListener('pointercancel',e=>{if(D&&e.pointerId===D.pid)cancelDrag();});
+addEventListener('blur',()=>cancelDrag());
+document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelDrag();});
+function cancelDrag(){const d=D;D=null;if(d&&d.started){d.tgt=null;endDrag(d);}sweepGhosts();}
+function sweepGhosts(keep){document.querySelectorAll('.card.ghost').forEach(g=>{if(g!==keep)g.remove();});
+  document.querySelectorAll('.card.lifted').forEach(el=>{if(!D||el!==D.src.el)el.classList.remove('lifted');});}
 function startDrag(){
   const src=D.src,el=src.el,own=src.kind==='own';const c=own?src.card:src.offer.card;const r=el.getBoundingClientRect();
+  sweepGhosts();
   const g=document.createElement('div');paintCard(g,c,'ghost');g.style.width=(c.size*cw-4)+'px';g.style.height=ch+'px';
   D.ox=(D.x0-r.left)/r.width*(c.size*cw-4);D.oy=(D.y0-r.top)/r.height*ch;
   document.body.appendChild(g);D.g=g;D.c=c;D.own=own;D.started=true;el.classList.add('lifted');
-  if(own){$('#sell').classList.add('armed');$('#sellTxt').innerHTML='拖到这里出售<br><b>+'+sellValue(c)+'</b>';}
+  if(own){$('#sell').classList.add('armed');$('#sellTxt').innerHTML='拖到这里卖掉<br><b>+'+sellValue(c)+'</b>';}
   markSyn(c,own?c:null);SFX.play('pick');
   if(!G.drawer){D.autoDrawer=true;setDrawer(true);}
 }
@@ -424,22 +433,38 @@ function moveDrag(e){
   D.gx=x;D.tgt=hitTest(e.clientX,e.clientY,x);showTgt(D.tgt);
 }
 function inside(r,x,y,m){m=m||0;return x>=r.left-m&&x<=r.right+m&&y>=r.top-m&&y<=r.bottom+m;}
+/* 插入排列：目标位置被占时，把两边的卡往外挤，腾出位置；挤不下才算失败 */
+function insertPlan(z,i,size,ignore){
+  const n=zoneN(z);const others=G.cards.filter(o=>o.loc===z&&o!==ignore).sort((a,b)=>a.idx-b.idx);
+  if(others.reduce((s,o)=>s+o.size,0)+size>n)return null;
+  const mid=i+size/2;const items=others.map(o=>({o,p:o.idx,s:o.size}));
+  items.splice(items.filter(t=>t.p+t.s/2<mid).length,0,{o:null,p:i,s:size});
+  let end=0;for(const t of items){t.p=Math.max(t.p,end);end=t.p+t.s;}
+  let st=n;for(let j=items.length-1;j>=0;j--){const t=items[j];t.p=Math.min(t.p,st-t.s);st=t.p;}
+  if(items[0].p<0)return null;
+  const me=items.find(t=>!t.o);
+  return{i:me.p,moves:items.filter(t=>t.o&&t.p!==t.o.idx).map(t=>[t.o,t.p])};
+}
 function hitTest(px,py,gx){
-  const c=D.c;
+  const c=D.c,ig=D.own?c:null;
   if(D.own&&inside($('#sell').getBoundingClientRect(),px,py,6))return{z:'sell'};
-  if(inside($('#bagBtn').getBoundingClientRect(),px,py,6)){let i=-1;for(let k=0;k+c.size<=4;k++)if(fits('stash',k,c.size,D.own?c:null)){i=k;break;}return{z:'bag',i,ok:i>=0};}
+  if(inside($('#bagBtn').getBoundingClientRect(),px,py,6)){let i=-1;for(let k=0;k+c.size<=4;k++)if(fits('stash',k,c.size,ig)){i=k;break;}return{z:'bag',i,ok:i>=0};}
   for(const z of['board','stash']){const r=$('#'+z).getBoundingClientRect();if(!inside(r,px,py,22))continue;
     if(!D.own&&c.tier<3){const o=occ(z);const under=o[clamp(Math.floor((px-r.left-4)/cw),0,zoneN(z)-1)];
       if(under&&under.key===c.key&&under.tier===c.tier)return{z:'merge',card:under};}
     const i=clamp(Math.round((gx-(r.left+4))/cw),0,zoneN(z)-c.size);
-    return{z,i,ok:fits(z,i,c.size,D.own?c:null)};}
+    if(fits(z,i,c.size,ig))return{z,i,ok:true,moves:[]};
+    const pl=insertPlan(z,i,c.size,ig);
+    return pl?{z,i:pl.i,ok:true,moves:pl.moves}:{z,i,ok:false};}
   return null;
 }
-function clearTgt(){document.querySelectorAll('.cell.ok,.cell.bad').forEach(x=>x.classList.remove('ok','bad'));document.querySelectorAll('.card.mergeT').forEach(x=>x.classList.remove('mergeT'));$('#sell').classList.remove('hot');$('#bagBtn').classList.remove('hot','bad');}
+function resetSlots(){for(const c of G.cards)if(c.el&&(c.loc==='board'||c.loc==='stash'))c.el.style.left=(4+c.idx*cw+2)+'px';}
+function clearTgt(){document.querySelectorAll('.cell.ok,.cell.bad').forEach(x=>x.classList.remove('ok','bad'));document.querySelectorAll('.card.mergeT,.card.nudge').forEach(x=>x.classList.remove('mergeT','nudge'));$('#sell').classList.remove('hot');$('#bagBtn').classList.remove('hot','bad');resetSlots();}
 function showTgt(t){clearTgt();if(!t)return;
   if(t.z==='sell'){$('#sell').classList.add('hot');return;}
   if(t.z==='bag'){$('#bagBtn').classList.add(t.ok?'hot':'bad');return;}
   if(t.z==='merge'){t.card.el.classList.add('mergeT');return;}
+  if(t.moves)for(const[o,p]of t.moves)if(o.el){o.el.style.left=(4+p*cw+2)+'px';o.el.classList.add('nudge');}
   const cs=cells(t.z);for(let i=t.i;i<t.i+D.c.size;i++)if(cs[i])cs[i].classList.add(t.ok?'ok':'bad');}
 function synergyAt(c,i,ignore){
   const o=occ('board').map(x=>x===ignore?null:x);const L=o[i-1],R=o[i+c.size];const tag=ITEMS[c.key].tag;
@@ -447,24 +472,29 @@ function synergyAt(c,i,ignore){
   return good(L)||good(R)||(L&&L.adj==='ignite')||((L||R)&&(c.adj==='echo'||ITEMS[c.key].charge||ITEMS[c.key].buff))||(R&&c.adj==='ignite');
 }
 function markSyn(c,ignore){const cs=cells('board');for(let i=0;i+c.size<=8;i++)if(fits('board',i,c.size,ignore)&&synergyAt(c,i,ignore))cs[i].classList.add('syn');}
+function applyMoves(t){if(t&&t.moves)for(const[o,p]of t.moves)o.idx=p;}
 function endDrag(d){
-  clearTgt();document.querySelectorAll('.cell.syn').forEach(x=>x.classList.remove('syn'));
-  $('#sell').classList.remove('armed');$('#sellTxt').innerHTML='背包 · 4格<br>拖到这里出售';
-  const t=d.tgt;let ok=false;
-  if(t&&G.phase==='prep'){
-    if(t.z==='sell'&&d.own){sellCard(d.src.card);afterChange();ok=true;}
-    else if(t.z==='merge'&&!d.own){ok=acquire(d.src.offer,'merge');}
-    else if(t.z==='bag'){if(!t.ok){toast('背包满了');SFX.play('bad');}else if(d.own){d.src.card.loc='stash';d.src.card.idx=t.i;SFX.play('place');afterChange(d.src.card);ok=true;}else ok=acquire(d.src.offer,{z:'stash',i:t.i});}
-    else if(t.ok){
-      if(d.own){d.src.card.loc=t.z;d.src.card.idx=t.i;SFX.play('place');afterChange(d.src.card);ok=true;}
-      else{const r=d.g.getBoundingClientRect();ok=acquire(d.src.offer,{z:t.z,i:t.i});if(ok)FX.burst(r.left+r.width/2,r.top+r.height/2,'#ffd166',14);}
-    }else if(t.z==='board'||t.z==='stash'){SFX.play('bad');}
+  let ok=false;
+  try{
+    clearTgt();document.querySelectorAll('.cell.syn').forEach(x=>x.classList.remove('syn'));
+    $('#sell').classList.remove('armed');$('#sellTxt').innerHTML='背包 · 4格<br>拖进来卖掉';
+    const t=d.tgt;
+    if(t&&G.phase==='prep'){
+      if(t.z==='sell'&&d.own){sellCard(d.src.card);afterChange();ok=true;}
+      else if(t.z==='merge'&&!d.own){ok=acquire(d.src.offer,'merge');}
+      else if(t.z==='bag'){if(!t.ok){toast('背包满了');SFX.play('bad');}else if(d.own){d.src.card.loc='stash';d.src.card.idx=t.i;SFX.play('place');afterChange(d.src.card);ok=true;}else ok=acquire(d.src.offer,{z:'stash',i:t.i});}
+      else if(t.ok){
+        if(d.own){applyMoves(t);d.src.card.loc=t.z;d.src.card.idx=t.i;SFX.play('place');afterChange(d.src.card);ok=true;}
+        else if(!d.src.offer.sold&&buyCheck(d.src.offer)){const r=d.g.getBoundingClientRect();applyMoves(t);ok=acquire(d.src.offer,{z:t.z,i:t.i});if(ok)FX.burst(r.left+r.width/2,r.top+r.height/2,'#ffd166',14);else renderOwned();}
+      }else if(t.z==='board'||t.z==='stash'){SFX.play('bad');toast('放不下了，先腾点位置');}
+    }
+  }finally{
+    if(d.src.el)d.src.el.classList.remove('lifted');
+    if(d.autoDrawer)setTimeout(()=>setDrawer(false),ok?350:0);
+    const g=d.g;
+    if(g){if(ok||!d.src.el||!d.src.el.isConnected)g.remove();
+      else{const r=d.src.el.getBoundingClientRect();g.classList.add('back');g.style.transform=`translate(${r.left}px,${r.top}px) rotate(0deg) scale(1)`;setTimeout(()=>g.remove(),230);}}
   }
-  d.src.el.classList.remove('lifted');
-  if(d.autoDrawer)setTimeout(()=>setDrawer(false),ok?350:0);
-  if(ok){d.g.remove();return;}
-  const r=d.src.el.getBoundingClientRect();const g=d.g;g.classList.add('back');
-  g.style.transform=`translate(${r.left}px,${r.top}px) rotate(0deg) scale(1)`;setTimeout(()=>g.remove(),230);
 }
 
 /* ================= 详情弹层 ================= */
