@@ -393,6 +393,96 @@ def enemies():
     c = Cv(); c.poly([(3, 6), (4, 2), (8, 0), (12, 2), (13, 6)], 'g'); c.rect(2, 6, 14, 6, 's'); c.ell(8, 9, 4, 3.5, 'f')
     c.px(6, 8, 'k', True); c.px(10, 8, 'k', True); c.line(6, 11, 10, 11, 'n', 1, True); c.poly([(1, 16), (3, 13), (13, 13), (15, 16)], 'b')
     c.rect(7, 13, 9, 16, 'y'); E['p_soldier'] = c.done(hl=HLP)
+    E.update(frost_enemies())
+    return E
+
+
+# ---------------------------------------------------------------- 第二套敌人：霜潮（冰原来的东西）
+def frost_enemies():
+    E = {}
+    # 冰螨：一团带冰刺的小虫
+    c = Cv(); c.ell(8, 10.5, 6, 4.5, 'c'); c.ell(8, 9, 4.5, 3, 'C')
+    for x, y in ((4, 5), (8, 3), (12, 5)): c.poly([(x - 1.5, y + 4), (x, y), (x + 1.5, y + 4)], 'w')
+    c.rect(5, 9, 6, 10, 'k', True); c.rect(10, 9, 11, 10, 'k', True); c.px(5, 9, 'w', True); c.px(10, 9, 'w', True)
+    for x in (3, 6, 10, 13): c.line(x, 14, x - (1 if x < 8 else -1), 15, 'b', 1)
+    E['f_mite'] = c.done()
+    # 雪鸮：白色大眼猫头鹰，张开翅膀
+    c = Cv(); c.poly([(7, 7), (0, 4), (0, 9), (2, 12), (7, 12)], 'g'); c.line(1, 6, 1, 10, 'w', 1); mirror(c)
+    c.ell(8, 8.5, 4, 5, 'w'); c.poly([(4.5, 4), (5, 1), (7, 4)], 'w'); c.poly([(9, 4), (11, 1), (11.5, 4)], 'w')
+    c.ell(6, 6.5, 1.6, 1.6, 'Y', True); c.ell(10, 6.5, 1.6, 1.6, 'Y', True); c.px(6, 6, 'k', True); c.px(10, 6, 'k', True)
+    c.poly([(7, 8), (9, 8), (8, 10)], 'o'); c.px(6, 11, 'g'); c.px(10, 11, 'g'); c.px(8, 12, 'g')
+    E['f_owl'] = c.done()
+    # 冻尸：结了冰的死人，蓝皮肤、肩上冰棱
+    c = Cv(); c.ell(8, 4.5, 3.6, 3.4, 'c'); c.rect(6, 5, 7, 6, 'k', True); c.rect(9, 5, 10, 6, 'k', True); c.px(6, 5, 'C', True); c.px(9, 5, 'C', True)
+    c.line(7, 8, 9, 8, 'd', 1, True); c.rect(4, 9, 12, 13, 'b'); c.line(6, 10, 10, 10, 's', 1, True)
+    c.poly([(3, 9), (2, 5), (5, 9)], 'C'); c.poly([(13, 9), (14, 4), (11, 9)], 'C'); c.line(3, 10, 2, 13, 'c', 1); c.line(13, 10, 14, 13, 'c', 1)
+    c.line(6, 14, 5, 15, 'c', 1); c.line(10, 14, 11, 15, 'c', 1)
+    E['f_husk'] = c.done()
+    # 冰卵：透明冰壳里有东西在看你
+    c = Cv(); c.ell(8, 8.5, 5.5, 6.5, 'C'); c.ell(8, 9.5, 3.5, 3.8, 'b')
+    c.px(7, 9, 'R', True); c.px(9, 9, 'R', True); c.line(4, 5, 6, 7, 'w', 1, True); c.line(11, 11, 13, 9, 'c', 1, True); c.line(6, 13, 8, 12, 'c', 1, True)
+    c.px(5, 4, 'w', True); c.rect(4, 15, 12, 15, 'g')
+    E['f_egg'] = c.done()
+    # 冰碴：卵里孵出来的小东西
+    c = Cv(12, 12); c.poly([(2, 10), (4, 4), (6, 1), (8, 4), (10, 10)], 'C'); c.px(5, 6, 'k', True); c.px(7, 6, 'k', True)
+    c.line(4, 8, 7, 8, 'b', 1, True); c.line(3, 10, 2, 11, 'c', 1); c.line(9, 10, 10, 11, 'c', 1)
+    E['f_chip'] = c.done()
+    # 雪人：大块头，白毛、冰角，撞墙会冻住你的卡
+    c = Cv(20, 20); c.poly([(3, 8), (6, 5), (14, 5), (17, 8), (18, 15), (15, 19), (5, 19), (2, 15)], 'w'); c.ell(10, 6, 5, 4.2, 'w')
+    c.poly([(5, 4), (3, 0), (7, 3)], 'C'); c.poly([(15, 4), (17, 0), (13, 3)], 'C')
+    c.ell(10, 7.5, 3.6, 2.6, 'g'); c.rect(8, 6, 8, 7, 'k', True); c.rect(12, 6, 12, 7, 'k', True); c.px(8, 6, 'c', True); c.px(12, 6, 'c', True)
+    c.line(8, 9, 12, 9, 'b', 1, True); c.px(9, 10, 'w', True); c.px(11, 10, 'w', True)
+    c.ell(2.5, 12, 2.4, 3.4, 'g'); c.ell(17.5, 12, 2.4, 3.4, 'g'); c.rect(5, 18, 8, 19, 'g'); c.rect(12, 18, 15, 19, 'g')
+    for x, y in ((6, 12), (13, 14), (9, 16), (11, 11)): c.px(x, y, 'g', True)
+    E['f_yeti'] = c.done()
+    # 冰墙卫：举着一面冰盾
+    c = Cv(); c.ell(8, 3.5, 3, 2.8, 's'); c.rect(5, 3, 11, 4, 's'); c.line(6, 3, 10, 3, 'C', 1, True)
+    c.line(14, 0, 14, 15, 'g', 1); c.poly([(13, 0), (15, 0), (14, 2)], 'C')
+    c.poly([(2, 6), (12, 6), (12, 12), (7, 16), (2, 12)], 'C'); c.poly([(4, 8), (10, 8), (10, 11), (7, 14), (4, 11)], 'c')
+    c.line(5, 9, 7, 11, 'w', 1, True); c.rect(4, 15, 5, 15, 'd'); c.rect(9, 15, 10, 15, 'd')
+    E['f_warden'] = c.done()
+    # 霜巫：深蓝兜帽，法杖顶着一颗冰珠，会给附近的怪回血
+    c = Cv(); c.poly([(4, 15), (5, 5), (8, 1), (11, 5), (12, 15)], 'b'); c.ell(8, 6, 2.5, 2.2, 'k', True)
+    c.px(7, 6, 'C', True); c.px(9, 6, 'C', True); c.rect(6, 10, 10, 11, 'c'); c.line(13, 3, 13, 15, 'g', 1)
+    c.ell(13, 2, 1.8, 1.8, 'C'); c.px(13, 2, 'w', True); c.line(3, 7, 1, 5, 'w', 1); c.px(1, 4, 'C')
+    E['f_witch'] = c.done()
+    # 号角手：吹着骨号，催队伍快走
+    c = Cv(); c.ell(8, 4, 3.5, 3, 'g'); c.poly([(4, 2), (5, 0), (6, 2)], 'w'); c.poly([(10, 2), (11, 0), (12, 2)], 'w')
+    c.px(7, 4, 'b', True); c.px(9, 4, 'b', True); c.rect(5, 7, 11, 12, 'd'); c.line(6, 9, 10, 9, 's', 1, True)
+    c.poly([(9, 6), (15, 3), (16, 6), (10, 8)], 'N'); c.px(15, 4, 'w', True); c.rect(5, 13, 6, 15, 'd'); c.rect(10, 13, 11, 15, 'd')
+    E['f_horn'] = c.done()
+    # 冰雷甲虫：背着一颗冰雷，死了会炸
+    c = Cv(); c.ell(8, 11, 6, 3.5, 'b'); c.ell(8, 10, 5, 2.5, 'c'); c.line(8, 8, 8, 13, 'd', 1, True)
+    c.ell(3, 11, 2, 1.6, 'd'); c.px(2, 11, 'C', True)
+    c.ell(9, 5.5, 3, 3, 'C'); c.px(8, 4, 'w', True); c.line(10, 3, 12, 1, 'N', 1); c.px(13, 0, 'Y', True); c.px(12, 0, 'o', True)
+    for x in (4, 8, 12): c.px(x, 14, 'd'); c.px(x, 15, 'd')
+    E['f_beetle'] = c.done()
+    # 雪雾：一团会散开的风雪，时有时无
+    c = Cv(); c.ell(8, 7, 5.5, 5, 'w'); c.poly([(3, 7), (13, 7), (14, 11), (12, 15), (10, 12), (8, 15), (6, 12), (3, 14)], 'w')
+    c.line(4, 5, 7, 4, 'g', 1, True); c.line(9, 9, 12, 8, 'g', 1, True); c.line(5, 11, 8, 11, 'g', 1, True)
+    c.rect(6, 6, 6, 7, 'b', True); c.rect(10, 6, 10, 7, 'b', True)
+    E['f_wisp'] = c.done()
+    # 冰棺祭司：戴冰冠的祭司，让冻尸站起来
+    c = Cv(); c.poly([(3, 15), (5, 5), (8, 2), (11, 5), (13, 15)], 'd'); c.ell(8, 6, 2.4, 2.4, 'c'); c.px(7, 6, 'w', True); c.px(9, 6, 'w', True)
+    for x in (6, 8, 10): c.poly([(x - 1, 3), (x, 0), (x + 1, 3)], 'C')
+    c.rect(5, 10, 11, 10, 'C'); c.line(14, 3, 14, 15, 'x', 1); c.rect(13, 1, 15, 4, 'C'); c.px(14, 2, 'b', True)
+    E['f_priest'] = c.done()
+    # 冰山雪橇：一整块冰拖着走，里面冻着一队冻尸
+    c = Cv(24, 24); c.poly([(3, 18), (4, 7), (9, 2), (16, 3), (21, 8), (21, 18)], 'C'); c.poly([(6, 16), (7, 9), (11, 6), (16, 7), (18, 11), (18, 16)], 'c')
+    for x in (9, 13, 16): c.rect(x, 11, x + 1, 13, 'b', True); c.px(x, 11, 'R', True)
+    c.line(5, 5, 8, 3, 'w', 1, True); c.rect(1, 20, 22, 20, 'n'); c.line(1, 20, 0, 17, 'n', 1); c.rect(4, 18, 5, 19, 'x'); c.rect(18, 18, 19, 19, 'x')
+    c.line(22, 20, 23, 17, 'n', 1)
+    E['f_sled'] = c.done()
+    # 霜狼：越伤越疯
+    c = Cv(); c.poly([(2, 8), (5, 6), (11, 6), (13, 8), (13, 11), (2, 11)], 'g'); c.poly([(11, 7), (13, 3), (16, 5), (15, 8), (13, 9)], 'g')
+    c.poly([(12, 4), (12, 1), (14, 3)], 'g'); c.px(14, 5, 'R', True); c.line(15, 7, 16, 7, 'w', 1, True)
+    c.line(2, 8, 0, 5, 'g', 1); c.rect(3, 11, 4, 15, 'g'); c.rect(10, 11, 11, 15, 'g'); c.line(4, 7, 10, 7, 'w', 1)
+    E['f_wolf'] = c.done()
+    # 冰弩车：停在远处往墙上射冰锥
+    c = Cv(); c.rect(2, 10, 13, 12, 'n'); c.line(1, 7, 14, 7, 'x', 1); c.line(1, 7, 3, 4, 'x', 1); c.line(14, 7, 12, 4, 'x', 1)
+    c.line(3, 5, 12, 5, 'w', 1, True); c.line(4, 7, 14, 1, 'C', 1); c.px(15, 0, 'w', True); c.rect(6, 8, 9, 9, 'n')
+    c.ell(4, 13.5, 2, 2, 's'); c.ell(11, 13.5, 2, 2, 's')
+    E['f_ballista'] = c.done()
     return E
 
 def write_js(path):
@@ -402,7 +492,14 @@ def write_js(path):
     out = ['', '/* ================= 像素美术（由 tools/pixelgen.py 生成，勿手改） =================',
            ' * 卡牌图标 16×16、人物立绘 32×32；覆盖 02-data.js 中的旧图。 */']
     out.append('Object.assign(PAL,' + json.dumps(EXTRA_PAL) + ');')
-    out.append('addSprites(' + json.dumps({**A, **P}, indent=0, ensure_ascii=False) + ');')
+    # 保留文件里已有、但这里没有生成的图（有些图是别处加进来的），只覆盖同名的
+    old = {}
+    if os.path.exists(path):
+        txt = open(path, encoding='utf-8').read()
+        i = txt.find('addSprites(')
+        if i >= 0: old = json.loads(txt[i + len('addSprites('):txt.rindex(');')])
+    merged = {**old, **A, **P}
+    out.append('addSprites(' + json.dumps(merged, indent=0, ensure_ascii=False) + ');')
     open(path, 'w', encoding='utf-8').write('\n'.join(out) + '\n')
     return A, P
 
