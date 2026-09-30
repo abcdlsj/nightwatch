@@ -77,7 +77,7 @@ const SFX=(function(){
 })();
 
 /* ================= 状态 ================= */
-const G={hero:'ayla',skills:[],drawer:false,phase:'title',round:1,maxRound:8,gold:10,wall:25,wallMax:25,speed:1,cards:[],relics:[],
+const G={hero:'ayla',foeSet:'dark',skills:[],drawer:false,phase:'title',round:1,maxRound:8,gold:10,wall:25,wallMax:25,speed:1,cards:[],relics:[],
   prep:{step:0,cur:null,doors:[]},nextWave:null,bestChain:0,firstPrep:true};
 let B=null;
 let cw=46,ch=90;
@@ -254,10 +254,11 @@ function rollDoors(){
 }
 function renderPreview(){
   const w=G.nextWave;const cnt={};w.forEach(s=>cnt[s.type]=(cnt[s.type]||0)+1);
-  const R=G.round;$('#pvTitle').textContent=(NIGHTS[R-1]||{title:'第'+R+'夜'}).title;
+  const R=G.round;$('#pvTitle').textContent=nightInfo(R).title;
   $('#pvList').innerHTML=Object.keys(cnt).map(k=>{const d=EN[k];return `<span class="pv${d.elite||d.boss?' elite':''}"><img src="${SPR[d.spr].url}" alt="">${d.elite||d.boss?d.n:'×'+cnt[k]}</span>`;}).join('');
   const boss=Object.keys(cnt).map(k=>EN[k]).find(d=>d.intents);
-  $('#pvNote').innerHTML=boss?boss.intents.map(t=>`【${t.n}】${t.d}`).join('<br>'):(cnt.golem?'石魔像护甲很厚：飞斧和高品质大件更有效。':cnt.skel?'骷髅兵带护甲，会减免每次命中的伤害。':'');
+  const tough=Object.keys(cnt).map(k=>EN[k]).filter(d=>d.tip).sort((a,b)=>b.hp*(1+b.armor)-a.hp*(1+a.armor))[0];
+  $('#pvNote').innerHTML=boss?boss.intents.map(t=>`【${t.n}】${t.d}`).join('<br>'):tough?`${tough.n}：${tough.tip}`:'';
 }
 function evHead(e){return `<div class="ev-head cat-${e.cat}"><img src="${icon(e.ico).url}" alt=""><div><b>${e.n}</b><em>${e.f}</em></div></div>`;}
 function btnRow(defs){const row=document.createElement('div');row.className='ev-btns';
