@@ -1272,25 +1272,25 @@ function modText(m){return Object.keys(m).map(k=>{const[l,p,inv]=MODL[k];if(p===
   const v=m[k];const good=inv?v<0:v>0;const sv=k==='range'?-v:v;
   return `<i class="${good?'mg':'mb'}">${l} ${sv>0?'+':''}${p?Math.round(sv*100)+'%':sv}</i>`;}).join('');}
 const EVENTS={
-  shop:{n:'流浪商人',ico:'bag',cat:'shop',w:3,d:'出售3张随机卡牌',f:'“什么都卖，就是不卖后悔药。”'},
-  smith:{n:'铁匠铺',ico:'axe',cat:'shop',w:1,d:'只卖【刃】和【机】卡牌',f:'炉火从不熄灭，铁匠也是。',filter:it=>it.tag==='刃'||it.tag==='机'},
-  forge:{n:'炼火工坊',ico:'spark',cat:'shop',w:1,d:'只卖【火】卡牌',f:'门上贴着：店内请勿呼吸。',filter:it=>it.tag==='火'},
-  storm:{n:'雷鸣塔',ico:'bolt',cat:'shop',w:1,d:'只卖【电】卡牌',f:'塔顶的风向标已经被劈弯了。',filter:it=>it.tag==='电'},
-  frostshop:{n:'霜语者小屋',ico:'frost',cat:'shop',w:1,d:'只卖【冰】卡牌',f:'她开口说话时，窗上会结出字来。',filter:it=>it.tag==='冰'},
-  giant:{n:'巨物集市',ico:'colossus',cat:'shop',w:1,minR:2,d:'只卖中型和大型卡牌',f:'这里的摊位得用骡子拉。',filter:it=>it.size>=2},
-  black:{n:'黑市',ico:'mask',cat:'shop',w:.8,minR:3,d:'品质更高、必带词缀，价格 ×1.5',f:'不问来路，不问去处。',black:1},
-  chest:{n:'路边宝箱',ico:'chest',cat:'free',w:1.1,d:'免费获得一张随机卡牌',f:'锁早就锈断了。'},
-  field:{n:'旧战场',ico:'dagger',cat:'free',w:1.1,d:'从3张卡牌中免费挑一张',f:'前人留下的东西，总得有人接着用。'},
+  shop:{n:'流浪商人',ico:'bag',cat:'shop',w:3,d:'随便卖三张卡',f:'“什么都卖，就是不卖后悔药。”'},
+  smith:{n:'铁匠铺',ico:'axe',cat:'shop',w:1,d:'只卖【刃】【机】的家伙',f:'炉火从不熄灭，铁匠也是。',filter:it=>it.tag==='刃'||it.tag==='机'},
+  forge:{n:'炼火工坊',ico:'spark',cat:'shop',w:1,d:'只卖【火】卡',f:'门上贴着：店内请勿呼吸。',filter:it=>it.tag==='火'},
+  storm:{n:'雷鸣塔',ico:'bolt',cat:'shop',w:1,d:'只卖【电】卡',f:'塔顶的风向标已经被劈弯了。',filter:it=>it.tag==='电'},
+  frostshop:{n:'霜语者小屋',ico:'frost',cat:'shop',w:1,d:'只卖【冰】卡',f:'她开口说话时，窗上会结出字来。',filter:it=>it.tag==='冰'},
+  giant:{n:'巨物集市',ico:'colossus',cat:'shop',w:1,minR:2,d:'只卖中大件',f:'这里的摊位得用骡子拉。',filter:it=>it.size>=2},
+  black:{n:'黑市',ico:'mask',cat:'shop',w:.8,minR:3,d:'货好，必带词缀，就是贵一半',f:'不问来路，不问去处。',black:1},
+  chest:{n:'路边宝箱',ico:'chest',cat:'free',w:1.1,d:'白捡一张卡',f:'锁早就锈断了。'},
+  field:{n:'旧战场',ico:'dagger',cat:'free',w:1.1,d:'三张卡，随便拿一张',f:'前人留下的东西，总得有人接着用。'},
   altar:{n:'遗物祭坛',ico:'altar',cat:'relic',w:1,d:'三件遗物，白拿一件',f:'香灰还是温的。'},
   grocer:{n:'杂货铺',ico:'potion:P',cat:'relic',w:1.3,d:'花钱买遗物，能刷新一次',f:'货架上的东西，一半能用，一半能吓人。'},
   parcel:{n:'无主的包裹',ico:'book:N',cat:'free',w:.8,d:'白捡一件遗物',f:'收件人一栏被雨水泡花了。'},
-  enchant:{n:'附魔师',ico:'wand',cat:'up',w:1,d:'为你的一张卡附上（或替换）词缀',f:'“别乱动，墨水还没干。”',need:()=>G.cards.length>0},
-  train:{n:'训练场',ico:'dummy',cat:'up',w:.9,d:'将你的一张卡提升一个品质（最高到金）',f:'稻草人挨了三千刀，依然站着。',need:()=>G.cards.some(c=>c.tier<2)},
-  gamble:{n:'赌徒的桌子',ico:'dice',cat:'misc',w:.8,d:'下注3金：一半机会赢回6金',f:'骰子灌过铅。灌在哪一面，没人知道。',need:()=>G.gold>=3},
-  spring:{n:'清泉',ico:'drop',cat:'misc',w:.9,d:'修复城墙8点',f:'井水有股铁锈味，但能用。',need:()=>G.wall<G.wallMax},
-  job:{n:'守夜轮值',ico:'lantern',cat:'misc',w:1,d:'替人值一班夜，获得3金币',f:'长夜漫漫，工钱照付。'},
+  enchant:{n:'附魔师',ico:'wand',cat:'up',w:1,d:'给一张卡换个词缀',f:'“别乱动，墨水还没干。”',need:()=>G.cards.length>0},
+  train:{n:'训练场',ico:'dummy',cat:'up',w:.9,d:'一张卡升一档品质（最多到金）',f:'稻草人挨了三千刀，依然站着。',need:()=>G.cards.some(c=>c.tier<2)},
+  gamble:{n:'赌徒的桌子',ico:'dice',cat:'misc',w:.8,d:'押3金，赢了拿6金，输了拉倒',f:'骰子灌过铅。灌在哪一面，没人知道。',need:()=>G.gold>=3},
+  spring:{n:'清泉',ico:'drop',cat:'misc',w:.9,d:'补墙8点',f:'井水有股铁锈味，但能用。',need:()=>G.wall<G.wallMax},
+  job:{n:'守夜轮值',ico:'lantern',cat:'misc',w:1,d:'替人值一班，挣3金',f:'长夜漫漫，工钱照付。'},
   furnace:{n:'熔炉',ico:'furnace',cat:'relic',w:.7,minR:2,d:'扔进去一张卡，换一件好遗物',f:'火焰只收最好的供品。',need:()=>G.cards.length>=2},
-  bank:{n:'钱庄',ico:'r_purse',cat:'misc',w:.8,minR:2,d:'存款生息：金币 +30%（至少+2）',f:'账房先生从来不抬头。'}
+  bank:{n:'钱庄',ico:'r_purse',cat:'misc',w:.8,minR:2,d:'存钱吃利息：金币+30%（最少+2）',f:'账房先生从来不抬头。'}
 };
 const EN={
   slime:{n:'史莱姆',hp:16,spd:.055,armor:0,wall:1,spr:'slime',sc:1,col:'#a7f070'},
@@ -1360,10 +1360,10 @@ Object.assign(RELICS,{
 });
 const HEROES={
   ayla:{n:'艾拉',title:'老兵守夜人',col:'#f0a64b',portrait:'p_ayla',wall:30,gold:8,start:[['dagger',0,3],['oathsword',1,4]],
-    tag:'擅长【刃】与【机】',desc:'在墙上站了二十年。城墙更厚，开局带着誓约长剑。专属：战号、城防弩车。',
+    tag:'擅长【刃】与【机】',desc:'墙上站了二十年的老兵。墙厚，开局就有誓约长剑。专属卡：战号、城防弩车。',
     intro:'我在这道墙上站了二十年。墙还在，我就还在。'},
   mo:{n:'墨',title:'流亡炼金师',col:'#b08cff',portrait:'p_mo',wall:22,gold:12,start:[['vial',0,3],['icicle',0,4]],
-    tag:'擅长【火】【冰】【电】',desc:'被学院放逐的天才。城墙更薄，但元素卡更强、钱更多。专属：元素棱镜、星陨。',
+    tag:'擅长【火】【冰】【电】',desc:'被学院赶出来的天才。墙薄钱多，元素卡更猛。专属卡：元素棱镜、星陨。',
     intro:'学院赶我走，是因为我说要用炼金术点亮太阳。现在，至少可以先点着几只怪物。'}
 };
 const TREES={

@@ -40,7 +40,7 @@ function meetFoe(type){
   const firstEver=!bestiary()[type];markSeen(type);
   const el=$('#foeCard');el.style.setProperty('--fc',d.col||'#ff8a80');
   const bb=$('#bossbar');el.style.top=(bb&&!bb.hidden?bb.offsetHeight+16:8)+'px';
-  el.innerHTML=`<img src="${SPR[d.spr].url}" alt=""><div><small>${firstEver?'新的敌人':'敌情'}${d.faction?' · '+d.faction:''}</small><b>${d.n}</b><p>${d.tip}</p></div>`;
+  el.innerHTML=`<img src="${SPR[d.spr].url}" alt=""><div><small>${firstEver?'头回见':'又来了'}${d.faction?' · '+d.faction:''}</small><b>${d.n}</b><p>${d.tip}</p></div>`;
   restart(el,'show');
   if(d.intro)say(d.intro[0],d.intro[1],2);
 }
