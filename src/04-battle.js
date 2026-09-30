@@ -72,7 +72,7 @@ function startBattle(){
 function later(dt,f){B.sched.push({t:dt,f});}
 function spawn(type,x,y){
   const d=EN[type];const sc=d.fixed?1:hpScale(G.round)*(G.round===1?.45:G.round===2?.55:.66);
-  const e={d,type,x:x!=null?x:rnd(.08,.92),y:y!=null?y:-.04,hp:d.hp*sc,maxHp:d.hp*sc,armor:d.armor,shield:0,slowT:0,slowA:0,burnT:0,burnD:0,burnSrc:null,burnTick:0,
+  const e={d,type,x:x!=null?x:rnd(.08,.92),y:y!=null?y:-.04,hp:d.hp*sc,maxHp:d.hp*sc,armor:d.armor,shield:0,slowT:0,slowA:0,burnT:0,burnD:0,burnSrc:null,burnTick:0,poisonT:0,poisonD:0,poisonSrc:null,poisonTick:0,
     flash:0,ph:Math.random()*6.28,armorB:0,hasteB:0,healT:rnd(1.5,3),bornT:B.t,raiseT:rnd(3,5),lobT:d.lob?d.lob[0]*.6:0,sprK:null,revealed:false,dashT:0,hardT:0,ii:0,it:d.intents?d.intents[0].t:0,dead:false};
   e.x0=e.x;B.en.push(e);if(!d.fixed&&e.y<0)for(let i=0;i<4;i++)part(ex(e)+rnd(-4,4),F.top+rnd(0,3),rnd(-8,8),rnd(5,20),.5,Math.random()<.5?'#a64ca6':'#5d275d',1);if(d.boss||d.elite){B.boss=e;$('#bossbar').hidden=false;$('#bossName').textContent=d.n;if(FOEB[type])say(type,FOEB[type].spawn,3);}
   if(!d.fixed)meetFoe(type);
@@ -109,6 +109,7 @@ function simStep(dt){
     if(e.slowT>0){e.slowT-=dt;if(e.slowT<=0)e.slowA=0;}
     if(e.hardT>0)e.hardT-=dt;
     if(e.burnT>0){e.burnT-=dt;e.burnTick+=dt;if(e.burnTick>=.5){e.burnTick-=.5;hurt(e,e.burnD*.5,e.burnSrc,false,{burnTick:1});if(e.dead)continue;}
+    if(e.poisonT>0){e.poisonT-=dt;e.poisonTick+=dt;if(e.poisonTick>=.5){e.poisonTick-=.5;hurt(e,e.poisonD*.5,e.poisonSrc,false,{poisonTick:1});if(Math.random()<.35)part(ex(e),ey(e)-8,rnd(-12,12),rnd(-24,-4),.45,'#7ddc5f',1);if(e.dead)continue;}}
       if(Math.random()<.25)part(ex(e)+rnd(-4,4),ey(e)-rnd(2,8),rnd(-5,5),-rnd(10,25),.4,Math.random()<.5?'#ef7d57':'#ffcd75',1);}
     if(e.d.intents){e.it-=dt;if(e.it<=0){doIntent(e);if(B.over)return;}}
     let sp=e.d.spd*(1-e.slowA)*(1+mv('enemySpd'))*(1+e.hasteB);if(e.dashT>0){e.dashT-=dt;sp*=3;}
@@ -168,6 +169,9 @@ function fire(c,depth){
   if(it.chargeSmall)for(const o of boardCards())if(o!==c&&o.size===1)chargeCard(o,it.chargeSmall*(1+.25*stepOf(c))*(1+mv('support')),c);
   if(it.buff)for(const n of c.nb){n.anvil=true;FX.link(c.el,n.el,'#e3e9f0',.22);}
   if(it.horn&&depth<10)for(const n of c.nb){if(n.frozen>0)continue;later(.1,()=>{if(B.over)return;FX.link(c.el,n.el,'#ffd166',.25);showChain(depth+2);if(depth+2>B.maxChain)B.maxChain=depth+2;trigger(n,depth+1);});}
+  if(it.fuse)for(const o of boardCards())if(o!==c&&ITEMS[o.key].tag===it.fuse.tag)chargeCard(o,it.fuse.amt+.03*stepOf(c),c);
+  if(it.detonate){let n=0;for(const e of B.en){if(e.dead||e.burnT<=0)continue;n++;const amt=e.burnD*e.burnT;e.burnT=0;e.burnD=0;ring(ex(e),ey(e)-8,3,34,'#ff7a2a',.45);hurt(e,amt,c,false,{});}if(n){SFX.play('boom');F.shake=Math.max(F.shake,4);}}
+  if(it.detonateP){let n=0;for(const e of B.en){if(e.dead||e.poisonT<=0)continue;n++;const amt=e.poisonD*e.poisonT;e.poisonT=0;e.poisonD=0;ring(ex(e),ey(e)-8,3,34,'#7ddc5f',.45);hurt(e,amt,c,false,{});}if(n){SFX.play('boom');F.shake=Math.max(F.shake,4);}}
   if(it.prism)for(const n of c.nb){if(!['火','冰','电'].includes(ITEMS[n.key].tag))continue;chargeCard(n,.25,c);n.anvil=true;FX.link(c.el,n.el,'#73eff7',.25);}
   if(c.adj==='ignite'&&c.right)chargeCard(c.right,.1,c);
   if(c.adj==='sturdy'){B.shield+=c.size*(c.tier+1);updateHUD();}
@@ -210,6 +214,11 @@ function attack(c,st){
     case'blizzard':{ring(F.W/2,F.H*.55,4,F.W*.7,'#73eff7',.5);for(let i=0;i<40;i++)part(rnd(0,F.W),rnd(F.top,F.H*.9),rnd(-50,-20),rnd(10,40),rnd(.4,.8),Math.random()<.5?'#f4f4f4':'#73eff7',1);
       for(const en of B.en)if(!en.dead&&en.y>=RANGE)H(en,1,{slow:it.slow});break;}
     case'spark':proj(o,t,{spd:230,kind:'spark'},e=>H(e,1,{burn:it.burn*dmgMul(c)*(1+mv('burn'))}));break;
+    case'sting':proj(o,t,{spd:300,kind:'knife'},e=>H(e,1,{poison:it.poison*dmgMul(c)*(1+mv('poison'))}));break;
+    case'gas':proj(o,t,{spd:0,kind:'shell',arc:1,dur:.42},(e,x,y)=>{boom(x,y,A,'#7ddc5f');ring(x,y,2,A*.7,'#a7f070',.4);for(const en of B.en)if(!en.dead&&Math.hypot(ex(en)-x,ey(en)-y)<=A)H(en,1,it.poison?{poison:it.poison*dmgMul(c)*(1+mv('poison'))}:null);});break;
+    case'fslash':{const x0=ex(t),y0=ey(t);let n2=null,bd=22*K();for(const e of B.en)if(!e.dead&&e!==t){const d=Math.hypot(ex(e)-x0,ey(e)-y0);if(d<bd){bd=d;n2=e;}}
+      for(let i=0;i<8;i++)part(x0+rnd(-8,8),y0-5,rnd(-40,40),rnd(-30,10),.3,Math.random()<.5?'#ffcd75':'#ef7d57',1);
+      bolt([[x0-8,y0-9],[x0+8,y0-1]],'#ffb37a',.14,true);H(t,1,{burn:it.burn*dmgMul(c)*(1+mv('burn'))});if(n2){bolt([[ex(n2)-7,ey(n2)-8],[ex(n2)+7,ey(n2)-2]],'#ffb37a',.14,true);H(n2,.8,{burn:it.burn*dmgMul(c)*(1+mv('burn'))});}break;}
     case'ice':proj(o,t,{spd:260,kind:'ice'},e=>H(e,1,{slow:Math.max(it.slow,mods.slow)}));break;
     case'arrow':proj(o,t,{spd:380,kind:'arrow'},e=>{H(e);
       const beh=B.en.filter(x=>!x.dead&&x!==e&&x.y<e.y&&Math.abs(ex(x)-ex(e))<26*K()).sort((a,b)=>b.y-a.y).slice(0,it.pierce);
@@ -245,20 +254,22 @@ function stepProj(p,dt){
 }
 function hurt(e,amt,src,crit,o){
   if(!e||e.dead)return;o=o||{};
-  if(phased(e)){if(!o.burnTick&&Math.random()<.3)num(ex(e),ey(e)-10,'0','#73eff7',1);return;}
+  if(phased(e)){if(!o.burnTick&&!o.poisonTick&&Math.random()<.3)num(ex(e),ey(e)-10,'0','#73eff7',1);return;}
   if(e.d.mimic&&!e.revealed){e.revealed=true;e.sprK=e.d.spr2;SFX.play('intent');ring(ex(e),ey(e)-5,2,14*K(),'#ffcd75',.3);}
   if(e.slowT>0&&mv('slowVuln'))amt*=1+mv('slowVuln');
   let a=Math.max(1,amt-Math.max(0,e.armor+e.armorB+(e.hardT>0?10:0)-(o.pen||0)-mv('pen')));
   if(o.burnTick)a=Math.max(1,amt);
+  if(o.poisonTick)a=Math.max(1,amt);
   if(e.shield>0){const s=Math.min(e.shield,a);e.shield-=s;a-=s;if(a<=0){num(ex(e),ey(e)-12,'0','#dfe6ee',1);return;}}
   e.hp-=a;e.flash=.08;if(src)src.bDmg+=a;
   const big=crit||a>=150;
-  if(crit||o.burnTick||F.nums.length<28||((e.d.boss||e.d.elite)?Math.random()<.25:Math.random()<.5))num(ex(e)+rnd(-7,7),ey(e)-10-rnd(0,5),fmt(a)+(crit?'!':''),o.burnTick?'#ef7d57':crit?'#fee761':'#ffffff',big?2:1);
-  if(!o.burnTick)SFX.play(crit?'crit':'hit');
+  if(crit||o.burnTick||o.poisonTick||F.nums.length<28||((e.d.boss||e.d.elite)?Math.random()<.25:Math.random()<.5))num(ex(e)+rnd(-7,7),ey(e)-10-rnd(0,5),fmt(a)+(crit?'!':''),o.poisonTick?'#7ddc5f':o.burnTick?'#ef7d57':crit?'#fee761':'#ffffff',big?2:1);
+  if(!o.burnTick&&!o.poisonTick)SFX.play(crit?'crit':'hit');
   if(crit){F.shake=Math.max(F.shake,1.5);if(a>=e.maxHp*.6&&a>=30)say('hero',BARKS.crit,1);}
   if(e===B.boss&&!e.lowSaid&&e.hp-a<e.maxHp*.3&&FOEB[e.type]){e.lowSaid=true;say(e.type,FOEB[e.type].low,3);say('hero',FOEB[e.type].heroLow,3);}
   if(o.slow){e.slowT=2;e.slowA=Math.min(.85,Math.max(e.slowA,o.slow*(1+mv('slow'))*(e.d.boss?.5:1)));}
   if(o.burn){e.burnT=3;e.burnD=Math.max(e.burnD,o.burn);e.burnSrc=src;}
+  if(o.poison){e.poisonT=3;e.poisonD+=o.poison;e.poisonSrc=src;}
   if(o.kb&&!e.d.boss)e.y=Math.max(-.03,e.y-o.kb*(e.d.elite?.3:1));
   for(let i=0;i<3;i++)part(ex(e),ey(e)-5,rnd(-30,30),rnd(-40,5),.25,'#ffffff',1);
   if(e.hp<=0)kill(e,src);
@@ -471,7 +482,7 @@ function heroSelect(){
   sc.innerHTML=`<div class="scr"><h1 style="font-size:32px">选择守夜人</h1><div class="heroes">${Object.keys(HEROES).map(k=>{const H=HEROES[k];
     return `<button class="hero" data-h="${k}" style="--hc:${H.col}"><img class="por" src="${SPR[H.portrait].url}" alt=""><div class="hn"><b>${H.n}</b><small>${H.title}</small></div>
     <div class="htag">${H.tag}</div><p>${H.desc}</p><div class="hstat"><span>城墙 <b>${H.wall}</b></span><span>金币 <b>${H.gold}</b></span></div>
-    <div class="hcards">${H.start.map(s=>`<img src="${SPR[s[0]].url}" alt="${ITEMS[s[0]].n}">`).join('')}${Object.keys(ITEMS).filter(i=>ITEMS[i].hero===k&&!H.start.some(s=>s[0]===i)).map(i=>`<img class="ex" src="${SPR[i].url}" alt="${ITEMS[i].n}">`).join('')}</div>
+    <div class="hcards">${H.start.map(s=>`<img src="${SPR[s[0]].url}" alt="${ITEMS[s[0]].n}">`).join('')}</div>
     <em>“${H.intro}”</em></button>`;}).join('')}</div></div>`;
   sc.hidden=false;
   sc.querySelectorAll('.hero').forEach(b=>b.onclick=()=>{SFX.ensure();SFX.play('merge');sc.hidden=true;newGame(b.dataset.h);});
