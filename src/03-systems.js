@@ -131,7 +131,7 @@ function stats(c,t){
     if(P.elem)n=new Set(boardCards().map(o=>ITEMS[o.key].tag)).size;else if(P.kind)n=countKind(P.kind,c);else if(P.tag)n=countTag(P.tag,c);
     if(n)pct.push([(P.elem?'元素':P.kind||P.tag)+'×'+n,P.pct*n]);}
   if(mv('t_alch')&&c.loc==='board'){const n=countKind('药剂');if(n)pct.push(['炼金手册×'+n,.04*n*mv('t_alch')]);}
-  mp('dmg','物品');mp('tag_'+it.tag,'物品·'+it.tag);mp('s'+it.size,'物品·'+SIZEN[it.size]+'型');
+  mp('dmg','加成');mp('tag_'+it.tag,'加成·'+it.tag);mp('s'+it.size,'加成·'+SIZEN[it.size]+'型');
   if(c.loc==='board'){const bc=boardCards();if(bc[0]===c)mp('left','最左');if(bc[bc.length-1]===c)mp('right','最右');
     if(mv('lonely')&&!(c.nb||neighbors(c)).length)mp('lonely','孤狼');if(mv('full')&&occ('board').every(Boolean))mp('full','满员');}
   const psum=pct.reduce((s,p)=>s+p[1],0);const mult=a==='deadly'?1.5:1;
@@ -194,19 +194,15 @@ function updateHUD(){
   document.querySelectorAll('.offer').forEach(o=>{const p=o.querySelector('.price');if(p&&+p.dataset.p>0)p.classList.toggle('cant',+p.dataset.p>G.gold);});
 }
 function renderRelics(fresh){
-  const box=$('#relics');box.innerHTML='';
-  const b=document.createElement('button');b.className='chip bagchip'+(fresh?' bump':'');b.setAttribute('aria-label','物品');
-  b.innerHTML=`<img class="ico" src="${SPR.bag.url}" alt=""><span class="lbl">物品</span><b>${G.relics.length}</b>`;
-  b.onclick=()=>{SFX.ensure();openBag();};box.appendChild(b);
-}
+  $('#relicN').textContent=G.relics.length||'';if(fresh)restart($('#relicBtn'),'bump');}
 function openBag(){SFX.play('ui');const sh=$('#sheet');const cnt={};G.relics.forEach(r=>cnt[r]=(cnt[r]||0)+1);
   const ids=Object.keys(cnt).sort((a,b)=>RELICS[b].t-RELICS[a].t);
-  sh.innerHTML=`<div class="sh" role="dialog" aria-label="物品"><h3>物品 <small style="color:var(--muted);font-size:15px">${G.relics.length} 件</small></h3>
-    ${ids.length?`<div class="bag">${ids.map(r=>`<button class="relic" data-r="${r}" style="--gc:${GT[RELICS[r].t].c}"><img src="${icon(RELICS[r].ico).url}" alt="${RELICS[r].n}">${cnt[r]>1?'<sub>'+cnt[r]+'</sub>':''}</button>`).join('')}</div>
-    <div class="stat"><div><span>合计效果</span><span></span></div><div class="mods">${modText(M)}</div></div>`:'<p>还没有物品。去遗物祭坛、杂货铺或熔炉看看。</p>'}
+  sh.innerHTML=`<div class="sh" role="dialog" aria-label="遗物"><h3>遗物 <small class="spn">${G.relics.length} 件</small></h3>
+    ${ids.length?`<div class="tlist">${ids.map(r=>{const R0=RELICS[r],c=GT[R0.t].c;return `<button class="trow relrow" data-r="${r}" style="--gc:${c}"><img class="ricon" src="${icon(R0.ico).url}" alt=""><div><b>${R0.n}${cnt[r]>1?' ×'+cnt[r]:''}<small class="gt">${GT[R0.t].n}</small></b><span class="mods">${modText(R0.m)}</span></div></button>`;}).join('')}</div>
+    <div class="stat"><div><span>加起来</span><span></span></div><div class="mods">${modText(M)}</div></div>`:'<p class="muted2">还两手空空。遗物祭坛、杂货铺、熔炉都能弄到。</p>'}
     <div class="sh-btns"><button class="btn" id="bClose">关闭</button></div></div>`;
   sh.hidden=false;$('#bClose').onclick=closeSheet;sh.onclick=e=>{if(e.target===sh)closeSheet();};
-  sh.querySelectorAll('.bag .relic').forEach(el=>el.onclick=()=>openRelicSheet(el.dataset.r));}
+  sh.querySelectorAll('.relrow').forEach(el=>el.onclick=()=>openRelicSheet(el.dataset.r));}
 function toast(msg){const t=$('#toast');t.textContent=msg;restart(t,'show');}
 function banner(msg,col){const b=$('#banner');b.textContent=msg;b.style.color=col||'#fff';restart(b,'show');}
 
@@ -336,7 +332,7 @@ function enterEvent(id){
   if(ev.cat==='shop'){cur.mode='shop';cur.refresh=1;cur.offers=[0,1,2].map(()=>makeOffer(ev.filter,{black:ev.black}));}
   else if(id==='chest'){cur.mode='gift';cur.offers=[makeOffer(null,{free:1})];}
   else if(id==='field'){cur.mode='pick';cur.offers=[0,1,2].map(()=>makeOffer(null,{free:1}));}
-  else if(id==='altar'){relicChoice(cur,'选择一件物品，效果永久生效，可叠加',rollGear(3,0,2));}
+  else if(id==='altar'){relicChoice(cur,'挑一件，一直生效，同名的能叠',rollGear(3,0,2));}
   else if(id==='parcel'){relicChoice(cur,'包裹里装着……',rollGear(1,1,2));}
   else if(id==='grocer'){cur.mode='gshop';cur.refresh=1;cur.goods=rollGear(3,1).map(k=>({k,price:gearPrice(k),sold:false}));}
   else if(id==='enchant'){cur.mode='choice';cur.hint='选一项附魔（会替换原有词缀）';
@@ -348,7 +344,7 @@ function enterEvent(id){
       act:()=>{c.tier++;repaint(c);checkMerges();renderOwned();SFX.play('merge');if(c.el){const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,TIERS[c.tier].c,24);restart(c.el,'merge');}finishStep();}};});}
   else if(id==='furnace'){cur.mode='choice';cur.hint='选一张卡投入熔炉';
     cur.opts=shuffled(G.cards).slice(0,4).map(c=>({card:c,label:'献祭 '+ITEMS[c.key].n,sub:'失去这张卡（售价 '+sellValue(c)+'），然后挑选一件遗物',
-      act:()=>{const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,'#ef7d57',26);SFX.play('boom');removeCard(c);renderOwned();relicChoice(cur,'熔炉吐出了三件物品，选一件',rollGear(3,3));renderPrep();}}));}
+      act:()=>{const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,'#ef7d57',26);SFX.play('boom');removeCard(c);renderOwned();relicChoice(cur,'熔炉吐出三件遗物，选一件',rollGear(3,3));renderPrep();}}));}
   else if(id==='gamble'){cur.mode='gamble';}
   else if(id==='mentor'||(id==='manual'&&Math.random()<.5)){const m=pick(MEETS);Object.assign(cur,{mode:'talent',who:m.who,intro:[[m.who,m.say]],picks:rollTalents(2),title:m.n});}
   else if(id==='manual'){cur.mode='pick';cur.offers=[0,1].map(()=>makeOffer(it=>it.hero===G.hero&&it.t>=1,{free:1}));}
@@ -399,7 +395,7 @@ function gearLabel(k){const g=RELICS[k];const n=G.relics.filter(x=>x===k).length
 function relicChoice(cur,hint,list){cur.mode='relic';cur.hint=hint;
   cur.opts=list.map(r=>({ico:RELICS[r].ico,gt:RELICS[r].t,label:gearLabel(r),sub:modText(RELICS[r].m),flav:RELICS[r].f,act:()=>gainRelic(r)}));}
 function gainRelic(r,stay){G.relics.push(r);const w=RELICS[r].m.wall;if(w){G.wallMax=Math.max(5,G.wallMax+w);G.wall=w>0?G.wall+w:Math.min(G.wall,G.wallMax);}
-  recalcMods();SFX.play('merge');renderRelics(r);renderOwned();updateHUD();toast('获得物品：'+RELICS[r].n);if(!stay)finishStep();}
+  recalcMods();SFX.play('merge');renderRelics(r);renderOwned();updateHUD();toast('拿到遗物：'+RELICS[r].n);if(!stay)finishStep();}
 function shuffled(a){return a.slice().sort(()=>Math.random()-.5);}
 function finishStep(){const P=G.prep;P.step++;P.cur=null;if(P.step<3)rollDoors();renderPrep();SFX.play('ui');
   if(P.step>=3)restart($('#goBtn'),'bump');}
@@ -578,8 +574,8 @@ function openSheet(src){
 }
 function kwBox(d){const ks=Object.keys(KW).filter(k=>d.includes('【'+k));return ks.length?`<div class="kwbox">${ks.map(k=>`<div><b>${k}</b><span>${KW[k]}</span></div>`).join('')}</div>`:'';}
 function openRelicSheet(r){const R0=RELICS[r];SFX.play('ui');const sh=$('#sheet');const n=G.relics.filter(x=>x===r).length;
-  sh.innerHTML=`<div class="sh" role="dialog" aria-label="${R0.n}"><div class="sh-top"><img class="ricon big" src="${icon(R0.ico).url}" alt="" style="--gc:${GT[R0.t].c}"><div><h3 style="color:${GT[R0.t].c}">${R0.n}${n>1?' ×'+n:''}</h3><div class="tags"><span class="tag" style="background:${GT[R0.t].c}33;color:${GT[R0.t].c}">${GT[R0.t].n}物品</span><span class="tag">${R0.u?'唯一':'可叠加'}</span></div><p class="mods">${modText(R0.m)}</p></div></div><p class="flav">“${R0.f}”</p><div class="sh-btns"><button class="btn" id="rClose">关闭</button></div></div>`;
-  sh.hidden=false;$('#rClose').onclick=closeSheet;sh.onclick=e=>{if(e.target===sh)closeSheet();};}
+  sh.innerHTML=`<div class="sh" role="dialog" aria-label="${R0.n}"><div class="sh-top"><img class="ricon big" src="${icon(R0.ico).url}" alt="" style="--gc:${GT[R0.t].c}"><div><h3 style="color:${GT[R0.t].c}">${R0.n}${n>1?' ×'+n:''}</h3><div class="tags"><span class="tag" style="background:${GT[R0.t].c}33;color:${GT[R0.t].c}">${GT[R0.t].n}遗物</span><span class="tag">${R0.u?'唯一':'可叠加'}</span></div><p class="mods">${modText(R0.m)}</p></div></div><p class="flav">“${R0.f}”</p><div class="sh-btns"><button class="btn" id="rBack">返回</button><button class="btn" id="rClose">关闭</button></div></div>`;
+  sh.hidden=false;$('#rClose').onclick=closeSheet;$('#rBack').onclick=openBag;sh.onclick=e=>{if(e.target===sh)closeSheet();};}
 function setDrawer(o){G.drawer=o;$('#stashRow').classList.toggle('closed',!o);updateHUD();setTimeout(()=>{if(G.phase==='battle')resizeField();},300);}
 function openTree(){const H=HEROES[G.hero];SFX.play('ui');const sh=$('#sheet');
   sh.innerHTML=`<div class="sh" role="dialog" aria-label="天赋"><h3>${H.n}的天赋 <small class="spn">${G.skills.length} 个</small></h3>

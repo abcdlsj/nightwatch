@@ -75,7 +75,7 @@ function spawn(type,x,y){
   const d=EN[type];const sc=d.fixed?1:hpScale(G.round)*(G.round===1?.45:G.round===2?.55:.66);
   const e={d,type,x:x!=null?x:rnd(.08,.92),y:y!=null?y:-.04,hp:d.hp*sc,maxHp:d.hp*sc,armor:d.armor,shield:0,slowT:0,slowA:0,burnT:0,burnD:0,burnSrc:null,burnTick:0,poisonT:0,poisonD:0,poisonSrc:null,poisonTick:0,frzT:0,frzN:0,vulnT:0,vulnA:0,
     flash:0,ph:Math.random()*6.28,armorB:0,hasteB:0,healT:rnd(1.5,3),bornT:B.t,raiseT:rnd(3,5),lobT:d.lob?d.lob[0]*.6:0,sprK:null,revealed:false,dashT:0,hardT:0,ii:0,it:d.intents?d.intents[0].t:0,dead:false};
-  e.x0=e.x;B.en.push(e);if(!d.fixed&&e.y<0)for(let i=0;i<4;i++)part(ex(e)+rnd(-4,4),F.top+rnd(0,3),rnd(-8,8),rnd(5,20),.5,Math.random()<.5?'#a64ca6':'#5d275d',1);if(d.boss||d.elite){B.boss=e;$('#bossbar').hidden=false;$('#bossName').textContent=d.n;if(FOEB[type])say(type,FOEB[type].spawn,3);}
+  e.x0=e.x;B.en.push(e);if((d.boss||d.elite||d.big)&&!B.flags['met'+type]){B.flags['met'+type]=1;later(1.2,()=>say('hero',BARKS.elite,2));}if(!d.fixed&&e.y<0)for(let i=0;i<4;i++)part(ex(e)+rnd(-4,4),F.top+rnd(0,3),rnd(-8,8),rnd(5,20),.5,Math.random()<.5?'#a64ca6':'#5d275d',1);if(d.boss||d.elite){B.boss=e;$('#bossbar').hidden=false;$('#bossName').textContent=d.n;if(FOEB[type])say(type,FOEB[type].spawn,3);}
   if(!d.fixed)meetFoe(type);
   return e;
 }
@@ -172,7 +172,7 @@ function trigger(c,depth){
 function fire(c,depth){
   if(B.over)return;
   const it=ITEMS[c.key];if(c.ammo===0)return;c.bTrig++;restart(c.el,'pop');SFX.play('fire',it.tag);
-  if(c.ammo>0){c.ammo--;setAmmo(c);}
+  if(c.ammo>0){c.ammo--;setAmmo(c);if(c.ammo===0&&!B.flags.emptySaid){B.flags.emptySaid=1;say('hero',BARKS.empty,1);}}
   const st=stats(c,B.t);
   if(it.dmg>0){attack(c,st);for(let i=1;i<(it.multi||1);i++)later(.09*i,()=>{if(!B.over)attack(c,st);});}
   if(it.stack)c.stk+=it.stack;
@@ -321,7 +321,8 @@ function surge(){banner('大军压境','#ff8a5b');SFX.play('intent');SFX.play('b
   say('soldier',BARKS.soldierSurge,2);say('hero',BARKS.surge,2);}
 function fmt(v){v=Math.round(v);return v>=10000?Math.round(v/1000)+'k':String(v);}
 function kill(e,src){
-  e.dead=true;B.kills++;SFX.play('kill');
+  e.dead=true;B.kills++;SFX.play('kill');if(B.kills===1)say('hero',BARKS.first,1);
+  B.kt=(B.kt||[]).filter(t=>t>B.t-2);B.kt.push(B.t);if(B.kt.length>=8){B.kt=[];say('hero',BARKS.streak,1);}
   emit('kill',{e,src,burning:e.burnT>0,poisoned:e.poisonT>0,frozen:e.frzT>0,elite:!!(e.d.elite||e.d.boss)});
   const n=e.d.boss?60:e.d.elite?36:12;for(let i=0;i<n;i++)part(ex(e),ey(e)-5,rnd(-50,50),rnd(-60,20),rnd(.3,.7),Math.random()<.6?e.d.col:'#1a1c2c',Math.random()<.5?2:1);
   part(ex(e),ey(e)-6,rnd(-4,4),-35,.8,'#dfe6ee',1);ring(ex(e),ey(e)-5,1,6*K()*e.d.sc,'#ffffff',.18);
@@ -333,7 +334,7 @@ function kill(e,src){
   if(e.d.split){for(let i=0;i<e.d.split;i++){const m=spawn('mini',clamp(e.x+(i?.05:-.05),.04,.96),e.y-.01);m.x0=m.x;}}
   if(src&&src.adj==='greedy'){G.gold++;B.greed++;const[cx,cy]=toClient(ex(e),ey(e));FX.coins(cx,cy,1);SFX.play('coin');updateHUD();}
   if(mv('killGold')&&Math.random()<mv('killGold')){G.gold++;const[cx,cy]=toClient(ex(e),ey(e));FX.coins(cx,cy,1);updateHUD();}
-  if(e.d.boss||e.d.elite){F.shake=6;SFX.play('boom');if(FOEB[e.type])say(e.type,FOEB[e.type].die,3);ring(ex(e),ey(e),4,60,'#fee761',.6);B.boss=null;$('#bossbar').hidden=true;}
+  if(e.d.boss||e.d.elite){F.shake=6;SFX.play('boom');if(FOEB[e.type])say(e.type,FOEB[e.type].die,3);if(!e.d.boss)say('hero',BARKS.killElite,2);ring(ex(e),ey(e),4,60,'#fee761',.6);B.boss=null;$('#bossbar').hidden=true;}
 }
 
 /* ---- 场景特效 ---- */
@@ -459,7 +460,7 @@ const FX=(function(){
 /* ================= 流程 ================= */
 function winBattle(){
   B.over=true;G.phase='report';$('#bossbar').hidden=true;
-  G.bestChain=Math.max(G.bestChain,B.maxChain);SFX.play('win');
+  G.bestChain=Math.max(G.bestChain,B.maxChain);SFX.play('win');say('hero',BARKS.win,2);
   for(const c of G.cards)if(c.adj==='hoard')c.hoard++;
   for(const c of boardCards()){const w=ITEMS[c.key].onWin;if(w)w(c);}
   finishQuests();
@@ -467,7 +468,7 @@ function winBattle(){
   const was=G.round;
   if(was>=G.maxRound){banner('黎明','#ffe79a');BG.set('shop');setTimeout(()=>playStory(STORY.win,()=>endScreen(true)),1400);return;}
   updateHUD();const winG=3+Math.floor(was/2);const rows=[['胜利奖励',winG]];if(was===4)rows.push(['击败精英',4]);
-  const interest=Math.min(3+mv('interest'),Math.floor(G.gold/6));if(mv('winGold'))rows.push(['物品加成',mv('winGold')]);if(mv('regen'))G.wall=Math.min(G.wallMax,G.wall+mv('regen'));if(interest)rows.push(['利息（每6金+1）',interest]);
+  const interest=Math.min(3+mv('interest'),Math.floor(G.gold/6));if(mv('winGold'))rows.push(['遗物/天赋',mv('winGold')]);if(mv('regen'))G.wall=Math.min(G.wallMax,G.wall+mv('regen'));if(interest)rows.push(['利息（每6金+1）',interest]);
   if(B.wallLost===0)rows.push(['城墙无损',1]);
   if(B.greed)rows.push(['贪婪收入（已到账）',0,B.greed]);
   const total=rows.reduce((s,r)=>s+r[1],0);
@@ -475,7 +476,7 @@ function winBattle(){
 }
 function showReport(was,rows,total){
   const rp=$('#report');const bc=G.cards.filter(c=>c.bTrig>0).sort((a,b)=>b.bDmg-a.bDmg);const mx=Math.max(1,...bc.map(c=>c.bDmg));
-  rp.innerHTML=`<div class="rp-title win">第${was}波 · 守住了</div>
+  rp.innerHTML=`<div class="rp-title win">第${was}夜 · ${pickLine(RPT.win)}</div>
   <div class="rp-list">${bc.map((c,i)=>`<div class="rp-row" style="animation-delay:${i*.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${SPR[c.key].url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${(c.bDmg/mx*100).toFixed(1)}"></i></div><b>${fmt(c.bDmg)}<small>×${c.bTrig}</small></b></div>`).join('')||'<div class="rp-meta">这一波没有卡牌出手</div>'}</div>
   <div class="rp-meta">${(was+1)%2===1?'<b style="color:#ffd166">明晚之前有夜谈</b>　':''}最高连锁 <b>×${B.maxChain||1}</b>　击杀 <b>${B.kills}</b>　城墙 <b>-${Math.ceil(B.wallLost)}</b></div>
   <div class="rp-cash" id="cash"></div>
@@ -488,13 +489,13 @@ function showReport(was,rows,total){
   setTimeout(next,400);
   $('#cashBtn').onclick=()=>{SFX.ensure();const r=$('#cashBtn').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top,Math.min(total,10));G.gold+=total;G.round++;$('#report').hidden=true;nightStory(()=>toPrep());};
 }
-function loseBattle(){B.over=true;G.phase='over';SFX.play('lose');G.bestChain=Math.max(G.bestChain,B.maxChain);banner('城墙被攻破','#ff6b5b');setTimeout(()=>playStory(STORY.lose,()=>endScreen(false)),1400);}
+function loseBattle(){B.over=true;G.phase='over';SFX.play('lose');G.bestChain=Math.max(G.bestChain,B.maxChain);banner(pickLine(RPT.fall),'#ff6b5b');setTimeout(()=>playStory(STORY.lose,()=>endScreen(false)),1400);}
 function endScreen(win){
   const sc=$('#screen');BG.set(win?'shop':'over');
   const best=G.cards.slice().sort((a,b)=>b.bDmg-a.bDmg)[0];
   sc.innerHTML=`<div class="scr"><img class="por-big" src="${SPR[HEROES[G.hero].portrait].url}" alt=""><h1 style="color:${win?'#ffe79a':'#ff8a80'}">${win?'黎明到来':'长夜未尽'}</h1><div class="logo-sub">${HEROES[G.hero].n} · ${HEROES[G.hero].title}</div>
   <div class="rules res"><div><span>坚守到</span><i style="margin-left:auto">第 ${Math.min(G.round,8)} 夜 / 8</i></div>
-  <div><span>物品 / 天赋</span><i style="margin-left:auto">${G.relics.length} 件 / ${G.skills.length} 个</i></div>
+  <div><span>遗物 / 天赋</span><i style="margin-left:auto">${G.relics.length} 件 / ${G.skills.length} 个</i></div>
   <div><span>最高连锁</span><i style="margin-left:auto">×${G.bestChain||1}</i></div>
   ${best?`<div><span>最后的王牌</span><i style="margin-left:auto">${best.adj?ADJ[best.adj].n+'的':''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}</i></div>`:''}</div>
   <button class="btn red big" id="againBtn">再来一局</button></div>`;
@@ -553,6 +554,7 @@ addEventListener('resize',layout);
 $('#goBtn').onclick=()=>{SFX.ensure();if(G.phase==='prep'&&G.prep.step>=3)startBattle();};
 $('#bagBtn').onclick=()=>{SFX.ensure();SFX.play('ui');if(G.phase!=='battle')setDrawer(!G.drawer);else toast('战斗中不能整理背包');};
 $('#treeBtn').onclick=()=>{SFX.ensure();openTree();};
+$('#relicBtn').onclick=()=>{SFX.ensure();openBag();};
 $('#speedBtn').onclick=()=>{SFX.ensure();SFX.play('ui');G.speed=G.speed>=3?1:G.speed+1;updateHUD();};
 $('#muteBtn').onclick=()=>{SFX.ensure();const m=SFX.toggle();$('#muteBtn').textContent=m?'♪ 关':'♪ 开';};
 let lastT=performance.now();
