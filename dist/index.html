@@ -382,6 +382,7 @@ button{font-family:inherit}
 .trow{display:flex;gap:10px;align-items:center;background:rgba(0,0,0,.25);border-radius:10px;padding:6px 9px;box-shadow:inset 3px 0 0 var(--gc)}
 .trow .ricon{width:36px;height:36px;padding:5px;box-shadow:inset 0 0 0 2px var(--gc)}
 .trow div{display:flex;flex-direction:column;gap:2px;min-width:0}.trow b{font-weight:400;font-size:16px;color:var(--gc)}
+.relrow{border:0;color:#fff;text-align:left;cursor:pointer;width:100%;font-family:inherit}.relrow .mods{font-size:12px;display:flex;flex-wrap:wrap;gap:0 8px}
 .trow em{font-family:Georgia,'Songti SC','Noto Serif CJK SC',serif;font-size:12px;color:#c9bda8}
 
 /* ---------- 战斗内台词 / 新敌人卡片（纯表现，不接收点击） ---------- */
@@ -499,6 +500,7 @@ button{font-family:inherit}
     <button class="btn" id="speedBtn">1×</button>
     <button class="btn fb" id="bagBtn" aria-label="背包"><img class="ico" data-ico="chest" alt="">背包<sup id="bagN"></sup></button>
     <button class="btn fb" id="treeBtn" aria-label="天赋"><img class="ico" data-ico="altar" alt="">天赋<sup id="treeN"></sup></button>
+    <button class="btn fb" id="relicBtn" aria-label="遗物"><img class="ico" data-ico="bag" alt="">遗物<sup id="relicN"></sup></button>
     <button class="btn red big" id="goBtn">开始战斗</button>
   </footer>
 </div>
@@ -1791,15 +1793,15 @@ const EVENTS={
   black:{n:'黑市',ico:'mask',cat:'shop',w:.8,minR:3,d:'品质更高、必带词缀，价格 ×1.5',f:'不问来路，不问去处。',black:1},
   chest:{n:'路边宝箱',ico:'chest',cat:'free',w:1.1,d:'免费获得一张随机卡牌',f:'锁早就锈断了。'},
   field:{n:'旧战场',ico:'dagger',cat:'free',w:1.1,d:'从3张卡牌中免费挑一张',f:'前人留下的东西，总得有人接着用。'},
-  altar:{n:'遗物祭坛',ico:'altar',cat:'relic',w:1,d:'从3件物品中免费选择一件',f:'香灰还是温的。'},
-  grocer:{n:'杂货铺',ico:'potion:P',cat:'relic',w:1.3,d:'用金币购买物品（3件，可刷新1次）',f:'货架上的东西，一半能用，一半能吓人。'},
-  parcel:{n:'无主的包裹',ico:'book:N',cat:'free',w:.8,d:'免费获得一件随机物品',f:'收件人一栏被雨水泡花了。'},
+  altar:{n:'遗物祭坛',ico:'altar',cat:'relic',w:1,d:'三件遗物，白拿一件',f:'香灰还是温的。'},
+  grocer:{n:'杂货铺',ico:'potion:P',cat:'relic',w:1.3,d:'花钱买遗物，能刷新一次',f:'货架上的东西，一半能用，一半能吓人。'},
+  parcel:{n:'无主的包裹',ico:'book:N',cat:'free',w:.8,d:'白捡一件遗物',f:'收件人一栏被雨水泡花了。'},
   enchant:{n:'附魔师',ico:'wand',cat:'up',w:1,d:'为你的一张卡附上（或替换）词缀',f:'“别乱动，墨水还没干。”',need:()=>G.cards.length>0},
   train:{n:'训练场',ico:'dummy',cat:'up',w:.9,d:'将你的一张卡提升一个品质（最高到金）',f:'稻草人挨了三千刀，依然站着。',need:()=>G.cards.some(c=>c.tier<2)},
   gamble:{n:'赌徒的桌子',ico:'dice',cat:'misc',w:.8,d:'下注3金：一半机会赢回6金',f:'骰子灌过铅。灌在哪一面，没人知道。',need:()=>G.gold>=3},
   spring:{n:'清泉',ico:'drop',cat:'misc',w:.9,d:'修复城墙8点',f:'井水有股铁锈味，但能用。',need:()=>G.wall<G.wallMax},
   job:{n:'守夜轮值',ico:'lantern',cat:'misc',w:1,d:'替人值一班夜，获得3金币',f:'长夜漫漫，工钱照付。'},
-  furnace:{n:'熔炉',ico:'furnace',cat:'relic',w:.7,minR:2,d:'献祭一张卡，换取一件更好的物品',f:'火焰只收最好的供品。',need:()=>G.cards.length>=2},
+  furnace:{n:'熔炉',ico:'furnace',cat:'relic',w:.7,minR:2,d:'扔进去一张卡，换一件好遗物',f:'火焰只收最好的供品。',need:()=>G.cards.length>=2},
   bank:{n:'钱庄',ico:'r_purse',cat:'misc',w:.8,minR:2,d:'存款生息：金币 +30%（至少+2）',f:'账房先生从来不抬头。'}
 };
 const EN={
@@ -1943,9 +1945,18 @@ const BARKS={
   freeze:{ayla:['手动不了了！快化开它！'],mo:['我的仪器被冻住了！']},
   surge:{ayla:['全员上墙！','来得正好，一次清干净！'],mo:['样本量……激增。','好多。好多好多。']},
   win:{ayla:['天还没亮，但今晚守住了。','清点人数，包扎伤口。'],mo:['数据很漂亮，今晚到此为止。','活下来了。准备下一组实验。']},
-  soldierSurge:['北面！更多的火把！大军压境！','地平线上全是火把！','它们……它们还在往上涌！'],
-  soldierHurt:['城墙被撞开一道缝！','东段在掉砖！','有人受伤了！担架！']
+  first:{ayla:['第一个。后面排好队。','开张了。'],mo:['第一份样本，到手。','反应开始了。'],ying:['打中啦！','第一盏灯亮了！']},
+  streak:{ayla:['一个接一个，别停手！','这才像话。'],mo:['效率很高。继续保持。','这批样本质量不行，碎得太快。'],ying:['叮叮叮叮——全倒了！','就像多米诺骨牌！']},
+  elite:{ayla:['大家伙来了。都给我站稳。','……又是个硬茬。'],mo:['大型样本。给我留个完整的。','这个体型，得加大剂量。'],ying:['好、好大……别慌，别慌。','那个我够不着，大家帮帮我！']},
+  killElite:{ayla:['倒了。下一个。','硬茬也就这样。'],mo:['解剖报告晚点写。','漂亮。记录在案。'],ying:['我们……我们打赢它了？','师父，你看见了吗！']},
+  empty:{ayla:['没箭了！拿刀顶上！','空了，换家伙！'],mo:['弹药耗尽。下次多备点。','瓶子扔光了……'],ying:['没油了！','灯油用完了，谁帮我续一下！']},
+  win:{ayla:['天还没亮，但今晚守住了。','清点人数，包扎伤口。'],mo:['数据很漂亮，今晚到此为止。','活下来了。准备下一组实验。'],ying:['今晚的灯，一盏都没灭。','收工。明晚还要早点来上油。']},
+  soldierSurge:{ayla:['长官！北面全是火把！','地平线上全是火把！长官，下命令吧！'],mo:['炼金师！又来了一大批！','您那些瓶子还够吗？它们又上来了！'],ying:['萤姑娘，快躲后面去！又来一大波！','好多火把……比城里的灯还多！']},
+  soldierHurt:{ayla:['长官，东段在掉砖！','城墙被撞开一道缝！'],mo:['炼金师，墙裂了！您那药能糊墙吗？','有人受伤了！担架！'],ying:['萤姑娘，墙上的灯被撞灭了！','有人受伤了！担架！']}
 };
+/* 战报标题 / 城破横幅：按人物说话 */
+const RPT={win:{ayla:['守住了。','墙还在。','又熬过一夜。'],mo:['实验成功。','数据有效。','今晚的记录：守住。'],ying:['灯没灭！','守住啦！','又亮了一夜。']},
+  fall:{ayla:'墙……塌了',mo:'计算失误',ying:'灯灭了'}};
 
 /* 首领台词：登场 / 意图 / 残血 / 倒下 */
 const FOEB={
@@ -1965,7 +1976,7 @@ const FOEB={
 const NIGHTS=[
   {title:'第一夜 · 墙外的黏液',beats:[
     [1,'narr','黄昏刚过，墙外的沼地开始蠕动。'],
-    [5,'soldier','它们爬过来了！长官……我们就这么点人？'],
+    [5,'soldier',{ayla:'它们爬过来了！长官……我们就这么点人？',mo:'它们爬过来了！炼金师，你那些瓶子够不够？',ying:'它们爬过来了！萤姑娘，你站我后面！'}],
     [9,'hero',{ayla:'够了。墙上的每个人都算数。',mo:'人少才好——实验变量更少。'}],
     [24,'bellman','钟还在响！城里的人都在窗户后面看着我们！']]},
   {title:'第二夜 · 地底的火药',beats:[
@@ -1996,7 +2007,7 @@ const NIGHTS=[
   {title:'第七夜 · 最长的夜',beats:[
     [1,'narr','钟楼只剩一口钟还在响。城里的人都上了墙，连孩子都在搬砖。'],
     [6,'hero',{ayla:'今晚过后，要么天亮，要么什么都不剩。',mo:'最后一瓶药剂我也倒进去了。别浪费。'}],
-    [16,'soldier','孩子们把砖递上来了！长官，城墙还在！'],
+    [16,'soldier',{ayla:'孩子们把砖递上来了！长官，城墙还在！',mo:'孩子们把砖递上来了！炼金师，还撑得住！',ying:'孩子们把砖递上来了！萤姑娘，你的学生也来了！'}],
     [30,'bellman','我还能敲！只要钟还在，我就还能敲！']]},
   {title:'第八夜 · 深渊之眼',beats:[
     [1,'narr','北方的天空裂开了。那只眼睛睁开，看着这座城——看着你。'],
@@ -4017,7 +4028,7 @@ TREE_SAY.ying=[
 const _Y={
   chain:['叮叮当当——全都转起来了！','就像师父的钟，一个带动一个！'],crit:['正中！','这一下，比钟声还响。'],
   hurt:['墙上的灯灭了一盏！','别碰我的灯！'],low:['灯……还剩几盏？不，别数了！','只要还有一盏亮着！'],
-  freeze:['齿轮卡住了！'],surge:['好多火把……比城里的灯还多。','所有的灯，全都点起来！'],win:['今晚的灯，一盏都没灭。','收工。明晚还要早点来上油。']
+  freeze:['齿轮卡住了！'],surge:['好多火把……比城里的灯还多。','所有的灯，全都点起来！']
 };
 for(const k in _Y)if(BARKS[k])BARKS[k].ying=_Y[k];
 FOEB.knight.low.ying='小姑娘……你的灯……让我想起……';
@@ -4448,7 +4459,7 @@ function stats(c,t){
     if(P.elem)n=new Set(boardCards().map(o=>ITEMS[o.key].tag)).size;else if(P.kind)n=countKind(P.kind,c);else if(P.tag)n=countTag(P.tag,c);
     if(n)pct.push([(P.elem?'元素':P.kind||P.tag)+'×'+n,P.pct*n]);}
   if(mv('t_alch')&&c.loc==='board'){const n=countKind('药剂');if(n)pct.push(['炼金手册×'+n,.04*n*mv('t_alch')]);}
-  mp('dmg','物品');mp('tag_'+it.tag,'物品·'+it.tag);mp('s'+it.size,'物品·'+SIZEN[it.size]+'型');
+  mp('dmg','加成');mp('tag_'+it.tag,'加成·'+it.tag);mp('s'+it.size,'加成·'+SIZEN[it.size]+'型');
   if(c.loc==='board'){const bc=boardCards();if(bc[0]===c)mp('left','最左');if(bc[bc.length-1]===c)mp('right','最右');
     if(mv('lonely')&&!(c.nb||neighbors(c)).length)mp('lonely','孤狼');if(mv('full')&&occ('board').every(Boolean))mp('full','满员');}
   const psum=pct.reduce((s,p)=>s+p[1],0);const mult=a==='deadly'?1.5:1;
@@ -4511,19 +4522,15 @@ function updateHUD(){
   document.querySelectorAll('.offer').forEach(o=>{const p=o.querySelector('.price');if(p&&+p.dataset.p>0)p.classList.toggle('cant',+p.dataset.p>G.gold);});
 }
 function renderRelics(fresh){
-  const box=$('#relics');box.innerHTML='';
-  const b=document.createElement('button');b.className='chip bagchip'+(fresh?' bump':'');b.setAttribute('aria-label','物品');
-  b.innerHTML=`<img class="ico" src="${SPR.bag.url}" alt=""><span class="lbl">物品</span><b>${G.relics.length}</b>`;
-  b.onclick=()=>{SFX.ensure();openBag();};box.appendChild(b);
-}
+  $('#relicN').textContent=G.relics.length||'';if(fresh)restart($('#relicBtn'),'bump');}
 function openBag(){SFX.play('ui');const sh=$('#sheet');const cnt={};G.relics.forEach(r=>cnt[r]=(cnt[r]||0)+1);
   const ids=Object.keys(cnt).sort((a,b)=>RELICS[b].t-RELICS[a].t);
-  sh.innerHTML=`<div class="sh" role="dialog" aria-label="物品"><h3>物品 <small style="color:var(--muted);font-size:15px">${G.relics.length} 件</small></h3>
-    ${ids.length?`<div class="bag">${ids.map(r=>`<button class="relic" data-r="${r}" style="--gc:${GT[RELICS[r].t].c}"><img src="${icon(RELICS[r].ico).url}" alt="${RELICS[r].n}">${cnt[r]>1?'<sub>'+cnt[r]+'</sub>':''}</button>`).join('')}</div>
-    <div class="stat"><div><span>合计效果</span><span></span></div><div class="mods">${modText(M)}</div></div>`:'<p>还没有物品。去遗物祭坛、杂货铺或熔炉看看。</p>'}
+  sh.innerHTML=`<div class="sh" role="dialog" aria-label="遗物"><h3>遗物 <small class="spn">${G.relics.length} 件</small></h3>
+    ${ids.length?`<div class="tlist">${ids.map(r=>{const R0=RELICS[r],c=GT[R0.t].c;return `<button class="trow relrow" data-r="${r}" style="--gc:${c}"><img class="ricon" src="${icon(R0.ico).url}" alt=""><div><b>${R0.n}${cnt[r]>1?' ×'+cnt[r]:''}<small class="gt">${GT[R0.t].n}</small></b><span class="mods">${modText(R0.m)}</span></div></button>`;}).join('')}</div>
+    <div class="stat"><div><span>加起来</span><span></span></div><div class="mods">${modText(M)}</div></div>`:'<p class="muted2">还两手空空。遗物祭坛、杂货铺、熔炉都能弄到。</p>'}
     <div class="sh-btns"><button class="btn" id="bClose">关闭</button></div></div>`;
   sh.hidden=false;$('#bClose').onclick=closeSheet;sh.onclick=e=>{if(e.target===sh)closeSheet();};
-  sh.querySelectorAll('.bag .relic').forEach(el=>el.onclick=()=>openRelicSheet(el.dataset.r));}
+  sh.querySelectorAll('.relrow').forEach(el=>el.onclick=()=>openRelicSheet(el.dataset.r));}
 function toast(msg){const t=$('#toast');t.textContent=msg;restart(t,'show');}
 function banner(msg,col){const b=$('#banner');b.textContent=msg;b.style.color=col||'#fff';restart(b,'show');}
 
@@ -4653,7 +4660,7 @@ function enterEvent(id){
   if(ev.cat==='shop'){cur.mode='shop';cur.refresh=1;cur.offers=[0,1,2].map(()=>makeOffer(ev.filter,{black:ev.black}));}
   else if(id==='chest'){cur.mode='gift';cur.offers=[makeOffer(null,{free:1})];}
   else if(id==='field'){cur.mode='pick';cur.offers=[0,1,2].map(()=>makeOffer(null,{free:1}));}
-  else if(id==='altar'){relicChoice(cur,'选择一件物品，效果永久生效，可叠加',rollGear(3,0,2));}
+  else if(id==='altar'){relicChoice(cur,'挑一件，一直生效，同名的能叠',rollGear(3,0,2));}
   else if(id==='parcel'){relicChoice(cur,'包裹里装着……',rollGear(1,1,2));}
   else if(id==='grocer'){cur.mode='gshop';cur.refresh=1;cur.goods=rollGear(3,1).map(k=>({k,price:gearPrice(k),sold:false}));}
   else if(id==='enchant'){cur.mode='choice';cur.hint='选一项附魔（会替换原有词缀）';
@@ -4665,7 +4672,7 @@ function enterEvent(id){
       act:()=>{c.tier++;repaint(c);checkMerges();renderOwned();SFX.play('merge');if(c.el){const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,TIERS[c.tier].c,24);restart(c.el,'merge');}finishStep();}};});}
   else if(id==='furnace'){cur.mode='choice';cur.hint='选一张卡投入熔炉';
     cur.opts=shuffled(G.cards).slice(0,4).map(c=>({card:c,label:'献祭 '+ITEMS[c.key].n,sub:'失去这张卡（售价 '+sellValue(c)+'），然后挑选一件遗物',
-      act:()=>{const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,'#ef7d57',26);SFX.play('boom');removeCard(c);renderOwned();relicChoice(cur,'熔炉吐出了三件物品，选一件',rollGear(3,3));renderPrep();}}));}
+      act:()=>{const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,'#ef7d57',26);SFX.play('boom');removeCard(c);renderOwned();relicChoice(cur,'熔炉吐出三件遗物，选一件',rollGear(3,3));renderPrep();}}));}
   else if(id==='gamble'){cur.mode='gamble';}
   else if(id==='mentor'||(id==='manual'&&Math.random()<.5)){const m=pick(MEETS);Object.assign(cur,{mode:'talent',who:m.who,intro:[[m.who,m.say]],picks:rollTalents(2),title:m.n});}
   else if(id==='manual'){cur.mode='pick';cur.offers=[0,1].map(()=>makeOffer(it=>it.hero===G.hero&&it.t>=1,{free:1}));}
@@ -4716,7 +4723,7 @@ function gearLabel(k){const g=RELICS[k];const n=G.relics.filter(x=>x===k).length
 function relicChoice(cur,hint,list){cur.mode='relic';cur.hint=hint;
   cur.opts=list.map(r=>({ico:RELICS[r].ico,gt:RELICS[r].t,label:gearLabel(r),sub:modText(RELICS[r].m),flav:RELICS[r].f,act:()=>gainRelic(r)}));}
 function gainRelic(r,stay){G.relics.push(r);const w=RELICS[r].m.wall;if(w){G.wallMax=Math.max(5,G.wallMax+w);G.wall=w>0?G.wall+w:Math.min(G.wall,G.wallMax);}
-  recalcMods();SFX.play('merge');renderRelics(r);renderOwned();updateHUD();toast('获得物品：'+RELICS[r].n);if(!stay)finishStep();}
+  recalcMods();SFX.play('merge');renderRelics(r);renderOwned();updateHUD();toast('拿到遗物：'+RELICS[r].n);if(!stay)finishStep();}
 function shuffled(a){return a.slice().sort(()=>Math.random()-.5);}
 function finishStep(){const P=G.prep;P.step++;P.cur=null;if(P.step<3)rollDoors();renderPrep();SFX.play('ui');
   if(P.step>=3)restart($('#goBtn'),'bump');}
@@ -4895,8 +4902,8 @@ function openSheet(src){
 }
 function kwBox(d){const ks=Object.keys(KW).filter(k=>d.includes('【'+k));return ks.length?`<div class="kwbox">${ks.map(k=>`<div><b>${k}</b><span>${KW[k]}</span></div>`).join('')}</div>`:'';}
 function openRelicSheet(r){const R0=RELICS[r];SFX.play('ui');const sh=$('#sheet');const n=G.relics.filter(x=>x===r).length;
-  sh.innerHTML=`<div class="sh" role="dialog" aria-label="${R0.n}"><div class="sh-top"><img class="ricon big" src="${icon(R0.ico).url}" alt="" style="--gc:${GT[R0.t].c}"><div><h3 style="color:${GT[R0.t].c}">${R0.n}${n>1?' ×'+n:''}</h3><div class="tags"><span class="tag" style="background:${GT[R0.t].c}33;color:${GT[R0.t].c}">${GT[R0.t].n}物品</span><span class="tag">${R0.u?'唯一':'可叠加'}</span></div><p class="mods">${modText(R0.m)}</p></div></div><p class="flav">“${R0.f}”</p><div class="sh-btns"><button class="btn" id="rClose">关闭</button></div></div>`;
-  sh.hidden=false;$('#rClose').onclick=closeSheet;sh.onclick=e=>{if(e.target===sh)closeSheet();};}
+  sh.innerHTML=`<div class="sh" role="dialog" aria-label="${R0.n}"><div class="sh-top"><img class="ricon big" src="${icon(R0.ico).url}" alt="" style="--gc:${GT[R0.t].c}"><div><h3 style="color:${GT[R0.t].c}">${R0.n}${n>1?' ×'+n:''}</h3><div class="tags"><span class="tag" style="background:${GT[R0.t].c}33;color:${GT[R0.t].c}">${GT[R0.t].n}遗物</span><span class="tag">${R0.u?'唯一':'可叠加'}</span></div><p class="mods">${modText(R0.m)}</p></div></div><p class="flav">“${R0.f}”</p><div class="sh-btns"><button class="btn" id="rBack">返回</button><button class="btn" id="rClose">关闭</button></div></div>`;
+  sh.hidden=false;$('#rClose').onclick=closeSheet;$('#rBack').onclick=openBag;sh.onclick=e=>{if(e.target===sh)closeSheet();};}
 function setDrawer(o){G.drawer=o;$('#stashRow').classList.toggle('closed',!o);updateHUD();setTimeout(()=>{if(G.phase==='battle')resizeField();},300);}
 function openTree(){const H=HEROES[G.hero];SFX.play('ui');const sh=$('#sheet');
   sh.innerHTML=`<div class="sh" role="dialog" aria-label="天赋"><h3>${H.n}的天赋 <small class="spn">${G.skills.length} 个</small></h3>
@@ -5063,7 +5070,7 @@ function spawn(type,x,y){
   const d=EN[type];const sc=d.fixed?1:hpScale(G.round)*(G.round===1?.45:G.round===2?.55:.66);
   const e={d,type,x:x!=null?x:rnd(.08,.92),y:y!=null?y:-.04,hp:d.hp*sc,maxHp:d.hp*sc,armor:d.armor,shield:0,slowT:0,slowA:0,burnT:0,burnD:0,burnSrc:null,burnTick:0,poisonT:0,poisonD:0,poisonSrc:null,poisonTick:0,frzT:0,frzN:0,vulnT:0,vulnA:0,
     flash:0,ph:Math.random()*6.28,armorB:0,hasteB:0,healT:rnd(1.5,3),bornT:B.t,raiseT:rnd(3,5),lobT:d.lob?d.lob[0]*.6:0,sprK:null,revealed:false,dashT:0,hardT:0,ii:0,it:d.intents?d.intents[0].t:0,dead:false};
-  e.x0=e.x;B.en.push(e);if(!d.fixed&&e.y<0)for(let i=0;i<4;i++)part(ex(e)+rnd(-4,4),F.top+rnd(0,3),rnd(-8,8),rnd(5,20),.5,Math.random()<.5?'#a64ca6':'#5d275d',1);if(d.boss||d.elite){B.boss=e;$('#bossbar').hidden=false;$('#bossName').textContent=d.n;if(FOEB[type])say(type,FOEB[type].spawn,3);}
+  e.x0=e.x;B.en.push(e);if((d.boss||d.elite||d.big)&&!B.flags['met'+type]){B.flags['met'+type]=1;later(1.2,()=>say('hero',BARKS.elite,2));}if(!d.fixed&&e.y<0)for(let i=0;i<4;i++)part(ex(e)+rnd(-4,4),F.top+rnd(0,3),rnd(-8,8),rnd(5,20),.5,Math.random()<.5?'#a64ca6':'#5d275d',1);if(d.boss||d.elite){B.boss=e;$('#bossbar').hidden=false;$('#bossName').textContent=d.n;if(FOEB[type])say(type,FOEB[type].spawn,3);}
   if(!d.fixed)meetFoe(type);
   return e;
 }
@@ -5160,7 +5167,7 @@ function trigger(c,depth){
 function fire(c,depth){
   if(B.over)return;
   const it=ITEMS[c.key];if(c.ammo===0)return;c.bTrig++;restart(c.el,'pop');SFX.play('fire',it.tag);
-  if(c.ammo>0){c.ammo--;setAmmo(c);}
+  if(c.ammo>0){c.ammo--;setAmmo(c);if(c.ammo===0&&!B.flags.emptySaid){B.flags.emptySaid=1;say('hero',BARKS.empty,1);}}
   const st=stats(c,B.t);
   if(it.dmg>0){attack(c,st);for(let i=1;i<(it.multi||1);i++)later(.09*i,()=>{if(!B.over)attack(c,st);});}
   if(it.stack)c.stk+=it.stack;
@@ -5309,7 +5316,8 @@ function surge(){banner('大军压境','#ff8a5b');SFX.play('intent');SFX.play('b
   say('soldier',BARKS.soldierSurge,2);say('hero',BARKS.surge,2);}
 function fmt(v){v=Math.round(v);return v>=10000?Math.round(v/1000)+'k':String(v);}
 function kill(e,src){
-  e.dead=true;B.kills++;SFX.play('kill');
+  e.dead=true;B.kills++;SFX.play('kill');if(B.kills===1)say('hero',BARKS.first,1);
+  B.kt=(B.kt||[]).filter(t=>t>B.t-2);B.kt.push(B.t);if(B.kt.length>=8){B.kt=[];say('hero',BARKS.streak,1);}
   emit('kill',{e,src,burning:e.burnT>0,poisoned:e.poisonT>0,frozen:e.frzT>0,elite:!!(e.d.elite||e.d.boss)});
   const n=e.d.boss?60:e.d.elite?36:12;for(let i=0;i<n;i++)part(ex(e),ey(e)-5,rnd(-50,50),rnd(-60,20),rnd(.3,.7),Math.random()<.6?e.d.col:'#1a1c2c',Math.random()<.5?2:1);
   part(ex(e),ey(e)-6,rnd(-4,4),-35,.8,'#dfe6ee',1);ring(ex(e),ey(e)-5,1,6*K()*e.d.sc,'#ffffff',.18);
@@ -5321,7 +5329,7 @@ function kill(e,src){
   if(e.d.split){for(let i=0;i<e.d.split;i++){const m=spawn('mini',clamp(e.x+(i?.05:-.05),.04,.96),e.y-.01);m.x0=m.x;}}
   if(src&&src.adj==='greedy'){G.gold++;B.greed++;const[cx,cy]=toClient(ex(e),ey(e));FX.coins(cx,cy,1);SFX.play('coin');updateHUD();}
   if(mv('killGold')&&Math.random()<mv('killGold')){G.gold++;const[cx,cy]=toClient(ex(e),ey(e));FX.coins(cx,cy,1);updateHUD();}
-  if(e.d.boss||e.d.elite){F.shake=6;SFX.play('boom');if(FOEB[e.type])say(e.type,FOEB[e.type].die,3);ring(ex(e),ey(e),4,60,'#fee761',.6);B.boss=null;$('#bossbar').hidden=true;}
+  if(e.d.boss||e.d.elite){F.shake=6;SFX.play('boom');if(FOEB[e.type])say(e.type,FOEB[e.type].die,3);if(!e.d.boss)say('hero',BARKS.killElite,2);ring(ex(e),ey(e),4,60,'#fee761',.6);B.boss=null;$('#bossbar').hidden=true;}
 }
 
 /* ---- 场景特效 ---- */
@@ -5447,7 +5455,7 @@ const FX=(function(){
 /* ================= 流程 ================= */
 function winBattle(){
   B.over=true;G.phase='report';$('#bossbar').hidden=true;
-  G.bestChain=Math.max(G.bestChain,B.maxChain);SFX.play('win');
+  G.bestChain=Math.max(G.bestChain,B.maxChain);SFX.play('win');say('hero',BARKS.win,2);
   for(const c of G.cards)if(c.adj==='hoard')c.hoard++;
   for(const c of boardCards()){const w=ITEMS[c.key].onWin;if(w)w(c);}
   finishQuests();
@@ -5455,7 +5463,7 @@ function winBattle(){
   const was=G.round;
   if(was>=G.maxRound){banner('黎明','#ffe79a');BG.set('shop');setTimeout(()=>playStory(STORY.win,()=>endScreen(true)),1400);return;}
   updateHUD();const winG=3+Math.floor(was/2);const rows=[['胜利奖励',winG]];if(was===4)rows.push(['击败精英',4]);
-  const interest=Math.min(3+mv('interest'),Math.floor(G.gold/6));if(mv('winGold'))rows.push(['物品加成',mv('winGold')]);if(mv('regen'))G.wall=Math.min(G.wallMax,G.wall+mv('regen'));if(interest)rows.push(['利息（每6金+1）',interest]);
+  const interest=Math.min(3+mv('interest'),Math.floor(G.gold/6));if(mv('winGold'))rows.push(['遗物/天赋',mv('winGold')]);if(mv('regen'))G.wall=Math.min(G.wallMax,G.wall+mv('regen'));if(interest)rows.push(['利息（每6金+1）',interest]);
   if(B.wallLost===0)rows.push(['城墙无损',1]);
   if(B.greed)rows.push(['贪婪收入（已到账）',0,B.greed]);
   const total=rows.reduce((s,r)=>s+r[1],0);
@@ -5463,7 +5471,7 @@ function winBattle(){
 }
 function showReport(was,rows,total){
   const rp=$('#report');const bc=G.cards.filter(c=>c.bTrig>0).sort((a,b)=>b.bDmg-a.bDmg);const mx=Math.max(1,...bc.map(c=>c.bDmg));
-  rp.innerHTML=`<div class="rp-title win">第${was}波 · 守住了</div>
+  rp.innerHTML=`<div class="rp-title win">第${was}夜 · ${pickLine(RPT.win)}</div>
   <div class="rp-list">${bc.map((c,i)=>`<div class="rp-row" style="animation-delay:${i*.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${SPR[c.key].url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${(c.bDmg/mx*100).toFixed(1)}"></i></div><b>${fmt(c.bDmg)}<small>×${c.bTrig}</small></b></div>`).join('')||'<div class="rp-meta">这一波没有卡牌出手</div>'}</div>
   <div class="rp-meta">${(was+1)%2===1?'<b style="color:#ffd166">明晚之前有夜谈</b>　':''}最高连锁 <b>×${B.maxChain||1}</b>　击杀 <b>${B.kills}</b>　城墙 <b>-${Math.ceil(B.wallLost)}</b></div>
   <div class="rp-cash" id="cash"></div>
@@ -5476,13 +5484,13 @@ function showReport(was,rows,total){
   setTimeout(next,400);
   $('#cashBtn').onclick=()=>{SFX.ensure();const r=$('#cashBtn').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top,Math.min(total,10));G.gold+=total;G.round++;$('#report').hidden=true;nightStory(()=>toPrep());};
 }
-function loseBattle(){B.over=true;G.phase='over';SFX.play('lose');G.bestChain=Math.max(G.bestChain,B.maxChain);banner('城墙被攻破','#ff6b5b');setTimeout(()=>playStory(STORY.lose,()=>endScreen(false)),1400);}
+function loseBattle(){B.over=true;G.phase='over';SFX.play('lose');G.bestChain=Math.max(G.bestChain,B.maxChain);banner(pickLine(RPT.fall),'#ff6b5b');setTimeout(()=>playStory(STORY.lose,()=>endScreen(false)),1400);}
 function endScreen(win){
   const sc=$('#screen');BG.set(win?'shop':'over');
   const best=G.cards.slice().sort((a,b)=>b.bDmg-a.bDmg)[0];
   sc.innerHTML=`<div class="scr"><img class="por-big" src="${SPR[HEROES[G.hero].portrait].url}" alt=""><h1 style="color:${win?'#ffe79a':'#ff8a80'}">${win?'黎明到来':'长夜未尽'}</h1><div class="logo-sub">${HEROES[G.hero].n} · ${HEROES[G.hero].title}</div>
   <div class="rules res"><div><span>坚守到</span><i style="margin-left:auto">第 ${Math.min(G.round,8)} 夜 / 8</i></div>
-  <div><span>物品 / 天赋</span><i style="margin-left:auto">${G.relics.length} 件 / ${G.skills.length} 个</i></div>
+  <div><span>遗物 / 天赋</span><i style="margin-left:auto">${G.relics.length} 件 / ${G.skills.length} 个</i></div>
   <div><span>最高连锁</span><i style="margin-left:auto">×${G.bestChain||1}</i></div>
   ${best?`<div><span>最后的王牌</span><i style="margin-left:auto">${best.adj?ADJ[best.adj].n+'的':''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}</i></div>`:''}</div>
   <button class="btn red big" id="againBtn">再来一局</button></div>`;
@@ -5541,6 +5549,7 @@ addEventListener('resize',layout);
 $('#goBtn').onclick=()=>{SFX.ensure();if(G.phase==='prep'&&G.prep.step>=3)startBattle();};
 $('#bagBtn').onclick=()=>{SFX.ensure();SFX.play('ui');if(G.phase!=='battle')setDrawer(!G.drawer);else toast('战斗中不能整理背包');};
 $('#treeBtn').onclick=()=>{SFX.ensure();openTree();};
+$('#relicBtn').onclick=()=>{SFX.ensure();openBag();};
 $('#speedBtn').onclick=()=>{SFX.ensure();SFX.play('ui');G.speed=G.speed>=3?1:G.speed+1;updateHUD();};
 $('#muteBtn').onclick=()=>{SFX.ensure();const m=SFX.toggle();$('#muteBtn').textContent=m?'♪ 关':'♪ 开';};
 let lastT=performance.now();
