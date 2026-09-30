@@ -119,40 +119,7 @@ f_mage:[
 "kdbcbbbbbbbcdknk",
 "kddbbbbbbbbddknk",
 ".kkkkkkkkkkkk.k.",
-"................"],
-brood:[
-"................................",
-"................................",
-"............kkkkkkkk............",
-".........kkkppppppppkkk.........",
-".......kkPPPPPPPPPPppppkk.......",
-"......kPPPPPPPPPPPPPPppppk......",
-".....kPPPPPPPPPPPPPPPPppppk.....",
-"....kPPPPPPPPPPPPPPPPPPppppk....",
-"...kpPPPPPPPPPPPPYYPPPPpppppk...",
-"...kGwGGPPPPPYYPPoRPPPPPppppk...",
-"..kpGGGGPPPPPoRPPPPPYYllGppppk..",
-"..kpPPPPPPPPPPPPPPPPoRllGGpppk..",
-"..kpPPPPPPPPPPPPPPPPGllGGGpppk..",
-"..kppPwlGGPPPeeeeeePPGGGGppppk..",
-"..kppGlllGGPewkwkwkwPPPppppppk..",
-"..kppGGlGGGekkkkkkkkePpppppppk..",
-"..kpppGGGGPPekkkkkkePppppppaak..",
-"..kppppppPPPPewewewpppppGGaaak..",
-"...kpppppppppppppGlGGpplwGGak...",
-"...kpppppplGppppplwlGppGGGGak...",
-"....kpppplwGGppppGlGGpaaGGak....",
-".....kpppGGGGppppGGGGaaaaak.....",
-".....kspppGGpppaaaaaaaaaadsk....",
-"...kkksddppppaaaaaaaaaadddskkk..",
-"..ksdsdddkkkaaaaaaaakkkkdddsdsk.",
-"..ksdddddk..kkkkkkkk...kdddddsk.",
-".ksdddkkk...............kkkdddsk",
-".kddddk...................kddddk",
-"kddkkk.....................kkkdd",
-"kddk.........................kdd",
-".kk...........................kk",
-"................................"]
+"................"]
 });
 /* ---------- 精英（拦路和无尽夜用） ---------- */
 Object.assign(EN,{
@@ -169,6 +136,8 @@ Object.assign(EN,{
   fa_lich:Object.assign({},EN.a_lich,{n:'冰棺主祭',spr:'f_priest',col:'#73eff7',raiseAs:'f_husk',faction:FACTIONS.frost})
 });
 Object.assign(FOESETS.frost.map,{a_brute:'fa_brute',a_golem:'fa_golem',a_lich:'fa_lich'});
+/* 首领和精英用单独画的大图（tools/pixelgen.py 的 big_foes），不再把小怪放大两倍 */
+for(const[k,s]of[['knight','b_knight'],['eye','b_eye'],['a_brute','e_brute'],['a_golem','e_golem'],['a_lich','e_lich'],['fa_brute','e_wolf'],['fa_golem','e_yeti'],['fa_lich','e_priest']])Object.assign(EN[k],{spr:s,sc:1});
 const ELITES=['a_brute','a_golem','a_lich'];
 Object.assign(FOEB,{
   a_brute:{spawn:'墙后面有肉。我闻得到。',intent:{roar:'跑起来！都给我跑起来！',dash:'让开！'},die:'……还没吃饱……'},
@@ -195,7 +164,7 @@ function frostBolt(e){const bc=boardCards().filter(c=>c.frozen<=0);if(!bc.length
   c.frozen=1.5;c.el.classList.add('frozen');tipOnce('frozen','「'+ITEMS[c.key].n+'」被冻住了，过一会儿自己会化开。');}
 
 /* ---------- 第二个首领：深渊母巢 ---------- */
-EN.brood={n:'深渊母巢',hp:11000,spd:.011,armor:2,wall:99,spr:'brood',sc:1,boss:1,fixed:1,col:'#7ddc5f',faction:FACTIONS.abyss,
+EN.brood={n:'深渊母巢',hp:11000,spd:.011,armor:2,wall:99,spr:'b_brood',sc:1,boss:1,fixed:1,col:'#7ddc5f',faction:FACTIONS.abyss,
   intents:[{n:'产卵',d:'生出4只裂殖虫',t:6,a:'brood'},{n:'酸雾',d:'你所有卡的充能清掉一半',t:9,a:'drain'},{n:'蜕壳',d:'获得相当于12%最大生命的护盾',t:8,a:'molt'}]};
 FOEB.brood={spawn:'墙？我见过很多墙。墙里面，总是软的。',
   intent:{brood:'孩子们，饿了吧。',drain:'你们的火，太吵了。',molt:'旧壳给你们，新壳留给我。'},

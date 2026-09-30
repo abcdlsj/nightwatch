@@ -5,7 +5,9 @@ function makeWave(r){
   const pack=(comp,n,t0,t1)=>{const DN=(1.15+.1*r)*(heat(5)?1.15:1);n=Math.round(n*DN);comp=Object.fromEntries(Object.entries(comp).map(([k,v])=>[k,EN[k].aura||d0(k)?v:Math.round(v*(r>=5?1.45:r>=3?1.3:1.1))]));for(let g=0;g<n;g++){const t=Math.max(0,t0+(t1-t0)*(n<=1?0:g/(n-1))+rnd(-.6,.6));const cx=rnd(.2,.8);
     const mem=[];for(const k in comp)for(let i=0;i<comp[k];i++)mem.push(k);
     const sup=mem.filter(k=>EN[k].aura),rest=mem.filter(k=>!EN[k].aura);const cols=Math.min(5,Math.max(1,rest.length));
-    rest.forEach((k,i)=>{const row=Math.floor(i/cols),col=i%cols;S.push({type:k,t:t+row*.35+rnd(0,.1),x:clamp(cx+(col-(cols-1)/2)*.085+rnd(-.015,.015),.05,.95),y:-.04-rnd(0,.02)});});
+    /* 游魂有一半时候不从北边来，直接在半路的雾里冒出来 */
+    const mid=comp.ghost&&Math.random()<.5?rnd(.3,.44):null;
+    rest.forEach((k,i)=>{const row=Math.floor(i/cols),col=i%cols;S.push({type:k,t:t+row*.35+rnd(0,.1),x:clamp(cx+(col-(cols-1)/2)*.085+rnd(-.015,.015),.05,.95),y:mid!=null&&k==='ghost'?mid+row*.05:-.04-rnd(0,.02)});});
     sup.forEach((k,i)=>S.push({type:k,t:t+.7+i*.2,x:clamp(cx+(i-(sup.length-1)/2)*.1,.06,.94),y:-.05}));}};
   const boss=(k,t)=>S.push({type:k,t,x:.5,y:-.04});
   const SG={1:[15],2:[17],3:[18],4:[16],5:[17],6:[19],7:[12,26],8:[22]};
@@ -23,6 +25,7 @@ function makeWave(r){
     default:endlessWave(r,pack,boss);
   }
   frostExtra(r,pack);
+  for(const s of S)if(s.type==='mimic')s.y=rnd(.3,.4);/* 宝箱怪本来就躺在半路上装宝箱 */
   for(const s of S)s.type=foeKey(s.type);
   const out=S.sort((a,b)=>a.t-b.t);out.surges=SG[r]||(r>8?[14,28]:[]);return out;
 }
@@ -32,8 +35,9 @@ const K=()=>F.W/180;
 
 /* ================= 战场画布 ================= */
 const F={cv:$('#field'),ctx:null,W:200,H:200,s:2,top:0,shake:0,wallFlash:0,parts:[],nums:[],rings:[],bolts:[]};
+/* 战场格子：手机上约 180 格宽。小怪 16 格只占一小块，首领和精英另画大图 */
 function resizeField(){
-  const st=$('#stage').getBoundingClientRect();const s=Math.max(2,Math.floor(st.width/120));
+  const st=$('#stage').getBoundingClientRect();const s=Math.max(2,Math.floor(st.width/160));
   F.s=s;F.W=Math.floor(st.width/s);F.H=Math.floor(st.height/s);F.cv.width=F.W;F.cv.height=F.H;
   F.cv.style.width=F.W*s+'px';F.cv.style.height=F.H*s+'px';F.cv.style.left=Math.floor((st.width-F.W*s)/2)+'px';
   F.ctx=F.cv.getContext('2d');F.ctx.imageSmoothingEnabled=false;buildGround();
@@ -82,13 +86,15 @@ function spawn(type,x,y){
   const d=EN[type];const sc=d.fixed?(G.round>8?Math.pow(1.4,G.round-8):1):hpScale(G.round)*(G.round===1?.5:G.round===2?.6:.7)*(heat(1)?1.15:1)*(heat(2)&&(d.boss||d.elite)?1.25:1)*(wg('iron')?1.3:1);
   const e={d,type,x:x!=null?x:rnd(.08,.92),y:y!=null?y:-.04,hp:d.hp*sc,maxHp:d.hp*sc,armor:d.armor,shield:0,slowT:0,slowA:0,burnT:0,burnD:0,burnSrc:null,burnTick:0,poisonT:0,poisonD:0,poisonSrc:null,poisonTick:0,frzT:0,frzN:0,vulnT:0,vulnA:0,
     flash:0,ph:Math.random()*6.28,armorB:0,hasteB:0,healT:rnd(1.5,3),bornT:B.t,raiseT:rnd(3,5),lobT:d.lob?d.lob[0]*.6:d.fbolt?d.fbolt*.6:0,sprK:null,revealed:false,dashT:0,hardT:0,ii:0,it:d.intents?d.intents[0].t:0,dead:false};
-  e.x0=e.x;B.en.push(e);if((d.boss||d.elite||d.big)&&!B.flags['met'+type]){B.flags['met'+type]=1;later(1.2,()=>say('hero',BARKS.elite,2));}if(!d.fixed&&e.y<0)for(let i=0;i<4;i++)part(ex(e)+rnd(-4,4),F.top+rnd(0,3),rnd(-8,8),rnd(5,20),.5,Math.random()<.5?'#a64ca6':'#5d275d',1);if(d.boss||d.elite){B.boss=e;$('#bossbar').hidden=false;$('#bossName').textContent=d.n;if(FOEB[type])say(type,FOEB[type].spawn,3);}
+  e.x0=e.x;B.en.push(e);if((d.boss||d.elite||d.big)&&!B.flags['met'+type]){B.flags['met'+type]=1;later(1.2,()=>say('hero',BARKS.elite,2));}if(!d.fixed&&e.y<0)for(let i=0;i<4;i++)part(ex(e)+rnd(-4,4),F.top+rnd(0,3),rnd(-8,8),rnd(5,20),.5,Math.random()<.5?'#a64ca6':'#5d275d',1);
+  if(!d.fixed&&e.y>.1){e.emerge=!d.mimic;const c=d.col||'#94b0c2';ring(ex(e),ey(e)-2,2,10*K(),c,.45);for(let i=0;i<10;i++)part(ex(e)+rnd(-5,5),ey(e)-rnd(0,2),rnd(-18,18),-rnd(15,40),.5,Math.random()<.5?c:'#4a3326',1);}if(d.boss||d.elite){B.boss=e;$('#bossbar').hidden=false;$('#bossName').textContent=d.n;if(FOEB[type])say(type,FOEB[type].spawn,3);}
   if(!d.fixed)meetFoe(type);
   return e;
 }
-const RANGE0=.24;let RANGE=.24;
+const RANGE0=.13;let RANGE=.13;
 const phased=e=>e.d.phase&&((B.t+e.ph)%3.2)>2.0;
-function front(){let b=null;for(const e of B.en)if(!e.dead&&e.y>=RANGE&&!phased(e)&&(!b||e.y>b.y))b=e;return b;}
+const rising=e=>e.emerge&&B.t-e.bornT<.5;
+function front(){let b=null;for(const e of B.en)if(!e.dead&&e.y>=RANGE&&!phased(e)&&!rising(e)&&(!b||e.y>b.y))b=e;return b;}
 function hasTarget(){return!!front();}
 function dist(a,b){return Math.hypot((ex(a)-ex(b)),(ey(a)-ey(b)));}
 
@@ -409,7 +415,8 @@ function drawField(dt){
       x.fillStyle='rgba(0,0,0,.35)';x.fillRect(px+2,Math.round(ey(e))-1,w-4,2);
       if(e.d.boss){
         const a=.25+.15*Math.sin(now*5);pcircle(x,px+w/2,py+h/2,w*.7,`rgba(228,59,68,${a.toFixed(3)})`);}
-      x.drawImage(sp.cv,px,py,w,h);x.globalAlpha=1;
+      if(rising(e)){const k=Math.max(.1,(now-e.bornT)/.5),hh=Math.max(1,Math.round(sp.h*k));x.globalAlpha=1;x.drawImage(sp.cv,0,0,sp.w,hh,px,py+h-hh*sc,w,hh*sc);}/* 从地里一点点钻出来 */
+      else x.drawImage(sp.cv,px,py,w,h);x.globalAlpha=1;
       if(e.armorB){x.fillStyle='#41a6f6';x.fillRect(px-1,py+2,2,3);}if(e.hasteB&&Math.random()<.2)part(ex(e)+rnd(-3,3),ey(e),0,-rnd(5,15),.3,'#ef7d57',1);
       if(e.slowT>0||e.frzT>0){x.globalAlpha=e.frzT>0?.8:.35;x.drawImage(sp.ice,px,py,w,h);x.globalAlpha=1;}
       if(e.vulnT>0){x.fillStyle='#ff5a8a';x.fillRect(Math.round(px+w/2)-1,Math.round(py)-4,3,3);x.fillStyle='#fff';x.fillRect(Math.round(px+w/2),Math.round(py)-3,1,1);}

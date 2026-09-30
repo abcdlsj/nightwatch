@@ -165,14 +165,14 @@ function sellValue(c){return Math.max(1,Math.floor(basePrice(c.key,c.adj,c.tier)
 
 /* ================= 卡牌 DOM ================= */
 function cardHTML(c){const it=ITEMS[c.key];const ad=c.adj?ADJ[c.adj]:null;
-  return `<div class="inner" style="--dl:${c.dl||0}s"><div class="face"><div class="band"></div><div class="nm${cardName(c).length>3?' long':''}">${cardName(c)}</div><img class="spr" src="${SPR[c.key].url}" alt="${it.n}" draggable="false"><div class="num"></div>${it.ammo!=null?'<div class="am"></div>':''}<div class="cdv"></div><div class="holo"></div><div class="flash"></div></div><div class="tb">${TIERS[c.tier].n}</div>${ad?`<div class="adj">${ad.ch}</div>`:''}</div>`;}
+  return `<div class="inner" style="--dl:${c.dl||0}s"><div class="face"><div class="band"></div><div class="nm${cardName(c).length>(c.size>1?5:3)?' long':''}">${cardName(c)}</div><img class="spr" src="${SPR[c.key].url}" alt="${it.n}" draggable="false"><div class="num"></div>${it.ammo!=null?'<div class="am"></div>':''}<div class="cdv"></div><div class="holo"></div><div class="flash"></div></div><div class="tb">${TIERS[c.tier].n}</div>${ad?`<div class="adj">${ad.ch}</div>`:''}</div>`;}
 function paintCard(el,c,extra){const it=ITEMS[c.key];const ad=c.adj?ADJ[c.adj]:null;const T=TIERS[c.tier];
   el.className='card s'+c.size+' t'+c.tier+(ad&&ad.r===2?' rare':'')+(extra?' '+extra:'');
   el.style.setProperty('--sz',c.size);el.style.setProperty('--tagc',TAGC[it.tag]);el.style.setProperty('--ac',ad?ad.c:'transparent');
   el.style.setProperty('--tc',T.c);el.style.setProperty('--tbg',T.bg);
   el.innerHTML=cardHTML(c);setNum(el,c);if(it.ammo!=null){const a=el.querySelector('.am');if(a)a.textContent='弹'+(c.ammo!=null&&G.phase==='battle'?c.ammo:maxAmmo(c));}}
 function numText(c){const it=ITEMS[c.key];if(it.numT)return it.numT(c);if(it.charge)return'+'+Math.round(chargeAmt(c)*100)+'%';if(it.buff)return'+50%';if(it.prism)return'+25%';if(it.chargeSmall)return'+'+Math.round(it.chargeSmall*(1+.25*stepOf(c))*100)+'%';if(it.horn)return'齐鸣';const v=Math.round(stats(c,null).total);return v>=10000?(v/1000).toFixed(1)+'k':String(v);}
-function setNum(el,c){const n=el.querySelector('.num');if(n)n.textContent=numText(c);}
+function setNum(el,c){const n=el.querySelector('.num');if(n){const s=numText(c);n.textContent=s;n.classList.toggle('txt',/[^\x00-\x7f]/.test(s));}}
 function renderOwned(){recalcMods();
   for(const c of G.cards){
     if(!c.el){c.el=document.createElement('div');paintCard(c.el,c);bindCard(c);}
@@ -567,7 +567,7 @@ function openSheet(src){
     let f='('+st.base+(st.flat?' + 锋利'+st.flat:'')+')';
     if(st.psum)f+=' × (1 + '+st.pct.map(p=>p[0]+' '+Math.round(p[1]*100)+'%').join(' + ')+')';
     if(st.mult>1)f+=' × 致命1.5';
-    rows+=`<div><span>单次伤害</span><span>${Math.round(st.total)}</span></div><div><span></span><span class="f">${f}</span></div>`;
+    rows+=`<div><span>单次伤害</span><span>${Math.round(st.total)}</span></div>`+(st.flat||st.psum||st.mult>1?`<div><span></span><span class="f">${f}</span></div>`:'');/* 没有加成时算式就是它自己，不单占一行 */
     rows+=`<div><span>暴击率</span><span>${Math.round(st.crit*100)}%（伤害×2）</span></div>`;
     if(it.chain)rows+=`<div><span>弹跳次数</span><span>${chainOf(c)}</span></div>`;
     if(it.multi)rows+=`<div><span>多重</span><span>每次触发打出 ${it.multi} 次</span></div>`;

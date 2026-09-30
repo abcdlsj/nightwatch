@@ -23,7 +23,8 @@
 @font-face{font-family:'Silkscreen';src:url(fonts/silkscreen-bold.woff2) format('woff2');font-weight:700;font-display:swap}
 /* 缝合像素 12px：小字正文用；数字统一用它（别的像素字体里 2、3、8 太像） */
 @font-face{font-family:'Fusion Pixel';src:url(fonts/fusion.woff2) format('woff2');font-display:swap}
-@font-face{font-family:'PixNum';src:url(fonts/fusion.woff2) format('woff2');unicode-range:U+0030-0039;font-display:swap}
+/* 数字：缩到八成，跟旁边的汉字一样高；声明整段字重，免得浏览器给像素字硬加粗 */
+@font-face{font-family:'PixNum';src:url(fonts/fusion.woff2) format('woff2');unicode-range:U+0030-0039;font-weight:100 900;size-adjust:80%;font-display:swap}
 :root{
   --bg:#0f1c20; --panel:#1c2a30; --panel2:#25363d; --edge:#3a525c; --ink:#fbf7ee; --muted:#9fb3ba;
   --red:#e2473b; --blue:#2c8fe0; --gold:#f2a93b; --green:#35a86b; --purple:#8e5bd8;
@@ -56,7 +57,7 @@ em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 */
 /* ---------- 顶栏 ---------- */
 #top{display:flex;gap:6px;align-items:stretch}
 .chip{display:flex;align-items:center;gap:5px;background:var(--panel);border-radius:9px;padding:3px 9px;
-  box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,255,255,.06);font-family:var(--px);font-size:19px;line-height:1}
+  box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,255,255,.06);font-family:var(--px);font-size:20px;line-height:1}
 .chip .lbl{font-family:var(--zh);font-size:13px;color:var(--muted)}
 .chip .sub{font-size:13px;color:var(--muted)}
 .chip b{font-weight:700;text-shadow:0 2px 0 rgba(0,0,0,.5)}
@@ -105,7 +106,7 @@ em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 */
 #shopHead{display:flex;align-items:center;gap:6px}
 #shopHead h2{margin:0;font-weight:400;font-size:22px;flex:1;text-shadow:0 2px 0 rgba(0,0,0,.5)}
 #offers{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;justify-content:center;min-height:0}
-.offer{position:relative;background:var(--panel2);border-radius:11px;padding:10px 4px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+.offer{position:relative;background:var(--panel2);border-radius:11px;padding:12px 4px 8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;
   box-shadow:0 4px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.05);min-height:0}
 .offer .oname{font-size:15px;margin-top:2px}
 .offer .oadj{font-size:13px;min-height:15px}
@@ -113,7 +114,9 @@ em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 */
 .offer .oflav{display:none}
 .price.free{color:#9bf0b8;background:#173a28}
 .offer .odesc{font-family:var(--body);font-size:12px;line-height:1.35;color:#c5d2d6;text-align:center;padding:0 2px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.offer .card.static{transform:scale(1.12);transform-origin:center top;margin-bottom:10px}
+/* 三张货并排时逐行对齐：卡图同高、名字同一行、价格贴底；卡图不缩放，像素保持清楚 */
+.offer .card.static{margin-bottom:6px}
+.offer .price{margin-top:auto}
 .price{margin-top:3px;display:inline-flex;align-items:center;gap:3px;background:#3b2a12;border-radius:7px;padding:3px 7px;font-family:var(--px);font-size:16px;color:#ffd166;box-shadow:0 2px 0 rgba(0,0,0,.5)}
 .price.cant{color:#b08a70;background:#2b2320}
 .offer.sold{opacity:.35}
@@ -134,6 +137,7 @@ em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 */
 .card .spr{display:block;width:32px;height:32px;margin:3px auto 0;image-rendering:pixelated}
 .card.s3 .spr{width:48px;height:48px;margin-top:0}
 .card .num{position:absolute;left:0;right:0;bottom:3px;text-align:center;font-family:'PixNum','Silkscreen','Pixelify Sans',ui-monospace,monospace;font-weight:700;font-size:15px;color:var(--cink);line-height:1;letter-spacing:.5px}
+.card .num.txt{font-family:var(--zh);font-weight:400;font-size:13px;bottom:4px}/* 「装填」「齐奏」这类字，跟卡名一个字体 */
 .card .cdv{position:absolute;left:0;right:0;top:8px;bottom:0;background:rgba(24,14,40,.5);transform-origin:top;transform:scaleY(var(--s,0))}
 .card .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 .card .holo{position:absolute;inset:0;pointer-events:none}
@@ -311,7 +315,7 @@ em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 */
 .bagchip{border:0;color:#fff;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 0 0 2px rgba(208,166,255,.35)}
 .bagchip b{color:#e0c8ff}
 .bag{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:8px;max-height:30vh;overflow:auto;padding:4px}
-.bag .relic{width:40px;height:40px}.bag .relic img{width:24px;height:24px}
+.bag .relic{width:40px;height:40px}.bag .relic img{width:32px;height:32px}
 .stat .mods{display:block!important;columns:2;column-gap:12px}
 .stat .mods i{break-inside:avoid}
 .relic{flex:none;width:32px;height:32px;border:0;border-radius:8px;background:var(--panel);box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 0 0 2px rgba(208,166,255,.35);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
@@ -333,14 +337,14 @@ em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 */
 .door:nth-child(2){animation-delay:.07s}.door:nth-child(3){animation-delay:.14s}
 .door:active{transform:translateY(3px)}
 @media (hover:hover){.door:hover,.opt:hover{filter:brightness(1.15)}}
-.door img{width:52px;height:52px;image-rendering:pixelated;flex:none;background:rgba(0,0,0,.28);border-radius:11px;padding:4px}
+.door img{width:56px;height:56px;image-rendering:pixelated;flex:none;background:rgba(0,0,0,.28);border-radius:11px;padding:4px}
 .door div,.opt div{display:flex;flex-direction:column;gap:3px;min-width:0}
 .door b{font-weight:400;font-size:20px;color:var(--cc)}
 .door span{font-size:15px}
 .door em,.ev-head em,.opt em,.flav{font-family:var(--body);font-size:12px;color:#8fa4ab;line-height:1.4}
 .cat-shop{--cc:#ffd166}.cat-free{--cc:#7ee8a2}.cat-relic{--cc:#d0a6ff}.cat-up{--cc:#7cc4ff}.cat-misc{--cc:#8fe3e0}
 .ev-head{display:flex;gap:10px;align-items:center;background:rgba(0,0,0,.3);border-radius:11px;padding:7px 10px;box-shadow:inset 4px 0 0 var(--cc)}
-.ev-head img{width:40px;height:40px;image-rendering:pixelated;flex:none}
+.ev-head img{width:32px;height:32px;image-rendering:pixelated;flex:none}
 .ev-head b{font-weight:400;font-size:19px;color:var(--cc);display:block}
 .ev-hint{font-size:14px;color:var(--muted);text-align:center}
 .ev-btns{display:flex;gap:8px;margin-top:auto;padding-top:8px;position:sticky;bottom:0;background:linear-gradient(transparent,rgba(12,22,26,.95) 30%)}.ev-btns .btn{flex:1}
@@ -353,7 +357,8 @@ em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 */
 .opt .oc .card.static{pointer-events:none;height:78px}
 .opt b{font-weight:400;font-size:17px}
 .opt span{font-family:var(--body);font-size:12px;color:#c5d2d6;line-height:1.4}
-.ricon{width:40px;height:40px;image-rendering:pixelated;background:rgba(0,0,0,.3);border-radius:10px;padding:6px;flex:none;box-shadow:inset 0 0 0 2px var(--gc,transparent)}
+/* 图标都是 16 格，显示尺寸取整倍（32 / 48），不糊 */
+.ricon{width:44px;height:44px;image-rendering:pixelated;background:rgba(0,0,0,.3);border-radius:10px;padding:6px;flex:none;box-shadow:inset 0 0 0 2px var(--gc,transparent)}
 .mg,.mb{display:block;font-style:normal;font-family:var(--body);font-size:12px;line-height:1.45}
 .mg{color:#8ff0b0}.mb{color:#ff8a80}
 .gt{font-size:11px;margin-left:6px;padding:1px 5px;border-radius:4px;background:rgba(255,255,255,.1);color:var(--gc,#c5d2d6);vertical-align:middle}
@@ -362,7 +367,7 @@ em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 */
 .opt .price.cant{color:#b08a70}
 .opt.sold{opacity:.45;cursor:default}
 .sh .mods{margin-top:6px}
-.ricon.big{width:72px;height:72px;padding:10px}
+.ricon.big{width:68px;height:68px;padding:10px}
 .big-res{text-align:center;font-size:28px;margin:auto 0;line-height:1.5;text-shadow:0 3px 0 rgba(0,0,0,.5)}
 .big-res b{font-family:var(--px);color:#ffd166}
 .big-res small{font-size:15px;color:var(--muted)}
@@ -430,7 +435,7 @@ em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 */
 .opt b small.gt{font-family:var(--zh)}
 .tlist{display:flex;flex-direction:column;gap:6px;overflow:auto;min-height:0}
 .trow{display:flex;gap:10px;align-items:center;background:rgba(0,0,0,.25);border-radius:10px;padding:6px 9px;box-shadow:inset 3px 0 0 var(--gc)}
-.trow .ricon{width:36px;height:36px;padding:5px;box-shadow:inset 0 0 0 2px var(--gc)}
+.trow .ricon{width:42px;height:42px;padding:5px;box-shadow:inset 0 0 0 2px var(--gc)}
 .trow div{display:flex;flex-direction:column;gap:2px;min-width:0}.trow b{font-weight:400;font-size:16px;color:var(--gc)}
 .relrow{border:0;color:#fff;text-align:left;cursor:pointer;width:100%;font-family:inherit}.relrow .mods{font-size:12px;display:flex;flex-wrap:wrap;gap:0 8px}
 .trow em{font-family:var(--body);font-size:12px;color:#c9bda8}
@@ -535,12 +540,12 @@ em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 */
 /* ---------- 矮屏：整页不超过一屏 ---------- */
 @media (max-height:760px){
   .logo{font-size:64px}.rules{font-size:14px;padding:10px 12px;gap:5px}.scr{gap:9px}
-  .hero em{display:none}.hero p{font-size:11.5px}
+  .hero em{display:none}.hero p{font-size:12px}
   .door{min-height:56px;padding:7px 10px}.door img{width:40px;height:40px}.door b{font-size:18px}.door span{font-size:13px}
   .offer .card.static{transform:none;margin-bottom:2px}.offer .oadj{display:none}
   .ptitle{font-size:18px}.ev-head{padding:5px 8px}.ev-head img{width:32px;height:32px}.ev-head b{font-size:17px}
   .rd-t{font-size:28px}.ready .muted{display:none}
-  .opt em{display:none}.tl p{font-size:12.5px;padding:4px 8px}
+  .opt em{display:none}.tl p{font-size:12px;padding:4px 8px}
   .ifoe span{display:none}.ifoe{grid-template-rows:auto}.ifoe img{grid-row:auto;width:22px;height:22px}.ready{gap:5px}
 }
 #prep.talking #preview{display:none}

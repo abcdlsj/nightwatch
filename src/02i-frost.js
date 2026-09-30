@@ -22,7 +22,7 @@ const _FROST={
   f_witch:{n:'霜巫',col:'#41a6f6',tip:'每3秒给身边的怪回血。',intro:['soldier','后面那个在哼歌——冰在往伤口上长！']},
   f_horn:{n:'号角手',col:'#c28a4d',tip:'号角一响，身边的怪走得更快。',intro:['soldier','听那号角！它们越走越快了！']},
   f_beetle:{n:'冰雷甲虫',col:'#41a6f6',tip:'撞墙伤害3点；打死时冰雷会炸，连身边的怪一起炸。',intro:['soldier','甲虫背着冰疙瘩！打爆它，别让它靠墙！']},
-  f_wisp:{n:'雪雾',col:'#f4f4f4',tip:'一阵一阵地散开：散开时打不着，也伤不到。',intro:['soldier','箭从雪里穿过去了！那到底是什么？']},
+  f_wisp:{n:'雪雾',col:'#f4f4f4',tip:'一阵一阵地散开：散开时打不着，也伤不到。有时就在半路上凝出来。',intro:['soldier','箭从雪里穿过去了！那到底是什么？']},
   f_priest:{n:'冰棺祭司',col:'#73eff7',raiseAs:'f_husk',tip:'每5秒让附近倒下的怪变成冻尸站起来。先打它！',intro:['f_priest','起来吧。北边的冷，还没结束。']},
   f_sled:{n:'冰山雪橇',col:'#73eff7',cargo:['f_husk',5],chill:2,tip:'又慢又硬，撞墙8点，还会冻住一张卡；打碎了放出一队冻尸。',intro:['soldier','一整座冰山……在往这边拖！']},
   f_wolf:{n:'霜狼',col:'#94b0c2',chill:1,tip:'血越少跑得越快；撞墙时会冻住一张卡1秒。',intro:['soldier','狼！那头狼越打越疯！']},
