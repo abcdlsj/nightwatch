@@ -481,15 +481,16 @@ function openRelicSheet(r){const R0=RELICS[r];SFX.play('ui');const sh=$('#sheet'
   sh.innerHTML=`<div class="sh" role="dialog" aria-label="${R0.n}"><div class="sh-top"><img class="ricon big" src="${icon(R0.ico).url}" alt="" style="--gc:${GT[R0.t].c}"><div><h3 style="color:${GT[R0.t].c}">${R0.n}${n>1?' ×'+n:''}</h3><div class="tags"><span class="tag" style="background:${GT[R0.t].c}33;color:${GT[R0.t].c}">${GT[R0.t].n}物品</span><span class="tag">${R0.u?'唯一':'可叠加'}</span></div><p class="mods">${modText(R0.m)}</p></div></div><p class="flav">“${R0.f}”</p><div class="sh-btns"><button class="btn" id="rClose">关闭</button></div></div>`;
   sh.hidden=false;$('#rClose').onclick=closeSheet;sh.onclick=e=>{if(e.target===sh)closeSheet();};}
 function setDrawer(o){G.drawer=o;$('#stashRow').classList.toggle('closed',!o);updateHUD();setTimeout(()=>{if(G.phase==='battle')resizeField();},300);}
-function openTree(){const T=TREES[G.hero],H=HEROES[G.hero];SFX.play('ui');const sh=$('#sheet');
+let treeSaid=null;
+function openTree(){const T=TREES[G.hero],H=HEROES[G.hero];SFX.play('ui');const sh=$('#sheet');const SAY=(TREE_SAY[G.hero]||[]);
   const learned=(b,i)=>G.skills.includes(b+'.'+i);
   sh.innerHTML=`<div class="sh" role="dialog" aria-label="天赋"><h3>${H.n}的天赋 <small class="spn">可用点数 <b>${G.sp}</b></small></h3>
-   <p class="muted2">每守住一夜获得1点。每条分支需要从上往下依次点亮。</p>
+   ${treeSaid?`<div class="tsay" style="--hc:${H.col}"><img src="${SPR[H.portrait].url}" alt=""><p>“${treeSaid}”</p></div>`:'<p class="muted2">每守住一夜获得1点。每条分支需要从上往下依次点亮。</p>'}
    <div class="tree">${T.map((br,b)=>`<div class="br" style="--bc:${br.c}"><div class="brn">${br.n}</div>${br.nodes.map((nd,i)=>{const L=learned(b,i);const can=!L&&G.sp>0&&(i===0||learned(b,i-1));
-     return `<button class="node${L?' on':can?' can':''}" data-b="${b}" data-i="${i}" ${L||!can?'aria-disabled="true"':''}><b>${nd.n}</b>${modText(nd.m)}</button>`;}).join('<i class="lnk"></i>')}</div>`).join('')}</div>
+     const q=(SAY[b]||[])[i];return `<button class="node${L?' on':can?' can':''}" data-b="${b}" data-i="${i}" ${L||!can?'aria-disabled="true"':''}><b>${nd.n}</b>${modText(nd.m)}${L&&q?`<em class="nq">“${q}”</em>`:''}</button>`;}).join('<i class="lnk"></i>')}</div>`).join('')}</div>
    <div class="sh-btns"><button class="btn" id="tClose">关闭</button></div></div>`;
   sh.hidden=false;$('#tClose').onclick=closeSheet;sh.onclick=e=>{if(e.target===sh)closeSheet();};
-  sh.querySelectorAll('.node.can').forEach(el=>el.onclick=()=>{G.sp--;G.skills.push(el.dataset.b+'.'+el.dataset.i);recalcMods();renderOwned();updateHUD();SFX.play('merge');
+  sh.querySelectorAll('.node.can').forEach(el=>el.onclick=()=>{treeSaid=(SAY[el.dataset.b]||[])[el.dataset.i]||null;G.sp--;G.skills.push(el.dataset.b+'.'+el.dataset.i);recalcMods();renderOwned();updateHUD();SFX.play('merge');
     const r=el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,T[el.dataset.b].c,22);openTree();});}
 /* ================= 剧情 ================= */
 function playStory(pages,done){
