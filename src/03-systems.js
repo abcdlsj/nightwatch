@@ -50,7 +50,7 @@ const SFX=(function(){
     g.gain.setValueAtTime(vol||.04,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+.03);}
   function noise(d,vol){if(!ac||muted)return;const n=Math.floor(ac.sampleRate*d);const b=ac.createBuffer(1,n,ac.sampleRate);const a=b.getChannelData(0);
     for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);const s=ac.createBufferSource();s.buffer=b;const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(ac.destination);s.start();}
-  const TP={'刃':520,'火':300,'电':660,'冰':780,'机':220};
+  const TP={'刃':520,'火':300,'电':660,'冰':780,'机':220,'毒':440};
   function play(k,p){if(!ac||muted)return;const now=performance.now();const lk=k==='echo'?k+p:k;if(last[lk]&&now-last[lk]<(k==='hit'?60:40))return;last[lk]=now;
     switch(k){
       case'fire':tone(TP[p]||400,.05,'square',.018,1.4);break;
@@ -187,7 +187,7 @@ function banner(msg,col){const b=$('#banner');b.textContent=msg;b.style.color=co
 
 /* ================= 卡牌生成 ================= */
 function rollAdj(key,force,exclude,maxTier){
-  if(!force&&Math.random()>.2)return null;
+  if(!force&&Math.random()>.12)return null;
   const r=Math.random();const rare=.06+.025*G.round;const unc=.3;
   let tier=r<rare?2:r<rare+unc?1:0;
   if(maxTier!==undefined)tier=Math.min(tier,maxTier);
