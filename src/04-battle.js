@@ -12,7 +12,7 @@ function makeWave(r){
   switch(r){
     case 1:pack({slime:5},5,.5,22);pack({slime:6},1,15,15);break;
     case 2:pack({slime:5},4,0,22);pack({bat:4},4,4,24);pack({bomber:2},1,10,10);pack({bat:4,slime:3},1,17,17);break;
-    case 3:pack({slime:5},3,0,22);pack({bat:4},3,3,22);pack({skel:3,shieldb:1},3,6,24);pack({ghost:2},2,6,20);pack({skel:3,bomber:1},1,18,18);break;
+    case 3:pack({slime:5},2,0,22);pack({bat:4},3,3,22);pack({skel:3,shieldb:1},2,6,24);pack({ghost:2},2,6,20);pack({skel:3,bomber:1},1,18,18);break;
     case 4:boss('knight',2);pack({skel:2,shieldb:1},2,4,18);pack({bat:4},3,6,24);pack({slime:5},3,0,22);pack({mimic:1},1,12,12);pack({bomber:3,ghost:2},1,16,16);break;
     case 5:pack({skel:3,necro:1},2,0,20);pack({skel:3,shaman:1},2,4,22);pack({bat:4},3,2,24);pack({berserker:2,drummer:1},2,8,24);pack({bug:3},2,1,20);pack({ghost:3,berserker:1},1,17,17);break;
     case 6:pack({catapult:2},1,2,2);pack({siege:1},1,8,8);pack({golem:1,shaman:1,shieldb:1},2,4,20);pack({skel:3,shieldb:1},3,0,24);pack({bug:3,drummer:1},2,2,24);pack({bat:5,bomber:2},2,4,26);pack({berserker:3,drummer:1},1,19,19);break;
