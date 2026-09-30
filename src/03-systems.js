@@ -187,9 +187,9 @@ function updateHUD(){
   const sc=G.cards.filter(c=>c.loc==='stash').length;$('#bagN').textContent=sc?sc:'';$('#bagBtn').classList.toggle('on',G.drawer);
   $('#treeN').textContent=G.skills.length||'';
   const go=$('#goBtn');
-  if(G.phase==='prep'){const s=G.prep.step;go.disabled=s<3;go.textContent=s<3?'备战中 '+s+' / 3':'开始战斗';}
-  else if(G.phase==='battle'){go.disabled=true;go.textContent='战斗中…';}
-  else if(G.phase==='report'){go.disabled=true;go.textContent='结算中';}
+  if(G.phase==='prep'){const s=G.prep.step;go.disabled=s<3;go.textContent=s<3?'备战 '+s+'/3':'开战';}
+  else if(G.phase==='battle'){go.disabled=true;go.textContent='战斗中';}
+  else if(G.phase==='report'){go.disabled=true;go.textContent='结算';}
   else{go.disabled=true;go.textContent='开始战斗';}
   document.querySelectorAll('.offer').forEach(o=>{const p=o.querySelector('.price');if(p&&+p.dataset.p>0)p.classList.toggle('cant',+p.dataset.p>G.gold);});
 }
@@ -239,7 +239,7 @@ function toPrep(){if(typeof saveGame==='function')setTimeout(saveGame,0);
   G.prep={step:0,cur:null,doors:[],talk:G.round%2===1};G.nextWave=makeWave(G.round);
   for(const c of G.cards){if(c.el)c.el.style.setProperty('--s',0);c.nb=null;c.right=null;}
   rollDoors();renderPreview();$('#prep').hidden=false;renderPrep();renderOwned();updateHUD();
-  if(G.firstPrep){G.firstPrep=false;setTimeout(()=>toast('每夜之前能走三个地方，挑着去'),500);}
+  if(G.firstPrep&&!G.prep.talk){G.firstPrep=false;setTimeout(()=>toast('每夜之前能走三个地方，挑着去'),500);}
 }
 function rollDoors(){
   const R=G.round,P=G.prep;
@@ -272,7 +272,7 @@ function renderPrep(){
     updateHUD();return;
   }
   if(!P.cur&&P.talk&&!P.talkDone)startTalk();
-  const cur=P.cur;
+  const cur=P.cur;$('#prep').classList.toggle('talking',!!cur&&(cur.mode==='talk'||cur.mode==='talent'));
   if(!cur){
     body.insertAdjacentHTML('beforeend',`<div class="ptitle">选择一个去处<span>第 ${P.step+1} 站 / 共 3 站</span></div>`);
     const list=document.createElement('div');list.className='doors';
@@ -384,7 +384,8 @@ function renderTalk(cur,body){
     if(!cur.picks.length)body.appendChild(btnRow([['拿 5 金走人','gold',()=>{gainGold(5);endTalk(cur);}]]));
   }
 }
-function endTalk(cur){if(cur.talk){G.prep.talkDone=true;G.prep.cur=null;renderPrep();}else finishStep();}
+function endTalk(cur){if(cur.talk){G.prep.talkDone=true;G.prep.cur=null;renderPrep();
+    if(G.firstPrep){G.firstPrep=false;setTimeout(()=>toast('这局来的是「'+FOESETS[G.foeSet].n+'」，先去三个地方准备'),700);}}else finishStep();}
 function gainGold(n){G.gold+=n;SFX.play('coin');const r=$('#pbody').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,Math.min(n,8));}
 function rollGear(n,bonus,maxTier){const R=G.round+(bonus||0);const w=[Math.max(10,62-8*R),24+2*R,R>=2?4+4*R:0,R>=4?2*R-4:0];
   if(maxTier!==undefined)for(let i=maxTier+1;i<4;i++)w[i]=0;
