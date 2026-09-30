@@ -147,7 +147,7 @@ function simStep(dt){
 function freeze(e,t,src){if(e.dead)return;let d=t*(e.d.boss||e.d.elite?.5:1);if(e.d.boss)d/=1+e.frzN*.5;e.frzN++;
   if(d>e.frzT){e.frzT=d;ring(ex(e),ey(e)-5,2,10*K(),'#c2f4ff',.3);}emit('freeze',{e,src});}
 function vuln(e,t,a){e.vulnT=Math.max(e.vulnT,t);e.vulnA=Math.max(e.vulnA,a);}
-function wallHit(e){e.dead=true;if(!B.wallBy)B.wallBy={};B.wallBy[e.type]=(B.wallBy[e.type]||0)+e.d.wall;damageWall(e.d.wall,ex(e),e.d.bomb?'boom':null);if(!B.over&&e.d.chill)chillCard(e.d.chill);if(!B.over&&B.ambush&&e.d.elite)ambushLose();}
+function wallHit(e){e.dead=true;if(!B.wallBy)B.wallBy={};B.wallBy[e.type]=(B.wallBy[e.type]||0)+e.d.wall;damageWall(e.d.wall,ex(e),e.d.bomb?'boom':null);if(!B.over&&e.d.chill)chillCard(e.d.chill);if(B.ambush&&e.d.elite)B.fled=1;}
 function chillCard(t){const bc=boardCards().filter(c=>c.frozen<=0);if(!bc.length)return;const c=pick(bc);c.frozen=t;c.el.classList.add('frozen');if(Math.random()<.5)say('hero',BARKS.freeze,1);tipOnce('frozen','「'+ITEMS[c.key].n+'」被冻住了，过一会儿自己会化开。');}
 function damageWall(d,xx,kind){
   const e={x:xx/F.W,y:1};if(wg('brittle'))d*=1.5;if(B.ambush)d*=.5;const ab=Math.min(B.shield,d);B.shield-=ab;d-=ab;if(G.run)G.run.wallLost+=d;if(kind==='boom'){boom(xx,WALLY()-2,16*K(),'#ef7d57');}

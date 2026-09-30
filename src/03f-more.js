@@ -156,12 +156,12 @@ brood:[
 });
 /* ---------- 精英（拦路和无尽夜用） ---------- */
 Object.assign(EN,{
-  a_brute:{n:'屠夫',hp:420,spd:.03,armor:2,wall:8,spr:'berserker',sc:2,elite:1,col:'#e43b44',rage:1.2,faction:FACTIONS.war,tip:'血越少冲得越快，还会吼着让身边的怪一起跑。',
-    intents:[{n:'狂吼',d:'身边的怪一起冲 3 秒',t:6,a:'roar'},{n:'冲锋',d:'2秒内移动速度×3',t:9,a:'dash'}]},
-  a_golem:{n:'山岩巨像',hp:520,spd:.022,armor:6,wall:10,spr:'golem',sc:1.4,elite:1,col:'#c28a4d',faction:FACTIONS.war,tip:'护甲很厚，时不时跺脚把你一张卡震住。',
+  a_brute:{n:'屠夫',hp:220,spd:.028,armor:2,wall:8,spr:'berserker',sc:2,elite:1,col:'#e43b44',rage:.8,faction:FACTIONS.war,tip:'血越少冲得越快，还会吼着让身边的怪一起跑。',
+    intents:[{n:'狂吼',d:'身边的怪一起冲 3 秒',t:6,a:'roar'},{n:'冲锋',d:'2秒内移动速度×3',t:11,a:'dash'}]},
+  a_golem:{n:'山岩巨像',hp:280,spd:.022,armor:6,wall:10,spr:'golem',sc:1.4,elite:1,col:'#c28a4d',faction:FACTIONS.war,tip:'护甲很厚，时不时跺脚把你一张卡震住。',
     intents:[{n:'硬化',d:'4秒内护甲 +10',t:7,a:'harden'},{n:'震地',d:'震住你随机1张卡，持续2秒',t:9,a:'quake'}]},
-  a_lich:{n:'白骨主教',hp:320,spd:.025,armor:0,wall:8,spr:'necro',sc:2,elite:1,col:'#b77cff',raise:3,faction:FACTIONS.cult,tip:'身边倒下的怪会被它拉起来，自己还会召骷髅。',
-    intents:[{n:'召亡',d:'召唤4个骷髅兵',t:7,a:'skels'},{n:'骨盾',d:'获得相当于15%最大生命的护盾',t:8,a:'shield'}]}
+  a_lich:{n:'白骨主教',hp:150,spd:.025,armor:0,wall:8,spr:'necro',sc:2,elite:1,col:'#b77cff',raise:2,faction:FACTIONS.cult,tip:'身边倒下的怪会被它拉起来，自己还会召骷髅。',
+    intents:[{n:'召亡',d:'召唤3个骷髅兵',t:9,a:'skels'},{n:'骨盾',d:'获得相当于15%最大生命的护盾',t:8,a:'shield'}]}
 });
 Object.assign(EN,{
   fa_brute:Object.assign({},EN.a_brute,{n:'霜狼王',spr:'f_wolf',col:'#94b0c2',faction:FACTIONS.frost,chill:2}),
@@ -213,19 +213,19 @@ function bossNight(r){return r===8&&G.boss8==='brood';}
 function extraIntent(e,a){
   if(a==='roar'){const R=40*K();for(const o of B.en)if(!o.dead&&o!==e&&Math.hypot(ex(o)-ex(e),ey(o)-ey(e))<=R){o.dashT=Math.max(o.dashT||0,3);}ring(ex(e),ey(e)-6,4,R,'#e43b44',.5);}
   if(a==='quake'){const bc=boardCards().filter(c=>c.frozen<=0);if(bc.length){const c=pick(bc);c.frozen=2;c.el.classList.add('frozen');}F.shake=Math.max(F.shake,6);}
-  if(a==='skels'){for(let i=0;i<4;i++){const s=spawn(foeKey('skel'),clamp(e.x+(i-1.5)*.08,.05,.95),Math.max(-.02,e.y-.03));s.x0=s.x;}}
+  if(a==='skels'){for(let i=0;i<3;i++){const s=spawn(foeKey('skel'),clamp(e.x+(i-1)*.08,.05,.95),Math.max(-.02,e.y-.03));s.x0=s.x;}}
   if(a==='brood'){for(let i=0;i<4;i++){const s=spawn(foeKey('bug'),clamp(e.x+rnd(-.22,.22),.05,.95),Math.max(-.02,e.y+.02));s.x0=s.x;}}
   if(a==='drain'){for(const c of boardCards()){c.charge*=.5;if(c.el)restart(c.el,'shake');}toast('酸雾漫上墙头，卡的充能掉了一半');}
   if(a==='molt'){e.shield+=e.maxHp*.12;}
 }
 
 /* ---------- 拦路 ---------- */
-EVENTS.ambush={n:'拦路',ico:'berserker',cat:'fight',w:.75,minR:2,d:'一个大家伙堵在路上。打赢挑一件好遗物；漏过去的怪砸墙减半，让它撞上墙就算输',f:'绕路要多走半夜。',
+EVENTS.ambush={n:'拦路',ico:'berserker',cat:'fight',w:.75,minR:2,d:'一个大家伙堵在路上。在它撞上墙之前打倒它，挑一件好遗物；漏过去的怪砸墙减半',f:'绕路要多走半夜。',
   need:()=>G.round!==4&&(G.round<8||G.endless)&&!(G.prep&&G.prep.fought)};
 function enterAmbush(cur){const k=foeKey(pick(ELITES));Object.assign(cur,{mode:'ambush',foe:k});}
 function ambushHtml(cur){const d=EN[cur.foe];
   return `<div class="amb"><img src="${SPR[d.spr].url}" alt=""><div><b>${d.n}</b><p>${d.tip}</p><p>${d.intents.map(t=>'【'+t.n+'】'+t.d).join('<br>')}</p></div></div>
-  <div class="ev-hint">带着几只小怪。守住了拿 ${ambushGold()} 金，再从三件好遗物里挑一件</div>`;}
+  <div class="ev-hint">带着几只小怪。打完拿 ${ambushGold()} 金；在它撞墙之前打倒它，再从三件好遗物里挑一件</div>`;}
 function ambushGold(){return 3+Math.floor(G.round/2);}
 function ambushWave(k){const S=[{type:k,t:1.2,x:.5,y:-.04}];
   for(const s of G.nextWave){if(s.t>9)break;const d=EN[s.type];if(d.boss||d.elite||d.cargo)continue;S.push({type:s.type,t:s.t+2.5,x:s.x,y:s.y});}
@@ -237,13 +237,14 @@ function ambushEnd(){
   for(const c of G.cards){c.charge=0;c.el.style.setProperty('--s',0);c.el.classList.remove('frozen','empty','haste');c.ammo=maxAmmo(c);setAmmo(c);}
   G.fightWave=null;B.over=true;clearVO();BG.set('shop');$('#bossbar').hidden=true;F.cv.style.display='none';$('#prep').hidden=false;
 }
-function ambushWin(){ambushEnd();
+function ambushWin(){const fled=B.fled;ambushEnd();
   const cur=G.prep.cur;G.gold+=ambushGold();
+  if(fled){Object.assign(cur,{mode:'reward',text:'它撞过墙跑了。<br><small>只捡到 '+ambushGold()+' 金</small>',apply:()=>{}});renderOwned();renderPrep();updateHUD();return;}
   relicChoice(cur,'赢了，拿 '+ambushGold()+' 金。战利品里挑一件',withFit(rollGear(3,3)));
   renderOwned();renderPrep();updateHUD();banner('守住了','#ffe79a');
 }
 
-/* 拦路打输了不算输掉整局：精英撞上墙或者墙快塌了就算输，墙最少留 1，这一站白走。拦路时墙只吃一半伤害 */
+/* 拦路：墙只吃一半伤害。精英撞墙跑了只给金币；墙快塌了就算输，墙最少留 1，这一站白走，但这局不算输 */
 function ambushLose(){B.over=true;G.wall=Math.max(1,G.wall);ambushEnd();SFX.play('lose');const cur=G.prep.cur;
   Object.assign(cur,{mode:'reward',text:'被它冲过去了。<br><small>'+(G.wall<=1?'墙只剩一口气，':'')+'这一站白走了</small>',apply:()=>{}});
   renderPrep();updateHUD();banner('没拦住','#ff8a80');}
