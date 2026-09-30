@@ -815,7 +815,7 @@ const EVENTS={
   train:{n:'训练场',ico:'dummy',cat:'up',w:.9,d:'将你的一张卡提升一个品质（最高到金）',f:'稻草人挨了三千刀，依然站着。',need:()=>G.cards.some(c=>c.tier<2)},
   gamble:{n:'赌徒的桌子',ico:'dice',cat:'misc',w:.8,d:'下注3金：一半机会赢回6金',f:'骰子灌过铅。灌在哪一面，没人知道。',need:()=>G.gold>=3},
   spring:{n:'清泉',ico:'drop',cat:'misc',w:.9,d:'修复城墙8点',f:'井水有股铁锈味，但能用。',need:()=>G.wall<G.wallMax},
-  job:{n:'守夜轮值',ico:'lantern',cat:'misc',w:1,d:'替人值一班夜，获得4金币',f:'长夜漫漫，工钱照付。'},
+  job:{n:'守夜轮值',ico:'lantern',cat:'misc',w:1,d:'替人值一班夜，获得3金币',f:'长夜漫漫，工钱照付。'},
   furnace:{n:'熔炉',ico:'furnace',cat:'relic',w:.7,minR:2,d:'献祭一张卡，换取一件更好的物品',f:'火焰只收最好的供品。',need:()=>G.cards.length>=2},
   bank:{n:'钱庄',ico:'r_purse',cat:'misc',w:.8,minR:2,d:'存款生息：金币 +30%（至少+2）',f:'账房先生从来不抬头。'}
 };
