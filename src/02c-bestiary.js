@@ -137,3 +137,7 @@ Object.assign(EN.drummer,{tip:'让附近的敌人加速。',intro:['soldier','�
 Object.assign(EN.golem,{tip:'护甲很厚，普通攻击几乎打不动。',intro:['soldier','石头……石头在走路！']});
 Object.assign(EN.bug,{tip:'死亡时分裂成两只幼虫。',intro:['soldier','砍成两半它还在动！']});
 Object.assign(EN.skel,{tip:'带护甲，会减免每次命中的伤害。'});
+
+/* 新像素图的尺寸已经包含体型（普通16、石魔像20、骑士与攻城塔24、深渊之眼32），统一按1倍绘制 */
+for(const k of['golem','knight','eye','siege'])if(EN[k])EN[k].sc=1;
+EN.mimic.spr='chest_m';

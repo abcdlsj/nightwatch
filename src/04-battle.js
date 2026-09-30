@@ -253,7 +253,7 @@ function hurt(e,amt,src,crit,o){
   if(e.shield>0){const s=Math.min(e.shield,a);e.shield-=s;a-=s;if(a<=0){num(ex(e),ey(e)-12,'0','#dfe6ee',1);return;}}
   e.hp-=a;e.flash=.08;if(src)src.bDmg+=a;
   const big=crit||a>=150;
-  num(ex(e)+rnd(-7,7),ey(e)-10-rnd(0,5),fmt(a)+(crit?'!':''),o.burnTick?'#ef7d57':crit?'#fee761':'#ffffff',big?2:1);
+  if(crit||o.burnTick||F.nums.length<28||((e.d.boss||e.d.elite)?Math.random()<.25:Math.random()<.5))num(ex(e)+rnd(-7,7),ey(e)-10-rnd(0,5),fmt(a)+(crit?'!':''),o.burnTick?'#ef7d57':crit?'#fee761':'#ffffff',big?2:1);
   if(!o.burnTick)SFX.play(crit?'crit':'hit');
   if(crit){F.shake=Math.max(F.shake,1.5);if(a>=e.maxHp*.6&&a>=30)say('hero',BARKS.crit,1);}
   if(e===B.boss&&!e.lowSaid&&e.hp-a<e.maxHp*.3&&FOEB[e.type]){e.lowSaid=true;say(e.type,FOEB[e.type].low,3);say('hero',FOEB[e.type].heroLow,3);}
@@ -349,13 +349,13 @@ function drawField(dt){
       if(e.d.bomb&&Math.random()<.3)part(ex(e)+3,ey(e)-11,rnd(-6,6),-rnd(5,15),.25,Math.random()<.5?'#fee761':'#ef7d57',1);
       const px=Math.round(ex(e)-w/2),py=Math.round(ey(e)-h+bob);
       x.fillStyle='rgba(0,0,0,.35)';x.fillRect(px+2,Math.round(ey(e))-1,w-4,2);
-      if(e.d.boss){for(let k=0;k<5;k++){for(let j=0;j<10;j++){x.fillStyle=j%2?'#6e1b2a':'#b13e53';x.fillRect(Math.round(px+6+k*5+Math.sin(now*4+k+j*.5)*2),py+h-4+j*2,2,2);}}
+      if(e.d.boss){
         const a=.25+.15*Math.sin(now*5);pcircle(x,px+w/2,py+h/2,w*.7,`rgba(228,59,68,${a.toFixed(3)})`);}
       x.drawImage(sp.cv,px,py,w,h);x.globalAlpha=1;
       if(e.armorB){x.fillStyle='#41a6f6';x.fillRect(px-1,py+2,2,3);}if(e.hasteB&&Math.random()<.2)part(ex(e)+rnd(-3,3),ey(e),0,-rnd(5,15),.3,'#ef7d57',1);
       if(e.slowT>0){x.globalAlpha=.35;x.drawImage(sp.ice,px,py,w,h);x.globalAlpha=1;}
       if(e.hardT>0){x.globalAlpha=.3+.2*Math.sin(now*20);x.drawImage(sp.white,px,py,w,h);x.globalAlpha=1;}
-      if(e.flash>0){x.globalAlpha=Math.min(1,e.flash*14);x.drawImage(sp.white,px,py,w,h);x.globalAlpha=1;}
+      if(e.flash>0){x.globalAlpha=Math.min(e.d.boss||e.d.elite?.35:.8,e.flash*14);x.drawImage(sp.white,px,py,w,h);x.globalAlpha=1;}
       if(e.d.intents&&e.it<1.2&&Math.floor(now*10)%2){x.strokeStyle='#ff5a5a';x.lineWidth=1;x.strokeRect(px-2.5,py-2.5,w+5,h+5);}
       if(!e.d.boss&&(e.hp<e.maxHp||e.shield>0)){const bw=Math.max(8,w-2);x.fillStyle='#1a1c2c';x.fillRect(px+(w-bw)/2-1,py-4,bw+2,3);
         x.fillStyle='#e43b44';x.fillRect(px+(w-bw)/2,py-3,Math.max(0,Math.round(bw*e.hp/e.maxHp)),1);
