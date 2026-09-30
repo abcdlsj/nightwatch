@@ -14,11 +14,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="连锁">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' rx='3' fill='%230f1c20'/%3E%3Crect x='7' y='1' width='2' height='2' fill='%239fb3ba'/%3E%3Crect x='5' y='3' width='6' height='1' fill='%237d6a5a'/%3E%3Crect x='4' y='4' width='8' height='8' fill='%237d6a5a'/%3E%3Crect x='5' y='5' width='6' height='6' fill='%23f2a93b'/%3E%3Crect x='6' y='6' width='4' height='4' fill='%23ffe79a'/%3E%3Crect x='5' y='12' width='6' height='1' fill='%237d6a5a'/%3E%3Crect x='4' y='14' width='8' height='1' fill='%23e2473b'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- 字体表不阻塞首屏：Google 字体连不上（比如国内网络）时直接用系统字体，不会白屏干等 -->
-<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Silkscreen:wght@400;700&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="preload" href="fonts/zcool.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+/* 字体放在自己站上（assets/fonts，由 tools/fontsub.py 子集化，只收游戏里用到的字）；加载完之前先用系统字体 */
+@font-face{font-family:'ZCOOL QingKe HuangYou';src:url(fonts/zcool.woff2) format('woff2');font-display:swap}
+@font-face{font-family:'Pixelify Sans';src:url(fonts/pixelify.woff2) format('woff2');font-weight:400 700;font-display:swap}
+@font-face{font-family:'Silkscreen';src:url(fonts/silkscreen-bold.woff2) format('woff2');font-weight:700;font-display:swap}
 :root{
   --bg:#0f1c20; --panel:#1c2a30; --panel2:#25363d; --edge:#3a525c; --ink:#fbf7ee; --muted:#9fb3ba;
   --red:#e2473b; --blue:#2c8fe0; --gold:#f2a93b; --green:#35a86b; --purple:#8e5bd8;

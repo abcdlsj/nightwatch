@@ -7,7 +7,7 @@
 
 ```bash
 ./build.sh            # 拼接 src/ → dist/index.html，并做 JS 语法检查
-open dist/index.html  # 直接用浏览器打开即可，无需服务器
+open dist/index.html  # 直接打开能玩；要看到自带字体，用 python3 -m http.server -d dist 起个服务
 ```
 
 ## 目录
@@ -34,7 +34,9 @@ open dist/index.html  # 直接用浏览器打开即可，无需服务器
 | `tools/smoke_test.py` | Playwright 冒烟测试：机器人自动打一整局 |
 | `tools/pixelgen.py` | 像素美术生成器：几何图元 + 自动描边 + 自动明暗，`--preview` 出预览图 |
 | `tools/shots.py` | 关键界面截图（棋盘、钻卡详情、天赋、战斗） |
-| `dist/index.html` | 构建产物（单文件，可直接发布） |
+| `tools/fontsub.py` | 字体子集化：只保留游戏里用到的字，输出到 `assets/fonts/` |
+| `assets/fonts/` | 自带的字体（子集），构建时拷到 `dist/fonts/`，不依赖 Google 字体 |
+| `dist/` | 构建产物：`index.html` + `fonts/`，整个目录发布 |
 
 ## 核心规则速览
 
