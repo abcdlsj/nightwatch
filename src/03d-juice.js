@@ -29,7 +29,7 @@ const MUSIC=(function(){
   for(const k in SONGS){const S=SONGS[k];if(S.lead)S.lead=S.lead.map(b=>b.split(' '));}
   let on=true,mood=null,cur=null,pend=null,swAt=0,step=0,nextT=0,gain=null,nbuf=null,hp=null;
   function ac(){return SFX.ctx();}
-  function setup(a){if(gain)return;gain=a.createGain();gain.gain.value=0;gain.connect(a.destination);
+  function setup(a){if(gain)return;gain=a.createGain();gain.gain.value=0;gain.connect(SFX.out()||a.destination);
     const n=a.sampleRate*.3|0;nbuf=a.createBuffer(1,n,a.sampleRate);const d=nbuf.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
     hp=a.createBiquadFilter();hp.type='highpass';hp.frequency.value=6000;hp.connect(gain);}
   function note(a,f,t,d,type,vol,box){const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);

@@ -45,12 +45,26 @@ const BG=(function(){
 const SFX=(function(){
   let ac=null,muted=false,mbI=0;const last={};
   const MB=[76,79,84,79,77,76,74,72,74,76,79,76,72,74,71,72];
-  function ensure(){if(!ac){try{ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){ac=null;}}if(ac&&ac.state==='suspended')ac.resume();}
+  let out=null,unlocked=false,sil=null;
+  // 手机上要在点按里解锁：iOS 还得先切到「播放」音频会话，不然手机开了静音就全没声
+  function silentWav(){const n=4000,b=new Uint8Array(44+n),v=new DataView(b.buffer),w=(o,s)=>{for(let i=0;i<s.length;i++)b[o+i]=s.charCodeAt(i);};
+    w(0,'RIFF');v.setUint32(4,36+n,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,8000,true);v.setUint32(28,8000,true);v.setUint16(32,1,true);v.setUint16(34,8,true);w(36,'data');v.setUint32(40,n,true);b.fill(128,44);
+    let s='';for(const x of b)s+=String.fromCharCode(x);return 'data:audio/wav;base64,'+btoa(s);}
+  function ensure(){
+    try{if(navigator.audioSession&&navigator.audioSession.type!=='playback')navigator.audioSession.type='playback';}catch(e){}
+    if(!ac){try{ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){ac=null;}
+      if(ac){const c=ac.createDynamicsCompressor();c.threshold.value=-12;c.ratio.value=6;c.connect(ac.destination);out=ac.createGain();out.gain.value=2.2;out.connect(c);}}
+    if(!ac)return;
+    if(ac.state!=='running')try{ac.resume();}catch(e){}
+    if(!unlocked){unlocked=true;try{const b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0);}catch(e){}
+      if(!sil&&/iP(hone|ad|od)|Macintosh/.test(navigator.userAgent)&&'ontouchend' in document){try{sil=new Audio(silentWav());sil.loop=true;sil.setAttribute('playsinline','');const p=sil.play();if(p&&p.catch)p.catch(()=>{sil=null;});}catch(e){sil=null;}}}}
+  ['pointerdown','touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,ensure,{capture:true,passive:true}));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ac&&ac.state!=='running')try{ac.resume();}catch(e){}});
   function tone(f,d,type,vol,slide,delay){if(!ac||muted)return;const t=ac.currentTime+(delay||0);const o=ac.createOscillator(),g=ac.createGain();
     o.type=type||'square';o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,f*slide),t+d);
-    g.gain.setValueAtTime(vol||.04,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+.03);}
+    g.gain.setValueAtTime(vol||.04,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(out);o.start(t);o.stop(t+d+.03);}
   function noise(d,vol){if(!ac||muted)return;const n=Math.floor(ac.sampleRate*d);const b=ac.createBuffer(1,n,ac.sampleRate);const a=b.getChannelData(0);
-    for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);const s=ac.createBufferSource();s.buffer=b;const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(ac.destination);s.start();}
+    for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);const s=ac.createBufferSource();s.buffer=b;const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(out);s.start();}
   const TP={'刃':520,'火':300,'电':660,'冰':780,'机':220,'毒':440};
   function play(k,p){if(!ac||muted)return;const now=performance.now();const lk=k==='echo'?k+p:k;if(last[lk]&&now-last[lk]<(k==='hit'?60:40))return;last[lk]=now;
     switch(k){
@@ -77,7 +91,7 @@ const SFX=(function(){
       case'drum':tone(110,.18,'sine',.09,.45);noise(.05,.05);break;
       case'hint':tone(880,.08,'triangle',.03);tone(1175,.14,'triangle',.03,1,.07);break;
     }}
-  return{ensure,play,ctx:()=>ac,setMuted(m){muted=m;},toggle(){muted=!muted;return muted;}};
+  return{ensure,play,ctx:()=>ac,out:()=>out,setMuted(m){muted=m;},toggle(){muted=!muted;return muted;}};
 })();
 
 /* ================= 状态 ================= */
