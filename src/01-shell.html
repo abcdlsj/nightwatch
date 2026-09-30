@@ -114,7 +114,7 @@ button{font-family:inherit}
 .card.t2 .tb{background:linear-gradient(135deg,#fff1a8,#ffc328)}
 .card .band{height:8px;background:var(--tagc);box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}
 .card .nm{font-size:12px;color:var(--cink);text-align:center;line-height:1;margin-top:2px;white-space:nowrap}
-.card .spr{display:block;width:36px;height:36px;margin:3px auto 0;image-rendering:pixelated}
+.card .spr{display:block;width:32px;height:32px;margin:3px auto 0;image-rendering:pixelated}
 .card.s3 .spr{width:48px;height:48px;margin-top:0}
 .card .num{position:absolute;left:0;right:0;bottom:3px;text-align:center;font-family:'Silkscreen','Pixelify Sans',ui-monospace,monospace;font-weight:700;font-size:15px;color:var(--cink);line-height:1;letter-spacing:.5px}
 .card .cdv{position:absolute;left:0;right:0;top:8px;bottom:0;background:rgba(24,14,40,.5);transform-origin:top;transform:scaleY(var(--s,0))}
@@ -202,8 +202,8 @@ button{font-family:inherit}
 .rp-title{font-size:26px;text-align:center;text-shadow:0 3px 0 rgba(0,0,0,.5)}
 .rp-title.win{color:#9bf0b8}
 .rp-list{display:flex;flex-direction:column;gap:3px;overflow:auto;min-height:0;flex:1}
-.rp-row{display:grid;grid-template-columns:26px 38px 1fr auto;align-items:center;gap:6px;font-size:14px;opacity:0;animation:rowIn .3s ease-out forwards}
-.rp-row img{width:24px;height:24px;image-rendering:pixelated}
+.rp-row{display:grid;grid-template-columns:34px 44px 1fr auto;align-items:center;gap:6px;font-size:14px;opacity:0;animation:rowIn .3s ease-out forwards}
+.rp-row img{width:32px;height:32px;image-rendering:pixelated}
 .rp-row .bar{height:9px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
 .rp-row .bar i{display:block;height:100%;background:var(--tagc);width:0;transition:width .6s cubic-bezier(.2,.9,.3,1)}
 .rp-row b{font-family:var(--px);font-size:15px;text-align:right;min-width:62px}
@@ -326,7 +326,7 @@ button{font-family:inherit}
 .hero{display:grid;grid-template-columns:72px 1fr;gap:4px 12px;text-align:left;color:#fff;border:0;border-radius:14px;padding:12px;background:rgba(16,22,30,.88);cursor:pointer;
   box-shadow:0 5px 0 rgba(0,0,0,.5),inset 0 0 0 2px var(--hc);animation:doorIn .35s backwards;transition:transform .1s}
 .hero:nth-child(2){animation-delay:.1s}.hero:active{transform:translateY(3px)}
-.hero .por{grid-row:span 3;width:72px;height:72px;image-rendering:pixelated;background:rgba(0,0,0,.35);border-radius:12px;box-shadow:inset 0 0 0 2px var(--hc)}
+.hero .por{grid-row:span 3;width:64px;height:64px;image-rendering:pixelated;background:rgba(0,0,0,.35);border-radius:12px;box-shadow:inset 0 0 0 2px var(--hc)}
 .hero .hn b{font-weight:400;font-size:24px;color:var(--hc)}.hero .hn small{margin-left:8px;color:var(--muted);font-size:14px}
 .htag{font-size:14px;color:var(--hc)}
 .hero p,.hero em,.hstat,.hcards{grid-column:1/-1}
@@ -340,7 +340,7 @@ button{font-family:inherit}
 #story[hidden]{display:none}
 .st-scene{width:min(420px,100%);aspect-ratio:120/68;image-rendering:pixelated;border-radius:12px;box-shadow:0 5px 0 rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,255,255,.1);margin:auto 0 12px}
 .st-box{width:100%;max-width:420px;display:flex;gap:12px;align-items:flex-start;background:rgba(14,18,26,.95);border-radius:14px;padding:12px;box-shadow:0 5px 0 rgba(0,0,0,.55),inset 0 0 0 2px var(--sc);animation:doorIn .25s}
-.st-por{width:64px;height:64px;image-rendering:pixelated;flex:none;background:rgba(0,0,0,.4);border-radius:10px;box-shadow:inset 0 0 0 2px var(--sc);padding:2px}
+.st-por{width:64px;height:64px;image-rendering:pixelated;flex:none;background:rgba(0,0,0,.4);border-radius:10px;box-shadow:inset 0 0 0 2px var(--sc)}
 .st-body b{font-weight:400;font-size:18px;color:var(--sc)}
 .st-body p{margin:6px 0 0;font-family:'PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif;font-size:16px;line-height:1.65;min-height:3.3em}
 .st-tap{margin-top:10px;font-size:13px;color:var(--muted);animation:pulseO .8s infinite alternate}
@@ -367,7 +367,7 @@ button{font-family:inherit}
 /* ---------- 战斗内台词 / 新敌人卡片（纯表现，不接收点击） ---------- */
 .bark{position:absolute;left:8px;right:8px;bottom:52px;display:flex;align-items:center;gap:8px;pointer-events:none;z-index:7;opacity:0;
   background:rgba(12,10,20,.86);border-radius:10px;padding:6px 10px 6px 6px;box-shadow:0 3px 0 rgba(0,0,0,.5),inset 3px 0 0 var(--vc,#fff);max-width:92%;width:max-content}
-.bark img{width:36px;height:36px;image-rendering:pixelated;flex:none;background:rgba(255,255,255,.06);border-radius:7px}
+.bark img{width:32px;height:32px;image-rendering:pixelated;flex:none;background:rgba(255,255,255,.06);border-radius:7px}
 .bark b{display:block;font-weight:400;font-size:13px;color:var(--vc,#fff)}
 .bark p{margin:1px 0 0;font-family:'PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif;font-size:14px;line-height:1.4;color:#f1ece0}
 .bark.foe{left:auto;right:8px;flex-direction:row-reverse;text-align:right;box-shadow:0 3px 0 rgba(0,0,0,.5),inset -3px 0 0 var(--vc,#fff)}
@@ -384,7 +384,7 @@ button{font-family:inherit}
 #foeCard.show{animation:foeA 4.5s ease-out forwards}
 @keyframes foeA{0%{opacity:0;transform:translateX(30px)}8%{opacity:1;transform:none}85%{opacity:1}100%{opacity:0;transform:translateX(10px)}}
 .tsay{display:flex;gap:10px;align-items:center;background:rgba(0,0,0,.3);border-radius:10px;padding:7px 10px;box-shadow:inset 3px 0 0 var(--hc);animation:doorIn .3s}
-.tsay img{width:40px;height:40px;image-rendering:pixelated;flex:none}
+.tsay img{width:32px;height:32px;image-rendering:pixelated;flex:none}
 .tsay p{margin:0;font-family:Georgia,'Songti SC','Noto Serif CJK SC',serif;font-style:italic;font-size:14px;color:#efe6d2;line-height:1.45}
 .node .nq{display:block;font-family:Georgia,'Songti SC','Noto Serif CJK SC',serif;font-style:italic;font-size:11px;line-height:1.35;color:#c9bda8;margin-top:3px}
 /* ---------- 卡牌精细化：纸面纹理、内框、品质装饰、传闻 ---------- */
