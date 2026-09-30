@@ -2,7 +2,7 @@
 /* ================= 波次 ================= */
 function makeWave(r){
   const S=[];
-  const pack=(comp,n,t0,t1)=>{const DN=1.15+.1*r;n=Math.round(n*DN);comp=Object.fromEntries(Object.entries(comp).map(([k,v])=>[k,EN[k].aura||d0(k)?v:Math.round(v*(r>=5?1.45:r>=3?1.3:1.1))]));for(let g=0;g<n;g++){const t=Math.max(0,t0+(t1-t0)*(n<=1?0:g/(n-1))+rnd(-.6,.6));const cx=rnd(.2,.8);
+  const pack=(comp,n,t0,t1)=>{const DN=(1.15+.1*r)*(heat(5)?1.15:1);n=Math.round(n*DN);comp=Object.fromEntries(Object.entries(comp).map(([k,v])=>[k,EN[k].aura||d0(k)?v:Math.round(v*(r>=5?1.45:r>=3?1.3:1.1))]));for(let g=0;g<n;g++){const t=Math.max(0,t0+(t1-t0)*(n<=1?0:g/(n-1))+rnd(-.6,.6));const cx=rnd(.2,.8);
     const mem=[];for(const k in comp)for(let i=0;i<comp[k];i++)mem.push(k);
     const sup=mem.filter(k=>EN[k].aura),rest=mem.filter(k=>!EN[k].aura);const cols=Math.min(5,Math.max(1,rest.length));
     rest.forEach((k,i)=>{const row=Math.floor(i/cols),col=i%cols;S.push({type:k,t:t+row*.35+rnd(0,.1),x:clamp(cx+(col-(cols-1)/2)*.085+rnd(-.015,.015),.05,.95),y:-.04-rnd(0,.02)});});
@@ -55,11 +55,13 @@ function toClient(x,y){const fr=F.cv.getBoundingClientRect();return[fr.left+x*F.
 function startBattle(){
   if(!boardCards().length){toast('棋盘上一张卡都没有');SFX.play('bad');return;}
   cancelDrag();closeSheet();if(G.drawer)setDrawer(false);G.phase='battle';
-  const wave=G.nextWave;const special=wave.some(s=>EN[s.type].boss)?'boss':'battle';BG.set(special);
+  let wave=G.nextWave;if(G.prep.wager==='horde')wave=hordeWave(wave);const special=wave.some(s=>EN[s.type].boss)?'boss':'battle';BG.set(special);
   B={t:0,spawns:wave,si:0,en:[],pr:[],epr:[],graves:[],sched:[],shield:0,maxChain:0,wallLost:0,endT:0,over:false,acc:0,boss:null,greed:0,kills:0,flags:{},rlog:{},
-    beats:nightInfo(G.round).beats,bi:0,surges:(wave.surges||[]).slice(),lowSaid:false};clearVO();
+    beats:nightInfo(G.round).beats,bi:0,surges:(wave.surges||[]).slice(),lowSaid:false,wager:G.prep.wager||null,maxCombo:0,combo:0,maxHit:0,slowT:0};clearVO();
   for(const c of G.cards){c.charge=0;c.mom=0;c.bDmg=0;c.bTrig=0;c.frozen=0;c.echoLog=[];c.evLog={};c.hasteT=0;c.stk=0;c.lastT=-9;c.rage=0;c.cnt=0;c.ammo=maxAmmo(c);c.el.classList.remove('frozen','empty','haste');setAmmo(c);}
   for(const c of boardCards()){c.nb=neighbors(c);c.right=rightOf(c);c.anvil=0;c.charge=mv('startCharge');}
+  recalcMods();noteLineup();
+  if(B.wager==='dark')for(const c of boardCards()){c.frozen=2.5;c.el.classList.add('frozen');}
   B.shield=mv('shieldStart');RANGE=clamp(RANGE0+mv('range'),.05,.35);
   F.parts=[];F.nums=[];F.rings=[];F.bolts=[];
   $('#prep').hidden=true;$('#report').hidden=true;F.cv.style.display='block';
@@ -69,11 +71,12 @@ function startBattle(){
   computeOrigins();updateHUD();
   banner(nightInfo(G.round).title,G.round===8?'#ff6b5b':G.round===4?'#ffb37a':'#fff');
   SFX.play(G.round>=8||G.round===4?'intent':'ui');
+  if(B.wager)later(.6,()=>banner('加码 · '+WAGERS[B.wager].n,'#ff8a5b'));
   emit('start',{});
 }
 function later(dt,f){B.sched.push({t:dt,f});}
 function spawn(type,x,y){
-  const d=EN[type];const sc=d.fixed?1:hpScale(G.round)*(G.round===1?.5:G.round===2?.6:.7);
+  const d=EN[type];const sc=d.fixed?1:hpScale(G.round)*(G.round===1?.5:G.round===2?.6:.7)*(heat(1)?1.15:1)*(heat(2)&&(d.boss||d.elite)?1.25:1)*(wg('iron')?1.3:1);
   const e={d,type,x:x!=null?x:rnd(.08,.92),y:y!=null?y:-.04,hp:d.hp*sc,maxHp:d.hp*sc,armor:d.armor,shield:0,slowT:0,slowA:0,burnT:0,burnD:0,burnSrc:null,burnTick:0,poisonT:0,poisonD:0,poisonSrc:null,poisonTick:0,frzT:0,frzN:0,vulnT:0,vulnA:0,
     flash:0,ph:Math.random()*6.28,armorB:0,hasteB:0,healT:rnd(1.5,3),bornT:B.t,raiseT:rnd(3,5),lobT:d.lob?d.lob[0]*.6:0,sprK:null,revealed:false,dashT:0,hardT:0,ii:0,it:d.intents?d.intents[0].t:0,dead:false};
   e.x0=e.x;B.en.push(e);if((d.boss||d.elite||d.big)&&!B.flags['met'+type]){B.flags['met'+type]=1;later(1.2,()=>say('hero',BARKS.elite,2));}if(!d.fixed&&e.y<0)for(let i=0;i<4;i++)part(ex(e)+rnd(-4,4),F.top+rnd(0,3),rnd(-8,8),rnd(5,20),.5,Math.random()<.5?'#a64ca6':'#5d275d',1);if(d.boss||d.elite){B.boss=e;$('#bossbar').hidden=false;$('#bossName').textContent=d.n;if(FOEB[type])say(type,FOEB[type].spawn,3);}
@@ -118,7 +121,7 @@ function simStep(dt){
     if(e.poisonT>0){e.poisonT-=dt;e.poisonTick+=dt;if(e.poisonTick>=.5){e.poisonTick-=.5;hurt(e,e.poisonD*.5,e.poisonSrc,false,{poisonTick:1});if(Math.random()<.35)part(ex(e),ey(e)-8,rnd(-12,12),rnd(-24,-4),.45,'#7ddc5f',1);if(e.dead)continue;}}
       if(Math.random()<.25)part(ex(e)+rnd(-4,4),ey(e)-rnd(2,8),rnd(-5,5),-rnd(10,25),.4,Math.random()<.5?'#ef7d57':'#ffcd75',1);}
     if(e.d.intents){e.it-=dt;if(e.it<=0){doIntent(e);if(B.over)return;}}
-    let sp=e.d.spd*(1-e.slowA)*(1+mv('enemySpd'))*(1+e.hasteB);if(e.dashT>0){e.dashT-=dt;sp*=3;}
+    let sp=e.d.spd*(1-e.slowA)*(1+mv('enemySpd')+(heat(7)?.1:0)+(wg('rush')?.2:0))*(1+e.hasteB);if(e.dashT>0){e.dashT-=dt;sp*=3;}
     if(e.d.rage)sp*=1+e.d.rage*(1-e.hp/e.maxHp);
     if(e.revealed)sp*=2.4;
     if(e.d.stopAt&&e.y>=e.d.stopAt&&e.dashT<=0)sp=0;
@@ -142,7 +145,7 @@ function vuln(e,t,a){e.vulnT=Math.max(e.vulnT,t);e.vulnA=Math.max(e.vulnA,a);}
 function wallHit(e){e.dead=true;damageWall(e.d.wall,ex(e),e.d.bomb?'boom':null);if(!B.over&&e.d.chill)chillCard(e.d.chill);}
 function chillCard(t){const bc=boardCards().filter(c=>c.frozen<=0);if(!bc.length)return;const c=pick(bc);c.frozen=t;c.el.classList.add('frozen');if(Math.random()<.5)say('hero',BARKS.freeze,1);}
 function damageWall(d,xx,kind){
-  const e={x:xx/F.W,y:1};const ab=Math.min(B.shield,d);B.shield-=ab;d-=ab;if(kind==='boom'){boom(xx,WALLY()-2,16*K(),'#ef7d57');}
+  const e={x:xx/F.W,y:1};if(wg('brittle'))d*=1.5;const ab=Math.min(B.shield,d);B.shield-=ab;d-=ab;if(G.run)G.run.wallLost+=d;if(kind==='boom'){boom(xx,WALLY()-2,16*K(),'#ef7d57');}
   G.wall-=d;B.wallLost+=d;F.wallFlash=.4;F.shake=Math.max(F.shake,d>0?4:1.5);SFX.play('hurt');
   for(let i=0;i<10;i++)part(ex(e)+rnd(-6,6),WALLY(),rnd(-30,30),-rnd(20,50),.5,'#e43b44',2);
   if(d>0)num(ex(e),WALLY()-6,'-'+Math.ceil(d),'#ff5a5a',2);
@@ -207,7 +210,7 @@ function haste(c,t,from){if(c.frozen>0||!c.el)return;c.hasteT=Math.max(c.hasteT|
 function reload(c,n,from){const m=maxAmmo(c);if(m==null)return false;if(c.ammo>=m)return true;c.ammo=Math.min(m,c.ammo+n);c.el.classList.remove('empty');setAmmo(c);if(from)FX.link(from.el,c.el,'#ffd166',.22);return true;}
 function setAmmo(c){if(!c.el)return;const a=c.el.querySelector('.am');if(!a)return;const v=B&&G.phase==='battle'?c.ammo:maxAmmo(c);a.textContent='弹'+v;c.el.classList.toggle('empty',v===0);}
 let chainT=0;
-function showChain(n){if(n<2)return;if(n===5||n===9)say('hero',BARKS.chain,1);const el=$('#chain');const cols=['#c38cff','#c38cff','#ff95dc','#ffd166','#ff8a5b','#ff5a5a'];
+function showChain(n){if(n<2)return;if(n===5||n===9)say('hero',BARKS.chain,1);if(n>=8)unlock('chain8');if(n>=11)unlock('chain11');const el=$('#chain');const cols=['#c38cff','#c38cff','#ff95dc','#ffd166','#ff8a5b','#ff5a5a'];
   if(n%5===0)emit('chain',{n});el.style.setProperty('--cc',cols[Math.min(cols.length-1,Math.floor(n/2))]);el.innerHTML='连锁 <b>×'+n+'</b>';
   const now=performance.now();if(now-chainT>90){restart(el,'show');chainT=now;}}
 
@@ -291,6 +294,7 @@ function hurt(e,amt,src,crit,o){
   if(o.poisonTick)a=Math.max(1,amt);
   if(e.shield>0){const s=Math.min(e.shield,a);e.shield-=s;a-=s;if(a<=0){num(ex(e),ey(e)-12,'0','#dfe6ee',1);return;}}
   e.hp-=a;e.flash=.08;if(src)src.bDmg+=a;
+  if(a>B.maxHit){B.maxHit=a;if(a>=1000)unlock('hit1k');if(a>=10000)unlock('hit10k');}
   const big=crit||a>=150;
   if(crit||o.burnTick||o.poisonTick||F.nums.length<28||((e.d.boss||e.d.elite)?Math.random()<.25:Math.random()<.5))num(ex(e)+rnd(-7,7),ey(e)-10-rnd(0,5),fmt(a)+(crit?'!':''),o.poisonTick?'#7ddc5f':o.burnTick?'#ef7d57':crit?'#fee761':'#ffffff',big?2:1);
   if(!o.burnTick&&!o.poisonTick)SFX.play(crit?'crit':'hit');
@@ -323,7 +327,7 @@ function surge(){banner('大军压境','#ff8a5b');SFX.play('intent');SFX.play('b
   say('soldier',BARKS.soldierSurge,2);say('hero',BARKS.surge,2);}
 function fmt(v){v=Math.round(v);return v>=10000?Math.round(v/1000)+'k':String(v);}
 function kill(e,src){
-  e.dead=true;B.kills++;SFX.play('kill');if(B.kills===1)say('hero',BARKS.first,1);
+  e.dead=true;B.kills++;SFX.play('kill');comboKill(e);if(e.type==='eye'&&B.t-e.bornT<=25)unlock('quickeye');if(B.kills===1)say('hero',BARKS.first,1);
   B.kt=(B.kt||[]).filter(t=>t>B.t-2);B.kt.push(B.t);if(B.kt.length>=8){B.kt=[];say('hero',BARKS.streak,1);}
   emit('kill',{e,src,burning:e.burnT>0,poisoned:e.poisonT>0,frozen:e.frzT>0,elite:!!(e.d.elite||e.d.boss)});
   const n=e.d.boss?60:e.d.elite?36:12;for(let i=0;i<n;i++)part(ex(e),ey(e)-5,rnd(-50,50),rnd(-60,20),rnd(.3,.7),Math.random()<.6?e.d.col:'#1a1c2c',Math.random()<.5?2:1);
@@ -336,7 +340,7 @@ function kill(e,src){
   if(e.d.split){for(let i=0;i<e.d.split;i++){const m=spawn(e.d.splitInto||'mini',clamp(e.x+(i?.05:-.05),.04,.96),e.y-.01);m.x0=m.x;}}
   if(src&&src.adj==='greedy'){G.gold++;B.greed++;const[cx,cy]=toClient(ex(e),ey(e));FX.coins(cx,cy,1);SFX.play('coin');updateHUD();}
   if(mv('killGold')&&Math.random()<mv('killGold')){G.gold++;const[cx,cy]=toClient(ex(e),ey(e));FX.coins(cx,cy,1);updateHUD();}
-  if(e.d.boss||e.d.elite){F.shake=6;SFX.play('boom');if(FOEB[e.type])say(e.type,FOEB[e.type].die,3);if(!e.d.boss)say('hero',BARKS.killElite,2);ring(ex(e),ey(e),4,60,'#fee761',.6);B.boss=null;$('#bossbar').hidden=true;}
+  if(e.d.boss||e.d.elite){F.shake=6;B.slowT=.6;SFX.play('boom');if(FOEB[e.type])say(e.type,FOEB[e.type].die,3);if(!e.d.boss)say('hero',BARKS.killElite,2);ring(ex(e),ey(e),4,60,'#fee761',.6);B.boss=null;$('#bossbar').hidden=true;}
 }
 
 /* ---- 场景特效 ---- */
@@ -463,16 +467,18 @@ const FX=(function(){
 function winBattle(){
   B.over=true;G.phase='report';$('#bossbar').hidden=true;
   G.bestChain=Math.max(G.bestChain,B.maxChain);SFX.play('win');say('hero',BARKS.win,2);
+  if(G.run){G.run.kills+=B.kills;G.run.maxHit=Math.max(G.run.maxHit,B.maxHit);G.run.maxCombo=Math.max(G.run.maxCombo,B.maxCombo);}if(B.kills>=150)unlock('kills150');
   for(const c of G.cards)if(c.adj==='hoard')c.hoard++;
   for(const c of boardCards()){const w=ITEMS[c.key].onWin;if(w)w(c);}
   finishQuests();
   for(const c of G.cards){c.charge=0;c.el.style.setProperty('--s',0);c.el.classList.remove('frozen','empty','haste');c.ammo=maxAmmo(c);setAmmo(c);}
   const was=G.round;
-  if(was>=G.maxRound){banner('黎明','#ffe79a');BG.set('shop');setTimeout(()=>playStory(STORY.win,()=>endScreen(true)),1400);return;}
-  updateHUD();const winG=3+Math.floor(was/2);const rows=[['守夜工钱',winG]];if(was===4)rows.push(['打倒精英',4]);
+  if(was>=G.maxRound){if(B.wager&&G.run)G.run.wagers++;runWon();banner('黎明','#ffe79a');BG.set('shop');setTimeout(()=>playStory(STORY.win,()=>endScreen(true)),1400);return;}
+  updateHUD();const winG=3+Math.floor(was/2)-(heat(6)?1:0);const rows=[['守夜工钱',winG]];if(was===4)rows.push(['打倒精英',4]);
   const interest=Math.min(3+mv('interest'),Math.floor(G.gold/6));if(mv('winGold'))rows.push(['遗物/天赋',mv('winGold')]);if(mv('regen'))G.wall=Math.min(G.wallMax,G.wall+mv('regen'));if(interest)rows.push(['利息（每6金+1）',interest]);
   if(B.wallLost===0)rows.push(['墙没掉砖',1]);
   if(B.greed)rows.push(['贪婪（已到账）',0,B.greed]);
+  rows.push(...wagerPay());
   const total=rows.reduce((s,r)=>s+r[1],0);
   showReport(was,rows,total);
 }
@@ -480,26 +486,31 @@ function showReport(was,rows,total){
   const rp=$('#report');const bc=G.cards.filter(c=>c.bTrig>0).sort((a,b)=>b.bDmg-a.bDmg);const mx=Math.max(1,...bc.map(c=>c.bDmg));
   rp.innerHTML=`<div class="rp-title win">第${was}夜 · ${pickLine(RPT.win)}</div>
   <div class="rp-list">${bc.map((c,i)=>`<div class="rp-row" style="animation-delay:${i*.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${SPR[c.key].url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${(c.bDmg/mx*100).toFixed(1)}"></i></div><b>${fmt(c.bDmg)}<small>×${c.bTrig}</small></b></div>`).join('')||'<div class="rp-meta">这一夜没有卡出手</div>'}</div>
-  <div class="rp-meta">${(was+1)%2===1?'<b style="color:#ffd166">明晚之前有夜谈</b>　':''}最高连锁 <b>×${B.maxChain||1}</b>　击杀 <b>${B.kills}</b>　城墙 <b>-${Math.ceil(B.wallLost)}</b></div>
+  <div class="rp-meta">${(was+1)%2===1?'<b style="color:#ffd166">明晚之前有夜谈</b>　':''}最高连锁 <b>×${B.maxChain||1}</b>　击杀 <b>${B.kills}</b>　连杀 <b>${B.maxCombo}</b>　城墙 <b>-${Math.ceil(B.wallLost)}</b></div>
   <div class="rp-cash" id="cash"></div>
   <button class="btn gold big" id="cashBtn" style="flex:none">收下 <img class="ico" src="${SPR.coin.url}" alt=""><b>${total}</b></button>`;
   rp.hidden=false;
   setTimeout(()=>rp.querySelectorAll('.bar i').forEach(i=>i.style.width=i.dataset.w+'%'),60);
   const cash=$('#cash');let i=0;
-  const next=()=>{if(i<rows.length){const r=rows[i];cash.insertAdjacentHTML('beforeend',`<div class="cash-row"><span>${r[0]}</span><b>${r[2]?'+'+r[2]:'+'+r[1]}</b></div>`);SFX.play('coin');i++;setTimeout(next,220);}
+  const next=()=>{if(i<rows.length){const r=rows[i];cash.insertAdjacentHTML('beforeend',`<div class="cash-row"><span>${r[0]}</span><b>${r[3]||(r[2]?'+'+r[2]:'+'+r[1])}</b></div>`);SFX.play('coin');i++;setTimeout(next,220);}
     else{cash.insertAdjacentHTML('beforeend',`<div class="cash-row total"><span>合计</span><b>+${total}</b></div>`);}};
   setTimeout(next,400);
   $('#cashBtn').onclick=()=>{SFX.ensure();const r=$('#cashBtn').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top,Math.min(total,10));G.gold+=total;G.round++;$('#report').hidden=true;nightStory(()=>toPrep());};
 }
-function loseBattle(){B.over=true;G.phase='over';SFX.play('lose');G.bestChain=Math.max(G.bestChain,B.maxChain);banner(pickLine(RPT.fall),'#ff6b5b');setTimeout(()=>playStory(STORY.lose,()=>endScreen(false)),1400);}
+function loseBattle(){B.over=true;if(G.run)G.run.kills+=B.kills;G.phase='over';SFX.play('lose');G.bestChain=Math.max(G.bestChain,B.maxChain);banner(pickLine(RPT.fall),'#ff6b5b');setTimeout(()=>playStory(STORY.lose,()=>endScreen(false)),1400);}
 function endScreen(win){
   const sc=$('#screen');BG.set(win?'shop':'over');
-  const best=G.cards.slice().sort((a,b)=>b.bDmg-a.bDmg)[0];
+  const best=G.cards.slice().sort((a,b)=>b.bDmg-a.bDmg)[0];const R=G.run||freshRun();META.runs++;saveMeta();
+  const got=R.got.map(id=>ACHM[id]).filter(Boolean);
   sc.innerHTML=`<div class="scr"><img class="por-big" src="${SPR[HEROES[G.hero].portrait].url}" alt=""><h1 style="color:${win?'#ffe79a':'#ff8a80'}">${win?'黎明到来':'长夜未尽'}</h1><div class="logo-sub">${HEROES[G.hero].n} · ${HEROES[G.hero].title}</div>
   <div class="rules res"><div><span>坚守到</span><i style="margin-left:auto">第 ${Math.min(G.round,8)} 夜 / 8</i></div>
+  ${G.heat?`<div><span>难度</span><i style="margin-left:auto">长夜 ${G.heat}</i></div>`:''}
   <div><span>遗物 / 天赋</span><i style="margin-left:auto">${G.relics.length} 件 / ${G.skills.length} 个</i></div>
   <div><span>最高连锁</span><i style="margin-left:auto">×${G.bestChain||1}</i></div>
+  <div><span>杀敌 / 最长连杀</span><i style="margin-left:auto">${R.kills} / ${R.maxCombo}</i></div>
   ${best?`<div><span>最后的王牌</span><i style="margin-left:auto">${best.adj?ADJ[best.adj].n+'的':''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}</i></div>`:''}</div>
+  ${R.newHeat?`<div class="newheat">解锁了 <b>长夜 ${R.newHeat}</b>：${HEATS[R.newHeat]}</div>`:''}
+  ${got.length?`<div class="rules res achgot"><div><span>这局解锁的成就</span></div>${got.map(a=>`<div><i>★</i><span><b>${a.n}</b> ${a.d}</span></div>`).join('')}</div>`:''}
   <button class="btn red big" id="againBtn">再守一次</button></div>`;
   clearSave();sc.hidden=false;$('#againBtn').onclick=()=>{SFX.ensure();SFX.play('ui');sc.hidden=true;heroSelect();};
 }
@@ -512,34 +523,36 @@ function titleScreen(){
   <div><i>3</i><span>两张同名同品质的卡合成一张更好的：铜→银→金→钻</span></div>
   <div><i>4</i><span>撑过8个夜晚，打倒深渊之眼；每两夜有一次夜谈，能学个新天赋</span></div></div>
   ${loadSave()?`<button class="btn gold big" id="contBtn">继续 · ${HEROES[loadSave().hero].n} 第${loadSave().round}夜</button>`:''}
-  <button class="btn ${loadSave()?'alt':'red'} big" id="startBtn">${loadSave()?'新的守夜':'开始游戏'}</button></div>`;
+  <button class="btn ${loadSave()?'alt':'red'} big" id="startBtn">${loadSave()?'新的守夜':'开始游戏'}</button>
+  <button class="btn alt" id="achBtn">成就 ${achCount()} / ${ACH.length}${META.heatMax?' · 长夜 '+META.heatMax:''}</button></div>`;
   sc.hidden=false;$('#startBtn').onclick=()=>{SFX.ensure();SFX.play('merge');heroSelect();};
+  $('#achBtn').onclick=()=>{SFX.ensure();openAch();};
   if($('#contBtn'))$('#contBtn').onclick=()=>{SFX.ensure();SFX.play('merge');sc.hidden=true;resumeSave();};
 }
 function heroSelect(){
   const sc=$('#screen');BG.set('title');
-  sc.innerHTML=`<div class="scr"><h1 style="font-size:32px">选择守夜人</h1><div class="heroes">${Object.keys(HEROES).map(k=>{const H=HEROES[k];
+  sc.innerHTML=`<div class="scr"><h1 style="font-size:32px">选择守夜人</h1>${heatBar()}<div class="heroes">${Object.keys(HEROES).map(k=>{const H=HEROES[k];
     return `<button class="hero" data-h="${k}" style="--hc:${H.col}"><img class="por" src="${SPR[H.portrait].url}" alt=""><div class="hn"><b>${H.n}</b><small>${H.title}</small></div>
     <div class="htag">${H.tag}</div><div class="hstat"><span>城墙 <b>${H.wall}</b></span><span>金币 <b>${H.gold}</b></span></div><p>${H.desc}</p>
     <div class="hmeta"><div class="hcards">${H.start.map(s=>`<img src="${SPR[s[0]].url}" alt="${ITEMS[s[0]].n}">`).join('')}</div></div>
     <em>“${H.intro}”</em></button>`;}).join('')}</div></div>`;
-  sc.hidden=false;
+  sc.hidden=false;bindHeat();
   sc.querySelectorAll('.hero').forEach(b=>b.onclick=()=>{SFX.ensure();SFX.play('merge');sc.hidden=true;newGame(b.dataset.h);});
 }
 const SAVEK='chain-demo-save-v4';
-function saveGame(){try{localStorage.setItem(SAVEK,JSON.stringify({hero:G.hero,round:G.round,gold:G.gold,wall:G.wall,wallMax:G.wallMax,relics:G.relics,skills:G.skills,foeSet:G.foeSet,bestChain:G.bestChain,
+function saveGame(){try{localStorage.setItem(SAVEK,JSON.stringify({hero:G.hero,round:G.round,gold:G.gold,wall:G.wall,wallMax:G.wallMax,relics:G.relics,skills:G.skills,foeSet:G.foeSet,bestChain:G.bestChain,heat:G.heat||0,run:G.run,
   cards:G.cards.map(c=>({key:c.key,tier:c.tier,adj:c.adj,loc:c.loc,idx:c.idx,hoard:c.hoard,grow:c.grow||0,qp:c.qp||0}))}));}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem(SAVEK);return s?JSON.parse(s):null;}catch(e){return null;}}
 function clearSave(){try{localStorage.removeItem(SAVEK);}catch(e){}}
 function resumeSave(){const s=loadSave();if(!s||!HEROES[s.hero]){heroSelect();return;}
   for(const c of G.cards)if(c.el)c.el.remove();
-  Object.assign(G,{hero:s.hero,round:s.round,gold:s.gold,wall:s.wall,wallMax:s.wallMax,foeSet:s.foeSet||'dark',relics:s.relics||[],skills:(s.skills||[]).filter(k=>TALENTS[k]),bestChain:s.bestChain||0,cards:[]});
+  Object.assign(G,{hero:s.hero,round:s.round,gold:s.gold,wall:s.wall,wallMax:s.wallMax,foeSet:s.foeSet||'dark',relics:s.relics||[],skills:(s.skills||[]).filter(k=>TALENTS[k]),bestChain:s.bestChain||0,heat:s.heat||0,run:s.run||freshRun(),cards:[]});
   for(const d of s.cards||[]){if(!ITEMS[d.key])continue;const c=newCard(d.key,d.tier,d.adj);c.loc=d.loc;c.idx=d.idx;c.hoard=d.hoard||0;c.grow=d.grow||0;c.qp=d.qp||0;G.cards.push(c);}
   recalcMods();renderRelics();shownGold=null;renderOwned();updateHUD();toPrep();toast('接着上回：第'+G.round+'夜');}
 function newGame(hero){
   for(const c of G.cards)if(c.el)c.el.remove();
-  G.hero=hero||G.hero;const H=HEROES[G.hero];
-  Object.assign(G,{round:1,gold:H.gold,wall:H.wall,wallMax:H.wall,cards:[],relics:[],skills:[],bestChain:0,foeSet:pick(Object.keys(FOESETS))});recalcMods();renderRelics();
+  G.hero=hero||G.hero;const H=HEROES[G.hero];const hh=Math.min(META.heatSel||0,META.heatMax||0);const w0=Math.round(H.wall*(hh>=4?.85:1));
+  Object.assign(G,{heat:hh,run:freshRun(),round:1,gold:H.gold,wall:w0,wallMax:w0,cards:[],relics:[],skills:[],bestChain:0,foeSet:pick(Object.keys(FOESETS))});recalcMods();renderRelics();
   for(const[k,t,i]of H.start){const c=newCard(k,t);c.loc='board';c.idx=i;G.cards.push(c);}
   shownGold=null;renderOwned();updateHUD();
   G.firstPrep=true;playStory(STORY.prologue,()=>nightStory(()=>toPrep()));
@@ -563,7 +576,8 @@ let lastT=performance.now();
 function loop(now){
   const dtR=Math.min(.05,(now-lastT)/1000);lastT=now;
   if(G.phase==='battle'&&B&&!B.over){
-    B.acc+=dtR*G.speed;const step=1/60;let n=0;const cap=G.speed>3?40:12;
+    let sm=1;if(B.slowT>0){B.slowT-=dtR;sm=.3;}
+    B.acc+=dtR*G.speed*sm;const step=1/60;let n=0;const cap=G.speed>3?40:12;
     while(B.acc>=step&&n<cap){simStep(step);B.acc-=step;n++;if(B.over)break;}
     if(n>=cap)B.acc=0;
     if(B&&!B.over)for(const c of boardCards())c.el.style.setProperty('--s',(1-Math.min(1,c.charge)).toFixed(3));

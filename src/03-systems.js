@@ -78,11 +78,11 @@ const SFX=(function(){
 
 /* ================= 状态 ================= */
 const G={hero:'ayla',foeSet:'dark',skills:[],drawer:false,phase:'title',round:1,maxRound:8,gold:10,wall:25,wallMax:25,speed:1,cards:[],relics:[],
-  prep:{step:0,cur:null,doors:[]},nextWave:null,bestChain:0,firstPrep:true};
+  prep:{step:0,cur:null,doors:[]},nextWave:null,bestChain:0,firstPrep:true,heat:0,run:null};
 let B=null;
 let cw=46,ch=90;
 let M={};function recalcMods(){M={};const add=m=>{for(const k in m)M[k]=(M[k]||0)+m[k];};for(const r of G.relics)add(RELICS[r].m);
-  for(const s of G.skills)if(TALENTS[s])add(TALENTS[s].m);}
+  for(const s of G.skills)if(TALENTS[s])add(TALENTS[s].m);add(synMods());}
 const mv=k=>M[k]||0;
 
 function newCard(key,tier,adj){return{id:UID++,key,tier:tier==null?ITEMS[key].t:tier,adj:adj||null,size:ITEMS[key].size,loc:null,idx:-1,hoard:0,grow:0,qp:0,el:null,
@@ -155,7 +155,7 @@ function paintCard(el,c,extra){const it=ITEMS[c.key];const ad=c.adj?ADJ[c.adj]:n
   el.innerHTML=cardHTML(c);setNum(el,c);if(it.ammo!=null){const a=el.querySelector('.am');if(a)a.textContent='弹'+(c.ammo!=null&&G.phase==='battle'?c.ammo:maxAmmo(c));}}
 function numText(c){const it=ITEMS[c.key];if(it.numT)return it.numT(c);if(it.charge)return'+'+Math.round(chargeAmt(c)*100)+'%';if(it.buff)return'+50%';if(it.prism)return'+25%';if(it.chargeSmall)return'+'+Math.round(it.chargeSmall*(1+.25*stepOf(c))*100)+'%';if(it.horn)return'齐鸣';const v=Math.round(stats(c,null).total);return v>=10000?(v/1000).toFixed(1)+'k':String(v);}
 function setNum(el,c){const n=el.querySelector('.num');if(n)n.textContent=numText(c);}
-function renderOwned(){
+function renderOwned(){recalcMods();
   for(const c of G.cards){
     if(!c.el){c.el=document.createElement('div');paintCard(c.el,c);bindCard(c);}
     const parent=c.loc==='board'?$('#board'):$('#stash');
@@ -163,6 +163,7 @@ function renderOwned(){
     c.el.style.left=(4+c.idx*cw+2)+'px';
   }
   for(const c of G.cards)setNum(c.el,c);
+  renderSyn();
 }
 function repaint(c){if(c.el)paintCard(c.el,c,c.el.classList.contains('frozen')?'frozen':'');}
 function bindCard(c){c.el.addEventListener('pointerdown',e=>onDown(e,{kind:'own',card:c,el:c.el}));}
@@ -180,7 +181,7 @@ function updateHUD(){
   $('#roundV').textContent=Math.min(G.round,G.maxRound);
   const rc=$('#roundChip');rc.classList.toggle('elite',G.round===4);rc.classList.toggle('boss',G.round===8);
   if(shownGold!==G.gold){if(shownGold!==null)restart($('#goldChip'),'bump');shownGold=G.gold;}
-  $('#goldV').textContent=G.gold;
+  $('#goldV').textContent=G.gold;if(G.gold>=50&&G.phase!=='title')unlock('rich');
   $('#hpV').textContent=Math.max(0,Math.ceil(G.wall));
   $('#shV').textContent=B&&B.shield>0&&G.phase==='battle'?'+'+Math.ceil(B.shield):'';
   $('#speedBtn').textContent=G.speed+'×';
@@ -229,7 +230,7 @@ function makeOffer(filter,opt){opt=opt||{};
   const key=rollItem(filter);let tier=ITEMS[key].t;
   if(opt.black||Math.random()<(G.round>=5?.18:G.round>=3?.08:0))tier=Math.min(opt.free?2:3,tier+1);
   const adj=rollAdj(key,!!opt.black);
-  let price=basePrice(key,adj,tier);if(opt.black)price=Math.round(price*1.5);if(opt.free)price=0;
+  let price=basePrice(key,adj,tier);if(opt.black)price=Math.round(price*1.5);if(opt.free)price=0;else if(heat(3))price+=1;
   return{card:{key,tier,adj,size:ITEMS[key].size,dl:0,hoard:0},price,sold:false};
 }
 
@@ -268,8 +269,8 @@ function renderPrep(){
   $('#stepPips').innerHTML=[0,1,2].map(i=>`<i class="${i<P.step?'done':i===P.step?'now':''}"></i>`).join('');
   body.innerHTML='';
   if(P.step>=3){
-    body.innerHTML=`<div class="ready"><div class="rd-t">准备好了</div><p>摆好阵型，第${G.round}夜要来了。</p><p class="muted">挨着放的卡会互相带动。点一下卡，能看到伤害是怎么算的。</p></div>`;
-    updateHUD();return;
+    body.innerHTML=`<div class="ready"><div class="rd-t">准备好了</div><p>摆好阵型，第${G.round}夜要来了。</p><p class="muted">挨着放的卡会互相带动，同元素凑够张数有羁绊。</p></div>${wagerHtml()}`;
+    bindWagers();updateHUD();return;
   }
   if(!P.cur&&P.talk&&!P.talkDone)startTalk();
   const cur=P.cur;$('#prep').classList.toggle('talking',!!cur&&(cur.mode==='talk'||cur.mode==='talent'));
@@ -373,7 +374,7 @@ function renderTalk(cur,body){
     else{body.insertAdjacentHTML('beforeend',`<div class="ev-hint">${cur.sc.q}</div>`);
       cur.sc.ans.forEach((a,i)=>{const b=document.createElement('button');b.className='opt say';b.style.animationDelay=(i*.06)+'s';
         b.innerHTML=`<div><b>“${pickLine(a.t)}”</b></div>`;
-        b.onclick=()=>{SFX.ensure();SFX.play('ui');cur.ans=pickLine(a.t);cur.re=a.re;cur.mode='talent';cur.picks=rollTalents(3,a.cat);renderPrep();};list.appendChild(b);});
+        b.onclick=()=>{SFX.ensure();SFX.play('ui');cur.ans=pickLine(a.t);cur.re=a.re;cur.mode='talent';cur.picks=rollTalents(heat(8)?2:3,a.cat);renderPrep();};list.appendChild(b);});
       body.appendChild(list);}
   }else{
     body.insertAdjacentHTML('beforeend',`<div class="ev-hint">${cur.picks.length?'挑一个学':'能学的都学会了'}</div>`);
@@ -381,7 +382,7 @@ function renderTalk(cur,body){
       b.innerHTML=`<img class="ricon" src="${icon(C.ico).url}" alt="" style="--gc:${C.c}"><div><b style="color:${C.c}">${T.n}<small class="gt" style="--gc:${C.c}">${C.n}</small>${T.hero?'<small class="gt">专属</small>':''}</b>${talentText(id)}${T.say?`<em>“${T.say}”</em>`:''}</div>`;
       b.onclick=()=>{SFX.ensure();learnTalent(id);endTalk(cur);};list.appendChild(b);});
     body.appendChild(list);
-    if(!cur.picks.length)body.appendChild(btnRow([['拿 5 金走人','gold',()=>{gainGold(5);endTalk(cur);}]]));
+    body.appendChild(btnRow(cur.picks.length?[['不学了 <small>拿 3 金</small>','',()=>{gainGold(3);endTalk(cur);}]]:[['拿 5 金走人','gold',()=>{gainGold(5);endTalk(cur);}]]));
   }
 }
 function endTalk(cur){if(cur.talk){G.prep.talkDone=true;G.prep.cur=null;renderPrep();
@@ -432,7 +433,7 @@ function checkMerges(){
       repaint(t);any=t;did=true;break;}
     if(!did)break;
   }
-  if(any){SFX.play('merge');setTimeout(()=>{if(!any.el||!G.cards.includes(any))return;restart(any.el,'merge');const r=any.el.getBoundingClientRect();
+  if(any){SFX.play('merge');if(any.tier>=3)unlock('dia');setTimeout(()=>{if(!any.el||!G.cards.includes(any))return;restart(any.el,'merge');const r=any.el.getBoundingClientRect();
     FX.burst(r.left+r.width/2,r.top+r.height/2,TIERS[any.tier].c,30);toast(ITEMS[any.key].n+' 升到【'+TIERS[any.tier].n+'】了');},30);}
   G.cards.filter(c=>c.loc==='temp').forEach(removeCard);
 }
