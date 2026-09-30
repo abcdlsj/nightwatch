@@ -419,9 +419,9 @@ function winBattle(){
   for(const c of G.cards){c.charge=0;c.el.style.setProperty('--s',0);c.el.classList.remove('frozen');}
   const was=G.round;
   if(was>=G.maxRound){banner('黎明','#ffe79a');BG.set('shop');setTimeout(()=>playStory(STORY.win,()=>endScreen(true)),1400);return;}
-  G.sp++;updateHUD();const rows=[['胜利奖励',5]];if(was===4)rows.push(['击败精英',4]);
-  const interest=Math.min(5+mv('interest'),Math.floor(G.gold/5));if(mv('winGold'))rows.push(['物品加成',mv('winGold')]);if(mv('regen'))G.wall=Math.min(G.wallMax,G.wall+mv('regen'));if(interest)rows.push(['利息（每5金+1）',interest]);
-  if(B.wallLost===0)rows.push(['城墙无损',2]);
+  G.sp++;updateHUD();const winG=3+Math.floor(was/2);const rows=[['胜利奖励',winG]];if(was===4)rows.push(['击败精英',4]);
+  const interest=Math.min(3+mv('interest'),Math.floor(G.gold/6));if(mv('winGold'))rows.push(['物品加成',mv('winGold')]);if(mv('regen'))G.wall=Math.min(G.wallMax,G.wall+mv('regen'));if(interest)rows.push(['利息（每6金+1）',interest]);
+  if(B.wallLost===0)rows.push(['城墙无损',1]);
   if(B.greed)rows.push(['贪婪收入（已到账）',0,B.greed]);
   const total=rows.reduce((s,r)=>s+r[1],0);
   showReport(was,rows,total);
