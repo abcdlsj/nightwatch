@@ -53,7 +53,7 @@ function toClient(x,y){const fr=F.cv.getBoundingClientRect();return[fr.left+x*F.
 /* ================= 战斗 ================= */
 function startBattle(){
   if(!boardCards().length){toast('先把至少一张卡放上棋盘');SFX.play('bad');return;}
-  closeSheet();if(G.drawer)setDrawer(false);G.phase='battle';
+  cancelDrag();closeSheet();if(G.drawer)setDrawer(false);G.phase='battle';
   const wave=G.nextWave;const special=wave.some(s=>EN[s.type].boss)?'boss':'battle';BG.set(special);
   B={t:0,spawns:wave,si:0,en:[],pr:[],epr:[],graves:[],sched:[],shield:0,maxChain:0,wallLost:0,endT:0,over:false,acc:0,boss:null,greed:0,kills:0,flags:{},rlog:{},
     beats:(NIGHTS[G.round-1]||{beats:[]}).beats,bi:0,surges:(wave.surges||[]).slice(),lowSaid:false};clearVO();
