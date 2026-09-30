@@ -2,7 +2,7 @@
 /* ================= 波次 ================= */
 function makeWave(r){
   const S=[];
-  const pack=(comp,n,t0,t1)=>{const DN=1.2+.12*r;n=Math.round(n*DN);comp=Object.fromEntries(Object.entries(comp).map(([k,v])=>[k,EN[k].aura||d0(k)?v:Math.round(v*(r>=5?1.5:r>=3?1.35:1.1))]));for(let g=0;g<n;g++){const t=Math.max(0,t0+(t1-t0)*(n<=1?0:g/(n-1))+rnd(-.6,.6));const cx=rnd(.2,.8);
+  const pack=(comp,n,t0,t1)=>{const DN=1.15+.1*r;n=Math.round(n*DN);comp=Object.fromEntries(Object.entries(comp).map(([k,v])=>[k,EN[k].aura||d0(k)?v:Math.round(v*(r>=5?1.45:r>=3?1.3:1.1))]));for(let g=0;g<n;g++){const t=Math.max(0,t0+(t1-t0)*(n<=1?0:g/(n-1))+rnd(-.6,.6));const cx=rnd(.2,.8);
     const mem=[];for(const k in comp)for(let i=0;i<comp[k];i++)mem.push(k);
     const sup=mem.filter(k=>EN[k].aura),rest=mem.filter(k=>!EN[k].aura);const cols=Math.min(5,Math.max(1,rest.length));
     rest.forEach((k,i)=>{const row=Math.floor(i/cols),col=i%cols;S.push({type:k,t:t+row*.35+rnd(0,.1),x:clamp(cx+(col-(cols-1)/2)*.085+rnd(-.015,.015),.05,.95),y:-.04-rnd(0,.02)});});
@@ -520,8 +520,8 @@ function heroSelect(){
   const sc=$('#screen');BG.set('title');
   sc.innerHTML=`<div class="scr"><h1 style="font-size:32px">选择守夜人</h1><div class="heroes">${Object.keys(HEROES).map(k=>{const H=HEROES[k];
     return `<button class="hero" data-h="${k}" style="--hc:${H.col}"><img class="por" src="${SPR[H.portrait].url}" alt=""><div class="hn"><b>${H.n}</b><small>${H.title}</small></div>
-    <div class="htag">${H.tag}</div><p>${H.desc}</p><div class="hstat"><span>城墙 <b>${H.wall}</b></span><span>金币 <b>${H.gold}</b></span></div>
-    <div class="hcards">${H.start.map(s=>`<img src="${SPR[s[0]].url}" alt="${ITEMS[s[0]].n}">`).join('')}</div>
+    <div class="htag">${H.tag}</div><div class="hstat"><span>城墙 <b>${H.wall}</b></span><span>金币 <b>${H.gold}</b></span></div><p>${H.desc}</p>
+    <div class="hmeta"><div class="hcards">${H.start.map(s=>`<img src="${SPR[s[0]].url}" alt="${ITEMS[s[0]].n}">`).join('')}</div></div>
     <em>“${H.intro}”</em></button>`;}).join('')}</div></div>`;
   sc.hidden=false;
   sc.querySelectorAll('.hero').forEach(b=>b.onclick=()=>{SFX.ensure();SFX.play('merge');sc.hidden=true;newGame(b.dataset.h);});
@@ -542,7 +542,7 @@ function newGame(hero){
   Object.assign(G,{round:1,gold:H.gold,wall:H.wall,wallMax:H.wall,cards:[],relics:[],skills:[],bestChain:0,foeSet:pick(Object.keys(FOESETS))});recalcMods();renderRelics();
   for(const[k,t,i]of H.start){const c=newCard(k,t);c.loc='board';c.idx=i;G.cards.push(c);}
   shownGold=null;renderOwned();updateHUD();
-  playStory(STORY.prologue,()=>nightStory(()=>{toPrep();setTimeout(()=>toast('这一局来的是「'+FOESETS[G.foeSet].n+'」'),2600);}));
+  G.firstPrep=true;playStory(STORY.prologue,()=>nightStory(()=>toPrep()));
 }
 
 /* ================= 布局与主循环 ================= */
