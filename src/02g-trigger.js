@@ -170,6 +170,6 @@ Object.assign(RELICS,{
 
 /* ---------------- 备战事件：按功能标签进货 ---------------- */
 Object.assign(EVENTS,{
-  armory:{n:'军械库',ico:'xbow',cat:'shop',w:1,d:'只卖【兵器】和【火器】卡牌',f:'库管说每件都登记过。登记簿上的墨还没干。',filter:it=>it.kind==='兵器'||it.kind==='火器'},
-  apothecary:{n:'药剂铺',ico:'potion:P',cat:'shop',w:.9,d:'只卖【药剂】和【灯具】卡牌',f:'架子上的瓶子会自己换位置。',filter:it=>it.kind==='药剂'||it.kind==='灯具'}
+  armory:{n:'军械库',ico:'xbow',cat:'shop',w:1,d:'只卖【兵器】【火器】',f:'库管说每件都登记过。登记簿上的墨还没干。',filter:it=>it.kind==='兵器'||it.kind==='火器'},
+  apothecary:{n:'药剂铺',ico:'potion:P',cat:'shop',w:.9,d:'只卖【药剂】【灯具】',f:'架子上的瓶子会自己换位置。',filter:it=>it.kind==='药剂'||it.kind==='灯具'}
 });

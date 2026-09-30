@@ -53,7 +53,7 @@ function toClient(x,y){const fr=F.cv.getBoundingClientRect();return[fr.left+x*F.
 
 /* ================= 战斗 ================= */
 function startBattle(){
-  if(!boardCards().length){toast('先把至少一张卡放上棋盘');SFX.play('bad');return;}
+  if(!boardCards().length){toast('棋盘上一张卡都没有');SFX.play('bad');return;}
   cancelDrag();closeSheet();if(G.drawer)setDrawer(false);G.phase='battle';
   const wave=G.nextWave;const special=wave.some(s=>EN[s.type].boss)?'boss':'battle';BG.set(special);
   B={t:0,spawns:wave,si:0,en:[],pr:[],epr:[],graves:[],sched:[],shield:0,maxChain:0,wallLost:0,endT:0,over:false,acc:0,boss:null,greed:0,kills:0,flags:{},rlog:{},
@@ -64,7 +64,7 @@ function startBattle(){
   F.parts=[];F.nums=[];F.rings=[];F.bolts=[];
   $('#prep').hidden=true;$('#report').hidden=true;F.cv.style.display='block';
   const bd=wave.map(s=>EN[s.type]).find(d=>d.intents);F.top=0;
-  if(bd){const bb=$('#bossbar');bb.hidden=false;$('#bossName').textContent=bd.n;$('#bossHp').style.width='100%';$('#bossSh').style.width='0%';$('#bossHpT').textContent='即将登场';
+  if(bd){const bb=$('#bossbar');bb.hidden=false;$('#bossName').textContent=bd.n;$('#bossHp').style.width='100%';$('#bossSh').style.width='0%';$('#bossHpT').textContent='快到了';
     $('#intName').textContent=bd.intents[0].n+'：'+bd.intents[0].d;$('#intT').textContent='';$('#intBar').style.width='0%';F.top=Math.ceil((bb.offsetHeight+14)/F.s);}
   computeOrigins();updateHUD();
   banner(nightInfo(G.round).title,G.round===8?'#ff6b5b':G.round===4?'#ffb37a':'#fff');
@@ -158,7 +158,7 @@ function doIntent(e){
   if(it.a==='dash'){e.dashT=2;}
   if(it.a==='harden'){e.hardT=4;}
   if(it.a==='summon'){for(let i=0;i<6;i++){const b=spawn(foeKey('bat'),clamp(e.x+rnd(-.25,.25),.06,.94),Math.max(-.02,e.y-.02));b.x0=b.x;}}
-  if(it.a==='gaze'){const bc=boardCards();for(let i=0;i<2&&bc.length;i++){const c=bc.splice(Math.floor(Math.random()*bc.length),1)[0];c.frozen=3;c.el.classList.add('frozen');}toast('凝视：两张卡被冻结');}
+  if(it.a==='gaze'){const bc=boardCards();for(let i=0;i<2&&bc.length;i++){const c=bc.splice(Math.floor(Math.random()*bc.length),1)[0];c.frozen=3;c.el.classList.add('frozen');}toast('被它盯住了，两张卡动不了');}
   banner(it.n,'#ff8a70');if(FOEB[e.type]&&FOEB[e.type].intent[it.a]&&Math.random()<.7)say(e.type,FOEB[e.type].intent[it.a],2);
   if(it.a==='gaze')say('hero',BARKS.freeze,2);
   e.ii=(e.ii+1)%e.d.intents.length;e.it=e.d.intents[e.ii].t;
@@ -469,17 +469,17 @@ function winBattle(){
   for(const c of G.cards){c.charge=0;c.el.style.setProperty('--s',0);c.el.classList.remove('frozen','empty','haste');c.ammo=maxAmmo(c);setAmmo(c);}
   const was=G.round;
   if(was>=G.maxRound){banner('黎明','#ffe79a');BG.set('shop');setTimeout(()=>playStory(STORY.win,()=>endScreen(true)),1400);return;}
-  updateHUD();const winG=3+Math.floor(was/2);const rows=[['胜利奖励',winG]];if(was===4)rows.push(['击败精英',4]);
+  updateHUD();const winG=3+Math.floor(was/2);const rows=[['守夜工钱',winG]];if(was===4)rows.push(['打倒精英',4]);
   const interest=Math.min(3+mv('interest'),Math.floor(G.gold/6));if(mv('winGold'))rows.push(['遗物/天赋',mv('winGold')]);if(mv('regen'))G.wall=Math.min(G.wallMax,G.wall+mv('regen'));if(interest)rows.push(['利息（每6金+1）',interest]);
-  if(B.wallLost===0)rows.push(['城墙无损',1]);
-  if(B.greed)rows.push(['贪婪收入（已到账）',0,B.greed]);
+  if(B.wallLost===0)rows.push(['墙没掉砖',1]);
+  if(B.greed)rows.push(['贪婪（已到账）',0,B.greed]);
   const total=rows.reduce((s,r)=>s+r[1],0);
   showReport(was,rows,total);
 }
 function showReport(was,rows,total){
   const rp=$('#report');const bc=G.cards.filter(c=>c.bTrig>0).sort((a,b)=>b.bDmg-a.bDmg);const mx=Math.max(1,...bc.map(c=>c.bDmg));
   rp.innerHTML=`<div class="rp-title win">第${was}夜 · ${pickLine(RPT.win)}</div>
-  <div class="rp-list">${bc.map((c,i)=>`<div class="rp-row" style="animation-delay:${i*.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${SPR[c.key].url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${(c.bDmg/mx*100).toFixed(1)}"></i></div><b>${fmt(c.bDmg)}<small>×${c.bTrig}</small></b></div>`).join('')||'<div class="rp-meta">这一波没有卡牌出手</div>'}</div>
+  <div class="rp-list">${bc.map((c,i)=>`<div class="rp-row" style="animation-delay:${i*.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${SPR[c.key].url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${(c.bDmg/mx*100).toFixed(1)}"></i></div><b>${fmt(c.bDmg)}<small>×${c.bTrig}</small></b></div>`).join('')||'<div class="rp-meta">这一夜没有卡出手</div>'}</div>
   <div class="rp-meta">${(was+1)%2===1?'<b style="color:#ffd166">明晚之前有夜谈</b>　':''}最高连锁 <b>×${B.maxChain||1}</b>　击杀 <b>${B.kills}</b>　城墙 <b>-${Math.ceil(B.wallLost)}</b></div>
   <div class="rp-cash" id="cash"></div>
   <button class="btn gold big" id="cashBtn" style="flex:none">收下 <img class="ico" src="${SPR.coin.url}" alt=""><b>${total}</b></button>`;
@@ -500,16 +500,16 @@ function endScreen(win){
   <div><span>遗物 / 天赋</span><i style="margin-left:auto">${G.relics.length} 件 / ${G.skills.length} 个</i></div>
   <div><span>最高连锁</span><i style="margin-left:auto">×${G.bestChain||1}</i></div>
   ${best?`<div><span>最后的王牌</span><i style="margin-left:auto">${best.adj?ADJ[best.adj].n+'的':''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}</i></div>`:''}</div>
-  <button class="btn red big" id="againBtn">再来一局</button></div>`;
+  <button class="btn red big" id="againBtn">再守一次</button></div>`;
   clearSave();sc.hidden=false;$('#againBtn').onclick=()=>{SFX.ensure();SFX.play('ui');sc.hidden=true;heroSelect();};
 }
 function titleScreen(){
   const sc=$('#screen');BG.set('title');
   sc.innerHTML=`<div class="scr"><div class="logo" aria-label="连锁"><span>连</span><span>锁</span></div><div class="logo-sub">PROJECT CHAIN · 原型</div>
   <p class="tagline">长夜第七百年。守住最后一道城墙，直到黎明。</p>
-  <div class="rules"><div><i>1</i><span>每夜之间有3次备战：逛商店、开宝箱、收集物品……</span></div>
-  <div><i>2</i><span>卡牌拖上棋盘后自动战斗，相邻的卡会互相触发</span></div>
-  <div><i>3</i><span>两张同名同品质的卡合成更高品质：铜→银→金→钻</span></div>
+  <div class="rules"><div><i>1</i><span>每夜之前能走三个地方：逛店、开箱子、捡遗物……</span></div>
+  <div><i>2</i><span>卡拖上棋盘就自己打，挨着的卡会互相带动</span></div>
+  <div><i>3</i><span>两张同名同品质的卡合成一张更好的：铜→银→金→钻</span></div>
   <div><i>4</i><span>撑过8个夜晚，打倒深渊之眼；每两夜有一次夜谈，能学个新天赋</span></div></div>
   ${loadSave()?`<button class="btn gold big" id="contBtn">继续 · ${HEROES[loadSave().hero].n} 第${loadSave().round}夜</button>`:''}
   <button class="btn ${loadSave()?'alt':'red'} big" id="startBtn">${loadSave()?'新的守夜':'开始游戏'}</button></div>`;
@@ -535,7 +535,7 @@ function resumeSave(){const s=loadSave();if(!s||!HEROES[s.hero]){heroSelect();re
   for(const c of G.cards)if(c.el)c.el.remove();
   Object.assign(G,{hero:s.hero,round:s.round,gold:s.gold,wall:s.wall,wallMax:s.wallMax,foeSet:s.foeSet||'dark',relics:s.relics||[],skills:(s.skills||[]).filter(k=>TALENTS[k]),bestChain:s.bestChain||0,cards:[]});
   for(const d of s.cards||[]){if(!ITEMS[d.key])continue;const c=newCard(d.key,d.tier,d.adj);c.loc=d.loc;c.idx=d.idx;c.hoard=d.hoard||0;c.grow=d.grow||0;c.qp=d.qp||0;G.cards.push(c);}
-  recalcMods();renderRelics();shownGold=null;renderOwned();updateHUD();toPrep();toast('已读取存档：第'+G.round+'夜');}
+  recalcMods();renderRelics();shownGold=null;renderOwned();updateHUD();toPrep();toast('接着上回：第'+G.round+'夜');}
 function newGame(hero){
   for(const c of G.cards)if(c.el)c.el.remove();
   G.hero=hero||G.hero;const H=HEROES[G.hero];
@@ -554,7 +554,7 @@ function layout(){
 }
 addEventListener('resize',layout);
 $('#goBtn').onclick=()=>{SFX.ensure();if(G.phase==='prep'&&G.prep.step>=3)startBattle();};
-$('#bagBtn').onclick=()=>{SFX.ensure();SFX.play('ui');if(G.phase!=='battle')setDrawer(!G.drawer);else toast('战斗中不能整理背包');};
+$('#bagBtn').onclick=()=>{SFX.ensure();SFX.play('ui');if(G.phase!=='battle')setDrawer(!G.drawer);else toast('打着仗呢，没空翻包');};
 $('#treeBtn').onclick=()=>{SFX.ensure();openTree();};
 $('#relicBtn').onclick=()=>{SFX.ensure();openBag();};
 $('#speedBtn').onclick=()=>{SFX.ensure();SFX.play('ui');G.speed=G.speed>=3?1:G.speed+1;updateHUD();};

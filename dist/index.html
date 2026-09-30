@@ -491,7 +491,7 @@ button{font-family:inherit}
     </div>
     <div id="prep" class="layer" hidden>
       <div id="preview">
-        <div class="ph"><span>下一波</span><b id="pvTitle"></b><span class="steps" id="stepPips"></span></div>
+        <div class="ph"><span>今晚</span><b id="pvTitle"></b><span class="steps" id="stepPips"></span></div>
         <div id="pvList"></div>
         <div id="pvNote"></div>
       </div>
@@ -1797,25 +1797,25 @@ function modText(m){return Object.keys(m).map(k=>{const[l,p,inv]=MODL[k];if(p===
   const v=m[k];const good=inv?v<0:v>0;const sv=k==='range'?-v:v;
   return `<i class="${good?'mg':'mb'}">${l} ${sv>0?'+':''}${p?Math.round(sv*100)+'%':sv}</i>`;}).join('');}
 const EVENTS={
-  shop:{n:'流浪商人',ico:'bag',cat:'shop',w:3,d:'出售3张随机卡牌',f:'“什么都卖，就是不卖后悔药。”'},
-  smith:{n:'铁匠铺',ico:'axe',cat:'shop',w:1,d:'只卖【刃】和【机】卡牌',f:'炉火从不熄灭，铁匠也是。',filter:it=>it.tag==='刃'||it.tag==='机'},
-  forge:{n:'炼火工坊',ico:'spark',cat:'shop',w:1,d:'只卖【火】卡牌',f:'门上贴着：店内请勿呼吸。',filter:it=>it.tag==='火'},
-  storm:{n:'雷鸣塔',ico:'bolt',cat:'shop',w:1,d:'只卖【电】卡牌',f:'塔顶的风向标已经被劈弯了。',filter:it=>it.tag==='电'},
-  frostshop:{n:'霜语者小屋',ico:'frost',cat:'shop',w:1,d:'只卖【冰】卡牌',f:'她开口说话时，窗上会结出字来。',filter:it=>it.tag==='冰'},
-  giant:{n:'巨物集市',ico:'colossus',cat:'shop',w:1,minR:2,d:'只卖中型和大型卡牌',f:'这里的摊位得用骡子拉。',filter:it=>it.size>=2},
-  black:{n:'黑市',ico:'mask',cat:'shop',w:.8,minR:3,d:'品质更高、必带词缀，价格 ×1.5',f:'不问来路，不问去处。',black:1},
-  chest:{n:'路边宝箱',ico:'chest',cat:'free',w:1.1,d:'免费获得一张随机卡牌',f:'锁早就锈断了。'},
-  field:{n:'旧战场',ico:'dagger',cat:'free',w:1.1,d:'从3张卡牌中免费挑一张',f:'前人留下的东西，总得有人接着用。'},
+  shop:{n:'流浪商人',ico:'bag',cat:'shop',w:3,d:'随便卖三张卡',f:'“什么都卖，就是不卖后悔药。”'},
+  smith:{n:'铁匠铺',ico:'axe',cat:'shop',w:1,d:'只卖【刃】【机】的家伙',f:'炉火从不熄灭，铁匠也是。',filter:it=>it.tag==='刃'||it.tag==='机'},
+  forge:{n:'炼火工坊',ico:'spark',cat:'shop',w:1,d:'只卖【火】卡',f:'门上贴着：店内请勿呼吸。',filter:it=>it.tag==='火'},
+  storm:{n:'雷鸣塔',ico:'bolt',cat:'shop',w:1,d:'只卖【电】卡',f:'塔顶的风向标已经被劈弯了。',filter:it=>it.tag==='电'},
+  frostshop:{n:'霜语者小屋',ico:'frost',cat:'shop',w:1,d:'只卖【冰】卡',f:'她开口说话时，窗上会结出字来。',filter:it=>it.tag==='冰'},
+  giant:{n:'巨物集市',ico:'colossus',cat:'shop',w:1,minR:2,d:'只卖中大件',f:'这里的摊位得用骡子拉。',filter:it=>it.size>=2},
+  black:{n:'黑市',ico:'mask',cat:'shop',w:.8,minR:3,d:'货好，必带词缀，就是贵一半',f:'不问来路，不问去处。',black:1},
+  chest:{n:'路边宝箱',ico:'chest',cat:'free',w:1.1,d:'白捡一张卡',f:'锁早就锈断了。'},
+  field:{n:'旧战场',ico:'dagger',cat:'free',w:1.1,d:'三张卡，随便拿一张',f:'前人留下的东西，总得有人接着用。'},
   altar:{n:'遗物祭坛',ico:'altar',cat:'relic',w:1,d:'三件遗物，白拿一件',f:'香灰还是温的。'},
   grocer:{n:'杂货铺',ico:'potion:P',cat:'relic',w:1.3,d:'花钱买遗物，能刷新一次',f:'货架上的东西，一半能用，一半能吓人。'},
   parcel:{n:'无主的包裹',ico:'book:N',cat:'free',w:.8,d:'白捡一件遗物',f:'收件人一栏被雨水泡花了。'},
-  enchant:{n:'附魔师',ico:'wand',cat:'up',w:1,d:'为你的一张卡附上（或替换）词缀',f:'“别乱动，墨水还没干。”',need:()=>G.cards.length>0},
-  train:{n:'训练场',ico:'dummy',cat:'up',w:.9,d:'将你的一张卡提升一个品质（最高到金）',f:'稻草人挨了三千刀，依然站着。',need:()=>G.cards.some(c=>c.tier<2)},
-  gamble:{n:'赌徒的桌子',ico:'dice',cat:'misc',w:.8,d:'下注3金：一半机会赢回6金',f:'骰子灌过铅。灌在哪一面，没人知道。',need:()=>G.gold>=3},
-  spring:{n:'清泉',ico:'drop',cat:'misc',w:.9,d:'修复城墙8点',f:'井水有股铁锈味，但能用。',need:()=>G.wall<G.wallMax},
-  job:{n:'守夜轮值',ico:'lantern',cat:'misc',w:1,d:'替人值一班夜，获得3金币',f:'长夜漫漫，工钱照付。'},
+  enchant:{n:'附魔师',ico:'wand',cat:'up',w:1,d:'给一张卡换个词缀',f:'“别乱动，墨水还没干。”',need:()=>G.cards.length>0},
+  train:{n:'训练场',ico:'dummy',cat:'up',w:.9,d:'一张卡升一档品质（最多到金）',f:'稻草人挨了三千刀，依然站着。',need:()=>G.cards.some(c=>c.tier<2)},
+  gamble:{n:'赌徒的桌子',ico:'dice',cat:'misc',w:.8,d:'押3金，赢了拿6金，输了拉倒',f:'骰子灌过铅。灌在哪一面，没人知道。',need:()=>G.gold>=3},
+  spring:{n:'清泉',ico:'drop',cat:'misc',w:.9,d:'补墙8点',f:'井水有股铁锈味，但能用。',need:()=>G.wall<G.wallMax},
+  job:{n:'守夜轮值',ico:'lantern',cat:'misc',w:1,d:'替人值一班，挣3金',f:'长夜漫漫，工钱照付。'},
   furnace:{n:'熔炉',ico:'furnace',cat:'relic',w:.7,minR:2,d:'扔进去一张卡，换一件好遗物',f:'火焰只收最好的供品。',need:()=>G.cards.length>=2},
-  bank:{n:'钱庄',ico:'r_purse',cat:'misc',w:.8,minR:2,d:'存款生息：金币 +30%（至少+2）',f:'账房先生从来不抬头。'}
+  bank:{n:'钱庄',ico:'r_purse',cat:'misc',w:.8,minR:2,d:'存钱吃利息：金币+30%（最少+2）',f:'账房先生从来不抬头。'}
 };
 const EN={
   slime:{n:'史莱姆',hp:16,spd:.055,armor:0,wall:1,spr:'slime',sc:1,col:'#a7f070'},
@@ -1885,10 +1885,10 @@ Object.assign(RELICS,{
 });
 const HEROES={
   ayla:{n:'艾拉',title:'老兵守夜人',col:'#f0a64b',portrait:'p_ayla',wall:30,gold:8,start:[['dagger',0,3],['oathsword',1,4]],
-    tag:'擅长【刃】与【机】',desc:'在墙上站了二十年。城墙更厚，开局带着誓约长剑。专属：战号、城防弩车。',
+    tag:'擅长【刃】与【机】',desc:'墙上站了二十年的老兵。墙厚，开局就有誓约长剑。专属卡：战号、城防弩车。',
     intro:'我在这道墙上站了二十年。墙还在，我就还在。'},
   mo:{n:'墨',title:'流亡炼金师',col:'#b08cff',portrait:'p_mo',wall:22,gold:12,start:[['vial',0,3],['icicle',0,4]],
-    tag:'擅长【火】【冰】【电】',desc:'被学院放逐的天才。城墙更薄，但元素卡更强、钱更多。专属：元素棱镜、星陨。',
+    tag:'擅长【火】【冰】【电】',desc:'被学院赶出来的天才。墙薄钱多，元素卡更猛。专属卡：元素棱镜、星陨。',
     intro:'学院赶我走，是因为我说要用炼金术点亮太阳。现在，至少可以先点着几只怪物。'}
 };
 const TREES={
@@ -4303,7 +4303,7 @@ Object.assign(RELICS,{
   lampbook:{n:'全城的灯谱',t:3,ico:'book:y',u:1,hero:'ying',m:{dmg:.2,s1:.3},f:'记着晨钟城每一盏灯的位置。七百年来，只熄过一盏。'}
 });
 HEROES.ying={n:'萤',title:'灯匠学徒',col:'#ffd166',portrait:'p_ying',wall:26,gold:10,start:[['firefly',0,3],['clock',1,4]],
-  tag:'擅长小型卡与【机】',desc:'老钟表匠的学徒，守着全城的灯。小卡越多越强，擅长充能与节奏。专属：八音盒、大钟摆。',
+  tag:'擅长小型卡与【机】',desc:'老钟表匠的徒弟，管着全城的灯。小卡越多越强，会充能、会踩节奏。专属卡：八音盒、大钟摆。',
   intro:'师父说，只要还有一盏灯亮着，这座城就还没输。我负责让它们一直亮着。'};
 TREES.ying=[
   {n:'灯',c:'#ffd166',nodes:[{n:'小灯',m:{s1:.15}},{n:'灯串',m:{left:.2,right:.2}},{n:'万家灯火',m:{s1:.3,full:.2}}]},
@@ -4509,8 +4509,8 @@ Object.assign(RELICS,{
 
 /* ---------------- 备战事件：按功能标签进货 ---------------- */
 Object.assign(EVENTS,{
-  armory:{n:'军械库',ico:'xbow',cat:'shop',w:1,d:'只卖【兵器】和【火器】卡牌',f:'库管说每件都登记过。登记簿上的墨还没干。',filter:it=>it.kind==='兵器'||it.kind==='火器'},
-  apothecary:{n:'药剂铺',ico:'potion:P',cat:'shop',w:.9,d:'只卖【药剂】和【灯具】卡牌',f:'架子上的瓶子会自己换位置。',filter:it=>it.kind==='药剂'||it.kind==='灯具'}
+  armory:{n:'军械库',ico:'xbow',cat:'shop',w:1,d:'只卖【兵器】【火器】',f:'库管说每件都登记过。登记簿上的墨还没干。',filter:it=>it.kind==='兵器'||it.kind==='火器'},
+  apothecary:{n:'药剂铺',ico:'potion:P',cat:'shop',w:.9,d:'只卖【药剂】【灯具】',f:'架子上的瓶子会自己换位置。',filter:it=>it.kind==='药剂'||it.kind==='灯具'}
 });
 
 /* ================= 天赋：随机天赋池 / 夜谈 =================
@@ -4850,7 +4850,7 @@ function updateHUD(){
   $('#shV').textContent=B&&B.shield>0&&G.phase==='battle'?'+'+Math.ceil(B.shield):'';
   $('#speedBtn').textContent=G.speed+'×';
   const sc=G.cards.filter(c=>c.loc==='stash').length;$('#bagN').textContent=sc?sc:'';$('#bagBtn').classList.toggle('on',G.drawer);
-  $('#treeN').textContent=G.skills.length||'';
+  $('#treeN').textContent='';
   const go=$('#goBtn');
   if(G.phase==='prep'){const s=G.prep.step;go.disabled=s<3;go.textContent=s<3?'备战 '+s+'/3':'开战';}
   else if(G.phase==='battle'){go.disabled=true;go.textContent='战斗中';}
@@ -4933,13 +4933,13 @@ function renderPrep(){
   $('#stepPips').innerHTML=[0,1,2].map(i=>`<i class="${i<P.step?'done':i===P.step?'now':''}"></i>`).join('');
   body.innerHTML='';
   if(P.step>=3){
-    body.innerHTML=`<div class="ready"><div class="rd-t">备战完成</div><p>调整好阵型，然后迎战第${G.round}波。</p><p class="muted">相邻协同、词缀和品质都会影响伤害。点任意卡牌可以查看伤害公式。</p></div>`;
+    body.innerHTML=`<div class="ready"><div class="rd-t">准备好了</div><p>摆好阵型，第${G.round}夜要来了。</p><p class="muted">挨着放的卡会互相带动。点一下卡，能看到伤害是怎么算的。</p></div>`;
     updateHUD();return;
   }
   if(!P.cur&&P.talk&&!P.talkDone)startTalk();
   const cur=P.cur;$('#prep').classList.toggle('talking',!!cur&&(cur.mode==='talk'||cur.mode==='talent'));
   if(!cur){
-    body.insertAdjacentHTML('beforeend',`<div class="ptitle">选择一个去处<span>第 ${P.step+1} 站 / 共 3 站</span></div>`);
+    body.insertAdjacentHTML('beforeend',`<div class="ptitle">去哪儿？<span>第 ${P.step+1} / 3 站</span></div>`);
     const list=document.createElement('div');list.className='doors';
     P.doors.forEach(id=>{const e=EVENTS[id];const b=document.createElement('button');b.className='door cat-'+e.cat;
       b.innerHTML=`<img src="${icon(e.ico).url}" alt=""><div><b>${e.n}</b><span>${e.d}</span><em>${e.f}</em></div>`;
@@ -4949,12 +4949,12 @@ function renderPrep(){
   if(cur.mode==='talk'||cur.mode==='talent'){renderTalk(cur,body);updateHUD();return;}
   body.insertAdjacentHTML('beforeend',evHead(cur.ev));
   if(cur.mode==='shop'||cur.mode==='pick'||cur.mode==='gift'){
-    const hint=cur.mode==='shop'?'拖到棋盘购买，或点卡牌查看详情':cur.mode==='pick'?(cur.taken?'已经选好了':'免费挑选其中一张'):(cur.taken?'收下了':'免费送你');
+    const hint=cur.mode==='shop'?'拖到棋盘上就是买，点一下看详情':cur.mode==='pick'?(cur.taken?'挑好了':'白给，挑一张'):(cur.taken?'拿到了':'送你的');
     body.insertAdjacentHTML('beforeend',`<div class="ev-hint">${hint}</div>`);
     const grid=document.createElement('div');grid.id='offers';grid.style.gridTemplateColumns=`repeat(${cur.offers.length},minmax(0,${cur.offers.length===1?'140px':'1fr'}))`;
     cur.offers.forEach(of=>grid.appendChild(offerEl(of)));body.appendChild(grid);
     if(cur.mode==='shop')body.appendChild(btnRow([...(cur.refresh>0?[['刷新 <small>(剩'+cur.refresh+'次)</small>','blue',()=>{cur.refresh--;cur.offers=cur.offers.map(()=>makeOffer(cur.ev.filter,{black:cur.ev.black}));SFX.play('buy');renderPrep();document.querySelectorAll('#offers .card').forEach(el=>restart(el,'land'));}]]:[]),['离开','',finishStep]]));
-    else body.appendChild(btnRow([[cur.taken?'继续':'放弃',cur.taken?'green':'',finishStep]]));
+    else body.appendChild(btnRow([[cur.taken?'继续':'不要了',cur.taken?'green':'',finishStep]]));
   }else if(cur.mode==='choice'||cur.mode==='relic'){
     body.insertAdjacentHTML('beforeend',`<div class="ev-hint">${cur.hint}</div>`);
     const list=document.createElement('div');list.className='opts';
@@ -4965,20 +4965,20 @@ function renderPrep(){
       b.onclick=()=>{SFX.ensure();o.act();};list.appendChild(b);});
     body.appendChild(list);body.appendChild(btnRow([['跳过','',finishStep]]));
   }else if(cur.mode==='gshop'){
-    body.insertAdjacentHTML('beforeend',`<div class="ev-hint">点击购买，可以买多件</div>`);
+    body.insertAdjacentHTML('beforeend',`<div class="ev-hint">点一下就买，能买好几件</div>`);
     const list=document.createElement('div');list.className='opts';
     cur.goods.forEach((g,i)=>{const R0=RELICS[g.k];const b=document.createElement('button');b.className='opt'+(g.sold?' sold':'');b.style.animationDelay=(i*.06)+'s';
       b.innerHTML=`<img class="ricon" src="${icon(R0.ico).url}" alt="" style="--gc:${GT[R0.t].c}"><div><b>${gearLabel(g.k)}</b><span>${modText(R0.m)}</span><em>${R0.f}</em></div><span class="price${g.sold?'':g.price>G.gold?' cant':''}" data-p="${g.price}">${g.sold?'已购':`<img class="ico" src="${SPR.coin.url}" alt="">${g.price}`}</span>`;
-      if(!g.sold)b.onclick=()=>{SFX.ensure();if(G.gold<g.price){toast('金币不足');restart($('#goldChip'),'shake');SFX.play('bad');return;}G.gold-=g.price;g.sold=true;gainRelic(g.k,true);renderPrep();};
+      if(!g.sold)b.onclick=()=>{SFX.ensure();if(G.gold<g.price){toast('钱不够');restart($('#goldChip'),'shake');SFX.play('bad');return;}G.gold-=g.price;g.sold=true;gainRelic(g.k,true);renderPrep();};
       list.appendChild(b);});
     body.appendChild(list);
     body.appendChild(btnRow([...(cur.refresh>0?[['刷新 <small>(剩'+cur.refresh+'次)</small>','blue',()=>{cur.refresh--;cur.goods=rollGear(3,1).map(k=>({k,price:gearPrice(k),sold:false}));SFX.play('buy');renderPrep();}]]:[]),['离开','',finishStep]]));
   }else if(cur.mode==='gamble'){
-    body.insertAdjacentHTML('beforeend',`<div class="big-res">${cur.result||'掷一次骰子？'}</div>`);
+    body.insertAdjacentHTML('beforeend',`<div class="big-res">${cur.result||'来一把？'}</div>`);
     body.appendChild(btnRow(cur.result?[['继续','green',finishStep]]:[['下注 <img class="ico" src="'+SPR.coin.url+'" alt=""><b>3</b>','gold',()=>{
-      if(G.gold<3){toast('金币不足');return;}G.gold-=3;const win=Math.random()<.5;
-      if(win){G.gold+=6;SFX.play('coin');const r=$('#pbody').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,6);cur.result='赢了！<b>+6</b> 金币';}
-      else{SFX.play('bad');cur.result='骰子背叛了你。<br><small>3金币没了</small>';}updateHUD();renderPrep();}],['离开','',finishStep]]));
+      if(G.gold<3){toast('钱不够');return;}G.gold-=3;const win=Math.random()<.5;
+      if(win){G.gold+=6;SFX.play('coin');const r=$('#pbody').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,6);cur.result='赢了，<b>+6</b> 金';}
+      else{SFX.play('bad');cur.result='输了。<br><small>3 金打了水漂</small>';}updateHUD();renderPrep();}],['离开','',finishStep]]));
   }else if(cur.mode==='reward'){
     body.insertAdjacentHTML('beforeend',`<div class="big-res">${cur.text}</div>`);
     body.appendChild(btnRow([['收下','green',()=>{cur.apply();updateHUD();finishStep();}]]));
@@ -5001,22 +5001,22 @@ function enterEvent(id){
   else if(id==='altar'){relicChoice(cur,'挑一件，一直生效，同名的能叠',rollGear(3,0,2));}
   else if(id==='parcel'){relicChoice(cur,'包裹里装着……',rollGear(1,1,2));}
   else if(id==='grocer'){cur.mode='gshop';cur.refresh=1;cur.goods=rollGear(3,1).map(k=>({k,price:gearPrice(k),sold:false}));}
-  else if(id==='enchant'){cur.mode='choice';cur.hint='选一项附魔（会替换原有词缀）';
+  else if(id==='enchant'){cur.mode='choice';cur.hint='挑一个词缀（原来的会被换掉）';
     cur.opts=shuffled(G.cards).slice(0,3).map(c=>{const a=rollAdj(c.key,true,c.adj,1);return{card:c,label:ITEMS[c.key].n+' → 【'+ADJ[a].n+'】',sub:ADJ[a].d,
       act:()=>{c.adj=a;repaint(c);renderOwned();SFX.play('merge');const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,ADJ[a].c,20);restart(c.el,'merge');finishStep();}};});}
-  else if(id==='train'){cur.mode='choice';cur.hint='选一张卡提升品质';
+  else if(id==='train'){cur.mode='choice';cur.hint='挑一张卡升一档';
     cur.opts=shuffled(G.cards.filter(c=>c.tier<2)).slice(0,3).map(c=>{const nx=Object.assign({},c,{tier:c.tier+1});const a=stats(c,null),b=stats(nx,null);
       return{card:c,label:ITEMS[c.key].n+'：'+TIERS[c.tier].n+' → '+TIERS[c.tier+1].n,sub:ITEMS[c.key].dmg?`伤害 ${Math.round(a.total)}→${Math.round(b.total)}　冷却 ${a.cd.toFixed(2)}→${b.cd.toFixed(2)}s`:UPS[ITEMS[c.key].up].t,
       act:()=>{c.tier++;repaint(c);checkMerges();renderOwned();SFX.play('merge');if(c.el){const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,TIERS[c.tier].c,24);restart(c.el,'merge');}finishStep();}};});}
-  else if(id==='furnace'){cur.mode='choice';cur.hint='选一张卡投入熔炉';
-    cur.opts=shuffled(G.cards).slice(0,4).map(c=>({card:c,label:'献祭 '+ITEMS[c.key].n,sub:'失去这张卡（售价 '+sellValue(c)+'），然后挑选一件遗物',
+  else if(id==='furnace'){cur.mode='choice';cur.hint='挑一张卡扔进去';
+    cur.opts=shuffled(G.cards).slice(0,4).map(c=>({card:c,label:'献祭 '+ITEMS[c.key].n,sub:'这张卡就没了（值 '+sellValue(c)+' 金），换一件遗物',
       act:()=>{const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,'#ef7d57',26);SFX.play('boom');removeCard(c);renderOwned();relicChoice(cur,'熔炉吐出三件遗物，选一件',rollGear(3,3));renderPrep();}}));}
   else if(id==='gamble'){cur.mode='gamble';}
   else if(id==='mentor'||(id==='manual'&&Math.random()<.5)){const m=pick(MEETS);Object.assign(cur,{mode:'talent',who:m.who,intro:[[m.who,m.say]],picks:rollTalents(2),title:m.n});}
   else if(id==='manual'){cur.mode='pick';cur.offers=[0,1].map(()=>makeOffer(it=>it.hero===G.hero&&it.t>=1,{free:1}));}
-  else if(id==='spring'){const h=Math.min(8,G.wallMax-G.wall);cur.mode='reward';cur.text=`城墙修复 <b>+${h}</b>`;cur.apply=()=>{G.wall+=h;SFX.play('merge');};}
-  else if(id==='job'){cur.mode='reward';cur.text='工钱 <b>+3</b> 金币';cur.apply=()=>gainGold(3);}
-  else if(id==='bank'){const g=Math.max(2,Math.round(G.gold*.3));cur.mode='reward';cur.text=`利息 <b>+${g}</b> 金币`;cur.apply=()=>gainGold(g);}
+  else if(id==='spring'){const h=Math.min(8,G.wallMax-G.wall);cur.mode='reward';cur.text=`墙补上了 <b>+${h}</b>`;cur.apply=()=>{G.wall+=h;SFX.play('merge');};}
+  else if(id==='job'){cur.mode='reward';cur.text='工钱 <b>+3</b> 金';cur.apply=()=>gainGold(3);}
+  else if(id==='bank'){const g=Math.max(2,Math.round(G.gold*.3));cur.mode='reward';cur.text=`利息 <b>+${g}</b> 金`;cur.apply=()=>gainGold(g);}
   P.cur=cur;renderPrep();
 }
 /* ---- 夜谈 / 学天赋 ---- */
@@ -5068,12 +5068,12 @@ function finishStep(){const P=G.prep;P.step++;P.cur=null;if(P.step<3)rollDoors()
   if(P.step>=3)restart($('#goBtn'),'bump');}
 
 /* ================= 获得/出售/合成 ================= */
-function buyCheck(of){if(G.gold<of.price){toast('金币不足');restart($('#goldChip'),'shake');SFX.play('bad');return false;}return true;}
+function buyCheck(of){if(G.gold<of.price){toast('钱不够');restart($('#goldChip'),'shake');SFX.play('bad');return false;}return true;}
 function acquire(of,dest){
   if(of.sold||G.phase!=='prep')return false;
   const canMerge=of.card.tier<3&&countSame(of.card.key,of.card.tier)>=1;
   if(!dest){const fit=firstFit(of.card.size);dest=fit||(canMerge?'merge':null);
-    if(!dest){toast('没有空位：先出售，或买同名同品质的卡来合成');SFX.play('bad');return false;}}
+    if(!dest){toast('没地方放了：卖掉一张，或者买同名同品质的来合成');SFX.play('bad');return false;}}
   if(!buyCheck(of))return false;
   G.gold-=of.price;of.sold=true;SFX.play('buy');
   const c=newCard(of.card.key,of.card.tier,of.card.adj);G.cards.push(c);
@@ -5081,7 +5081,7 @@ function acquire(of,dest){
   const cur=G.prep.cur;if(cur&&(cur.mode==='pick'||cur.mode==='gift')){cur.taken=true;cur.offers.forEach(o=>o.sold=true);}
   afterChange(c);return true;
 }
-function sellCard(c){const v=sellValue(c);G.gold+=v;SFX.play('sell');const r=c.el.getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,Math.min(v,6));removeCard(c);toast('出售获得 '+v+' 金币');}
+function sellCard(c){const v=sellValue(c);G.gold+=v;SFX.play('sell');const r=c.el.getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,Math.min(v,6));removeCard(c);toast('卖了 '+v+' 金');}
 function checkMerges(){
   let any=null;
   for(let guard=0;guard<8;guard++){
@@ -5098,7 +5098,7 @@ function checkMerges(){
     if(!did)break;
   }
   if(any){SFX.play('merge');setTimeout(()=>{if(!any.el||!G.cards.includes(any))return;restart(any.el,'merge');const r=any.el.getBoundingClientRect();
-    FX.burst(r.left+r.width/2,r.top+r.height/2,TIERS[any.tier].c,30);toast(ITEMS[any.key].n+' 合成为【'+TIERS[any.tier].n+'】品质');},30);}
+    FX.burst(r.left+r.width/2,r.top+r.height/2,TIERS[any.tier].c,30);toast(ITEMS[any.key].n+' 升到【'+TIERS[any.tier].n+'】了');},30);}
   G.cards.filter(c=>c.loc==='temp').forEach(removeCard);
 }
 function afterChange(placed){checkMerges();renderOwned();if(G.phase==='prep')renderPrep();updateHUD();
@@ -5220,7 +5220,7 @@ function openSheet(src){
   if(c.tier<3){const nx=Object.assign({},c,{tier:c.tier+1});const b=stats(nx,null);
     rows+=`<div><span>升到${TIERS[c.tier+1].n}</span><span>${it.dmg?'伤害 '+Math.round(b.total)+' · ':''}冷却 ${b.cd.toFixed(2)}s</span></div>`;}
   if(own&&c.bTrig)rows+=`<div><span>上一场</span><span>${Math.round(c.bDmg)} 伤害 · 触发${c.bTrig}次</span></div>`;
-  if(own)rows+=`<div><span>出售价</span><span>${sellValue(c)}</span></div>`;
+  if(own)rows+=`<div><span>能卖</span><span>${sellValue(c)}</span></div>`;
   const sh=$('#sheet');
   sh.innerHTML=`<div class="sh" role="dialog" aria-label="${it.n}"><div class="sh-top"><div id="shCard"></div><div><h3>${ad?`<span style="color:${ad.c}">${ad.n}的</span>`:''}${c.tier>=3&&it.dn?`<span class="dn">「${it.dn}」</span><small class="bn">${it.n}</small>`:it.n}</h3>
     <div class="tags"><span class="tag" style="background:${T.c}33;color:${T.c}">${T.n}品质</span><span class="tag" style="background:${TAGC[it.tag]}33;color:${TAGC[it.tag]}">${it.tag}</span>${it.kind?`<span class="tag">${it.kind}</span>`:''}<span class="tag">${SIZEN[c.size]}型·占${c.size}格</span></div>
@@ -5235,7 +5235,7 @@ function openSheet(src){
   const bt=$('#shBtns');
   const mk=(txt,cls,fn)=>{const b=document.createElement('button');b.className='btn '+cls;b.innerHTML=txt;b.onclick=fn;bt.appendChild(b);};
   if(!own&&G.phase==='prep'&&!src.offer.sold)mk(src.offer.price?'购买 <img class="ico" src="'+SPR.coin.url+'" alt=""><b>'+src.offer.price+'</b>':'免费拿走','gold',()=>{if(acquire(src.offer,null))closeSheet();});
-  if(own&&G.phase==='prep')mk('出售 <b>+'+sellValue(c)+'</b>','red',()=>{sellCard(c);afterChange();closeSheet();});
+  if(own&&G.phase==='prep')mk('卖掉 <b>+'+sellValue(c)+'</b>','red',()=>{sellCard(c);afterChange();closeSheet();});
   mk('关闭','',closeSheet);
   sh.hidden=false;sh.onclick=e=>{if(e.target===sh)closeSheet();};
 }
@@ -5258,9 +5258,9 @@ function playStory(pages,done){
     if(p.who==='knight')return{n:'暗影骑士 · 卡尔',img:SPR.knight.url,c:'#c79bff'};if(p.who==='eye')return{n:'深渊之眼',img:SPR.eye.url,c:'#ff6b5b'};return{n:'',img:'',c:'#fff'};};
   const mode=pages===STORY.win?'dawn':pages===STORY.lose?'fall':'night';
   const show=()=>{const p=pages[i];ov.hidden=false;
-    if(p.title){ov.innerHTML=`<canvas class="st-scene" width="120" height="68"></canvas><div class="st-title"><small>${p.act||''}</small><h2>${p.title}</h2></div><div class="st-tap">点击继续</div><button class="btn sm st-skip" id="stSkip">跳过</button>`;drawScene(ov.querySelector('canvas'),mode);typing=null;$('#stSkip').onclick=e=>{e.stopPropagation();end();};SFX.play('bell');return;}
+    if(p.title){ov.innerHTML=`<canvas class="st-scene" width="120" height="68"></canvas><div class="st-title"><small>${p.act||''}</small><h2>${p.title}</h2></div><div class="st-tap">点一下继续</div><button class="btn sm st-skip" id="stSkip">跳过</button>`;drawScene(ov.querySelector('canvas'),mode);typing=null;$('#stSkip').onclick=e=>{e.stopPropagation();end();};SFX.play('bell');return;}
     const w=who(p);let t=p.t;if(t==='@intro')t=HEROES[G.hero].intro;if(typeof t==='object')t=t[G.hero];full=t;
-    ov.innerHTML=`<canvas class="st-scene" width="120" height="68"></canvas><div class="st-box" style="--sc:${w.c}"><img class="st-por" src="${w.img}" alt=""><div class="st-body"><b>${w.n}</b><p id="stText"></p></div></div><div class="st-tap">点击继续</div><button class="btn sm st-skip" id="stSkip">跳过</button>`;
+    ov.innerHTML=`<canvas class="st-scene" width="120" height="68"></canvas><div class="st-box" style="--sc:${w.c}"><img class="st-por" src="${w.img}" alt=""><div class="st-body"><b>${w.n}</b><p id="stText"></p></div></div><div class="st-tap">点一下继续</div><button class="btn sm st-skip" id="stSkip">跳过</button>`;
     drawScene(ov.querySelector('canvas'),mode);$('#stSkip').onclick=e=>{e.stopPropagation();end();};
     let k=0;const el=$('#stText');clearInterval(typing);typing=setInterval(()=>{k++;el.textContent=full.slice(0,k);if(k%3===0)SFX.play('ui');if(k>=full.length){clearInterval(typing);typing=null;}},28);};
   const end=()=>{clearInterval(typing);ov.hidden=true;ov.onclick=null;done&&done();};
@@ -5328,7 +5328,7 @@ function meetFoe(type){
   const firstEver=!bestiary()[type];markSeen(type);
   const el=$('#foeCard');el.style.setProperty('--fc',d.col||'#ff8a80');
   const bb=$('#bossbar');el.style.top=(bb&&!bb.hidden?bb.offsetHeight+16:8)+'px';
-  el.innerHTML=`<img src="${SPR[d.spr].url}" alt=""><div><small>${firstEver?'新的敌人':'敌情'}${d.faction?' · '+d.faction:''}</small><b>${d.n}</b><p>${d.tip}</p></div>`;
+  el.innerHTML=`<img src="${SPR[d.spr].url}" alt=""><div><small>${firstEver?'头回见':'又来了'}${d.faction?' · '+d.faction:''}</small><b>${d.n}</b><p>${d.tip}</p></div>`;
   restart(el,'show');
   if(d.intro)say(d.intro[0],d.intro[1],2);
 }
@@ -5387,7 +5387,7 @@ function toClient(x,y){const fr=F.cv.getBoundingClientRect();return[fr.left+x*F.
 
 /* ================= 战斗 ================= */
 function startBattle(){
-  if(!boardCards().length){toast('先把至少一张卡放上棋盘');SFX.play('bad');return;}
+  if(!boardCards().length){toast('棋盘上一张卡都没有');SFX.play('bad');return;}
   cancelDrag();closeSheet();if(G.drawer)setDrawer(false);G.phase='battle';
   const wave=G.nextWave;const special=wave.some(s=>EN[s.type].boss)?'boss':'battle';BG.set(special);
   B={t:0,spawns:wave,si:0,en:[],pr:[],epr:[],graves:[],sched:[],shield:0,maxChain:0,wallLost:0,endT:0,over:false,acc:0,boss:null,greed:0,kills:0,flags:{},rlog:{},
@@ -5398,7 +5398,7 @@ function startBattle(){
   F.parts=[];F.nums=[];F.rings=[];F.bolts=[];
   $('#prep').hidden=true;$('#report').hidden=true;F.cv.style.display='block';
   const bd=wave.map(s=>EN[s.type]).find(d=>d.intents);F.top=0;
-  if(bd){const bb=$('#bossbar');bb.hidden=false;$('#bossName').textContent=bd.n;$('#bossHp').style.width='100%';$('#bossSh').style.width='0%';$('#bossHpT').textContent='即将登场';
+  if(bd){const bb=$('#bossbar');bb.hidden=false;$('#bossName').textContent=bd.n;$('#bossHp').style.width='100%';$('#bossSh').style.width='0%';$('#bossHpT').textContent='快到了';
     $('#intName').textContent=bd.intents[0].n+'：'+bd.intents[0].d;$('#intT').textContent='';$('#intBar').style.width='0%';F.top=Math.ceil((bb.offsetHeight+14)/F.s);}
   computeOrigins();updateHUD();
   banner(nightInfo(G.round).title,G.round===8?'#ff6b5b':G.round===4?'#ffb37a':'#fff');
@@ -5492,7 +5492,7 @@ function doIntent(e){
   if(it.a==='dash'){e.dashT=2;}
   if(it.a==='harden'){e.hardT=4;}
   if(it.a==='summon'){for(let i=0;i<6;i++){const b=spawn(foeKey('bat'),clamp(e.x+rnd(-.25,.25),.06,.94),Math.max(-.02,e.y-.02));b.x0=b.x;}}
-  if(it.a==='gaze'){const bc=boardCards();for(let i=0;i<2&&bc.length;i++){const c=bc.splice(Math.floor(Math.random()*bc.length),1)[0];c.frozen=3;c.el.classList.add('frozen');}toast('凝视：两张卡被冻结');}
+  if(it.a==='gaze'){const bc=boardCards();for(let i=0;i<2&&bc.length;i++){const c=bc.splice(Math.floor(Math.random()*bc.length),1)[0];c.frozen=3;c.el.classList.add('frozen');}toast('被它盯住了，两张卡动不了');}
   banner(it.n,'#ff8a70');if(FOEB[e.type]&&FOEB[e.type].intent[it.a]&&Math.random()<.7)say(e.type,FOEB[e.type].intent[it.a],2);
   if(it.a==='gaze')say('hero',BARKS.freeze,2);
   e.ii=(e.ii+1)%e.d.intents.length;e.it=e.d.intents[e.ii].t;
@@ -5803,17 +5803,17 @@ function winBattle(){
   for(const c of G.cards){c.charge=0;c.el.style.setProperty('--s',0);c.el.classList.remove('frozen','empty','haste');c.ammo=maxAmmo(c);setAmmo(c);}
   const was=G.round;
   if(was>=G.maxRound){banner('黎明','#ffe79a');BG.set('shop');setTimeout(()=>playStory(STORY.win,()=>endScreen(true)),1400);return;}
-  updateHUD();const winG=3+Math.floor(was/2);const rows=[['胜利奖励',winG]];if(was===4)rows.push(['击败精英',4]);
+  updateHUD();const winG=3+Math.floor(was/2);const rows=[['守夜工钱',winG]];if(was===4)rows.push(['打倒精英',4]);
   const interest=Math.min(3+mv('interest'),Math.floor(G.gold/6));if(mv('winGold'))rows.push(['遗物/天赋',mv('winGold')]);if(mv('regen'))G.wall=Math.min(G.wallMax,G.wall+mv('regen'));if(interest)rows.push(['利息（每6金+1）',interest]);
-  if(B.wallLost===0)rows.push(['城墙无损',1]);
-  if(B.greed)rows.push(['贪婪收入（已到账）',0,B.greed]);
+  if(B.wallLost===0)rows.push(['墙没掉砖',1]);
+  if(B.greed)rows.push(['贪婪（已到账）',0,B.greed]);
   const total=rows.reduce((s,r)=>s+r[1],0);
   showReport(was,rows,total);
 }
 function showReport(was,rows,total){
   const rp=$('#report');const bc=G.cards.filter(c=>c.bTrig>0).sort((a,b)=>b.bDmg-a.bDmg);const mx=Math.max(1,...bc.map(c=>c.bDmg));
   rp.innerHTML=`<div class="rp-title win">第${was}夜 · ${pickLine(RPT.win)}</div>
-  <div class="rp-list">${bc.map((c,i)=>`<div class="rp-row" style="animation-delay:${i*.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${SPR[c.key].url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${(c.bDmg/mx*100).toFixed(1)}"></i></div><b>${fmt(c.bDmg)}<small>×${c.bTrig}</small></b></div>`).join('')||'<div class="rp-meta">这一波没有卡牌出手</div>'}</div>
+  <div class="rp-list">${bc.map((c,i)=>`<div class="rp-row" style="animation-delay:${i*.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${SPR[c.key].url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${(c.bDmg/mx*100).toFixed(1)}"></i></div><b>${fmt(c.bDmg)}<small>×${c.bTrig}</small></b></div>`).join('')||'<div class="rp-meta">这一夜没有卡出手</div>'}</div>
   <div class="rp-meta">${(was+1)%2===1?'<b style="color:#ffd166">明晚之前有夜谈</b>　':''}最高连锁 <b>×${B.maxChain||1}</b>　击杀 <b>${B.kills}</b>　城墙 <b>-${Math.ceil(B.wallLost)}</b></div>
   <div class="rp-cash" id="cash"></div>
   <button class="btn gold big" id="cashBtn" style="flex:none">收下 <img class="ico" src="${SPR.coin.url}" alt=""><b>${total}</b></button>`;
@@ -5834,16 +5834,16 @@ function endScreen(win){
   <div><span>遗物 / 天赋</span><i style="margin-left:auto">${G.relics.length} 件 / ${G.skills.length} 个</i></div>
   <div><span>最高连锁</span><i style="margin-left:auto">×${G.bestChain||1}</i></div>
   ${best?`<div><span>最后的王牌</span><i style="margin-left:auto">${best.adj?ADJ[best.adj].n+'的':''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}</i></div>`:''}</div>
-  <button class="btn red big" id="againBtn">再来一局</button></div>`;
+  <button class="btn red big" id="againBtn">再守一次</button></div>`;
   clearSave();sc.hidden=false;$('#againBtn').onclick=()=>{SFX.ensure();SFX.play('ui');sc.hidden=true;heroSelect();};
 }
 function titleScreen(){
   const sc=$('#screen');BG.set('title');
   sc.innerHTML=`<div class="scr"><div class="logo" aria-label="连锁"><span>连</span><span>锁</span></div><div class="logo-sub">PROJECT CHAIN · 原型</div>
   <p class="tagline">长夜第七百年。守住最后一道城墙，直到黎明。</p>
-  <div class="rules"><div><i>1</i><span>每夜之间有3次备战：逛商店、开宝箱、收集物品……</span></div>
-  <div><i>2</i><span>卡牌拖上棋盘后自动战斗，相邻的卡会互相触发</span></div>
-  <div><i>3</i><span>两张同名同品质的卡合成更高品质：铜→银→金→钻</span></div>
+  <div class="rules"><div><i>1</i><span>每夜之前能走三个地方：逛店、开箱子、捡遗物……</span></div>
+  <div><i>2</i><span>卡拖上棋盘就自己打，挨着的卡会互相带动</span></div>
+  <div><i>3</i><span>两张同名同品质的卡合成一张更好的：铜→银→金→钻</span></div>
   <div><i>4</i><span>撑过8个夜晚，打倒深渊之眼；每两夜有一次夜谈，能学个新天赋</span></div></div>
   ${loadSave()?`<button class="btn gold big" id="contBtn">继续 · ${HEROES[loadSave().hero].n} 第${loadSave().round}夜</button>`:''}
   <button class="btn ${loadSave()?'alt':'red'} big" id="startBtn">${loadSave()?'新的守夜':'开始游戏'}</button></div>`;
@@ -5869,7 +5869,7 @@ function resumeSave(){const s=loadSave();if(!s||!HEROES[s.hero]){heroSelect();re
   for(const c of G.cards)if(c.el)c.el.remove();
   Object.assign(G,{hero:s.hero,round:s.round,gold:s.gold,wall:s.wall,wallMax:s.wallMax,foeSet:s.foeSet||'dark',relics:s.relics||[],skills:(s.skills||[]).filter(k=>TALENTS[k]),bestChain:s.bestChain||0,cards:[]});
   for(const d of s.cards||[]){if(!ITEMS[d.key])continue;const c=newCard(d.key,d.tier,d.adj);c.loc=d.loc;c.idx=d.idx;c.hoard=d.hoard||0;c.grow=d.grow||0;c.qp=d.qp||0;G.cards.push(c);}
-  recalcMods();renderRelics();shownGold=null;renderOwned();updateHUD();toPrep();toast('已读取存档：第'+G.round+'夜');}
+  recalcMods();renderRelics();shownGold=null;renderOwned();updateHUD();toPrep();toast('接着上回：第'+G.round+'夜');}
 function newGame(hero){
   for(const c of G.cards)if(c.el)c.el.remove();
   G.hero=hero||G.hero;const H=HEROES[G.hero];
@@ -5888,7 +5888,7 @@ function layout(){
 }
 addEventListener('resize',layout);
 $('#goBtn').onclick=()=>{SFX.ensure();if(G.phase==='prep'&&G.prep.step>=3)startBattle();};
-$('#bagBtn').onclick=()=>{SFX.ensure();SFX.play('ui');if(G.phase!=='battle')setDrawer(!G.drawer);else toast('战斗中不能整理背包');};
+$('#bagBtn').onclick=()=>{SFX.ensure();SFX.play('ui');if(G.phase!=='battle')setDrawer(!G.drawer);else toast('打着仗呢，没空翻包');};
 $('#treeBtn').onclick=()=>{SFX.ensure();openTree();};
 $('#relicBtn').onclick=()=>{SFX.ensure();openBag();};
 $('#speedBtn').onclick=()=>{SFX.ensure();SFX.play('ui');G.speed=G.speed>=3?1:G.speed+1;updateHUD();};

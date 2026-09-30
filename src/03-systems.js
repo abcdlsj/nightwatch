@@ -185,7 +185,7 @@ function updateHUD(){
   $('#shV').textContent=B&&B.shield>0&&G.phase==='battle'?'+'+Math.ceil(B.shield):'';
   $('#speedBtn').textContent=G.speed+'×';
   const sc=G.cards.filter(c=>c.loc==='stash').length;$('#bagN').textContent=sc?sc:'';$('#bagBtn').classList.toggle('on',G.drawer);
-  $('#treeN').textContent=G.skills.length||'';
+  $('#treeN').textContent='';
   const go=$('#goBtn');
   if(G.phase==='prep'){const s=G.prep.step;go.disabled=s<3;go.textContent=s<3?'备战 '+s+'/3':'开战';}
   else if(G.phase==='battle'){go.disabled=true;go.textContent='战斗中';}
@@ -268,13 +268,13 @@ function renderPrep(){
   $('#stepPips').innerHTML=[0,1,2].map(i=>`<i class="${i<P.step?'done':i===P.step?'now':''}"></i>`).join('');
   body.innerHTML='';
   if(P.step>=3){
-    body.innerHTML=`<div class="ready"><div class="rd-t">备战完成</div><p>调整好阵型，然后迎战第${G.round}波。</p><p class="muted">相邻协同、词缀和品质都会影响伤害。点任意卡牌可以查看伤害公式。</p></div>`;
+    body.innerHTML=`<div class="ready"><div class="rd-t">准备好了</div><p>摆好阵型，第${G.round}夜要来了。</p><p class="muted">挨着放的卡会互相带动。点一下卡，能看到伤害是怎么算的。</p></div>`;
     updateHUD();return;
   }
   if(!P.cur&&P.talk&&!P.talkDone)startTalk();
   const cur=P.cur;$('#prep').classList.toggle('talking',!!cur&&(cur.mode==='talk'||cur.mode==='talent'));
   if(!cur){
-    body.insertAdjacentHTML('beforeend',`<div class="ptitle">选择一个去处<span>第 ${P.step+1} 站 / 共 3 站</span></div>`);
+    body.insertAdjacentHTML('beforeend',`<div class="ptitle">去哪儿？<span>第 ${P.step+1} / 3 站</span></div>`);
     const list=document.createElement('div');list.className='doors';
     P.doors.forEach(id=>{const e=EVENTS[id];const b=document.createElement('button');b.className='door cat-'+e.cat;
       b.innerHTML=`<img src="${icon(e.ico).url}" alt=""><div><b>${e.n}</b><span>${e.d}</span><em>${e.f}</em></div>`;
@@ -284,12 +284,12 @@ function renderPrep(){
   if(cur.mode==='talk'||cur.mode==='talent'){renderTalk(cur,body);updateHUD();return;}
   body.insertAdjacentHTML('beforeend',evHead(cur.ev));
   if(cur.mode==='shop'||cur.mode==='pick'||cur.mode==='gift'){
-    const hint=cur.mode==='shop'?'拖到棋盘购买，或点卡牌查看详情':cur.mode==='pick'?(cur.taken?'已经选好了':'免费挑选其中一张'):(cur.taken?'收下了':'免费送你');
+    const hint=cur.mode==='shop'?'拖到棋盘上就是买，点一下看详情':cur.mode==='pick'?(cur.taken?'挑好了':'白给，挑一张'):(cur.taken?'拿到了':'送你的');
     body.insertAdjacentHTML('beforeend',`<div class="ev-hint">${hint}</div>`);
     const grid=document.createElement('div');grid.id='offers';grid.style.gridTemplateColumns=`repeat(${cur.offers.length},minmax(0,${cur.offers.length===1?'140px':'1fr'}))`;
     cur.offers.forEach(of=>grid.appendChild(offerEl(of)));body.appendChild(grid);
     if(cur.mode==='shop')body.appendChild(btnRow([...(cur.refresh>0?[['刷新 <small>(剩'+cur.refresh+'次)</small>','blue',()=>{cur.refresh--;cur.offers=cur.offers.map(()=>makeOffer(cur.ev.filter,{black:cur.ev.black}));SFX.play('buy');renderPrep();document.querySelectorAll('#offers .card').forEach(el=>restart(el,'land'));}]]:[]),['离开','',finishStep]]));
-    else body.appendChild(btnRow([[cur.taken?'继续':'放弃',cur.taken?'green':'',finishStep]]));
+    else body.appendChild(btnRow([[cur.taken?'继续':'不要了',cur.taken?'green':'',finishStep]]));
   }else if(cur.mode==='choice'||cur.mode==='relic'){
     body.insertAdjacentHTML('beforeend',`<div class="ev-hint">${cur.hint}</div>`);
     const list=document.createElement('div');list.className='opts';
@@ -300,20 +300,20 @@ function renderPrep(){
       b.onclick=()=>{SFX.ensure();o.act();};list.appendChild(b);});
     body.appendChild(list);body.appendChild(btnRow([['跳过','',finishStep]]));
   }else if(cur.mode==='gshop'){
-    body.insertAdjacentHTML('beforeend',`<div class="ev-hint">点击购买，可以买多件</div>`);
+    body.insertAdjacentHTML('beforeend',`<div class="ev-hint">点一下就买，能买好几件</div>`);
     const list=document.createElement('div');list.className='opts';
     cur.goods.forEach((g,i)=>{const R0=RELICS[g.k];const b=document.createElement('button');b.className='opt'+(g.sold?' sold':'');b.style.animationDelay=(i*.06)+'s';
       b.innerHTML=`<img class="ricon" src="${icon(R0.ico).url}" alt="" style="--gc:${GT[R0.t].c}"><div><b>${gearLabel(g.k)}</b><span>${modText(R0.m)}</span><em>${R0.f}</em></div><span class="price${g.sold?'':g.price>G.gold?' cant':''}" data-p="${g.price}">${g.sold?'已购':`<img class="ico" src="${SPR.coin.url}" alt="">${g.price}`}</span>`;
-      if(!g.sold)b.onclick=()=>{SFX.ensure();if(G.gold<g.price){toast('金币不足');restart($('#goldChip'),'shake');SFX.play('bad');return;}G.gold-=g.price;g.sold=true;gainRelic(g.k,true);renderPrep();};
+      if(!g.sold)b.onclick=()=>{SFX.ensure();if(G.gold<g.price){toast('钱不够');restart($('#goldChip'),'shake');SFX.play('bad');return;}G.gold-=g.price;g.sold=true;gainRelic(g.k,true);renderPrep();};
       list.appendChild(b);});
     body.appendChild(list);
     body.appendChild(btnRow([...(cur.refresh>0?[['刷新 <small>(剩'+cur.refresh+'次)</small>','blue',()=>{cur.refresh--;cur.goods=rollGear(3,1).map(k=>({k,price:gearPrice(k),sold:false}));SFX.play('buy');renderPrep();}]]:[]),['离开','',finishStep]]));
   }else if(cur.mode==='gamble'){
-    body.insertAdjacentHTML('beforeend',`<div class="big-res">${cur.result||'掷一次骰子？'}</div>`);
+    body.insertAdjacentHTML('beforeend',`<div class="big-res">${cur.result||'来一把？'}</div>`);
     body.appendChild(btnRow(cur.result?[['继续','green',finishStep]]:[['下注 <img class="ico" src="'+SPR.coin.url+'" alt=""><b>3</b>','gold',()=>{
-      if(G.gold<3){toast('金币不足');return;}G.gold-=3;const win=Math.random()<.5;
-      if(win){G.gold+=6;SFX.play('coin');const r=$('#pbody').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,6);cur.result='赢了！<b>+6</b> 金币';}
-      else{SFX.play('bad');cur.result='骰子背叛了你。<br><small>3金币没了</small>';}updateHUD();renderPrep();}],['离开','',finishStep]]));
+      if(G.gold<3){toast('钱不够');return;}G.gold-=3;const win=Math.random()<.5;
+      if(win){G.gold+=6;SFX.play('coin');const r=$('#pbody').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,6);cur.result='赢了，<b>+6</b> 金';}
+      else{SFX.play('bad');cur.result='输了。<br><small>3 金打了水漂</small>';}updateHUD();renderPrep();}],['离开','',finishStep]]));
   }else if(cur.mode==='reward'){
     body.insertAdjacentHTML('beforeend',`<div class="big-res">${cur.text}</div>`);
     body.appendChild(btnRow([['收下','green',()=>{cur.apply();updateHUD();finishStep();}]]));
@@ -336,22 +336,22 @@ function enterEvent(id){
   else if(id==='altar'){relicChoice(cur,'挑一件，一直生效，同名的能叠',rollGear(3,0,2));}
   else if(id==='parcel'){relicChoice(cur,'包裹里装着……',rollGear(1,1,2));}
   else if(id==='grocer'){cur.mode='gshop';cur.refresh=1;cur.goods=rollGear(3,1).map(k=>({k,price:gearPrice(k),sold:false}));}
-  else if(id==='enchant'){cur.mode='choice';cur.hint='选一项附魔（会替换原有词缀）';
+  else if(id==='enchant'){cur.mode='choice';cur.hint='挑一个词缀（原来的会被换掉）';
     cur.opts=shuffled(G.cards).slice(0,3).map(c=>{const a=rollAdj(c.key,true,c.adj,1);return{card:c,label:ITEMS[c.key].n+' → 【'+ADJ[a].n+'】',sub:ADJ[a].d,
       act:()=>{c.adj=a;repaint(c);renderOwned();SFX.play('merge');const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,ADJ[a].c,20);restart(c.el,'merge');finishStep();}};});}
-  else if(id==='train'){cur.mode='choice';cur.hint='选一张卡提升品质';
+  else if(id==='train'){cur.mode='choice';cur.hint='挑一张卡升一档';
     cur.opts=shuffled(G.cards.filter(c=>c.tier<2)).slice(0,3).map(c=>{const nx=Object.assign({},c,{tier:c.tier+1});const a=stats(c,null),b=stats(nx,null);
       return{card:c,label:ITEMS[c.key].n+'：'+TIERS[c.tier].n+' → '+TIERS[c.tier+1].n,sub:ITEMS[c.key].dmg?`伤害 ${Math.round(a.total)}→${Math.round(b.total)}　冷却 ${a.cd.toFixed(2)}→${b.cd.toFixed(2)}s`:UPS[ITEMS[c.key].up].t,
       act:()=>{c.tier++;repaint(c);checkMerges();renderOwned();SFX.play('merge');if(c.el){const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,TIERS[c.tier].c,24);restart(c.el,'merge');}finishStep();}};});}
-  else if(id==='furnace'){cur.mode='choice';cur.hint='选一张卡投入熔炉';
-    cur.opts=shuffled(G.cards).slice(0,4).map(c=>({card:c,label:'献祭 '+ITEMS[c.key].n,sub:'失去这张卡（售价 '+sellValue(c)+'），然后挑选一件遗物',
+  else if(id==='furnace'){cur.mode='choice';cur.hint='挑一张卡扔进去';
+    cur.opts=shuffled(G.cards).slice(0,4).map(c=>({card:c,label:'献祭 '+ITEMS[c.key].n,sub:'这张卡就没了（值 '+sellValue(c)+' 金），换一件遗物',
       act:()=>{const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,'#ef7d57',26);SFX.play('boom');removeCard(c);renderOwned();relicChoice(cur,'熔炉吐出三件遗物，选一件',rollGear(3,3));renderPrep();}}));}
   else if(id==='gamble'){cur.mode='gamble';}
   else if(id==='mentor'||(id==='manual'&&Math.random()<.5)){const m=pick(MEETS);Object.assign(cur,{mode:'talent',who:m.who,intro:[[m.who,m.say]],picks:rollTalents(2),title:m.n});}
   else if(id==='manual'){cur.mode='pick';cur.offers=[0,1].map(()=>makeOffer(it=>it.hero===G.hero&&it.t>=1,{free:1}));}
-  else if(id==='spring'){const h=Math.min(8,G.wallMax-G.wall);cur.mode='reward';cur.text=`城墙修复 <b>+${h}</b>`;cur.apply=()=>{G.wall+=h;SFX.play('merge');};}
-  else if(id==='job'){cur.mode='reward';cur.text='工钱 <b>+3</b> 金币';cur.apply=()=>gainGold(3);}
-  else if(id==='bank'){const g=Math.max(2,Math.round(G.gold*.3));cur.mode='reward';cur.text=`利息 <b>+${g}</b> 金币`;cur.apply=()=>gainGold(g);}
+  else if(id==='spring'){const h=Math.min(8,G.wallMax-G.wall);cur.mode='reward';cur.text=`墙补上了 <b>+${h}</b>`;cur.apply=()=>{G.wall+=h;SFX.play('merge');};}
+  else if(id==='job'){cur.mode='reward';cur.text='工钱 <b>+3</b> 金';cur.apply=()=>gainGold(3);}
+  else if(id==='bank'){const g=Math.max(2,Math.round(G.gold*.3));cur.mode='reward';cur.text=`利息 <b>+${g}</b> 金`;cur.apply=()=>gainGold(g);}
   P.cur=cur;renderPrep();
 }
 /* ---- 夜谈 / 学天赋 ---- */
@@ -403,12 +403,12 @@ function finishStep(){const P=G.prep;P.step++;P.cur=null;if(P.step<3)rollDoors()
   if(P.step>=3)restart($('#goBtn'),'bump');}
 
 /* ================= 获得/出售/合成 ================= */
-function buyCheck(of){if(G.gold<of.price){toast('金币不足');restart($('#goldChip'),'shake');SFX.play('bad');return false;}return true;}
+function buyCheck(of){if(G.gold<of.price){toast('钱不够');restart($('#goldChip'),'shake');SFX.play('bad');return false;}return true;}
 function acquire(of,dest){
   if(of.sold||G.phase!=='prep')return false;
   const canMerge=of.card.tier<3&&countSame(of.card.key,of.card.tier)>=1;
   if(!dest){const fit=firstFit(of.card.size);dest=fit||(canMerge?'merge':null);
-    if(!dest){toast('没有空位：先出售，或买同名同品质的卡来合成');SFX.play('bad');return false;}}
+    if(!dest){toast('没地方放了：卖掉一张，或者买同名同品质的来合成');SFX.play('bad');return false;}}
   if(!buyCheck(of))return false;
   G.gold-=of.price;of.sold=true;SFX.play('buy');
   const c=newCard(of.card.key,of.card.tier,of.card.adj);G.cards.push(c);
@@ -416,7 +416,7 @@ function acquire(of,dest){
   const cur=G.prep.cur;if(cur&&(cur.mode==='pick'||cur.mode==='gift')){cur.taken=true;cur.offers.forEach(o=>o.sold=true);}
   afterChange(c);return true;
 }
-function sellCard(c){const v=sellValue(c);G.gold+=v;SFX.play('sell');const r=c.el.getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,Math.min(v,6));removeCard(c);toast('出售获得 '+v+' 金币');}
+function sellCard(c){const v=sellValue(c);G.gold+=v;SFX.play('sell');const r=c.el.getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,Math.min(v,6));removeCard(c);toast('卖了 '+v+' 金');}
 function checkMerges(){
   let any=null;
   for(let guard=0;guard<8;guard++){
@@ -433,7 +433,7 @@ function checkMerges(){
     if(!did)break;
   }
   if(any){SFX.play('merge');setTimeout(()=>{if(!any.el||!G.cards.includes(any))return;restart(any.el,'merge');const r=any.el.getBoundingClientRect();
-    FX.burst(r.left+r.width/2,r.top+r.height/2,TIERS[any.tier].c,30);toast(ITEMS[any.key].n+' 合成为【'+TIERS[any.tier].n+'】品质');},30);}
+    FX.burst(r.left+r.width/2,r.top+r.height/2,TIERS[any.tier].c,30);toast(ITEMS[any.key].n+' 升到【'+TIERS[any.tier].n+'】了');},30);}
   G.cards.filter(c=>c.loc==='temp').forEach(removeCard);
 }
 function afterChange(placed){checkMerges();renderOwned();if(G.phase==='prep')renderPrep();updateHUD();
@@ -555,7 +555,7 @@ function openSheet(src){
   if(c.tier<3){const nx=Object.assign({},c,{tier:c.tier+1});const b=stats(nx,null);
     rows+=`<div><span>升到${TIERS[c.tier+1].n}</span><span>${it.dmg?'伤害 '+Math.round(b.total)+' · ':''}冷却 ${b.cd.toFixed(2)}s</span></div>`;}
   if(own&&c.bTrig)rows+=`<div><span>上一场</span><span>${Math.round(c.bDmg)} 伤害 · 触发${c.bTrig}次</span></div>`;
-  if(own)rows+=`<div><span>出售价</span><span>${sellValue(c)}</span></div>`;
+  if(own)rows+=`<div><span>能卖</span><span>${sellValue(c)}</span></div>`;
   const sh=$('#sheet');
   sh.innerHTML=`<div class="sh" role="dialog" aria-label="${it.n}"><div class="sh-top"><div id="shCard"></div><div><h3>${ad?`<span style="color:${ad.c}">${ad.n}的</span>`:''}${c.tier>=3&&it.dn?`<span class="dn">「${it.dn}」</span><small class="bn">${it.n}</small>`:it.n}</h3>
     <div class="tags"><span class="tag" style="background:${T.c}33;color:${T.c}">${T.n}品质</span><span class="tag" style="background:${TAGC[it.tag]}33;color:${TAGC[it.tag]}">${it.tag}</span>${it.kind?`<span class="tag">${it.kind}</span>`:''}<span class="tag">${SIZEN[c.size]}型·占${c.size}格</span></div>
@@ -570,7 +570,7 @@ function openSheet(src){
   const bt=$('#shBtns');
   const mk=(txt,cls,fn)=>{const b=document.createElement('button');b.className='btn '+cls;b.innerHTML=txt;b.onclick=fn;bt.appendChild(b);};
   if(!own&&G.phase==='prep'&&!src.offer.sold)mk(src.offer.price?'购买 <img class="ico" src="'+SPR.coin.url+'" alt=""><b>'+src.offer.price+'</b>':'免费拿走','gold',()=>{if(acquire(src.offer,null))closeSheet();});
-  if(own&&G.phase==='prep')mk('出售 <b>+'+sellValue(c)+'</b>','red',()=>{sellCard(c);afterChange();closeSheet();});
+  if(own&&G.phase==='prep')mk('卖掉 <b>+'+sellValue(c)+'</b>','red',()=>{sellCard(c);afterChange();closeSheet();});
   mk('关闭','',closeSheet);
   sh.hidden=false;sh.onclick=e=>{if(e.target===sh)closeSheet();};
 }
@@ -593,9 +593,9 @@ function playStory(pages,done){
     if(p.who==='knight')return{n:'暗影骑士 · 卡尔',img:SPR.knight.url,c:'#c79bff'};if(p.who==='eye')return{n:'深渊之眼',img:SPR.eye.url,c:'#ff6b5b'};return{n:'',img:'',c:'#fff'};};
   const mode=pages===STORY.win?'dawn':pages===STORY.lose?'fall':'night';
   const show=()=>{const p=pages[i];ov.hidden=false;
-    if(p.title){ov.innerHTML=`<canvas class="st-scene" width="120" height="68"></canvas><div class="st-title"><small>${p.act||''}</small><h2>${p.title}</h2></div><div class="st-tap">点击继续</div><button class="btn sm st-skip" id="stSkip">跳过</button>`;drawScene(ov.querySelector('canvas'),mode);typing=null;$('#stSkip').onclick=e=>{e.stopPropagation();end();};SFX.play('bell');return;}
+    if(p.title){ov.innerHTML=`<canvas class="st-scene" width="120" height="68"></canvas><div class="st-title"><small>${p.act||''}</small><h2>${p.title}</h2></div><div class="st-tap">点一下继续</div><button class="btn sm st-skip" id="stSkip">跳过</button>`;drawScene(ov.querySelector('canvas'),mode);typing=null;$('#stSkip').onclick=e=>{e.stopPropagation();end();};SFX.play('bell');return;}
     const w=who(p);let t=p.t;if(t==='@intro')t=HEROES[G.hero].intro;if(typeof t==='object')t=t[G.hero];full=t;
-    ov.innerHTML=`<canvas class="st-scene" width="120" height="68"></canvas><div class="st-box" style="--sc:${w.c}"><img class="st-por" src="${w.img}" alt=""><div class="st-body"><b>${w.n}</b><p id="stText"></p></div></div><div class="st-tap">点击继续</div><button class="btn sm st-skip" id="stSkip">跳过</button>`;
+    ov.innerHTML=`<canvas class="st-scene" width="120" height="68"></canvas><div class="st-box" style="--sc:${w.c}"><img class="st-por" src="${w.img}" alt=""><div class="st-body"><b>${w.n}</b><p id="stText"></p></div></div><div class="st-tap">点一下继续</div><button class="btn sm st-skip" id="stSkip">跳过</button>`;
     drawScene(ov.querySelector('canvas'),mode);$('#stSkip').onclick=e=>{e.stopPropagation();end();};
     let k=0;const el=$('#stText');clearInterval(typing);typing=setInterval(()=>{k++;el.textContent=full.slice(0,k);if(k%3===0)SFX.play('ui');if(k>=full.length){clearInterval(typing);typing=null;}},28);};
   const end=()=>{clearInterval(typing);ov.hidden=true;ov.onclick=null;done&&done();};

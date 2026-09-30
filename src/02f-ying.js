@@ -242,7 +242,7 @@ Object.assign(RELICS,{
   lampbook:{n:'全城的灯谱',t:3,ico:'book:y',u:1,hero:'ying',m:{dmg:.2,s1:.3},f:'记着晨钟城每一盏灯的位置。七百年来，只熄过一盏。'}
 });
 HEROES.ying={n:'萤',title:'灯匠学徒',col:'#ffd166',portrait:'p_ying',wall:26,gold:10,start:[['firefly',0,3],['clock',1,4]],
-  tag:'擅长小型卡与【机】',desc:'老钟表匠的学徒，守着全城的灯。小卡越多越强，擅长充能与节奏。专属：八音盒、大钟摆。',
+  tag:'擅长小型卡与【机】',desc:'老钟表匠的徒弟，管着全城的灯。小卡越多越强，会充能、会踩节奏。专属卡：八音盒、大钟摆。',
   intro:'师父说，只要还有一盏灯亮着，这座城就还没输。我负责让它们一直亮着。'};
 TREES.ying=[
   {n:'灯',c:'#ffd166',nodes:[{n:'小灯',m:{s1:.15}},{n:'灯串',m:{left:.2,right:.2}},{n:'万家灯火',m:{s1:.3,full:.2}}]},
