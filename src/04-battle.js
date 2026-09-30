@@ -466,7 +466,7 @@ function winBattle(){
   for(const c of G.cards){c.charge=0;c.el.style.setProperty('--s',0);c.el.classList.remove('frozen','empty','haste');c.ammo=maxAmmo(c);setAmmo(c);}
   const was=G.round;
   if(was>=G.maxRound){banner('黎明','#ffe79a');BG.set('shop');setTimeout(()=>playStory(STORY.win,()=>endScreen(true)),1400);return;}
-  G.sp++;updateHUD();const winG=3+Math.floor(was/2);const rows=[['胜利奖励',winG]];if(was===4)rows.push(['击败精英',4]);
+  updateHUD();const winG=3+Math.floor(was/2);const rows=[['胜利奖励',winG]];if(was===4)rows.push(['击败精英',4]);
   const interest=Math.min(3+mv('interest'),Math.floor(G.gold/6));if(mv('winGold'))rows.push(['物品加成',mv('winGold')]);if(mv('regen'))G.wall=Math.min(G.wallMax,G.wall+mv('regen'));if(interest)rows.push(['利息（每6金+1）',interest]);
   if(B.wallLost===0)rows.push(['城墙无损',1]);
   if(B.greed)rows.push(['贪婪收入（已到账）',0,B.greed]);
@@ -477,7 +477,7 @@ function showReport(was,rows,total){
   const rp=$('#report');const bc=G.cards.filter(c=>c.bTrig>0).sort((a,b)=>b.bDmg-a.bDmg);const mx=Math.max(1,...bc.map(c=>c.bDmg));
   rp.innerHTML=`<div class="rp-title win">第${was}波 · 守住了</div>
   <div class="rp-list">${bc.map((c,i)=>`<div class="rp-row" style="animation-delay:${i*.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${SPR[c.key].url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${(c.bDmg/mx*100).toFixed(1)}"></i></div><b>${fmt(c.bDmg)}<small>×${c.bTrig}</small></b></div>`).join('')||'<div class="rp-meta">这一波没有卡牌出手</div>'}</div>
-  <div class="rp-meta"><b style="color:#ffd166">天赋点 +1</b>　最高连锁 <b>×${B.maxChain||1}</b>　击杀 <b>${B.kills}</b>　城墙 <b>-${Math.ceil(B.wallLost)}</b></div>
+  <div class="rp-meta">${(was+1)%2===1?'<b style="color:#ffd166">明晚之前有夜谈</b>　':''}最高连锁 <b>×${B.maxChain||1}</b>　击杀 <b>${B.kills}</b>　城墙 <b>-${Math.ceil(B.wallLost)}</b></div>
   <div class="rp-cash" id="cash"></div>
   <button class="btn gold big" id="cashBtn" style="flex:none">收下 <img class="ico" src="${SPR.coin.url}" alt=""><b>${total}</b></button>`;
   rp.hidden=false;
@@ -507,7 +507,7 @@ function titleScreen(){
   <div class="rules"><div><i>1</i><span>每夜之间有3次备战：逛商店、开宝箱、收集物品……</span></div>
   <div><i>2</i><span>卡牌拖上棋盘后自动战斗，相邻的卡会互相触发</span></div>
   <div><i>3</i><span>两张同名同品质的卡合成更高品质：铜→银→金→钻</span></div>
-  <div><i>4</i><span>撑过8个夜晚，击败深渊之眼；每守住一夜得1个天赋点</span></div></div>
+  <div><i>4</i><span>撑过8个夜晚，打倒深渊之眼；每两夜有一次夜谈，能学个新天赋</span></div></div>
   ${loadSave()?`<button class="btn gold big" id="contBtn">继续 · ${HEROES[loadSave().hero].n} 第${loadSave().round}夜</button>`:''}
   <button class="btn ${loadSave()?'alt':'red'} big" id="startBtn">${loadSave()?'新的守夜':'开始游戏'}</button></div>`;
   sc.hidden=false;$('#startBtn').onclick=()=>{SFX.ensure();SFX.play('merge');heroSelect();};
@@ -523,20 +523,20 @@ function heroSelect(){
   sc.hidden=false;
   sc.querySelectorAll('.hero').forEach(b=>b.onclick=()=>{SFX.ensure();SFX.play('merge');sc.hidden=true;newGame(b.dataset.h);});
 }
-const SAVEK='chain-demo-save-v3';
-function saveGame(){try{localStorage.setItem(SAVEK,JSON.stringify({hero:G.hero,round:G.round,gold:G.gold,wall:G.wall,wallMax:G.wallMax,relics:G.relics,skills:G.skills,sp:G.sp,bestChain:G.bestChain,
+const SAVEK='chain-demo-save-v4';
+function saveGame(){try{localStorage.setItem(SAVEK,JSON.stringify({hero:G.hero,round:G.round,gold:G.gold,wall:G.wall,wallMax:G.wallMax,relics:G.relics,skills:G.skills,foeSet:G.foeSet,bestChain:G.bestChain,
   cards:G.cards.map(c=>({key:c.key,tier:c.tier,adj:c.adj,loc:c.loc,idx:c.idx,hoard:c.hoard,grow:c.grow||0,qp:c.qp||0}))}));}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem(SAVEK);return s?JSON.parse(s):null;}catch(e){return null;}}
 function clearSave(){try{localStorage.removeItem(SAVEK);}catch(e){}}
 function resumeSave(){const s=loadSave();if(!s||!HEROES[s.hero]){heroSelect();return;}
   for(const c of G.cards)if(c.el)c.el.remove();
-  Object.assign(G,{hero:s.hero,round:s.round,gold:s.gold,wall:s.wall,wallMax:s.wallMax,relics:s.relics||[],skills:s.skills||[],sp:s.sp||0,bestChain:s.bestChain||0,cards:[]});
+  Object.assign(G,{hero:s.hero,round:s.round,gold:s.gold,wall:s.wall,wallMax:s.wallMax,relics:s.relics||[],skills:(s.skills||[]).filter(k=>TALENTS[k]),bestChain:s.bestChain||0,cards:[]});
   for(const d of s.cards||[]){if(!ITEMS[d.key])continue;const c=newCard(d.key,d.tier,d.adj);c.loc=d.loc;c.idx=d.idx;c.hoard=d.hoard||0;c.grow=d.grow||0;c.qp=d.qp||0;G.cards.push(c);}
   recalcMods();renderRelics();shownGold=null;renderOwned();updateHUD();toPrep();toast('已读取存档：第'+G.round+'夜');}
 function newGame(hero){
   for(const c of G.cards)if(c.el)c.el.remove();
   G.hero=hero||G.hero;const H=HEROES[G.hero];
-  Object.assign(G,{round:1,gold:H.gold,wall:H.wall,wallMax:H.wall,cards:[],relics:[],skills:[],sp:1,bestChain:0});recalcMods();renderRelics();
+  Object.assign(G,{round:1,gold:H.gold,wall:H.wall,wallMax:H.wall,cards:[],relics:[],skills:[],bestChain:0});recalcMods();renderRelics();
   for(const[k,t,i]of H.start){const c=newCard(k,t);c.loc='board';c.idx=i;G.cards.push(c);}
   shownGold=null;renderOwned();updateHUD();
   playStory(STORY.prologue,()=>nightStory(()=>toPrep()));

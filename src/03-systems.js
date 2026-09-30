@@ -77,12 +77,12 @@ const SFX=(function(){
 })();
 
 /* ================= 状态 ================= */
-const G={hero:'ayla',sp:0,skills:[],drawer:false,phase:'title',round:1,maxRound:8,gold:10,wall:25,wallMax:25,speed:1,cards:[],relics:[],
+const G={hero:'ayla',skills:[],drawer:false,phase:'title',round:1,maxRound:8,gold:10,wall:25,wallMax:25,speed:1,cards:[],relics:[],
   prep:{step:0,cur:null,doors:[]},nextWave:null,bestChain:0,firstPrep:true};
 let B=null;
 let cw=46,ch=90;
 let M={};function recalcMods(){M={};const add=m=>{for(const k in m)M[k]=(M[k]||0)+m[k];};for(const r of G.relics)add(RELICS[r].m);
-  for(const s of G.skills){const[b,i]=s.split('.');add(TREES[G.hero][b].nodes[i].m);}}
+  for(const s of G.skills)if(TALENTS[s])add(TALENTS[s].m);}
 const mv=k=>M[k]||0;
 
 function newCard(key,tier,adj){return{id:UID++,key,tier:tier==null?ITEMS[key].t:tier,adj:adj||null,size:ITEMS[key].size,loc:null,idx:-1,hoard:0,grow:0,qp:0,el:null,
@@ -106,6 +106,7 @@ function emit(ev,x){
   if(!B||B.over||G.phase!=='battle')return;x=x||{};
   for(const c of boardCards()){const h=ITEMS[c.key].on;if(!h||!h[ev]||c.frozen>0)continue;if(!evOk(c.evLog||(c.evLog={}),ev,8))continue;h[ev](c,x);if(B.over)return;}
   for(const r of new Set(G.relics)){const h=RELICS[r].on;if(!h||!h[ev])continue;if(!evOk(B.rlog,r+ev,8))continue;h[ev](G.relics.filter(y=>y===r).length,x);if(B.over)return;}
+  for(const s of G.skills){const h=TALENTS[s]&&TALENTS[s].on;if(!h||!h[ev])continue;if(!evOk(B.rlog,'T'+s+ev,8))continue;h[ev](x);if(B.over)return;}
 }
 const kindOf=c=>ITEMS[c.key].kind||'';
 function countKind(k,ex){return boardCards().filter(o=>o!==ex&&kindOf(o)===k).length;}
@@ -137,6 +138,7 @@ function stats(c,t){
   const total=(base+flat)*Math.max(.1,1+psum)*mult;
   let cd=it.cd*U.c[s];if(a==='twin')cd*=1.6;if(a==='heavy')cd*=1.3;
   let spd=1;if(a==='swift')spd+=.25;if(a==='momentum'&&c.mom)spd+=.05*c.mom;if(a==='rush'&&t!=null&&t<5)spd+=1;if(it.kind==='药剂'&&c.loc==='board'){const j=boardCards().filter(o=>ITEMS[o.key].kindHaste).length;if(j)spd+=.06*j*countKind('药剂');}
+  if(mv('t_last')&&G.wall<G.wallMax*.35)spd+=.25;
   spd=Math.max(.3,spd+mv('spd'));
   return{base,flat,pct,psum,mult,total,cd:Math.max(.25,cd/spd),cdRaw:it.cd,crit:.05+(a==='precise'?.2:0)+mv('crit')};
 }
@@ -183,7 +185,7 @@ function updateHUD(){
   $('#shV').textContent=B&&B.shield>0&&G.phase==='battle'?'+'+Math.ceil(B.shield):'';
   $('#speedBtn').textContent=G.speed+'×';
   const sc=G.cards.filter(c=>c.loc==='stash').length;$('#bagN').textContent=sc?sc:'';$('#bagBtn').classList.toggle('on',G.drawer);
-  $('#treeN').textContent=G.sp>0?G.sp:'';$('#treeBtn').classList.toggle('glow',G.sp>0);
+  $('#treeN').textContent=G.skills.length||'';
   const go=$('#goBtn');
   if(G.phase==='prep'){const s=G.prep.step;go.disabled=s<3;go.textContent=s<3?'备战中 '+s+' / 3':'开始战斗';}
   else if(G.phase==='battle'){go.disabled=true;go.textContent='战斗中…';}
@@ -238,19 +240,20 @@ function makeOffer(filter,opt){opt=opt||{};
 /* ================= 备战：随机事件 ================= */
 function toPrep(){if(typeof saveGame==='function')setTimeout(saveGame,0);
   G.phase='prep';B=null;BG.set('shop');$('#report').hidden=true;$('#bossbar').hidden=true;F.cv.style.display='none';
-  G.prep={step:0,cur:null,doors:[]};G.nextWave=makeWave(G.round);
+  G.prep={step:0,cur:null,doors:[],talk:G.round%2===1};G.nextWave=makeWave(G.round);
   for(const c of G.cards){if(c.el)c.el.style.setProperty('--s',0);c.nb=null;c.right=null;}
   rollDoors();renderPreview();$('#prep').hidden=false;renderPrep();renderOwned();updateHUD();
-  if(G.firstPrep){G.firstPrep=false;setTimeout(()=>toast('每波之间有3次备战，挑一个去处'),500);}
+  if(G.firstPrep){G.firstPrep=false;setTimeout(()=>toast('每夜之前能走三个地方，挑着去'),500);}
 }
 function rollDoors(){
   const R=G.round,P=G.prep;
   const ids=Object.keys(EVENTS).filter(id=>{const e=EVENTS[id];return(!e.minR||R>=e.minR)&&(!e.need||e.need());});
-  const out=[];
+  const isRare=i=>EVENTS[i].cat==='rare';const out=[];
   if(R===1&&P.step===0)out.push('shop','field');
-  while(out.length<3){const pool=ids.filter(i=>!out.includes(i));if(!pool.length)break;
+  while(out.length<3){const pool=ids.filter(i=>!out.includes(i)&&!(isRare(i)&&(P.rare||out.some(isRare))));if(!pool.length)break;
     let t=Math.random()*pool.reduce((s,i)=>s+EVENTS[i].w,0);let got=null;for(const i of pool){t-=EVENTS[i].w;if(t<=0){got=i;break;}}out.push(got||pool[pool.length-1]);}
-  if(!out.some(i=>EVENTS[i].cat==='shop'||EVENTS[i].cat==='free'))out[2]='shop';
+  if(!out.some(i=>EVENTS[i].cat==='shop'||EVENTS[i].cat==='free'))out[out.findIndex(i=>!isRare(i))]='shop';
+  if(out.some(isRare))P.rare=1;
   P.doors=out.sort(()=>Math.random()-.5);
 }
 function renderPreview(){
@@ -271,6 +274,7 @@ function renderPrep(){
     body.innerHTML=`<div class="ready"><div class="rd-t">备战完成</div><p>调整好阵型，然后迎战第${G.round}波。</p><p class="muted">相邻协同、词缀和品质都会影响伤害。点任意卡牌可以查看伤害公式。</p></div>`;
     updateHUD();return;
   }
+  if(!P.cur&&P.talk&&!P.talkDone)startTalk();
   const cur=P.cur;
   if(!cur){
     body.insertAdjacentHTML('beforeend',`<div class="ptitle">选择一个去处<span>第 ${P.step+1} 站 / 共 3 站</span></div>`);
@@ -280,6 +284,7 @@ function renderPrep(){
       b.onclick=()=>{SFX.ensure();SFX.play('ui');enterEvent(id);};list.appendChild(b);});
     body.appendChild(list);updateHUD();return;
   }
+  if(cur.mode==='talk'||cur.mode==='talent'){renderTalk(cur,body);updateHUD();return;}
   body.insertAdjacentHTML('beforeend',evHead(cur.ev));
   if(cur.mode==='shop'||cur.mode==='pick'||cur.mode==='gift'){
     const hint=cur.mode==='shop'?'拖到棋盘购买，或点卡牌查看详情':cur.mode==='pick'?(cur.taken?'已经选好了':'免费挑选其中一张'):(cur.taken?'收下了':'免费送你');
@@ -345,11 +350,44 @@ function enterEvent(id){
     cur.opts=shuffled(G.cards).slice(0,4).map(c=>({card:c,label:'献祭 '+ITEMS[c.key].n,sub:'失去这张卡（售价 '+sellValue(c)+'），然后挑选一件遗物',
       act:()=>{const r=c.el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,'#ef7d57',26);SFX.play('boom');removeCard(c);renderOwned();relicChoice(cur,'熔炉吐出了三件物品，选一件',rollGear(3,3));renderPrep();}}));}
   else if(id==='gamble'){cur.mode='gamble';}
+  else if(id==='mentor'||(id==='manual'&&Math.random()<.5)){const m=pick(MEETS);Object.assign(cur,{mode:'talent',who:m.who,intro:[[m.who,m.say]],picks:rollTalents(2),title:m.n});}
+  else if(id==='manual'){cur.mode='pick';cur.offers=[0,1].map(()=>makeOffer(it=>it.hero===G.hero&&it.t>=1,{free:1}));}
   else if(id==='spring'){const h=Math.min(8,G.wallMax-G.wall);cur.mode='reward';cur.text=`城墙修复 <b>+${h}</b>`;cur.apply=()=>{G.wall+=h;SFX.play('merge');};}
   else if(id==='job'){cur.mode='reward';cur.text='工钱 <b>+3</b> 金币';cur.apply=()=>gainGold(3);}
   else if(id==='bank'){const g=Math.max(2,Math.round(G.gold*.3));cur.mode='reward';cur.text=`利息 <b>+${g}</b> 金币`;cur.apply=()=>gainGold(g);}
   P.cur=cur;renderPrep();
 }
+/* ---- 夜谈 / 学天赋 ---- */
+function startTalk(){const sc=TALKS[Math.floor((G.round-1)/2)%TALKS.length];
+  G.prep.cur={id:'talk',talk:1,mode:'talk',who:sc.who,title:sc.title,sc,li:1,intro:sc.lines};}
+function tline(who,t){const v=voiceOf(who);return `<div class="tl${who==='hero'?' me':''}" style="--vc:${v.c}"><img src="${v.img}" alt=""><p><b>${v.n}</b>${pickLine(t)}</p></div>`;}
+function renderTalk(cur,body){
+  const v=voiceOf(cur.who);
+  body.insertAdjacentHTML('beforeend',`<div class="ptitle">${cur.talk?'夜谈 · '+cur.title:cur.title}<span>${cur.talk?'每两夜一次':'难得碰上'}</span></div>`);
+  const log=document.createElement('div');log.className='tlog';
+  const lines=(cur.intro||[]).slice(0,cur.mode==='talk'?cur.li:99);
+  if(!cur.said)cur.said=lines.map(([w,t])=>[w,pickLine(t)]);
+  while(cur.said.length<lines.length){const[w,t]=lines[cur.said.length];cur.said.push([w,pickLine(t)]);}
+  log.innerHTML=cur.ans?tline('hero',cur.ans)+tline(cur.who,cur.re):cur.said.map(([w,t])=>tline(w,t)).join('');
+  body.appendChild(log);
+  const list=document.createElement('div');list.className='opts';
+  if(cur.mode==='talk'){
+    if(cur.li<cur.sc.lines.length){body.appendChild(btnRow([['接着听','blue',()=>{cur.li++;SFX.play('ui');renderPrep();}]]));}
+    else{body.insertAdjacentHTML('beforeend',`<div class="ev-hint">${cur.sc.q}</div>`);
+      cur.sc.ans.forEach((a,i)=>{const b=document.createElement('button');b.className='opt say';b.style.animationDelay=(i*.06)+'s';
+        b.innerHTML=`<div><b>“${pickLine(a.t)}”</b></div>`;
+        b.onclick=()=>{SFX.ensure();SFX.play('ui');cur.ans=pickLine(a.t);cur.re=a.re;cur.mode='talent';cur.picks=rollTalents(3,a.cat);renderPrep();};list.appendChild(b);});
+      body.appendChild(list);}
+  }else{
+    body.insertAdjacentHTML('beforeend',`<div class="ev-hint">${cur.picks.length?'挑一个学':'能学的都学会了'}</div>`);
+    cur.picks.forEach((id,i)=>{const T=TALENTS[id],C=TCAT[T.cat];const b=document.createElement('button');b.className='opt';b.style.animationDelay=(i*.06)+'s';
+      b.innerHTML=`<img class="ricon" src="${icon(C.ico).url}" alt="" style="--gc:${C.c}"><div><b style="color:${C.c}">${T.n}<small class="gt" style="--gc:${C.c}">${C.n}</small>${T.hero?'<small class="gt">专属</small>':''}</b>${talentText(id)}${T.say?`<em>“${T.say}”</em>`:''}</div>`;
+      b.onclick=()=>{SFX.ensure();learnTalent(id);endTalk(cur);};list.appendChild(b);});
+    body.appendChild(list);
+    if(!cur.picks.length)body.appendChild(btnRow([['拿 5 金走人','gold',()=>{gainGold(5);endTalk(cur);}]]));
+  }
+}
+function endTalk(cur){if(cur.talk){G.prep.talkDone=true;G.prep.cur=null;renderPrep();}else finishStep();}
 function gainGold(n){G.gold+=n;SFX.play('coin');const r=$('#pbody').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,Math.min(n,8));}
 function rollGear(n,bonus,maxTier){const R=G.round+(bonus||0);const w=[Math.max(10,62-8*R),24+2*R,R>=2?4+4*R:0,R>=4?2*R-4:0];
   if(maxTier!==undefined)for(let i=maxTier+1;i<4;i++)w[i]=0;
@@ -543,17 +581,13 @@ function openRelicSheet(r){const R0=RELICS[r];SFX.play('ui');const sh=$('#sheet'
   sh.innerHTML=`<div class="sh" role="dialog" aria-label="${R0.n}"><div class="sh-top"><img class="ricon big" src="${icon(R0.ico).url}" alt="" style="--gc:${GT[R0.t].c}"><div><h3 style="color:${GT[R0.t].c}">${R0.n}${n>1?' ×'+n:''}</h3><div class="tags"><span class="tag" style="background:${GT[R0.t].c}33;color:${GT[R0.t].c}">${GT[R0.t].n}物品</span><span class="tag">${R0.u?'唯一':'可叠加'}</span></div><p class="mods">${modText(R0.m)}</p></div></div><p class="flav">“${R0.f}”</p><div class="sh-btns"><button class="btn" id="rClose">关闭</button></div></div>`;
   sh.hidden=false;$('#rClose').onclick=closeSheet;sh.onclick=e=>{if(e.target===sh)closeSheet();};}
 function setDrawer(o){G.drawer=o;$('#stashRow').classList.toggle('closed',!o);updateHUD();setTimeout(()=>{if(G.phase==='battle')resizeField();},300);}
-let treeSaid=null;
-function openTree(){const T=TREES[G.hero],H=HEROES[G.hero];SFX.play('ui');const sh=$('#sheet');const SAY=(TREE_SAY[G.hero]||[]);
-  const learned=(b,i)=>G.skills.includes(b+'.'+i);
-  sh.innerHTML=`<div class="sh" role="dialog" aria-label="天赋"><h3>${H.n}的天赋 <small class="spn">可用点数 <b>${G.sp}</b></small></h3>
-   ${treeSaid?`<div class="tsay" style="--hc:${H.col}"><img src="${SPR[H.portrait].url}" alt=""><p>“${treeSaid}”</p></div>`:'<p class="muted2">每守住一夜获得1点。每条分支需要从上往下依次点亮。</p>'}
-   <div class="tree">${T.map((br,b)=>`<div class="br" style="--bc:${br.c}"><div class="brn">${br.n}</div>${br.nodes.map((nd,i)=>{const L=learned(b,i);const can=!L&&G.sp>0&&(i===0||learned(b,i-1));
-     const q=(SAY[b]||[])[i];return `<button class="node${L?' on':can?' can':''}" data-b="${b}" data-i="${i}" ${L||!can?'aria-disabled="true"':''}><b>${nd.n}</b>${modText(nd.m)}${L&&q?`<em class="nq">“${q}”</em>`:''}</button>`;}).join('<i class="lnk"></i>')}</div>`).join('')}</div>
+function openTree(){const H=HEROES[G.hero];SFX.play('ui');const sh=$('#sheet');
+  sh.innerHTML=`<div class="sh" role="dialog" aria-label="天赋"><h3>${H.n}的天赋 <small class="spn">${G.skills.length} 个</small></h3>
+   <p class="muted2">每两夜有一次夜谈，聊完能学一个；路上偶尔也能碰到有人教。</p>
+   <div class="tlist">${G.skills.length?G.skills.filter(id=>TALENTS[id]).map(id=>{const T=TALENTS[id],C=TCAT[T.cat];
+     return `<div class="trow" style="--gc:${C.c}"><img class="ricon" src="${icon(C.ico).url}" alt=""><div><b>${T.n}<small class="gt">${C.n}</small></b>${talentText(id)}${T.say?`<em>“${T.say}”</em>`:''}</div></div>`;}).join(''):'<p class="muted2">还没学会什么。第一次夜谈就在今晚。</p>'}</div>
    <div class="sh-btns"><button class="btn" id="tClose">关闭</button></div></div>`;
-  sh.hidden=false;$('#tClose').onclick=closeSheet;sh.onclick=e=>{if(e.target===sh)closeSheet();};
-  sh.querySelectorAll('.node.can').forEach(el=>el.onclick=()=>{treeSaid=(SAY[el.dataset.b]||[])[el.dataset.i]||null;G.sp--;G.skills.push(el.dataset.b+'.'+el.dataset.i);recalcMods();renderOwned();updateHUD();SFX.play('merge');
-    const r=el.getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,T[el.dataset.b].c,22);openTree();});}
+  sh.hidden=false;$('#tClose').onclick=closeSheet;sh.onclick=e=>{if(e.target===sh)closeSheet();};}
 /* ================= 剧情 ================= */
 function playStory(pages,done){
   const ov=$('#story');let i=0,typing=null,full='';

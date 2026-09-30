@@ -1,5 +1,5 @@
 """冒烟测试：机器人自动玩一整局，报告每夜城墙剩余、同屏最多敌人数和页面报错。
-用法：python3 tools/smoke_test.py [人物序号0/1] [shots]"""
+用法：python3 tools/smoke_test.py [人物序号0/1/2] [shots]"""
 import asyncio, json, sys, os
 from playwright.async_api import async_playwright
 HERO=int(sys.argv[1]) if len(sys.argv)>1 else 0
@@ -17,6 +17,7 @@ BOT="""()=>{const g=__game,G=g.G;const P=G.prep;
  if(c.mode==='choice'||c.mode==='relic'){if(c.opts.length)c.opts[0].act();else g.finishStep();return 'chose';}
  if(c.mode==='gshop'){const it=c.goods.find(x=>!x.sold&&x.price<=G.gold&&G.gold-x.price>=4);if(it){G.gold-=it.price;it.sold=true;g.gainRelic(it.k,true);return 'gear';}g.finishStep();return 'leave';}
  if(c.mode==='reward'){c.apply();g.finishStep();return 'reward';}
+ if(c.mode==='talk'||c.mode==='talent'){const b=document.querySelector('#pbody .opt')||document.querySelector('#pbody .ev-btns .btn');if(b){b.click();return c.mode;}}
  g.finishStep();return 'skip';}"""
 async def skip(pg):
     for _ in range(20):
@@ -40,15 +41,7 @@ async def main():
                 r=await pg.evaluate(BOT)
                 if r=='ready': break
                 if r=='wait': await skip(pg); await pg.wait_for_timeout(200)
-            # spend skill points
-            await pg.evaluate("()=>{const G=__game.G;}")
-            await pg.evaluate("()=>__game.openTree()")
-            for _ in range(6):
-                n=await pg.query_selector('.node.can')
-                if not n: break
-                await n.click(); await pg.wait_for_timeout(120)
-            await pg.evaluate("()=>{const s=document.querySelector('#sheet');if(s)s.hidden=true;}")
-            st=await pg.evaluate("({r:__game.G.round,g:__game.G.gold,w:__game.G.wall,rel:__game.G.relics.length,sp:__game.G.sp,n:__game.G.cards.length})")
+            st=await pg.evaluate("({r:__game.G.round,g:__game.G.gold,w:__game.G.wall,rel:__game.G.relics.length,tal:__game.G.skills.join(','),n:__game.G.cards.length})")
             print(json.dumps(st))
             await pg.evaluate("__game.G.speed=%d"%(1 if SHOTS and rnd in (3,7) else 20))
             await pg.click('#goBtn')
