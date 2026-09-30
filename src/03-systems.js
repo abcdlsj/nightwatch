@@ -43,7 +43,8 @@ const BG=(function(){
 
 /* ================= 音效 ================= */
 const SFX=(function(){
-  let ac=null,muted=false;const last={};
+  let ac=null,muted=false,mbI=0;const last={};
+  const MB=[76,79,84,79,77,76,74,72,74,76,79,76,72,74,71,72];
   function ensure(){if(!ac){try{ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){ac=null;}}if(ac&&ac.state==='suspended')ac.resume();}
   function tone(f,d,type,vol,slide,delay){if(!ac||muted)return;const t=ac.currentTime+(delay||0);const o=ac.createOscillator(),g=ac.createGain();
     o.type=type||'square';o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,f*slide),t+d);
@@ -72,8 +73,11 @@ const SFX=(function(){
       case'lose':[392,330,262,196].forEach((f,i)=>tone(f,.25,'triangle',.05,1,i*.16));break;
       case'ui':tone(700,.03,'square',.02);break;
       case'bad':tone(160,.12,'square',.04,.8);break;
+      case'mbox':{const f=440*Math.pow(2,(MB[mbI++%MB.length]-69)/12);tone(f,.7,'sine',.05);tone(f*2,.25,'triangle',.012,1,.005);break;}
+      case'drum':tone(110,.18,'sine',.09,.45);noise(.05,.05);break;
+      case'hint':tone(880,.08,'triangle',.03);tone(1175,.14,'triangle',.03,1,.07);break;
     }}
-  return{ensure,play,toggle(){muted=!muted;return muted;}};
+  return{ensure,play,ctx:()=>ac,setMuted(m){muted=m;},toggle(){muted=!muted;return muted;}};
 })();
 
 /* ================= 状态 ================= */
@@ -182,7 +186,7 @@ function updateHUD(){
   const rc=$('#roundChip');rc.classList.toggle('elite',G.round===4);rc.classList.toggle('boss',G.round===8);
   if(shownGold!==G.gold){if(shownGold!==null)restart($('#goldChip'),'bump');shownGold=G.gold;}
   $('#goldV').textContent=G.gold;if(G.gold>=50&&G.phase!=='title')unlock('rich');
-  $('#hpV').textContent=Math.max(0,Math.ceil(G.wall));
+  $('#hpV').textContent=Math.max(0,Math.ceil(G.wall));$('#hpChip').classList.toggle('low',G.phase!=='title'&&G.wall>0&&G.wall<G.wallMax*.35);
   $('#shV').textContent=B&&B.shield>0&&G.phase==='battle'?'+'+Math.ceil(B.shield):'';
   $('#speedBtn').textContent=G.speed+'×';
   const sc=G.cards.filter(c=>c.loc==='stash').length;$('#bagN').textContent=sc?sc:'';$('#bagBtn').classList.toggle('on',G.drawer);
@@ -269,8 +273,8 @@ function renderPrep(){
   $('#stepPips').innerHTML=[0,1,2].map(i=>`<i class="${i<P.step?'done':i===P.step?'now':''}"></i>`).join('');
   body.innerHTML='';
   if(P.step>=3){
-    body.innerHTML=`<div class="ready"><div class="rd-t">准备好了</div><p>摆好阵型，第${G.round}夜要来了。</p><p class="muted">挨着放的卡会互相带动，同元素凑够张数有羁绊。</p></div>${wagerHtml()}`;
-    bindWagers();updateHUD();return;
+    body.innerHTML=readyHtml()+wagerHtml();
+    bindWagers();updateHUD();if(G.prep.wagers&&G.round<G.maxRound)tipOnce('wager','「加码」是选做的：选了今晚更难，打赢多拿钱。不选也行。',600);return;
   }
   if(!P.cur&&P.talk&&!P.talkDone)startTalk();
   const cur=P.cur;$('#prep').classList.toggle('talking',!!cur&&(cur.mode==='talk'||cur.mode==='talent'));
@@ -330,6 +334,7 @@ function offerEl(of){
   return o;
 }
 function enterEvent(id){
+  if(EVENTS[id].cat==='shop')tipOnce('shop','卡拖到棋盘上就是买，点一下能看详情。棋盘满了就拖进背包。',500);
   const ev=EVENTS[id];const cur={id,ev};const P=G.prep;
   if(ev.cat==='shop'){cur.mode='shop';cur.refresh=1;cur.offers=[0,1,2].map(()=>makeOffer(ev.filter,{black:ev.black}));}
   else if(id==='chest'){cur.mode='gift';cur.offers=[makeOffer(null,{free:1})];}
@@ -412,7 +417,7 @@ function acquire(of,dest){
     if(!dest){toast('没地方放了：卖掉一张，或者买同名同品质的来合成');SFX.play('bad');return false;}}
   if(!buyCheck(of))return false;
   G.gold-=of.price;of.sold=true;SFX.play('buy');
-  const c=newCard(of.card.key,of.card.tier,of.card.adj);G.cards.push(c);
+  const c=newCard(of.card.key,of.card.tier,of.card.adj);G.cards.push(c);if(c.adj)tipOnce('adj','这张卡带词缀。点开卡能看到它多了什么效果，合成时会留下更好的那个。',400);
   if(dest==='merge'){c.loc='temp';c.idx=-1;}else{c.loc=dest.z;c.idx=dest.i;}
   const cur=G.prep.cur;if(cur&&(cur.mode==='pick'||cur.mode==='gift')){cur.taken=true;cur.offers.forEach(o=>o.sold=true);}
   afterChange(c);return true;
@@ -433,7 +438,7 @@ function checkMerges(){
       repaint(t);any=t;did=true;break;}
     if(!did)break;
   }
-  if(any){SFX.play('merge');if(any.tier>=3)unlock('dia');setTimeout(()=>{if(!any.el||!G.cards.includes(any))return;restart(any.el,'merge');const r=any.el.getBoundingClientRect();
+  if(any){SFX.play('merge');buzz([12,40,18]);tipOnce('merge','两张同名同品质的卡会自动合成，品质升一档：铜→银→金→钻。背包里的也算。',1400);if(any.tier>=3)unlock('dia');setTimeout(()=>{if(!any.el||!G.cards.includes(any))return;restart(any.el,'merge');const r=any.el.getBoundingClientRect();
     FX.burst(r.left+r.width/2,r.top+r.height/2,TIERS[any.tier].c,30);toast(ITEMS[any.key].n+' 升到【'+TIERS[any.tier].n+'】了');},30);}
   G.cards.filter(c=>c.loc==='temp').forEach(removeCard);
 }
@@ -579,7 +584,7 @@ function kwBox(d){const ks=Object.keys(KW).filter(k=>d.includes('【'+k));return
 function openRelicSheet(r){const R0=RELICS[r];SFX.play('ui');const sh=$('#sheet');const n=G.relics.filter(x=>x===r).length;
   sh.innerHTML=`<div class="sh" role="dialog" aria-label="${R0.n}"><div class="sh-top"><img class="ricon big" src="${icon(R0.ico).url}" alt="" style="--gc:${GT[R0.t].c}"><div><h3 style="color:${GT[R0.t].c}">${R0.n}${n>1?' ×'+n:''}</h3><div class="tags"><span class="tag" style="background:${GT[R0.t].c}33;color:${GT[R0.t].c}">${GT[R0.t].n}遗物</span><span class="tag">${R0.u?'唯一':'可叠加'}</span></div><p class="mods">${modText(R0.m)}</p></div></div><p class="flav">“${R0.f}”</p><div class="sh-btns"><button class="btn" id="rBack">返回</button><button class="btn" id="rClose">关闭</button></div></div>`;
   sh.hidden=false;$('#rClose').onclick=closeSheet;$('#rBack').onclick=openBag;sh.onclick=e=>{if(e.target===sh)closeSheet();};}
-function setDrawer(o){G.drawer=o;$('#stashRow').classList.toggle('closed',!o);updateHUD();setTimeout(()=>{if(G.phase==='battle')resizeField();},300);}
+function setDrawer(o){G.drawer=o;if(o&&G.phase==='prep')tipOnce('sell','背包里的卡不上场，但留着能合成。把卡拖到右边的出售格能卖掉，大概回一半的钱。',300);$('#stashRow').classList.toggle('closed',!o);updateHUD();setTimeout(()=>{if(G.phase==='battle')resizeField();},300);}
 function openTree(){const H=HEROES[G.hero];SFX.play('ui');const sh=$('#sheet');
   sh.innerHTML=`<div class="sh" role="dialog" aria-label="天赋"><h3>${H.n}的天赋 <small class="spn">${G.skills.length} 个</small></h3>
    <p class="muted2">每两夜有一次夜谈，聊完能学一个；路上偶尔也能碰到有人教。</p>
