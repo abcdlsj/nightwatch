@@ -183,7 +183,7 @@ function cells(z){return[...$('#'+z).querySelectorAll('.cell')].sort((a,b)=>a.da
 let shownGold=null;
 function updateHUD(){
   $('#roundV').textContent=Math.min(G.round,G.maxRound);
-  const rc=$('#roundChip');rc.classList.toggle('elite',G.round===4);rc.classList.toggle('boss',G.round===8);
+  const rc=$('#roundChip');rc.classList.toggle('elite',G.round===4||(G.round>8&&(G.round-8)%2===1));rc.classList.toggle('boss',G.round===8||(G.round>8&&(G.round-8)%4===0));
   if(shownGold!==G.gold){if(shownGold!==null)restart($('#goldChip'),'bump');shownGold=G.gold;}
   $('#goldV').textContent=G.gold;if(G.gold>=50&&G.phase!=='title')unlock('rich');
   $('#hpV').textContent=Math.max(0,Math.ceil(G.wall));$('#hpChip').classList.toggle('low',G.phase!=='title'&&G.wall>0&&G.wall<G.wallMax*.35);
@@ -293,7 +293,7 @@ function renderPrep(){
     body.insertAdjacentHTML('beforeend',`<div class="ev-hint">${hint}</div>`);
     const grid=document.createElement('div');grid.id='offers';grid.style.gridTemplateColumns=`repeat(${cur.offers.length},minmax(0,${cur.offers.length===1?'140px':'1fr'}))`;
     cur.offers.forEach(of=>grid.appendChild(offerEl(of)));body.appendChild(grid);
-    if(cur.mode==='shop')body.appendChild(btnRow([...(cur.refresh>0?[['刷新 <small>(剩'+cur.refresh+'次)</small>','blue',()=>{cur.refresh--;cur.offers=cur.offers.map(()=>makeOffer(cur.ev.filter,{black:cur.ev.black}));SFX.play('buy');renderPrep();document.querySelectorAll('#offers .card').forEach(el=>restart(el,'land'));}]]:[]),['离开','',finishStep]]));
+    if(cur.mode==='shop')body.appendChild(btnRow([...(cur.refresh>0?[['刷新 <small>(剩'+cur.refresh+'次)</small>','blue',()=>{cur.refresh--;cur.offers=cur.offers.map(o=>o.locked&&!o.sold?o:makeOffer(cur.ev.filter,{black:cur.ev.black}));SFX.play('buy');renderPrep();document.querySelectorAll('#offers .card').forEach(el=>restart(el,'land'));}]]:[]),['离开','',finishStep]]));
     else body.appendChild(btnRow([[cur.taken?'继续':'不要了',cur.taken?'green':'',finishStep]]));
   }else if(cur.mode==='choice'||cur.mode==='relic'){
     body.insertAdjacentHTML('beforeend',`<div class="ev-hint">${cur.hint}</div>`);
@@ -319,6 +319,9 @@ function renderPrep(){
       if(G.gold<3){toast('钱不够');return;}G.gold-=3;const win=Math.random()<.5;
       if(win){G.gold+=6;SFX.play('coin');const r=$('#pbody').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top+r.height/2,6);cur.result='赢了，<b>+6</b> 金';}
       else{SFX.play('bad');cur.result='输了。<br><small>3 金打了水漂</small>';}updateHUD();renderPrep();}],['离开','',finishStep]]));
+  }else if(cur.mode==='ambush'){
+    body.insertAdjacentHTML('beforeend',ambushHtml(cur));
+    body.appendChild(btnRow([['迎战','red',()=>startAmbush(cur)],['绕开','',()=>{G.prep.doors=G.prep.doors.filter(i=>i!=='ambush');G.prep.cur=null;renderPrep();}]]));
   }else if(cur.mode==='reward'){
     body.insertAdjacentHTML('beforeend',`<div class="big-res">${cur.text}</div>`);
     body.appendChild(btnRow([['收下','green',()=>{cur.apply();updateHUD();finishStep();}]]));
@@ -331,12 +334,14 @@ function offerEl(of){
   const cel=document.createElement('div');paintCard(cel,c,'static');o.appendChild(cel);
   o.insertAdjacentHTML('beforeend',`<div class="oname">${it.n}</div><div class="oadj"><span style="color:${TIERS[c.tier].c}">${TIERS[c.tier].n}</span>${ad?` · <span style="color:${ad.c}">${ad.n}</span>`:''}</div><div class="odesc">${ad?ad.d:it.d}</div><div class="oflav">${it.f}</div><div class="price${of.price===0?' free':of.price>G.gold?' cant':''}" data-p="${of.price}">${of.price===0?'免费':`<img class="ico" src="${SPR.coin.url}" alt="金币">${of.price}`}</div>`);
   if(!of.sold)cel.addEventListener('pointerdown',e=>onDown(e,{kind:'shop',offer:of,el:cel}));
+  lockBtn(o,of,G.prep&&G.prep.cur);
   return o;
 }
 function enterEvent(id){
   if(EVENTS[id].cat==='shop')tipOnce('shop','卡拖到棋盘上就是买，点一下能看详情。棋盘满了就拖进背包。',500);
   const ev=EVENTS[id];const cur={id,ev};const P=G.prep;
-  if(ev.cat==='shop'){cur.mode='shop';cur.refresh=1;cur.offers=[0,1,2].map(()=>makeOffer(ev.filter,{black:ev.black}));}
+  if(ev.cat==='shop'){cur.mode='shop';cur.refresh=1;cur.offers=lockedOffers([0,1,2].map(()=>makeOffer(ev.filter,{black:ev.black})));}
+  else if(id==='ambush')enterAmbush(cur);
   else if(id==='chest'){cur.mode='gift';cur.offers=[makeOffer(null,{free:1})];}
   else if(id==='field'){cur.mode='pick';cur.offers=[0,1,2].map(()=>makeOffer(null,{free:1}));}
   else if(id==='altar'){relicChoice(cur,'挑一件，一直生效，同名的能叠',withFit(rollGear(3,0,2)));}
@@ -416,7 +421,7 @@ function acquire(of,dest){
   if(!dest){const fit=firstFit(of.card.size);dest=fit||(canMerge?'merge':null);
     if(!dest){toast('没地方放了：卖掉一张，或者买同名同品质的来合成');SFX.play('bad');return false;}}
   if(!buyCheck(of))return false;
-  G.gold-=of.price;of.sold=true;SFX.play('buy');
+  G.gold-=of.price;of.sold=true;if(of.locked){of.locked=false;G.lock=null;}SFX.play('buy');
   const c=newCard(of.card.key,of.card.tier,of.card.adj);G.cards.push(c);if(c.adj)tipOnce('adj','这张卡带词缀。点开卡能看到它多了什么效果，合成时会留下更好的那个。',400);
   if(dest==='merge'){c.loc='temp';c.idx=-1;}else{c.loc=dest.z;c.idx=dest.i;}
   const cur=G.prep.cur;if(cur&&(cur.mode==='pick'||cur.mode==='gift')){cur.taken=true;cur.offers.forEach(o=>o.sold=true);}

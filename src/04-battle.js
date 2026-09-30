@@ -18,11 +18,13 @@ function makeWave(r){
     case 6:pack({catapult:2},1,2,2);pack({siege:1},1,8,8);pack({golem:1,shaman:1,shieldb:1},2,4,20);pack({skel:3,shieldb:1},3,0,24);pack({bug:3,drummer:1},2,2,24);pack({bat:5,bomber:2},2,4,26);pack({berserker:3,drummer:1},1,19,19);break;
     case 7:pack({siege:1},2,4,20);pack({catapult:2},1,3,3);pack({skel:3,necro:1},2,0,22);pack({golem:1,shaman:1,shieldb:1},2,6,24);pack({berserker:2,drummer:1},3,2,26);
       pack({ghost:3},2,8,24);pack({bat:5,bomber:2},3,4,28);pack({slime:6,mimic:1},2,0,20);pack({skel:4,berserker:2,shieldb:1},1,26,26);break;
-    default:boss('eye',1);pack({siege:1},1,10,10);pack({catapult:1},1,6,6);pack({skel:3,necro:1},2,4,30);pack({bat:5,drummer:1},3,8,36);
-      pack({ghost:3},2,14,32);pack({slime:6,shaman:1},2,12,30);pack({berserker:3,bomber:2},1,22,22);
+    case 8:boss(G.boss8==='brood'?'brood':'eye',1);pack({siege:1},1,10,10);pack({catapult:1},1,6,6);pack({skel:3,necro:1},2,4,30);pack({bat:5,drummer:1},3,8,36);
+      pack({ghost:3},2,14,32);pack({slime:6,shaman:1},2,12,30);pack({berserker:3,bomber:2},1,22,22);break;
+    default:endlessWave(r,pack,boss);
   }
+  frostExtra(r,pack);
   for(const s of S)s.type=foeKey(s.type);
-  const out=S.sort((a,b)=>a.t-b.t);out.surges=SG[r]||[];return out;
+  const out=S.sort((a,b)=>a.t-b.t);out.surges=SG[r]||(r>8?[14,28]:[]);return out;
 }
 const hpScale=r=>Math.pow(1.32,r-1);
 const d0=t=>['eye','knight','golem','siege','catapult','mimic','necro'].includes(t);
@@ -55,9 +57,9 @@ function toClient(x,y){const fr=F.cv.getBoundingClientRect();return[fr.left+x*F.
 function startBattle(){
   if(!boardCards().length){toast('棋盘上一张卡都没有');SFX.play('bad');return;}
   cancelDrag();closeSheet();if(G.drawer)setDrawer(false);G.phase='battle';
-  let wave=G.nextWave;if(G.prep.wager==='horde')wave=hordeWave(wave);const special=wave.some(s=>EN[s.type].boss)?'boss':'battle';BG.set(special);
+  const amb=!!G.fightWave;let wave=G.fightWave||G.nextWave;if(!amb&&G.prep.wager==='horde')wave=hordeWave(wave);const special=wave.some(s=>EN[s.type].boss)?'boss':'battle';BG.set(special);
   B={t:0,spawns:wave,si:0,en:[],pr:[],epr:[],graves:[],sched:[],shield:0,maxChain:0,wallLost:0,endT:0,over:false,acc:0,boss:null,greed:0,kills:0,flags:{},rlog:{},
-    beats:nightInfo(G.round).beats,bi:0,surges:(wave.surges||[]).slice(),lowSaid:false,wager:G.prep.wager||null,maxCombo:0,combo:0,maxHit:0,slowT:0};clearVO();
+    beats:amb?[]:nightInfo(G.round).beats,bi:0,surges:(wave.surges||[]).slice(),lowSaid:false,wager:amb?null:(G.prep.wager||null),ambush:amb,maxCombo:0,combo:0,maxHit:0,slowT:0};clearVO();
   for(const c of G.cards){c.charge=0;c.mom=0;c.bDmg=0;c.bTrig=0;c.bSrc={};c.bCh=0;c.bHs=0;c.bRl=0;c.bBf=0;c.bTr=0;c.frozen=0;c.echoLog=[];c.evLog={};c.hasteT=0;c.stk=0;c.lastT=-9;c.rage=0;c.cnt=0;c.ammo=maxAmmo(c);c.el.classList.remove('frozen','empty','haste');setAmmo(c);}
   for(const c of boardCards()){c.nb=neighbors(c);c.right=rightOf(c);c.anvil=0;c.charge=mv('startCharge');}
   recalcMods();noteLineup();
@@ -69,7 +71,7 @@ function startBattle(){
   if(bd){const bb=$('#bossbar');bb.hidden=false;$('#bossName').textContent=bd.n;$('#bossHp').style.width='100%';$('#bossSh').style.width='0%';$('#bossHpT').textContent='快到了';
     $('#intName').textContent=bd.intents[0].n+'：'+bd.intents[0].d;$('#intT').textContent='';$('#intBar').style.width='0%';F.top=Math.ceil((bb.offsetHeight+14)/F.s);}
   computeOrigins();updateHUD();
-  banner(nightInfo(G.round).title,G.round===8?'#ff6b5b':G.round===4?'#ffb37a':'#fff');
+  banner(amb?'拦路 · '+bd.n:nightInfo(G.round).title,G.round===8||amb?'#ff6b5b':G.round===4?'#ffb37a':'#fff');
   SFX.play(G.round>=8||G.round===4?'intent':'ui');
   if(B.wager)later(.6,()=>banner('加码 · '+WAGERS[B.wager].n,'#ff8a5b'));
   tipOnce('battle','卡会自己打：底下的进度条转满就出手。左下角的 1× 能调快。',1600);if(bd)tipOnce('boss','首领血条下面写着它的下一招，进度条走满就放。',2600);
@@ -77,9 +79,9 @@ function startBattle(){
 }
 function later(dt,f){B.sched.push({t:dt,f});}
 function spawn(type,x,y){
-  const d=EN[type];const sc=d.fixed?1:hpScale(G.round)*(G.round===1?.5:G.round===2?.6:.7)*(heat(1)?1.15:1)*(heat(2)&&(d.boss||d.elite)?1.25:1)*(wg('iron')?1.3:1);
+  const d=EN[type];const sc=d.fixed?(G.round>8?Math.pow(1.4,G.round-8):1):hpScale(G.round)*(G.round===1?.5:G.round===2?.6:.7)*(heat(1)?1.15:1)*(heat(2)&&(d.boss||d.elite)?1.25:1)*(wg('iron')?1.3:1);
   const e={d,type,x:x!=null?x:rnd(.08,.92),y:y!=null?y:-.04,hp:d.hp*sc,maxHp:d.hp*sc,armor:d.armor,shield:0,slowT:0,slowA:0,burnT:0,burnD:0,burnSrc:null,burnTick:0,poisonT:0,poisonD:0,poisonSrc:null,poisonTick:0,frzT:0,frzN:0,vulnT:0,vulnA:0,
-    flash:0,ph:Math.random()*6.28,armorB:0,hasteB:0,healT:rnd(1.5,3),bornT:B.t,raiseT:rnd(3,5),lobT:d.lob?d.lob[0]*.6:0,sprK:null,revealed:false,dashT:0,hardT:0,ii:0,it:d.intents?d.intents[0].t:0,dead:false};
+    flash:0,ph:Math.random()*6.28,armorB:0,hasteB:0,healT:rnd(1.5,3),bornT:B.t,raiseT:rnd(3,5),lobT:d.lob?d.lob[0]*.6:d.fbolt?d.fbolt*.6:0,sprK:null,revealed:false,dashT:0,hardT:0,ii:0,it:d.intents?d.intents[0].t:0,dead:false};
   e.x0=e.x;B.en.push(e);if((d.boss||d.elite||d.big)&&!B.flags['met'+type]){B.flags['met'+type]=1;later(1.2,()=>say('hero',BARKS.elite,2));}if(!d.fixed&&e.y<0)for(let i=0;i<4;i++)part(ex(e)+rnd(-4,4),F.top+rnd(0,3),rnd(-8,8),rnd(5,20),.5,Math.random()<.5?'#a64ca6':'#5d275d',1);if(d.boss||d.elite){B.boss=e;$('#bossbar').hidden=false;$('#bossName').textContent=d.n;if(FOEB[type])say(type,FOEB[type].spawn,3);}
   if(!d.fixed)meetFoe(type);
   return e;
@@ -124,10 +126,12 @@ function simStep(dt){
     if(e.d.intents){e.it-=dt;if(e.it<=0){doIntent(e);if(B.over)return;}}
     let sp=e.d.spd*(1-e.slowA)*(1+mv('enemySpd')+(heat(7)?.1:0)+(wg('rush')?.2:0))*(1+e.hasteB);if(e.dashT>0){e.dashT-=dt;sp*=3;}
     if(e.d.rage)sp*=1+e.d.rage*(1-e.hp/e.maxHp);
+    if(e.d.dive&&e.y>.45)sp*=e.d.dive;
     if(e.revealed)sp*=2.4;
     if(e.d.stopAt&&e.y>=e.d.stopAt&&e.dashT<=0)sp=0;
     if(e.frzT>0){e.frzT-=dt;sp=0;}
     if(e.d.lob&&e.y>=e.d.stopAt-.02){e.lobT-=dt;if(e.lobT<=0){e.lobT=e.d.lob[0];lobRock(e);}}
+    if(e.d.fbolt&&e.y>=e.d.stopAt-.02){e.lobT-=dt;if(e.lobT<=0){e.lobT=e.d.fbolt;frostBolt(e);}}
     if(e.d.raise&&e.y>0){e.raiseT-=dt;if(e.raiseT<=0){e.raiseT=5;raiseDead(e);}}
     e.y+=sp*dt;
     if(e.d.zig)e.x=clamp(e.x0+Math.sin(B.t*3+e.ph)*.07,.04,.96);
@@ -143,17 +147,17 @@ function simStep(dt){
 function freeze(e,t,src){if(e.dead)return;let d=t*(e.d.boss||e.d.elite?.5:1);if(e.d.boss)d/=1+e.frzN*.5;e.frzN++;
   if(d>e.frzT){e.frzT=d;ring(ex(e),ey(e)-5,2,10*K(),'#c2f4ff',.3);}emit('freeze',{e,src});}
 function vuln(e,t,a){e.vulnT=Math.max(e.vulnT,t);e.vulnA=Math.max(e.vulnA,a);}
-function wallHit(e){e.dead=true;if(!B.wallBy)B.wallBy={};B.wallBy[e.type]=(B.wallBy[e.type]||0)+e.d.wall;damageWall(e.d.wall,ex(e),e.d.bomb?'boom':null);if(!B.over&&e.d.chill)chillCard(e.d.chill);}
+function wallHit(e){e.dead=true;if(!B.wallBy)B.wallBy={};B.wallBy[e.type]=(B.wallBy[e.type]||0)+e.d.wall;damageWall(e.d.wall,ex(e),e.d.bomb?'boom':null);if(!B.over&&e.d.chill)chillCard(e.d.chill);if(!B.over&&B.ambush&&e.d.elite)ambushLose();}
 function chillCard(t){const bc=boardCards().filter(c=>c.frozen<=0);if(!bc.length)return;const c=pick(bc);c.frozen=t;c.el.classList.add('frozen');if(Math.random()<.5)say('hero',BARKS.freeze,1);tipOnce('frozen','「'+ITEMS[c.key].n+'」被冻住了，过一会儿自己会化开。');}
 function damageWall(d,xx,kind){
-  const e={x:xx/F.W,y:1};if(wg('brittle'))d*=1.5;const ab=Math.min(B.shield,d);B.shield-=ab;d-=ab;if(G.run)G.run.wallLost+=d;if(kind==='boom'){boom(xx,WALLY()-2,16*K(),'#ef7d57');}
+  const e={x:xx/F.W,y:1};if(wg('brittle'))d*=1.5;if(B.ambush)d*=.5;const ab=Math.min(B.shield,d);B.shield-=ab;d-=ab;if(G.run)G.run.wallLost+=d;if(kind==='boom'){boom(xx,WALLY()-2,16*K(),'#ef7d57');}
   G.wall-=d;B.wallLost+=d;F.wallFlash=.4;F.shake=Math.max(F.shake,d>0?4:1.5);SFX.play('hurt');
   for(let i=0;i<10;i++)part(ex(e)+rnd(-6,6),WALLY(),rnd(-30,30),-rnd(20,50),.5,'#e43b44',2);
   if(d>0)num(ex(e),WALLY()-6,'-'+Math.ceil(d),'#ff5a5a',2);
   restart($('#hpChip'),'shake');updateHUD();if(d>0){buzz(d>=5?60:25);tipOnce('wall','有怪摸到城墙了。顶上那颗红心就是城墙，掉光这局就结束。点它能看说明。',300);}
   emit('wall',{d});if(B.over)return;
   if(d>0){if(!B.lowSaid&&G.wall<G.wallMax*.35&&G.wall>0){B.lowSaid=true;say('hero',BARKS.low,2);tipOnce('low','城墙快撑不住了。下一夜多上几张输出卡，或者去找能补墙的遗物和天赋。',1500);}else if(Math.random()<.5)say('hero',BARKS.hurt,1);else say('soldier',BARKS.soldierHurt,1);}
-  if(G.wall<=0){G.wall=0;loseBattle();}
+  if(G.wall<=0){if(B.ambush){ambushLose();return;}G.wall=0;loseBattle();}
 }
 function doIntent(e){
   const it=e.d.intents[e.ii];SFX.play('intent');F.shake=Math.max(F.shake,3);
@@ -162,6 +166,7 @@ function doIntent(e){
   if(it.a==='dash'){e.dashT=2;}
   if(it.a==='harden'){e.hardT=4;}
   if(it.a==='summon'){for(let i=0;i<6;i++){const b=spawn(foeKey('bat'),clamp(e.x+rnd(-.25,.25),.06,.94),Math.max(-.02,e.y-.02));b.x0=b.x;}}
+  extraIntent(e,it.a);
   if(it.a==='gaze'){const bc=boardCards();for(let i=0;i<2&&bc.length;i++){const c=bc.splice(Math.floor(Math.random()*bc.length),1)[0];c.frozen=3;c.el.classList.add('frozen');}toast('被它盯住了，两张卡动不了');}
   banner(it.n,'#ff8a70');if(FOEB[e.type]&&FOEB[e.type].intent[it.a]&&Math.random()<.7)say(e.type,FOEB[e.type].intent[it.a],2);
   if(it.a==='gaze')say('hero',BARKS.freeze,2);
@@ -287,6 +292,7 @@ function stepProj(p,dt){
 function hurt(e,amt,src,crit,o){
   if(!e||e.dead)return;o=o||{};
   if(phased(e)){if(!o.burnTick&&!o.poisonTick&&Math.random()<.3)num(ex(e),ey(e)-10,'0','#73eff7',1);return;}
+  if(e.d.shell&&(e.shellN||0)<e.d.shell&&!o.burnTick&&!o.poisonTick){e.shellN=(e.shellN||0)+1;e.flash=.05;num(ex(e),ey(e)-10,e.shellN>=e.d.shell?'碎':'壳',e.shellN>=e.d.shell?'#ffffff':'#73eff7',1);if(e.shellN>=e.d.shell){ring(ex(e),ey(e)-5,2,10*K(),'#c2f4ff',.3);SFX.play('hit');}return;}
   if(e.d.mimic&&!e.revealed){e.revealed=true;e.sprK=e.d.spr2;SFX.play('intent');ring(ex(e),ey(e)-5,2,14*K(),'#ffcd75',.3);}
   if(e.slowT>0&&mv('slowVuln'))amt*=1+mv('slowVuln');
   if(e.vulnT>0)amt*=1+e.vulnA;
@@ -466,6 +472,7 @@ const FX=(function(){
 
 /* ================= 流程 ================= */
 function winBattle(){
+  if(B.ambush){B.over=true;ambushWin();return;}
   B.over=true;G.phase='report';$('#bossbar').hidden=true;
   G.bestChain=Math.max(G.bestChain,B.maxChain);SFX.play('win');say('hero',BARKS.win,2);
   if(G.run){G.run.kills+=B.kills;G.run.maxHit=Math.max(G.run.maxHit,B.maxHit);G.run.maxCombo=Math.max(G.run.maxCombo,B.maxCombo);}if(B.kills>=150)unlock('kills150');
@@ -474,8 +481,8 @@ function winBattle(){
   finishQuests();
   for(const c of G.cards){c.charge=0;c.el.style.setProperty('--s',0);c.el.classList.remove('frozen','empty','haste');c.ammo=maxAmmo(c);setAmmo(c);}
   const was=G.round;
-  if(was>=G.maxRound){if(B.wager&&G.run)G.run.wagers++;runWon();banner('黎明','#ffe79a');BG.set('shop');setTimeout(()=>playStory(STORY.win,()=>endScreen(true)),1400);return;}
-  updateHUD();const winG=3+Math.floor(was/2)-(heat(6)?1:0);const rows=[['守夜工钱',winG]];if(was===4)rows.push(['打倒精英',4]);
+  if(was>=G.maxRound){if(B.wager&&G.run)G.run.wagers++;runWon();banner('黎明','#ffe79a');BG.set('shop');STORY.win[0].t=G.boss8==='brood'?'母巢缩成一团，不再动了。北方的裂缝里，透出一线灰白色的光。':'那只眼睛闭上了。北方的裂缝里，透出一线灰白色的光。';setTimeout(()=>playStory(STORY.win,()=>endScreen(true)),1400);return;}
+  updateHUD();const winG=3+Math.floor(Math.min(was,8)/2)-(heat(6)?1:0);const rows=[['守夜工钱',winG]];if(was===4)rows.push(['打倒精英',4]);
   const interest=Math.min(3+mv('interest'),Math.floor(G.gold/6));if(mv('winGold'))rows.push(['遗物/天赋',mv('winGold')]);if(mv('regen'))G.wall=Math.min(G.wallMax,G.wall+mv('regen'));if(interest)rows.push(['利息（每6金+1）',interest]);
   if(B.wallLost===0)rows.push(['墙没掉砖',1]);
   if(B.greed)rows.push(['打怪掉的金币（已到账）',0,B.greed]);
@@ -501,21 +508,21 @@ function showReport(was,rows,total){
 function loseBattle(){B.over=true;if(G.run)G.run.kills+=B.kills;G.phase='over';SFX.play('lose');G.bestChain=Math.max(G.bestChain,B.maxChain);banner(pickLine(RPT.fall),'#ff6b5b');setTimeout(()=>playStory(STORY.lose,()=>endScreen(false)),1400);}
 function endScreen(win){
   const sc=$('#screen');BG.set(win?'shop':'over');
-  const best=G.cards.slice().sort((a,b)=>b.bDmg-a.bDmg)[0];const R=G.run||freshRun();META.runs++;saveMeta();const mg=mastGain(win);
+  const best=G.cards.slice().sort((a,b)=>b.bDmg-a.bDmg)[0];const R=G.run||freshRun();const endl=!!G.endless;if(endl)endlessLost();else{META.runs++;saveMeta();}const mg=endl?null:mastGain(win);
   const got=R.got.map(id=>ACHM[id]).filter(Boolean);
-  sc.innerHTML=`<div class="scr"><img class="por-big" src="${SPR[HEROES[G.hero].portrait].url}" alt=""><h1 style="color:${win?'#ffe79a':'#ff8a80'}">${win?'黎明到来':'长夜未尽'}</h1><div class="logo-sub">${HEROES[G.hero].n} · ${HEROES[G.hero].title}</div>
-  <div class="rules res"><div><span>坚守到</span><i style="margin-left:auto">第 ${Math.min(G.round,8)} 夜 / 8</i></div>
+  sc.innerHTML=`<div class="scr"><img class="por-big" src="${SPR[HEROES[G.hero].portrait].url}" alt=""><h1 style="color:${win||endl?'#ffe79a':'#ff8a80'}">${win?'黎明到来':endl?'长夜无尽':'长夜未尽'}</h1><div class="logo-sub">${HEROES[G.hero].n} · ${HEROES[G.hero].title}</div>
+  <div class="rules res"><div><span>坚守到</span><i style="margin-left:auto">${endl?'第 '+G.round+' 夜':'第 '+Math.min(G.round,8)+' 夜 / 8'}</i></div>
   ${G.heat?`<div><span>难度</span><i style="margin-left:auto">长夜 ${G.heat}</i></div>`:''}
   <div><span>遗物 / 天赋</span><i style="margin-left:auto">${G.relics.length} 件 / ${G.skills.length} 个</i></div>
   <div><span>最高连锁</span><i style="margin-left:auto">×${G.bestChain||1}</i></div>
   <div><span>杀敌 / 最长连杀</span><i style="margin-left:auto">${R.kills} / ${R.maxCombo}</i></div>
   ${best?`<div><span>最后的王牌</span><i style="margin-left:auto">${best.adj?ADJ[best.adj].n+'的':''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}</i></div>`:''}</div>
-  ${win?'':loseNote()}
+  ${endlessNote()}${win?'':loseNote()}
   ${mastNote(mg)}
   ${R.newHeat?`<div class="newheat">解锁了 <b>长夜 ${R.newHeat}</b>：${HEATS[R.newHeat]}</div>`:''}
   ${got.length?`<div class="rules res achgot"><div><span>这局解锁的成就</span></div>${got.map(a=>`<div><i>★</i><span><b>${a.n}</b> ${a.d}</span></div>`).join('')}</div>`:''}
-  <button class="btn red big" id="againBtn">再守一次</button></div>`;
-  clearSave();sc.hidden=false;$('#againBtn').onclick=()=>{SFX.ensure();SFX.play('ui');sc.hidden=true;heroSelect();};
+  ${win?'<button class="btn gold big" id="endlessBtn">接着守下去</button>':''}<button class="btn red big" id="againBtn">再守一次</button></div>`;
+  clearSave();sc.hidden=false;$('#againBtn').onclick=()=>{SFX.ensure();SFX.play('ui');sc.hidden=true;heroSelect();};if($('#endlessBtn'))$('#endlessBtn').onclick=()=>{SFX.ensure();SFX.play('merge');continueEndless();};
 }
 function titleScreen(){
   const sc=$('#screen');BG.set('title');
@@ -524,7 +531,7 @@ function titleScreen(){
   <div class="rules"><div><i>1</i><span>每夜之前能走三个地方：逛店、开箱子、捡遗物……</span></div>
   <div><i>2</i><span>卡拖上棋盘就自己打，挨着的卡会互相带动</span></div>
   <div><i>3</i><span>两张同名同品质的卡合成一张更好的：铜→银→金→钻</span></div>
-  <div><i>4</i><span>撑过8个夜晚，打倒深渊之眼；每两夜有一次夜谈，能学个新天赋</span></div></div>
+  <div><i>4</i><span>撑过8个夜晚，打倒北边来的首领；每两夜有一次夜谈，能学个新天赋</span></div></div>
   ${loadSave()?`<button class="btn gold big" id="contBtn">继续 · ${HEROES[loadSave().hero].n} 第${loadSave().round}夜</button>`:''}
   <button class="btn ${loadSave()?'alt':'red'} big" id="startBtn">${loadSave()?'新的守夜':'开始游戏'}</button>
   <div class="tbtns"><button class="btn alt" id="achBtn">成就 ${achCount()} / ${ACH.length}${META.heatMax?' · 长夜 '+META.heatMax:''}</button><button class="btn alt" id="cdxBtn">卡牌图鉴</button><button class="btn alt" id="sndBtn" style="flex:none">${AUDIO_L[audioMode][0]}</button></div></div>`;
@@ -543,23 +550,22 @@ function heroSelect(){
   sc.querySelectorAll('.hero').forEach(b=>b.onclick=()=>{SFX.ensure();SFX.play('merge');sc.hidden=true;newGame(b.dataset.h);});
 }
 const SAVEK='chain-demo-save-v4';
-function saveGame(){try{localStorage.setItem(SAVEK,JSON.stringify({hero:G.hero,round:G.round,gold:G.gold,wall:G.wall,wallMax:G.wallMax,relics:G.relics,skills:G.skills,foeSet:G.foeSet,bestChain:G.bestChain,heat:G.heat||0,run:G.run,
+function saveGame(){try{localStorage.setItem(SAVEK,JSON.stringify({hero:G.hero,round:G.round,gold:G.gold,wall:G.wall,wallMax:G.wallMax,relics:G.relics,skills:G.skills,foeSet:G.foeSet,bestChain:G.bestChain,heat:G.heat||0,run:G.run,boss8:G.boss8,endless:!!G.endless,lock:G.lock||null,
   cards:G.cards.map(c=>({key:c.key,tier:c.tier,adj:c.adj,loc:c.loc,idx:c.idx,hoard:c.hoard,grow:c.grow||0,qp:c.qp||0}))}));}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem(SAVEK);return s?JSON.parse(s):null;}catch(e){return null;}}
 function clearSave(){try{localStorage.removeItem(SAVEK);}catch(e){}}
 function resumeSave(){const s=loadSave();if(!s||!HEROES[s.hero]){heroSelect();return;}
   for(const c of G.cards)if(c.el)c.el.remove();
-  Object.assign(G,{hero:s.hero,round:s.round,gold:s.gold,wall:s.wall,wallMax:s.wallMax,foeSet:s.foeSet||'dark',relics:s.relics||[],skills:(s.skills||[]).filter(k=>TALENTS[k]),bestChain:s.bestChain||0,heat:s.heat||0,run:s.run||freshRun(),cards:[]});
+  Object.assign(G,{hero:s.hero,round:s.round,gold:s.gold,wall:s.wall,wallMax:s.wallMax,foeSet:s.foeSet||'dark',relics:s.relics||[],skills:(s.skills||[]).filter(k=>TALENTS[k]),bestChain:s.bestChain||0,heat:s.heat||0,run:s.run||freshRun(),boss8:s.boss8||'eye',endless:!!s.endless,maxRound:s.endless?999:8,lock:s.lock||null,fightWave:null,cards:[]});
   for(const d of s.cards||[]){if(!ITEMS[d.key])continue;const c=newCard(d.key,d.tier,d.adj);c.loc=d.loc;c.idx=d.idx;c.hoard=d.hoard||0;c.grow=d.grow||0;c.qp=d.qp||0;G.cards.push(c);}
   recalcMods();renderRelics();shownGold=null;renderOwned();updateHUD();toPrep();toast('接着上回：第'+G.round+'夜');}
 function newGame(hero){
   for(const c of G.cards)if(c.el)c.el.remove();
   G.hero=hero||G.hero;const H=HEROES[G.hero];const hh=Math.min(META.heatSel||0,META.heatMax||0);const w0=Math.round(H.wall*(hh>=4?.85:1));
-  Object.assign(G,{heat:hh,run:freshRun(),round:1,gold:H.gold,wall:w0,wallMax:w0,cards:[],relics:[],skills:[],bestChain:0,foeSet:pick(Object.keys(FOESETS))});recalcMods();renderRelics();
-  for(const[k,t,i]of H.start){const c=newCard(k,t);c.loc='board';c.idx=i;G.cards.push(c);}
-  mastStart();
+  Object.assign(G,{heat:hh,run:freshRun(),round:1,maxRound:8,endless:false,lock:null,fightWave:null,gold:H.gold,wall:w0,wallMax:w0,cards:[],relics:[],skills:[],bestChain:0,foeSet:pick(Object.keys(FOESETS)),boss8:pick(['eye','brood'])});recalcMods();renderRelics();
+  pickKit(()=>{mastStart();
   shownGold=null;renderOwned();updateHUD();
-  G.firstPrep=true;playStory(STORY.prologue,()=>nightStory(()=>toPrep()));
+  G.firstPrep=true;playStory(STORY.prologue,()=>nightStory(()=>toPrep()));});
 }
 
 /* ================= 布局与主循环 ================= */
@@ -596,7 +602,7 @@ function loop(now){
   requestAnimationFrame(loop);
 }
 layout();titleScreen();requestAnimationFrame(loop);
-window.__game={heroSelect,setDrawer,openTree,G,get B(){return B;},startBattle,acquire,toPrep,newGame,boardCards,newCard,afterChange,renderPreview,makeWave,enterEvent,finishStep,renderRelics,gainRelic,MUSIC,rollGear,withFit,rollTalents,stats,TALENTS,mastLv};
+window.__game={endScreen,winBattle,heroSelect,setDrawer,openTree,G,get B(){return B;},startBattle,acquire,toPrep,newGame,boardCards,newCard,afterChange,renderPreview,makeWave,enterEvent,finishStep,renderRelics,gainRelic,MUSIC,rollGear,withFit,rollTalents,stats,TALENTS,mastLv};
 })();
 </script>
 </body>

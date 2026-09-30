@@ -42,5 +42,5 @@ const NIGHTS_FROST={
   5:{title:'第六夜 · 冰山压城',beats:{0:[1,'narr','地面在震。深渊拖来整块的冰山，里面冻着一整队兵。'],1:[6,'soldier','冰锥！趴下！'],
     2:[10,'hero',{ayla:'把最重的家伙留给最重的武器。',mo:'弹道很标准。有人在教它们几何。',ying:'那些弩车……是照着我们的图纸做的！'}],3:[26,'bellman','东墙冻裂了！能动的都去东墙！']}}
 };
-function nightInfo(r){const N=NIGHTS[r-1]||{title:'第'+r+'夜',beats:[]};if(G.foeSet!=='frost'||!NIGHTS_FROST[r-1])return N;
+function nightInfo(r){if(bossNight(r))return NIGHT8_BROOD;const N=NIGHTS[r-1]||{title:r>8?'第'+r+'夜 · 长夜无尽':'第'+r+'夜',beats:[]};if(G.foeSet!=='frost'||!NIGHTS_FROST[r-1])return N;
   const O=NIGHTS_FROST[r-1];return{title:O.title||N.title,beats:N.beats.map((b,i)=>O.beats[i]||b)};}

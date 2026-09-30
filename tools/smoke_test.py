@@ -7,7 +7,7 @@ SHOTS=len(sys.argv)>2
 BOT="""()=>{const g=__game,G=g.G;const P=G.prep;
  if(G.phase!=='prep')return 'wait';
  if(P.step>=3)return 'ready';
- if(!P.cur){const pref=['train','field','grocer','altar','parcel','shop','black','giant','smith','forge','storm','frostshop','chest','furnace','enchant','job','bank','spring','gamble'];
+ if(!P.cur){const pref=['train','field','grocer','altar','parcel','shop','black','giant','smith','forge','storm','frostshop','chest','furnace','enchant','job','bank','spring','gamble','ambush'];
    const d=P.doors.slice().sort((a,b)=>(pref.indexOf(a)+99)%120-(pref.indexOf(b)+99)%120)[0];g.enterEvent(d);return 'enter '+d;}
  const c=P.cur;
  if(c.mode==='shop'||c.mode==='pick'||c.mode==='gift'){
@@ -16,6 +16,7 @@ BOT="""()=>{const g=__game,G=g.G;const P=G.prep;
    g.finishStep();return 'leave';}
  if(c.mode==='choice'||c.mode==='relic'){if(c.opts.length)c.opts[0].act();else g.finishStep();return 'chose';}
  if(c.mode==='gshop'){const it=c.goods.find(x=>!x.sold&&x.price<=G.gold&&G.gold-x.price>=4);if(it){G.gold-=it.price;it.sold=true;g.gainRelic(it.k,true);return 'gear';}g.finishStep();return 'leave';}
+ if(c.mode==='ambush'){G.speed=20;document.querySelector('#pbody .ev-btns .btn.red').click();return 'ambush';}
  if(c.mode==='reward'){c.apply();g.finishStep();return 'reward';}
  if(c.mode==='talk'||c.mode==='talent'){const b=document.querySelector('#pbody .opt')||document.querySelector('#pbody .ev-btns .btn');if(b){b.click();return c.mode;}}
  g.finishStep();return 'skip';}"""
@@ -34,10 +35,11 @@ async def main():
         await pg.route("**/fonts.g*/**",lambda r:r.abort())
         await pg.goto('file://'+os.path.abspath(os.path.join(os.path.dirname(__file__),'..','dist','index.html'))); await pg.wait_for_timeout(400)
         await pg.click('#startBtn'); await pg.wait_for_timeout(400)
-        await pg.click(f'.hero >> nth={HERO}'); await pg.wait_for_timeout(800)
+        await pg.click(f'.hero >> nth={HERO}'); await pg.wait_for_timeout(400)
+        await pg.click('.kit >> nth=%d'%(os.getpid()%3)); await pg.wait_for_timeout(800)
         for rnd in range(1,9):
             await skip(pg)
-            for k in range(40):
+            for k in range(300):
                 r=await pg.evaluate(BOT)
                 if r=='ready': break
                 if r=='wait': await skip(pg); await pg.wait_for_timeout(200)
