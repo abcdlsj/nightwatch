@@ -561,6 +561,7 @@ function openSheet(src){
   if(c.tier<3){const nx=Object.assign({},c,{tier:c.tier+1});const b=stats(nx,null);
     rows+=`<div><span>升到${TIERS[c.tier+1].n}</span><span>${it.dmg?'伤害 '+Math.round(b.total)+' · ':''}冷却 ${b.cd.toFixed(2)}s</span></div>`;}
   if(own&&c.bTrig)rows+=`<div><span>上一场</span><span>${Math.round(c.bDmg)} 伤害 · 触发${c.bTrig}次</span></div>`;
+  if(own&&c.bSrc&&supOf(c))rows+=`<div><span>上一场辅助</span><span>${supOf(c)}</span></div>`;
   if(own)rows+=`<div><span>能卖</span><span>${sellValue(c)}</span></div>`;
   const sh=$('#sheet');
   sh.innerHTML=`<div class="sh" role="dialog" aria-label="${it.n}"><div class="sh-top"><div id="shCard"></div><div><h3>${ad?`<span style="color:${ad.c}">${ad.n}的</span>`:''}${c.tier>=3&&it.dn?`<span class="dn">「${it.dn}」</span><small class="bn">${it.n}</small>`:it.n}</h3>

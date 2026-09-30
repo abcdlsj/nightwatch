@@ -134,3 +134,14 @@ function openCodex(tab){SFX.play('ui');const sh=$('#sheet');sh.classList.add('to
 
 /* 有自己声音的卡：八音盒放那首曲子的下一个音，战鼓咚一下 */
 ITEMS.musicbox.snd='mbox';ITEMS.wardrum.snd='drum';
+
+/* ---------- 战报：每张卡是被谁触发的、帮队友干了什么 ---------- */
+const EVL={burn:'有卡点燃',bounce:'闪电弹跳',wall:'城墙受击',kill:'敌人倒下',use:'有卡触发',crit:'暴击',freeze:'冻住敌人',poison:'施毒',charge:'被充能',chain:'连锁',start:'开战'};
+function passiveSrc(it){const k=it.on&&Object.keys(it.on).find(k=>EVL[k]);return k?EVL[k]+'时':'被动';}
+function supOf(c){const s=[];if(c.bCh>=1)s.push('给队友攒了约 '+Math.round(c.bCh)+' 次出手');else if(c.bCh>.001)s.push('给队友充能 '+Math.round(c.bCh*100)+'%');if(c.bHs>.05)s.push('加速 '+c.bHs.toFixed(1)+' 秒');
+  if(c.bRl)s.push('装填 '+c.bRl+' 发');if(c.bBf)s.push('增伤 '+c.bBf+' 次');if(c.bTr)s.push('带动触发 '+c.bTr+' 次');return s.join(' · ');}
+function srcLine(c){const it=ITEMS[c.key];const ks=Object.keys(c.bSrc||{}).sort((a,b)=>c.bSrc[b]-c.bSrc[a]);const out=[];
+  if(ks.length&&!(ks.length===1&&ks[0]==='冷却'))out.push('触发：'+ks.map(k=>k+' '+c.bSrc[k]).join('，'));
+  else if(it.passive&&!ks.length)out.push(it.on?'被动：'+passiveSrc(it)+'生效':'被动：常驻加成');
+  const s=supOf(c);if(s)out.push(s);
+  return out.length?`<small class="rp-src">${out.join('　')}</small>`:'';}

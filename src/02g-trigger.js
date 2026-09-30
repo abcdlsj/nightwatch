@@ -159,11 +159,11 @@ Object.assign(RELICS,{
   icechain:{n:'冰锥项链',t:0,ico:'ring:C',m:{t_icechain:1},on:{kill:(n,x)=>{if(!x.frozen)return;const X=ex(x.e),Y=ey(x.e)-4,R=16*K();ring(X,Y,2,R,'#c2f4ff',.3);
     later(.03,()=>{for(const o of B.en)if(!o.dead&&Math.hypot(ex(o)-X,ey(o)-Y)<=R)hurt(o,8*n,null,false,{});});}},f:'每一颗冰锥里，都冻着一小声尖叫。'},
   magazine:{n:'弹匣',t:0,ico:'book:g',m:{ammo:1},f:'多一发，往往就是多一条命。'},
-  chaingear:{n:'连珠机括',t:1,ico:'ring:y',m:{t_chain:1},on:{chain:()=>{const[L]=lr();if(L)later(.1,()=>{if(!B.over)trigger(L,1);});}},f:'咔、咔、咔——第五声之后，总会多出一声。'},
+  chaingear:{n:'连珠机括',t:1,ico:'ring:y',m:{t_chain:1},on:{chain:()=>{const[L]=lr();if(L)later(.1,()=>{if(!B.over)trigger(L,1,'连珠机括');});}},f:'咔、咔、咔——第五声之后，总会多出一声。'},
   lootbag:{n:'战利品袋',t:1,ico:'book:N',m:{t_loot:1},on:{kill:(n,x)=>{if(!x.elite)return;G.gold+=3*n;const[cx,cy]=toClient(ex(x.e),ey(x.e));FX.coins(cx,cy,6);SFX.play('coin');updateHUD();}},f:'袋子底下有个洞。但大件的东西掉不出去。'},
   alchbook:{n:'炼金手册',t:1,ico:'book:P',m:{t_alch:1},f:'扉页写着：本书内容请勿在室内尝试。'},
   photo:{n:'师徒合照',t:1,ico:'scroll:y',m:{t_photo:1},u:1,f:'照片上的两个人都没在笑，但都站得很近。'},
-  thunderdrum:{n:'雷鸣鼓',t:2,ico:'orb:Y',m:{t_drum:1},on:{wall:()=>{if(B.flags.drumT>B.t-2)return;B.flags.drumT=B.t;const b=boardCards().filter(o=>o.ammo!==0&&o.frozen<=0);if(b.length)trigger(pick(b),1);}},f:'城墙挨一下，鼓就响一下。敌人很快就学会了害怕这声音。'},
+  thunderdrum:{n:'雷鸣鼓',t:2,ico:'orb:Y',m:{t_drum:1},on:{wall:()=>{if(B.flags.drumT>B.t-2)return;B.flags.drumT=B.t;const b=boardCards().filter(o=>o.ammo!==0&&o.frozen<=0);if(b.length)trigger(pick(b),1,'雷鸣鼓');}},f:'城墙挨一下，鼓就响一下。敌人很快就学会了害怕这声音。'},
   tyrantnail:{n:'暴君的钉子',t:2,ico:'claw:R',m:{t_nail:1},on:{crit:(n,x)=>{if(x.e&&!x.e.dead)vuln(x.e,2,.2);}},f:'从旧王座上拔下来的。王座上的人，是后来才拔下来的。'},
   treasuremap:{n:'寻宝图',t:3,ico:'scroll:N',m:{t_map:1},u:1,f:'X 标在城墙上。所以宝藏一直在你脚下。'}
 });

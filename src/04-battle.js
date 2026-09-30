@@ -58,7 +58,7 @@ function startBattle(){
   let wave=G.nextWave;if(G.prep.wager==='horde')wave=hordeWave(wave);const special=wave.some(s=>EN[s.type].boss)?'boss':'battle';BG.set(special);
   B={t:0,spawns:wave,si:0,en:[],pr:[],epr:[],graves:[],sched:[],shield:0,maxChain:0,wallLost:0,endT:0,over:false,acc:0,boss:null,greed:0,kills:0,flags:{},rlog:{},
     beats:nightInfo(G.round).beats,bi:0,surges:(wave.surges||[]).slice(),lowSaid:false,wager:G.prep.wager||null,maxCombo:0,combo:0,maxHit:0,slowT:0};clearVO();
-  for(const c of G.cards){c.charge=0;c.mom=0;c.bDmg=0;c.bTrig=0;c.frozen=0;c.echoLog=[];c.evLog={};c.hasteT=0;c.stk=0;c.lastT=-9;c.rage=0;c.cnt=0;c.ammo=maxAmmo(c);c.el.classList.remove('frozen','empty','haste');setAmmo(c);}
+  for(const c of G.cards){c.charge=0;c.mom=0;c.bDmg=0;c.bTrig=0;c.bSrc={};c.bCh=0;c.bHs=0;c.bRl=0;c.bBf=0;c.bTr=0;c.frozen=0;c.echoLog=[];c.evLog={};c.hasteT=0;c.stk=0;c.lastT=-9;c.rage=0;c.cnt=0;c.ammo=maxAmmo(c);c.el.classList.remove('frozen','empty','haste');setAmmo(c);}
   for(const c of boardCards()){c.nb=neighbors(c);c.right=rightOf(c);c.anvil=0;c.charge=mv('startCharge');}
   recalcMods();noteLineup();
   if(B.wager==='dark')for(const c of boardCards()){c.frozen=2.5;c.el.classList.add('frozen');}
@@ -102,7 +102,7 @@ function simStep(dt){
     if(c.hasteT>0){c.hasteT-=dt;if(c.hasteT<=0)c.el.classList.remove('haste');}
     if(it.passive&&!it.dmg){c.charge=1;continue;}
     if(!it.passive){const st=stats(c,B.t);c.charge+=dt/st.cd*(c.hasteT>0?2:1);}
-    if(c.charge>=1){if(ITEMS[c.key].dmg>0&&!hasTarget())c.charge=1;else{c.charge-=1;if(c.charge>1)c.charge=.99;trigger(c,0);}}
+    if(c.charge>=1){if(ITEMS[c.key].dmg>0&&!hasTarget())c.charge=1;else{c.charge-=1;if(c.charge>1)c.charge=.99;trigger(c,0,it.passive?passiveSrc(it):'冷却');}}
   }
   for(const e of B.en){e.armorB=0;e.hasteB=0;}
   for(const s of B.en){if(s.dead||!s.d.aura||s.y<-.02)continue;const R2=s.d.aura*K();
@@ -169,8 +169,8 @@ function doIntent(e){
 }
 
 /* ---- 触发与连锁 ---- */
-function trigger(c,depth){
-  if(depth>10||B.over||c.ammo===0)return;
+function trigger(c,depth,src){
+  if(depth>10||B.over||c.ammo===0)return;if(c.bSrc){const k=src||'连锁';c.bSrc[k]=(c.bSrc[k]||0)+1;}
   const times=c.adj==='twin'?2:1;
   fire(c,depth);
   if(times>1)later(.08,()=>fire(c,depth));
@@ -187,14 +187,14 @@ function fire(c,depth){
   if(it.hasteNb)for(const n of c.nb)haste(n,it.hasteNb*(1+.2*stepOf(c)),c);
   if(it.hasteKind)for(const o of boardCards())if(o!==c&&ITEMS[o.key].kind===it.hasteKind.kind)haste(o,it.hasteKind.t*(1+.2*stepOf(c)),c);
   if(it.hasteSmall)for(const o of boardCards())if(o!==c&&o.size===1)haste(o,it.hasteSmall,c);
-  if(it.chargeAll)for(const o of boardCards())if(o!==c)chargeCard(o,it.chargeAll+.07*stepOf(c),null);
+  if(it.chargeAll)for(const o of boardCards())if(o!==c){const a=it.chargeAll+.07*stepOf(c);if(o.frozen<=0)c.bCh+=a;chargeCard(o,a,null);}
   if(it.chargeSmall)for(const o of boardCards())if(o!==c&&o.size===1)chargeCard(o,it.chargeSmall*(1+.25*stepOf(c))*(1+mv('support')),c);
-  if(it.buff){const a=buffAmt(c);for(const n of c.nb){n.anvil=Math.max(n.anvil||0,a);FX.link(c.el,n.el,'#e3e9f0',.22);}}
-  if(it.horn&&depth<10)for(const n of c.nb){if(n.frozen>0)continue;later(.1,()=>{if(B.over)return;FX.link(c.el,n.el,'#ffd166',.25);showChain(depth+2);if(depth+2>B.maxChain)B.maxChain=depth+2;trigger(n,depth+1);});}
+  if(it.buff){const a=buffAmt(c);c.bBf+=c.nb.length;for(const n of c.nb){n.anvil=Math.max(n.anvil||0,a);FX.link(c.el,n.el,'#e3e9f0',.22);}}
+  if(it.horn&&depth<10)for(const n of c.nb){if(n.frozen>0)continue;later(.1,()=>{if(B.over)return;FX.link(c.el,n.el,'#ffd166',.25);showChain(depth+2);if(depth+2>B.maxChain)B.maxChain=depth+2;c.bTr++;trigger(n,depth+1,it.n);});}
   if(it.fuse)for(const o of boardCards())if(o!==c&&ITEMS[o.key].tag===it.fuse.tag)chargeCard(o,it.fuse.amt+.03*stepOf(c),c);
   if(it.detonate){let n=0;for(const e of B.en){if(e.dead||e.burnT<=0)continue;n++;const amt=e.burnD*e.burnT;e.burnT=0;e.burnD=0;ring(ex(e),ey(e)-8,3,34,'#ff7a2a',.45);hurt(e,amt,c,false,{});}if(n){SFX.play('boom');F.shake=Math.max(F.shake,4);}}
   if(it.detonateP){let n=0;for(const e of B.en){if(e.dead||e.poisonT<=0)continue;n++;const amt=e.poisonD*e.poisonT;e.poisonT=0;e.poisonD=0;ring(ex(e),ey(e)-8,3,34,'#7ddc5f',.45);hurt(e,amt,c,false,{});}if(n){SFX.play('boom');F.shake=Math.max(F.shake,4);}}
-  if(it.prism)for(const n of c.nb){if(!['火','冰','电'].includes(ITEMS[n.key].tag))continue;chargeCard(n,.25,c);n.anvil=Math.max(n.anvil||0,.5);FX.link(c.el,n.el,'#73eff7',.25);}
+  if(it.prism)for(const n of c.nb){if(!['火','冰','电'].includes(ITEMS[n.key].tag))continue;chargeCard(n,.25,c);n.anvil=Math.max(n.anvil||0,.5);c.bBf++;FX.link(c.el,n.el,'#73eff7',.25);}
   if(c.adj==='ignite'&&c.right)chargeCard(c.right,.1,c);
   if(c.adj==='sturdy'){B.shield+=c.size*(c.tier+1);updateHUD();}
   if(c.adj==='momentum')c.mom=Math.min(10,c.mom+1);
@@ -203,12 +203,12 @@ function fire(c,depth){
     if(n.adj!=='echo'||n.frozen>0)continue;
     n.echoLog=n.echoLog.filter(t=>t>B.t-1);if(n.echoLog.length>=6)continue;n.echoLog.push(B.t);
     later(.12,()=>{const d=depth+1;if(B.over||d>10)return;FX.link(c.el,n.el,ADJ.echo.c);
-      if(d+1>B.maxChain)B.maxChain=d+1;showChain(d+1);if(mv('shellChain')&&(d+1)%5===0){B.shield+=3;updateHUD();}SFX.play('echo',d);trigger(n,d);});
+      if(d+1>B.maxChain)B.maxChain=d+1;showChain(d+1);if(mv('shellChain')&&(d+1)%5===0){B.shield+=3;updateHUD();}SFX.play('echo',d);trigger(n,d,'回响');});
   }
 }
-function chargeCard(c,amt,from){if(c.frozen>0)return;c.charge=Math.min(1.5,c.charge+amt);if(from)FX.link(from.el,c.el,'#ffa53b',.16);emit('charge',{c,from});}
-function haste(c,t,from){if(c.frozen>0||!c.el)return;c.hasteT=Math.max(c.hasteT||0,t);c.el.classList.add('haste');if(from)FX.link(from.el,c.el,'#8ff0c8',.2);}
-function reload(c,n,from){const m=maxAmmo(c);if(m==null)return false;if(c.ammo>=m)return true;c.ammo=Math.min(m,c.ammo+n);c.el.classList.remove('empty');setAmmo(c);if(from)FX.link(from.el,c.el,'#ffd166',.22);return true;}
+function chargeCard(c,amt,from){if(c.frozen>0)return;c.charge=Math.min(1.5,c.charge+amt);if(from&&from!==c&&from.bSrc)from.bCh+=amt;if(from)FX.link(from.el,c.el,'#ffa53b',.16);emit('charge',{c,from});}
+function haste(c,t,from){if(c.frozen>0||!c.el)return;if(from&&from!==c&&from.bSrc)from.bHs+=t;c.hasteT=Math.max(c.hasteT||0,t);c.el.classList.add('haste');if(from)FX.link(from.el,c.el,'#8ff0c8',.2);}
+function reload(c,n,from){const m=maxAmmo(c);if(m==null)return false;if(c.ammo>=m)return true;if(from&&from.bSrc)from.bRl+=Math.min(n,m-c.ammo);c.ammo=Math.min(m,c.ammo+n);c.el.classList.remove('empty');setAmmo(c);if(from)FX.link(from.el,c.el,'#ffd166',.22);return true;}
 function setAmmo(c){if(!c.el)return;const a=c.el.querySelector('.am');if(!a)return;const v=B&&G.phase==='battle'?c.ammo:maxAmmo(c);a.textContent='弹'+v;c.el.classList.toggle('empty',v===0);}
 let chainT=0;
 function showChain(n){if(n<2)return;if(n===5||n===9)say('hero',BARKS.chain,1);if(n>=8)unlock('chain8');if(n>=11)unlock('chain11');const el=$('#chain');const cols=['#c38cff','#c38cff','#ff95dc','#ffd166','#ff8a5b','#ff5a5a'];
@@ -484,9 +484,9 @@ function winBattle(){
   showReport(was,rows,total);
 }
 function showReport(was,rows,total){
-  const rp=$('#report');const bc=G.cards.filter(c=>c.bTrig>0).sort((a,b)=>b.bDmg-a.bDmg);const mx=Math.max(1,...bc.map(c=>c.bDmg));
+  const rp=$('#report');const bc=G.cards.filter(c=>c.bTrig>0||c.bDmg>0||supOf(c)||(c.loc==='board'&&ITEMS[c.key].passive)).sort((a,b)=>b.bDmg-a.bDmg);const mx=Math.max(1,...bc.map(c=>c.bDmg));
   rp.innerHTML=`<div class="rp-title win">第${was}夜 · ${pickLine(RPT.win)}</div>
-  <div class="rp-list">${bc.map((c,i)=>`<div class="rp-row" style="animation-delay:${i*.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${SPR[c.key].url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${(c.bDmg/mx*100).toFixed(1)}"></i></div><b>${fmt(c.bDmg)}<small>×${c.bTrig}</small></b></div>`).join('')||'<div class="rp-meta">这一夜没有卡出手</div>'}</div>
+  <div class="rp-list">${bc.map((c,i)=>`<div class="rp-row" style="animation-delay:${i*.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${SPR[c.key].url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${(c.bDmg/mx*100).toFixed(1)}"></i></div><b>${c.bDmg?fmt(c.bDmg):supOf(c)?'<em>辅助</em>':ITEMS[c.key].passive?'<em>被动</em>':'0'}<small>×${c.bTrig}</small></b>${srcLine(c)}</div>`).join('')||'<div class="rp-meta">这一夜没有卡出手</div>'}</div>
   <div class="rp-meta">${(was+1)%2===1?'<b style="color:#ffd166">明晚之前有夜谈</b>　':''}最高连锁 <b>×${B.maxChain||1}</b>　击杀 <b>${B.kills}</b>　连杀 <b>${B.maxCombo}</b>　城墙 <b>-${Math.ceil(B.wallLost)}</b></div>
   <div class="rp-cash" id="cash"></div>
   <button class="btn gold big" id="cashBtn" style="flex:none">收下 <img class="ico" src="${SPR.coin.url}" alt=""><b>${total}</b></button>`;

@@ -26,7 +26,7 @@ const TALENTS={
   rearguard:{n:'压阵',cat:'atk',r:0,m:{right:.35},say:'最后一个出手的，得最稳。'},
   loner:{n:'独来独往',cat:'atk',r:1,m:{lonely:.35},say:'离远点，别碍我事。'},
   opener:{n:'开门红',cat:'atk',r:1,m:{t_opener:1},say:'铃一响，先给它们来一下。',
-    on:{start:()=>later(.3,()=>{const b=boardCards();const L=b[0],R=b[b.length-1];if(L)trigger(L,1);if(R&&R!==L)later(.1,()=>{if(!B.over)trigger(R,1);});})}},
+    on:{start:()=>later(.3,()=>{const b=boardCards();const L=b[0],R=b[b.length-1];if(L)trigger(L,1,'开门红');if(R&&R!==L)later(.1,()=>{if(!B.over)trigger(R,1,'开门红');});})}},
   bloodlust:{n:'杀红了眼',cat:'atk',r:2,m:{t_bloodlust:1},say:'越打越顺手。',
     on:{kill:()=>{B.flags.kc=(B.flags.kc||0)+1;if(B.flags.kc%12)return;for(const o of boardCards())chargeCard(o,.15,null);}}},
   tough:{n:'墙根结实',cat:'def',r:0,m:{wall:6},say:'砖缝里灌了铁水，一时半会儿倒不了。'},
