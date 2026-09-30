@@ -42,6 +42,12 @@ async def main():
                 if r=='wait': await skip(pg); await pg.wait_for_timeout(200)
             # spend skill points
             await pg.evaluate("()=>{const G=__game.G;}")
+            await pg.evaluate("()=>__game.openTree()")
+            for _ in range(6):
+                n=await pg.query_selector('.node.can')
+                if not n: break
+                await n.click(); await pg.wait_for_timeout(120)
+            await pg.evaluate("()=>{const s=document.querySelector('#sheet');if(s)s.hidden=true;}")
             st=await pg.evaluate("({r:__game.G.round,g:__game.G.gold,w:__game.G.wall,rel:__game.G.relics.length,sp:__game.G.sp,n:__game.G.cards.length})")
             print(json.dumps(st))
             await pg.evaluate("__game.G.speed=%d"%(1 if SHOTS and rnd in (3,7) else 20))
