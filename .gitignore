@@ -1,6 +1,16 @@
+node_modules/
+dist/
 shots/
 __pycache__/
 *.pyc
 .DS_Store
-dist/
 tools/.fontsrc/
+.migrate/
+# Capacitor 原生工程的构建产物
+ios/App/App/public/
+ios/App/build/
+ios/App/DerivedData/
+android/app/build/
+android/build/
+android/.gradle/
+android/app/src/main/assets/public/

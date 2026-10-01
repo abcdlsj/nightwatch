@@ -1,0 +1,47 @@
+/* ---------- 卡牌 ---------- */
+.card{position:absolute;top:4px;width:calc(var(--cw) * var(--sz) - 4px);height:var(--ch);cursor:grab;touch-action:none;
+  transition:left .2s cubic-bezier(.3,1.4,.5,1)}
+.card .inner{position:absolute;inset:0;animation:bob 3.4s ease-in-out infinite;animation-delay:var(--dl,0s)}
+.card .face{position:absolute;inset:0;border-radius:8px;background:var(--tbg,var(--card));border:3px solid var(--tc,var(--cink));overflow:hidden;
+  box-shadow:0 3px 0 rgba(0,0,0,.55),0 0 0 2px var(--cink),inset 0 0 0 1px rgba(0,0,0,.35)}
+.card .tb{position:absolute;left:-6px;top:-7px;height:19px;min-width:19px;padding:0 3px;border-radius:5px;background:var(--tc);color:#1b1224;font-size:13px;line-height:19px;text-align:center;box-shadow:0 2px 0 rgba(0,0,0,.55),inset 0 0 0 2px #1b1224;z-index:2}
+.card.t3 .tb{background:linear-gradient(135deg,#8ff4ff,#45dcff 50%,#e0b3ff)}
+.card.t2 .tb{background:linear-gradient(135deg,#fff1a8,#ffc328)}
+.card .band{height:8px;background:var(--tagc);box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}
+.card .nm{font-size:12px;color:var(--cink);text-align:center;line-height:1;margin-top:2px;white-space:nowrap}
+.card .spr{display:block;width:32px;height:32px;margin:3px auto 0;image-rendering:pixelated}
+.card.s3 .spr{width:48px;height:48px;margin-top:0}
+.card .num{position:absolute;left:0;right:0;bottom:3px;text-align:center;font-family:'PixNum','Silkscreen','Pixelify Sans',ui-monospace,monospace;font-weight:700;font-size:15px;color:var(--cink);line-height:1;letter-spacing:.5px}
+.card .num.txt{font-family:var(--zh);font-weight:400;font-size:13px;bottom:4px}/* 「装填」「齐奏」这类字，跟卡名一个字体 */
+.card .cdv{position:absolute;left:0;right:0;top:8px;bottom:0;background:rgba(24,14,40,.5);transform-origin:top;transform:scaleY(var(--s,0))}
+.card .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.card .holo{position:absolute;inset:0;pointer-events:none}
+.card.t3 .holo{background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.6) 44%,rgba(200,150,255,.4) 50%,transparent 62%);
+  background-size:260% 100%;animation:holo 2.6s linear infinite;mix-blend-mode:overlay}
+.card .gem{position:absolute;left:5px;top:3px;width:7px;height:7px;background:var(--tc);transform:rotate(45deg);box-shadow:0 0 0 1px var(--cink);z-index:1}
+.card.t1 .gem{box-shadow:0 0 0 1px var(--cink),0 0 3px #fff}
+.card.t2 .inner{filter:drop-shadow(0 0 4px rgba(255,201,60,.65))}
+.card.t3 .inner{filter:drop-shadow(0 0 6px rgba(111,230,255,.85))}
+.card.t3 .gem{animation:tw .7s infinite alternate}
+.card.rare .adj{box-shadow:0 2px 0 rgba(0,0,0,.55),inset 0 0 0 2px #1b1224,0 0 8px var(--ac)}
+.card .adj{position:absolute;bottom:-7px;right:-6px;min-width:21px;height:21px;padding:0 3px;border-radius:6px;background:var(--ac);color:#1b1224;
+  font-size:14px;line-height:21px;text-align:center;box-shadow:0 2px 0 rgba(0,0,0,.55),inset 0 0 0 2px #1b1224;z-index:2}
+.card.pop{animation:pop .24s ease-out}
+.card.pop .flash{animation:flash .24s ease-out}
+.card.land{animation:land .32s ease-out}
+.card.lifted{opacity:.25}
+.card .am{position:absolute;right:2px;bottom:24px;z-index:3;font-size:9px;line-height:1;padding:1px 3px;border-radius:3px;background:#1a1c2cdd;color:#ffd166;font-weight:700;pointer-events:none}
+.card.empty .face{filter:grayscale(1) brightness(.55)}
+.card.haste .face{box-shadow:0 0 0 2px #8ff0c8,0 0 10px #8ff0c8aa}
+.kwbox{margin:8px 0;padding:6px 8px;border-radius:8px;background:#ffffff0d;font-size:12px;display:grid;gap:3px}
+.kwbox b{color:#ffd166;margin-right:6px}.kwbox span{color:var(--muted)}
+.card.frozen .face::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(130,215,255,.6) 0 4px,rgba(210,245,255,.45) 4px 8px)}
+.card.mergeT .face{box-shadow:0 3px 0 rgba(0,0,0,.55),inset 0 0 0 3px #ffd34d;animation:glow .6s infinite alternate}
+.card.merge{animation:mergeA .5s ease-out}
+.card.ghost{position:fixed;left:0;top:0;z-index:70;pointer-events:none;transition:none}
+.card.ghost .inner{animation:none;filter:drop-shadow(0 12px 10px rgba(0,0,0,.55))}
+.card.ghost.back{transition:transform .22s ease-in}
+.card.nudge .face{box-shadow:0 3px 0 rgba(0,0,0,.55),0 0 0 2px #8ff0bb}
+.card.static{position:relative;top:0;left:auto;flex:none;height:84px;cursor:grab}
+.card.static.s1{width:46px}.card.static.s2{width:64px}.card.static.s3{width:82px;max-width:100%}
+@media (hover:hover){.card:not(.ghost):hover .inner{transform:translateY(-3px) scale(1.04);animation-play-state:paused}}

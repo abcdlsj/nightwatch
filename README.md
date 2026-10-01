@@ -3,43 +3,73 @@
 竖屏自动战斗构筑卡牌游戏。底层是可精算的伤害流水线，表层是满屏打怪的爽感。
 参考：大巴扎（尺寸与相邻）、杀戮尖塔（意图与路线）、吸血鬼幸存者（自动战斗）、小丑牌（表现与数字爆炸）、土豆兄弟（物品堆叠）。
 
+技术栈：TypeScript + Vite，界面用原生 DOM，战场用 Canvas 2D（低分辨率像素画布放大显示），音乐音效全部 WebAudio 现场合成。
+同一份构建产物可以发布成网页（Vercel），也可以装进 Capacitor 原生壳上架 iOS / Android；以后接 Steam 时再加一层桌面壳。
+
 ## 运行
 
+需要 Node 20.19 以上。
+
 ```bash
-./build.sh            # 拼接 src/ → dist/index.html，并做 JS 语法检查
-open dist/index.html  # 直接打开能玩；要看到自带字体，用 python3 -m http.server -d dist 起个服务
+npm install
+npm run dev        # 开发服务器，改代码自动刷新
+npm run build      # 构建到 dist/（Vercel 用的就是这个）
+npm run preview    # 本地预览构建结果（端口 4317）
+npm run check      # 类型检查 + 单元测试 + 构建，提交前跑
+npm run e2e        # 冒烟测试：机器人自动打一局（需要先 build；首次要 npx playwright install chromium）
 ```
+
+网址加 `?seed=数字` 可以固定种子，同一种子、同样的操作，出怪、商店、掉落和战斗结果都一样，方便复现问题。
 
 ## 目录
 
-| 路径 | 内容 |
+```
+index.html            页面骨架（静态文字标了 data-i18n）
+public/fonts/         自带字体子集（由 tools/fontsub.py 生成）
+src/
+  main.ts             入口：装配各层、底栏按钮、主循环
+  core/               随机数（可复现）、工具函数、事件总线
+  platform/           存储、震动、运行环境（网页 / 原生壳）
+  data/               纯数据：卡牌、遗物、天赋、敌人、事件、人物、局外；art/ 是像素图
+  locales/zh-CN/      全部文字：内容文案、剧情台词、界面文字
+  i18n/               t() 和语言切换；启动时把文案填进数据表
+  game/               规则：状态、伤害公式、掉落、备战、存档、局外进度
+  sim/                战斗模拟：出怪、出手连锁、伤害、敌人行为、触发钩子
+  render/             画面：像素图、战场画布、背景着色器、界面特效层
+  audio/              音效、背景音乐、声音开关
+  ui/                 界面组件：卡牌、顶栏、弹层、剧情、战报、图鉴、台词
+  app/                流程：开局 → 备战 → 战斗 → 结算；prep/ 是备战的操作、界面和拖拽
+  styles/             样式，按界面区域分文件
+tests/
+  unit/               语言包完整性、分层约束、无界面战斗模拟（vitest）
+  e2e/                冒烟测试和关键界面截图（Playwright）
+tools/                像素图生成、字体子集化、缺字检查
+docs/                 字体授权说明
+```
+
+## 分层
+
+规则层和模拟层不碰 DOM，换渲染方式、换平台时只动上层。`tests/unit/layers.test.ts` 会检查：
+
+| 层 | 可以依赖 |
 | --- | --- |
-| `src/01-shell.html` | 页面骨架、全部 CSS、DOM 结构 |
-| `src/02-data.js` | 像素美术、卡牌、词缀、物品、事件、敌人、人物、天赋等基础数据 |
-| `src/02b-story.js` | 战斗内叙事：说话人、通用台词、首领台词、八夜剧情节拍、天赋台词 |
-| `src/02c-bestiary.js` | 敌人图鉴：阵营、新敌人数据与行为开关、首次登场台词 |
-| `src/02d-lore.js` | 卡牌传闻：金品质传闻、钻品质专属名与后记 |
-| `src/02e-art.js` | 16×16 卡牌、遗物、事件图标，32×32 人物立绘，敌人与首领/精英大图（由 `tools/pixelgen.py` 生成，勿手改） |
-| `src/02f-ying.js` | 第三名人物「萤」的卡牌、物品、天赋与台词 |
-| `src/02g-trigger.js` | 触发框架的数据层：关键词说明、功能标签、事件卡、旧卡改造、触发型物品、按功能进货的商店 |
-| `src/02h-talent.js` | 天赋池（通用 + 人物专属）、夜谈对话、偶遇事件（过路人、残破的手札） |
-| `src/02i-frost.js` | 第二套敌人「霜潮」：与原敌人按角色对应、冻手行为、夜晚标题与台词替换 |
-| `src/02j-fit.js` | 「对路」遗物和天赋：手里有某类卡时，拿遗物 / 学天赋偶尔多一个针对性选项 |
-| `src/03-systems.js` | 背景着色器、音效、状态、卡牌/背包/备战事件/拖拽/弹层/剧情页 |
-| `src/03b-voice.js` | 台词气泡 / 战报字幕 / 新敌人卡片（纯表现层） |
-| `src/03c-meta.js` | 成就、长夜难度、加码、羁绊、连杀（成就与难度进度存在 `chain-meta-v1`） |
-| `src/03d-juice.js` | 现场合成的背景音乐（跟场景换曲，声音三档开关）、一次性新手提示、顶栏说明、今晚情报、败因 |
-| `src/03e-mastery.js` | 熟练：每个守夜人各自的轻量局外成长（存在 `chain-meta-v1` 的 `mast`） |
-| `src/03g-codex.js` | 图鉴（卡牌、遗物、天赋、敌人，碰到过才解锁）和过往守夜（每局结束记一条，最多 40 条），都存在 `chain-meta-v1` 的 `cx` / `hist` |
-| `src/03f-more.js` | 起手三选一、商店锁卡、拦路精英、霜潮专属敌人、深渊母巢、无尽长夜，以及这几个新敌人的像素图 |
-| `src/03h-secrets.js` | 隐藏事件：满足特定条件才会出现的小事件和剧情分支（不改战斗规则，内容见文件头注释，有剧透） |
-| `src/04-battle.js` | 波次、敌人行为、战场渲染、触发与连锁、伤害结算、流程、存档、主循环 |
-| `tools/smoke_test.py` | Playwright 冒烟测试：机器人自动打一整局 |
-| `tools/pixelgen.py` | 像素美术生成器：几何图元 + 自动描边 + 自动明暗，`--preview` 出预览图 |
-| `tools/shots.py` | 关键界面截图（棋盘、钻卡详情、天赋、战斗） |
-| `tools/fontsub.py` | 字体子集化：只保留游戏里用到的字，输出到 `assets/fonts/` |
-| `assets/fonts/` | 自带的字体（子集），构建时拷到 `dist/fonts/`，不依赖 Google 字体 |
-| `dist/` | 构建产物：`index.html` + `fonts/`，整个目录发布 |
+| `core` | 无 |
+| `data` | `core` |
+| `i18n` / `locales` | `data`、`core` |
+| `game` | 上面这些 + `platform` |
+| `sim` | 上面这些 + `game` |
+| `render` / `audio` / `ui` / `app` | 全部 |
+
+战斗模拟对外只通过 `sim/view.ts` 的 `SimView` 接口「喊一声」（粒子、飘字、音效、台词、卡牌闪烁……），界面层在 `ui/battle-view.ts` 实现它；无界面跑模拟时用空实现。
+
+随机数分两种：规则相关的（出怪、商店、掉落、暴击……）走 `core/rng.ts` 的 `rng`，可复现；纯表现的（粒子、飘字、台词挑哪句）用 `vr()`，不影响结算。存档里记着进入备战前的随机数状态，读档后当晚的出怪和三站跟存档时一样。
+
+## 多语言
+
+- 屏幕上的字全部在 `src/locales/zh-CN/`：`cards` `relics` `talents` `enemies` `events` `heroes` 是内容文案，`story` 是剧情和台词，`terms` 是术语（元素、品质、词缀……），`meta` 是成就、难度、加码等，`ui` 是界面文字。
+- 数据表（`src/data`）只放机制，不放文字；启动时 `i18n/apply.ts` 把文案填进去，代码里照常读 `ITEMS[k].n`。
+- 界面文字用 `t('prep.refresh', { n: 2 })`，参数写成 `{n}`。
+- 加一门语言：复制 `locales/zh-CN` 改译文，在 `i18n/index.ts` 的 `PACKS` 里登记，再给字体子集补字。`tests/unit/i18n.test.ts` 会检查缺键。
 
 ## 核心规则速览
 
@@ -71,7 +101,7 @@ open dist/index.html  # 直接打开能玩；要看到自带字体，用 python3
 
 ## 触发框架
 
-卡牌和物品在数据里声明 `on:{事件:(卡, 上下文)=>{}}`，战斗引擎在对应时机 `emit(事件)`：
+卡牌、遗物、天赋的触发型效果写在 `src/sim/hooks.ts`，按 id 登记；战斗引擎在对应时机 `emit(事件)`：
 
 | 事件 | 时机 |
 | --- | --- |
@@ -87,13 +117,14 @@ open dist/index.html  # 直接打开能玩；要看到自带字体，用 python3
 
 每张卡每种事件每秒最多响应 8 次，防止互相触发成死循环。卡牌还可以用 `onWin` 在守住一夜后结算成长。
 
-关键词：冻结、加速、弹药、装填、多重、易伤、处决、成长、任务。说明文字写在 `KW` 里，卡牌描述里出现【关键词】时详情页会自动附上解释。`passive:1` 表示没有冷却、只靠事件充能。
+关键词：冻结、加速、弹药、装填、多重、易伤、处决、成长、任务。说明写在 `locales/zh-CN/terms.ts` 的 `kw` 里，卡牌描述里出现【关键词】时详情页会自动附上解释。`passive:1` 表示没有冷却、只靠事件充能。
 
 ## 开发约定
 
 - 每个改动独立提交，提交信息用 `类型(范围): 说明`，如 `feat(enemy): 新增自爆鼠`。
-- 提交前运行 `./build.sh`，大改动再跑 `python3 tools/smoke_test.py 0`。
-- `dist/` 是构建产物，不入库；拉下代码后运行 `./build.sh` 生成。
+- 提交前运行 `npm run check`，大改动再跑 `npm run e2e`。
+- 新增文字只写进 `src/locales`；出现新汉字时 `npm run build` 会提醒跑 `npm run fonts`。
+- `dist/` 是构建产物，不入库。
 
 ## 叙事原则
 
@@ -111,16 +142,22 @@ open dist/index.html  # 直接打开能玩；要看到自带字体，用 python3
 
 ## 美术流程
 
-卡牌图标和人物立绘都写成 `tools/pixelgen.py` 里的绘制函数，改完运行：
+卡牌图标、人物立绘、首领大图都写成 `tools/pixelgen.py` 里的绘制函数，改完运行：
 
 ```bash
-python3 tools/pixelgen.py --preview   # 重新生成 src/02e-art.js，并输出 shots/ 下的预览图
-./build.sh
+npm run art                              # 重新生成 src/data/art/generated.ts
+python3 tools/pixelgen.py --preview      # 另外输出 shots/ 下的预览图（需要 Pillow）
 ```
 
-## 路线图（逐步提交）
+## 已知问题（迁移时发现，保持旧版行为未改）
 
-- [x] 敌人图鉴界面（并进了图鉴的「敌人」页）
+- 中毒只有在敌人同时燃烧时才掉血：旧版把中毒结算写进了灼烧的代码块里（`src/sim/enemies.ts` 里有注释）。改掉会让毒流派明显变强，需要重新调平衡。
+- 战场飘字只有数字字形：「壳」「碎」「处决」会画成 0（`src/render/field.ts` 的 `drawNum`）。
+
+## 路线图
+
+- [x] 工程化：TypeScript + Vite，分层，可复现随机数，无界面战斗模拟
+- [x] 全部文字抽成语言包
 - [ ] 敌人与首领立绘升级到 16×16 / 32×32
-- [ ] 数值表外置（CSV/JSON），加入平衡模拟脚本
-- [x] 第二套首领与更多夜晚（深渊母巢、无尽长夜）
+- [ ] 平衡模拟脚本（基于 `tests/unit/sim.test.ts` 的无界面模拟批量跑）
+- [ ] 横屏布局、手柄操作、Steam 桌面壳

@@ -1,0 +1,19 @@
+/* ---------- 战报 ---------- */
+#report{background:rgba(10,14,20,.8);justify-content:flex-start}
+.rp-title{font-size:26px;text-align:center;text-shadow:0 3px 0 rgba(0,0,0,.5)}
+.rp-title.win{color:#9bf0b8}
+.rp-list{display:flex;flex-direction:column;gap:3px;overflow:auto;min-height:0;flex:1}
+.rp-row{display:grid;grid-template-columns:34px 44px 1fr auto;align-items:center;gap:6px;font-size:14px;opacity:0;animation:rowIn .3s ease-out forwards}
+.rp-row img{width:32px;height:32px;image-rendering:pixelated}
+.rp-row .bar{height:9px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.rp-row .bar i{display:block;height:100%;background:var(--tagc);width:0;transition:width .6s cubic-bezier(.2,.9,.3,1)}
+.rp-row b{font-family:var(--px);font-size:15px;text-align:right;min-width:62px}
+.rp-row b small{color:var(--muted);font-size:11px;margin-left:3px;font-weight:400}
+.rp-src{grid-column:2/-1;margin-top:-3px;font-family:var(--body);font-size:12px;line-height:1.3;color:#9fb3ba}
+.rp-row b em{font-style:normal;font-family:var(--zh);font-size:13px;color:#8ff0c8}
+.rp-meta{text-align:center;font-size:14px;color:var(--muted)}
+.rp-meta b{font-family:var(--px);color:#e0c8ff}
+.rp-cash{background:rgba(0,0,0,.3);border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;gap:3px}
+.cash-row{display:flex;justify-content:space-between;font-size:15px;opacity:0;animation:rowIn .25s ease-out forwards}
+.cash-row b{font-family:var(--px);color:#ffd166}
+.cash-row.total{border-top:2px dashed rgba(255,255,255,.15);padding-top:4px;font-size:18px}

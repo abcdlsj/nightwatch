@@ -1,9 +1,9 @@
-"""字体子集化：只保留游戏里用到的字，生成 assets/fonts/*.woff2，并记下收录的字到 assets/fonts/chars.txt。
-改了文案、出现新汉字后跑一次：python3 tools/fontsub.py
+"""字体子集化：只保留游戏里用到的字，生成 public/fonts/*.woff2，并记下收录的字到 tools/font-chars.txt。
+改了文案、出现新汉字后跑一次：npm run fonts（屏幕上的字都在 src/locales 和 index.html 里）
 需要 fonttools 和 brotli（pip install fonttools brotli）。源字体来自 google/fonts 和 npm 上的 @fontsource/fusion-pixel-12px-proportional-sc（都是 OFL 授权），不存在时自动下载到 tools/.fontsrc/。"""
 import os, re, subprocess, urllib.request
 ROOT=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
-SRC=os.path.join(ROOT,'tools','.fontsrc'); OUT=os.path.join(ROOT,'assets','fonts')
+SRC=os.path.join(ROOT,'tools','.fontsrc'); OUT=os.path.join(ROOT,'public','fonts')
 RAW='https://raw.githubusercontent.com/google/fonts/main/ofl/'
 FONTS={  # 输出名: (源路径, 收录范围)
   'zcool.woff2':('zcoolqingkehuangyou/ZCOOLQingKeHuangYou-Regular.ttf','all'),
@@ -19,10 +19,9 @@ def fetch(path,dst):
   tf=tarfile.open(fileobj=io.BytesIO(urllib.request.urlopen(meta['dist']['tarball']).read()))
   open(dst,'wb').write(tf.extractfile('package/'+inner).read())
 def game_chars():
-  s=set()
-  for f in sorted(os.listdir(os.path.join(ROOT,'src'))):
-    if f.startswith('02e'): continue  # 像素图数据，没有文字
-    s|=set(open(os.path.join(ROOT,'src',f),encoding='utf-8').read())
+  s=set(open(os.path.join(ROOT,'index.html'),encoding='utf-8').read())
+  for d,_,fs in os.walk(os.path.join(ROOT,'src','locales')):
+    for f in fs: s|=set(re.sub(r'/\*[\s\S]*?\*/','',open(os.path.join(d,f),encoding='utf-8').read()))
   return ''.join(sorted(c for c in s if ord(c)>0x7f))
 def main():
   os.makedirs(SRC,exist_ok=True); os.makedirs(OUT,exist_ok=True)
@@ -33,6 +32,6 @@ def main():
     text=latin+(cjk if rng=='all' else '·×→←—…')
     subprocess.run(['pyftsubset',src,'--text='+text,'--flavor=woff2','--layout-features=*','--output-file='+os.path.join(OUT,out)],check=True)
     print(out,os.path.getsize(os.path.join(OUT,out)),'bytes')
-  open(os.path.join(OUT,'chars.txt'),'w',encoding='utf-8').write(cjk)
+  open(os.path.join(ROOT,'tools','font-chars.txt'),'w',encoding='utf-8').write(cjk)
   print('收录',len(cjk),'个非 ASCII 字符')
 main()

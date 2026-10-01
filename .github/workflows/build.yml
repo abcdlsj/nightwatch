@@ -12,8 +12,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - name: 构建单文件版本
-        run: bash build.sh
-      - name: 校验产物
-        run: test -s dist/index.html && grep -q "</html>" dist/index.html
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: 类型检查
+        run: npm run typecheck
+      - name: 单元测试（语言包、分层、无界面战斗模拟）
+        run: npm test
+      - name: 构建
+        run: npm run build
+      - name: 冒烟测试（机器人自动打一局）
+        run: |
+          npx playwright install --with-deps chromium
+          npm run e2e

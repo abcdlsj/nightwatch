@@ -1,0 +1,23 @@
+/* ---------- 战斗内台词 / 新敌人卡片（纯表现，不接收点击） ---------- */
+.bark{position:absolute;left:8px;right:8px;bottom:52px;display:flex;align-items:center;gap:8px;pointer-events:none;z-index:7;opacity:0;
+  background:rgba(12,10,20,.86);border-radius:10px;padding:6px 10px 6px 6px;box-shadow:0 3px 0 rgba(0,0,0,.5),inset 3px 0 0 var(--vc,#fff);max-width:92%;width:max-content}
+.bark img{width:32px;height:32px;image-rendering:pixelated;flex:none;background:rgba(255,255,255,.06);border-radius:7px}
+.bark b{display:block;font-weight:400;font-size:13px;color:var(--vc,#fff)}
+.bark p{margin:1px 0 0;font-family:var(--body);font-size:12px;line-height:1.4;color:#f1ece0}
+.bark.foe{left:auto;right:8px;flex-direction:row-reverse;text-align:right;box-shadow:0 3px 0 rgba(0,0,0,.5),inset -3px 0 0 var(--vc,#fff)}
+.bark.sub{left:0;right:0;max-width:none;width:auto;justify-content:center;border-radius:0;top:38%;bottom:auto;padding:8px 18px;
+  background:linear-gradient(90deg,transparent,rgba(8,6,14,.82) 20%,rgba(8,6,14,.82) 80%,transparent);box-shadow:none}
+.bark.sub p{font-family:var(--body);font-size:18px;color:#e6dcc4;text-align:center;letter-spacing:1px}
+.bark.show{animation:barkA var(--dur,2600ms) ease-out forwards}
+@keyframes barkA{0%{opacity:0;transform:translateY(8px)}7%{opacity:1;transform:none}88%{opacity:1}100%{opacity:0}}
+#foeCard{position:absolute;right:8px;top:8px;width:220px;display:flex;gap:8px;align-items:center;pointer-events:none;z-index:8;opacity:0;
+  background:rgba(20,8,12,.8);border-radius:10px;padding:7px 9px;box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 0 0 2px var(--fc,#ff8a80)}
+#foeCard img{width:48px;height:48px;object-fit:contain;image-rendering:pixelated;flex:none}
+#foeCard small{font-size:11px;color:var(--fc)}#foeCard b{display:block;font-weight:400;font-size:16px}
+#foeCard p{margin:2px 0 0;font-family:var(--body);font-size:12px;line-height:1.4;color:#d8d0c8}
+#foeCard.show{animation:foeA 4.5s ease-out forwards}
+@keyframes foeA{0%{opacity:0;transform:translateX(30px)}8%{opacity:1;transform:none}85%{opacity:1}100%{opacity:0;transform:translateX(10px)}}
+.tsay{display:flex;gap:10px;align-items:center;background:rgba(0,0,0,.3);border-radius:10px;padding:7px 10px;box-shadow:inset 3px 0 0 var(--hc);animation:doorIn .3s}
+.tsay img{width:32px;height:32px;image-rendering:pixelated;flex:none}
+.tsay p{margin:0;font-family:var(--body);font-size:12px;color:#efe6d2;line-height:1.45}
+.node .nq{display:block;font-family:var(--body);font-size:12px;line-height:1.35;color:#c9bda8;margin-top:3px}

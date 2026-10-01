@@ -1,0 +1,29 @@
+/* ---------- 棋盘 ---------- */
+#stashRow{display:flex;gap:7px}
+#stashRow{max-height:calc(var(--ch) + 12px);transition:max-height .25s ease,opacity .2s,margin .25s;overflow:visible}
+#stashRow.closed{max-height:0;opacity:0;margin-top:-7px;overflow:hidden;pointer-events:none}
+#stash,#board{position:relative;height:calc(var(--ch) + 8px);border-radius:11px;background:rgba(0,0,0,.38);
+  box-shadow:inset 0 3px 0 rgba(0,0,0,.35),0 3px 0 rgba(255,255,255,.04)}
+#stash{width:calc(var(--cw) * 4 + 8px);flex:none;background:rgba(0,0,0,.28)}
+#board{width:calc(var(--cw) * 8 + 8px);margin:0 auto;background:linear-gradient(rgba(60,40,26,.55),rgba(30,20,14,.7))}
+.cell{position:absolute;top:4px;width:calc(var(--cw) - 4px);height:var(--ch);border-radius:8px;background:rgba(0,0,0,.25);
+  box-shadow:inset 0 2px 0 rgba(0,0,0,.4)}
+.cell.ok{background:rgba(53,168,107,.5);box-shadow:inset 0 0 0 2px #8ff0bb}
+.cell.bad{background:rgba(226,71,59,.45)}
+.cell.syn::after{content:'✦';position:absolute;top:36%;left:0;right:0;text-align:center;color:#ffd34d;font-size:18px;animation:tw .8s infinite alternate;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+#sell{flex:1;border-radius:11px;border:2px dashed rgba(255,255,255,.16);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--muted);font-size:14px;text-align:center;padding:4px;line-height:1.35;transition:transform .12s,background .12s}
+#sell b{font-family:var(--px);color:#ffd166;font-size:18px}
+#sell.armed{border-color:var(--gold);color:#ffd9a0;background:rgba(242,169,59,.12)}
+#sell.hot{background:rgba(242,169,59,.32);transform:scale(1.04)}
+#boardRow{position:relative}
+
+#actions{display:flex;gap:7px}
+#speedBtn{min-width:44px;font-family:var(--px);font-weight:700;padding:8px 8px;flex:none}
+#goBtn{font-size:19px;padding:10px 8px;white-space:nowrap;min-width:0}
+.fb{position:relative;flex-direction:column;font-size:12px;padding:5px 6px 4px;gap:2px;min-width:46px;flex:none}
+.fb .ico{width:18px;height:18px}
+.fb sup{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;line-height:18px;border-radius:9px;background:var(--red);font-family:var(--px);font-size:12px;padding:0 4px;box-shadow:0 2px 0 rgba(0,0,0,.5)}
+.fb sup:empty{display:none}
+#bagBtn.on{background:#5a4a2a}#bagBtn.hot{background:var(--green);transform:scale(1.08)}#bagBtn.bad{background:var(--red)}
+#treeBtn.glow{animation:glow .8s infinite alternate;box-shadow:0 4px 0 rgba(0,0,0,.5),0 0 12px #ffd166}

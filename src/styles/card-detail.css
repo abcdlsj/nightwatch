@@ -1,0 +1,28 @@
+/* ---------- 卡牌精细化：纸面纹理、内框、品质装饰、传闻 ---------- */
+.card .face{background-image:repeating-linear-gradient(135deg,rgba(60,40,20,.035) 0 2px,transparent 2px 5px),linear-gradient(var(--tbg,var(--card)),var(--tbg,var(--card)))}
+.card .face::before{content:'';position:absolute;left:2px;right:2px;top:10px;bottom:2px;border:1px solid rgba(40,28,20,.14);border-radius:4px;pointer-events:none}
+.card.t1 .face::before{border-color:rgba(120,140,165,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.5)}
+.card.t2 .face::before{border:1px solid rgba(190,130,20,.6);
+  background:linear-gradient(#c8901e,#c8901e) left top/5px 1px no-repeat,linear-gradient(#c8901e,#c8901e) left top/1px 5px no-repeat,
+  linear-gradient(#c8901e,#c8901e) right top/5px 1px no-repeat,linear-gradient(#c8901e,#c8901e) right top/1px 5px no-repeat,
+  linear-gradient(#c8901e,#c8901e) left bottom/5px 1px no-repeat,linear-gradient(#c8901e,#c8901e) left bottom/1px 5px no-repeat,
+  linear-gradient(#c8901e,#c8901e) right bottom/5px 1px no-repeat,linear-gradient(#c8901e,#c8901e) right bottom/1px 5px no-repeat}
+.card.t3 .face::before{border-color:rgba(80,200,255,.7);box-shadow:inset 0 0 6px rgba(120,230,255,.45)}
+.card.t2 .holo{background:linear-gradient(115deg,transparent 40%,rgba(255,250,220,.55) 48%,transparent 56%);background-size:300% 100%;animation:holo 5.5s linear infinite;mix-blend-mode:overlay}
+.card.t3 .inner::before{content:'';position:absolute;inset:-2px;border-radius:10px;background:conic-gradient(from var(--ang,0deg),#6fe6ff,#e0b3ff,#fff3b0,#6fe6ff);animation:spinB 3s linear infinite;z-index:-1}
+@property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes spinB{to{--ang:360deg}}
+.card .spr{filter:drop-shadow(0 1px 0 rgba(0,0,0,.28))}
+.card .nm.long{font-size:10px;letter-spacing:-.5px}
+.card.t3 .nm{color:#1b3a5c;font-weight:700}
+.sh h3 .dn{background:linear-gradient(90deg,#8ff4ff,#e0b3ff,#fff3b0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sh h3 .bn{font-size:14px;color:var(--muted);margin-left:6px}
+.lore{border-radius:9px;padding:8px 11px;background:linear-gradient(135deg,rgba(255,201,60,.12),rgba(0,0,0,.25));box-shadow:inset 3px 0 0 #ffc93c}
+.lore small{font-size:12px;color:#ffc93c;letter-spacing:2px}
+.lore p{margin:3px 0 0;font-family:var(--body);font-size:12px;line-height:1.6;color:#efe3c6}
+.lore .dl{color:#bfefff}
+.lore.dia{background:linear-gradient(135deg,rgba(111,230,255,.14),rgba(224,179,255,.1),rgba(0,0,0,.25));box-shadow:inset 3px 0 0 #6fe6ff}
+.lore.dia small{color:#8ff4ff}
+.lore.locked{background:rgba(0,0,0,.2);box-shadow:inset 3px 0 0 rgba(255,255,255,.15)}
+.lore.locked small{color:var(--muted)}.lore.locked p{color:var(--muted)}
+.scr{margin:auto}

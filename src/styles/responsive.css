@@ -1,0 +1,15 @@
+/* ---------- 矮屏：整页不超过一屏 ---------- */
+@media (max-height:760px){
+  .logo{font-size:64px}.rules{font-size:14px;padding:10px 12px;gap:5px}.scr{gap:9px}
+  .hero em{display:none}.hero p{font-size:12px}
+  .door{min-height:56px;padding:7px 10px}.door img{width:40px;height:40px}.door b{font-size:18px}.door span{font-size:13px}
+  .offer .card.static{transform:none;margin-bottom:2px}.offer .oadj{display:none}
+  .ptitle{font-size:18px}.ev-head{padding:5px 8px}.ev-head img{width:32px;height:32px}.ev-head b{font-size:17px}
+  .rd-t{font-size:28px}.ready .muted{display:none}
+  .opt em{display:none}.tl p{font-size:12px;padding:4px 8px}
+  .ifoe span{display:none}.ifoe{grid-template-rows:auto}.ifoe img{grid-row:auto;width:22px;height:22px}.ready{gap:5px}
+}
+#prep.talking #preview{display:none}
+@media (prefers-reduced-motion: reduce){
+  .card .inner,.logo span,.card.t3 .holo{animation:none}
+}

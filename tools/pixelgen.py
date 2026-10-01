@@ -1,9 +1,9 @@
 """像素美术生成器：用几何图元 + 自动描边 + 自动明暗绘制 16×16 卡牌图标与 32×32 人物立绘，
-输出 src/02e-art.js（覆盖 02-data.js 里的旧 12×12 图）。
+输出 src/data/art/generated.ts。
 
-用法：python3 tools/pixelgen.py            生成 JS
+用法：python3 tools/pixelgen.py            生成 TS
       python3 tools/pixelgen.py --preview  额外输出 shots/art_preview.png 预览图
-调色板字母与 02-data.js 的 PAL 一致；新增字母在 EXTRA_PAL 里声明，会一并写进 JS。
+调色板字母与 src/data/art/palette.ts 的 PAL 一致；新增字母在 EXTRA_PAL 里声明，会一并写进 TS。
 """
 import math, os, sys, json
 
@@ -2663,22 +2663,24 @@ def event_icons():
     c.rect(2, 14, 14, 15, 'd'); c.px(8, 0, 'g'); E['furnace'] = c.done()
     return E
 
-def write_js(path):
+SPRITES_HEAD = 'export const SPRITES: Record<string, string[]> = '
+
+
+def write_ts(path):
     A = card_art(); P = {**portraits(), **enemies(), **relic_icons(), **event_icons()}
     for k, rows in {**A, **P}.items():
         assert all(len(r) == len(rows[0]) for r in rows), k
-    out = ['', '/* ================= 像素美术（由 tools/pixelgen.py 生成，勿手改） =================',
-           ' * 卡牌图标 16×16、人物立绘 32×32；覆盖 02-data.js 中的旧图。 */']
-    out.append('Object.assign(PAL,' + json.dumps(EXTRA_PAL) + ');')
-    out.append('Object.assign(SHAPES,' + json.dumps(relic_templates(), ensure_ascii=False) + ');')
+    out = ['/* 像素美术（由 tools/pixelgen.py 生成，勿手改）：卡牌图标 16×16、人物立绘 32×32、敌人与首领大图 */',
+           'export const EXTRA_PAL: Record<string, string> = ' + json.dumps(EXTRA_PAL) + ';',
+           'export const SHAPES: Record<string, string[]> = ' + json.dumps(relic_templates(), ensure_ascii=False) + ';']
     # 保留文件里已有、但这里没有生成的图（有些图是别处加进来的），只覆盖同名的
     old = {}
     if os.path.exists(path):
         txt = open(path, encoding='utf-8').read()
-        i = txt.find('addSprites(')
-        if i >= 0: old = json.loads(txt[i + len('addSprites('):txt.rindex(');')])
+        i = txt.find(SPRITES_HEAD)
+        if i >= 0: old = json.loads(txt[i + len(SPRITES_HEAD):txt.rindex(';')])
     merged = {**old, **A, **P}
-    out.append('addSprites(' + json.dumps(merged, indent=0, ensure_ascii=False) + ');')
+    out.append(SPRITES_HEAD + json.dumps(merged, indent=0, ensure_ascii=False) + ';')
     open(path, 'w', encoding='utf-8').write('\n'.join(out) + '\n')
     return A, P
 
@@ -2703,7 +2705,7 @@ def preview(A, P, path):
 
 if __name__ == '__main__':
     root = os.path.join(os.path.dirname(__file__), '..')
-    A, P = write_js(os.path.join(root, 'src', '02e-art.js'))
+    A, P = write_ts(os.path.join(root, 'src', 'data', 'art', 'generated.ts'))
     E = enemies()
     print('cards', len(A), 'portraits', len(P))
     if '--preview' in sys.argv:

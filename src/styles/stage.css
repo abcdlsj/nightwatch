@@ -1,0 +1,38 @@
+/* ---------- 舞台 ---------- */
+#stage{position:relative;flex:1;min-height:200px;border-radius:14px;overflow:hidden;background:rgba(8,14,18,.55);
+  box-shadow:inset 0 0 0 3px rgba(0,0,0,.35),0 4px 0 rgba(0,0,0,.4)}
+#field{position:absolute;top:0;image-rendering:pixelated;display:block}
+.layer{position:absolute;inset:0;display:flex;flex-direction:column;gap:7px;padding:9px}
+.layer[hidden]{display:none}
+#prep{background:linear-gradient(to bottom,rgba(10,22,24,.35),rgba(10,22,24,.72))}
+
+#preview{background:rgba(0,0,0,.32);border-radius:10px;padding:6px 8px;display:flex;flex-direction:column;gap:5px;flex:none}
+#preview .ph{display:flex;align-items:baseline;gap:8px}
+#preview .ph span{font-size:13px;color:var(--muted)}
+#preview .ph b{font-size:18px;font-weight:400}
+#pvList{display:flex;flex-wrap:wrap;gap:4px;max-height:58px;overflow:hidden}
+.pv{display:inline-flex;align-items:center;gap:2px;background:rgba(255,255,255,.07);border-radius:6px;padding:1px 6px 1px 1px;font-family:var(--px);font-size:13px}
+.pv img{width:24px;height:24px;image-rendering:pixelated}
+.pv.elite{background:rgba(226,71,59,.35);box-shadow:inset 0 0 0 2px rgba(255,120,100,.5)}
+#pvNote{font-size:12px;color:#ffc3b8;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#pvNote:empty{display:none}
+
+#shopHead{display:flex;align-items:center;gap:6px}
+#shopHead h2{margin:0;font-weight:400;font-size:22px;flex:1;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+#offers{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;justify-content:center;min-height:0}
+.offer{position:relative;background:var(--panel2);border-radius:11px;padding:12px 4px 8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;
+  box-shadow:0 4px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.05);min-height:0}
+.offer .oname{font-size:15px;margin-top:2px}
+.offer .oadj{font-size:13px;min-height:15px}
+.offer .osz{font-size:12px;color:var(--muted)}
+.offer .oflav{display:none}
+.price.free{color:#9bf0b8;background:#173a28}
+.offer .odesc{font-family:var(--body);font-size:12px;line-height:1.35;color:#c5d2d6;text-align:center;padding:0 2px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+/* 三张货并排时逐行对齐：卡图同高、名字同一行、价格贴底；卡图不缩放，像素保持清楚 */
+.offer .card.static{margin-bottom:6px}
+.offer .price{margin-top:auto}
+.price{margin-top:3px;display:inline-flex;align-items:center;gap:3px;background:#3b2a12;border-radius:7px;padding:3px 7px;font-family:var(--px);font-size:16px;color:#ffd166;box-shadow:0 2px 0 rgba(0,0,0,.5)}
+.price.cant{color:#b08a70;background:#2b2320}
+.offer.sold{opacity:.35}
+.offer.sold .card{visibility:hidden}
+.offer.sold::after{content:attr(data-sold);position:absolute;top:36%;left:0;right:0;text-align:center;font-size:18px;color:var(--muted)}

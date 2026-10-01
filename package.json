@@ -1,0 +1,28 @@
+{
+  "name": "nightwatch",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "node tools/check-font-chars.mjs && vite build",
+    "preview": "vite preview --port 4317",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "e2e": "node tests/e2e/smoke.mjs",
+    "shots": "node tests/e2e/shots.mjs",
+    "check": "npm run typecheck && npm test && npm run build",
+    "art": "python3 tools/pixelgen.py",
+    "fonts": "python3 tools/fontsub.py"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "playwright": "^1.63.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3"
+  }
+}
