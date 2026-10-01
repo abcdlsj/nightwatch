@@ -47,6 +47,20 @@ tools/                像素图生成、字体子集化、缺字检查
 docs/                 字体授权说明
 ```
 
+## 手机（iOS / Android）
+
+原生壳用 Capacitor，工程在 `ios/` 和 `android/`，配置在 `capacitor.config.ts`（appId `com.abcdlsj.nightwatch`，上架前定下来就不能再改）。
+
+```bash
+npm run build && npx cap sync     # 把 dist/ 同步进原生工程
+npx cap open ios                  # Xcode 打开，选设备运行 / Archive 上架
+npx cap open android              # Android Studio 打开（需要装 Android SDK）
+```
+
+- 只支持竖屏；刘海和圆角靠 CSS 的 safe-area-inset 处理。
+- 原生壳里存档写进系统存储（`@capacitor/preferences`），第一次启动会把 WebView 里的旧数据搬过去；震动用系统震感；切后台自动静音；Android 返回键先关弹层和背包。这些都在 `src/platform/native.ts`，网页版不加载。
+- 图标和启动图：`node tools/make-app-assets.mjs` 生成 `resources/` 源图（现在是游戏里的灯笼像素图，占位用），再 `npx @capacitor/assets generate --assetPath resources` 导出各尺寸。
+
 ## 分层
 
 规则层和模拟层不碰 DOM，换渲染方式、换平台时只动上层。`tests/unit/layers.test.ts` 会检查：
@@ -153,6 +167,7 @@ python3 tools/pixelgen.py --preview      # 另外输出 shots/ 下的预览图�
 
 - 中毒只有在敌人同时燃烧时才掉血：旧版把中毒结算写进了灼烧的代码块里（`src/sim/enemies.ts` 里有注释）。改掉会让毒流派明显变强，需要重新调平衡。
 - 战场飘字只有数字字形：「壳」「碎」「处决」会画成 0（`src/render/field.ts` 的 `drawNum`）。
+- iOS 上「→」「♪」不显示（标题页规则、声音按钮）：字体子集里这几个符号是空字形，不会回退到系统字体。
 
 ## 路线图
 
