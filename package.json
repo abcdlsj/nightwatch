@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "e2e": "node tests/e2e/smoke.mjs",
+    "layout": "node tests/e2e/layout.mjs",
     "shots": "node tests/e2e/shots.mjs",
     "check": "npm run typecheck && npm test && npm run build",
     "art": "python3 tools/pixelgen.py",

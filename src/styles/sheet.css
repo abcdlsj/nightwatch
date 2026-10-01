@@ -1,7 +1,7 @@
 /* ---------- 弹层 ---------- */
-#sheet{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center}
+#sheet{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding-top:calc(var(--sat) + 8px)}
 #sheet[hidden]{display:none}
-.sh{width:100%;max-width:440px;max-height:calc(100% - 20px);overflow-y:auto;background:var(--panel);border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
+.sh{width:100%;max-width:440px;max-height:100%;overflow-y:auto;background:var(--panel);border-radius:18px 18px 0 0;padding:16px 16px calc(16px + var(--sab));
   box-shadow:0 -4px 0 rgba(0,0,0,.4),inset 0 2px 0 rgba(255,255,255,.06);animation:up .22s ease-out;display:flex;flex-direction:column;gap:10px}
 .sh-top{display:flex;gap:14px;align-items:flex-start}
 .sh-top .card{flex:none}

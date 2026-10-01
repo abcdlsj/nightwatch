@@ -17,7 +17,7 @@
 .hcards img.ex{background:#2a2140;box-shadow:0 0 0 2px var(--hc)}
 .hero em{font-family:var(--body);font-size:12px;color:#8fa4ab}
 .por-big{width:96px;height:96px;image-rendering:pixelated}
-#story{position:fixed;inset:0;z-index:88;background:radial-gradient(ellipse at 50% 30%,rgba(10,10,20,.35),rgba(4,6,10,.88));display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding:20px 14px calc(28px + env(safe-area-inset-bottom,0px));cursor:pointer}
+#story{position:fixed;inset:0;z-index:88;background:radial-gradient(ellipse at 50% 30%,rgba(10,10,20,.35),rgba(4,6,10,.88));display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding:20px 14px calc(28px + var(--sab));cursor:pointer}
 #story[hidden]{display:none}
 .st-scene{width:min(420px,100%);aspect-ratio:120/68;image-rendering:pixelated;border-radius:12px;box-shadow:0 5px 0 rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,255,255,.1);margin:auto 0 12px}
 .st-box{width:100%;max-width:420px;display:flex;gap:12px;align-items:flex-start;background:rgba(14,18,26,.95);border-radius:14px;padding:12px;box-shadow:0 5px 0 rgba(0,0,0,.55),inset 0 0 0 2px var(--sc);animation:doorIn .25s}
@@ -25,7 +25,7 @@
 .st-body b{font-weight:400;font-size:18px;color:var(--sc)}
 .st-body p{margin:6px 0 0;font-family:var(--body);font-size:18px;line-height:1.65;min-height:3.3em}
 .st-tap{margin-top:10px;font-size:13px;color:var(--muted);animation:pulseO .8s infinite alternate}
-.st-skip{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px}
+.st-skip{position:fixed;top:calc(12px + var(--sat));right:12px}
 .st-title{margin:0 0 auto;text-align:center;animation:doorIn .5s}
 .st-title small{display:block;font-size:15px;color:#c79bff;letter-spacing:4px;margin-bottom:10px}
 .st-title h2{margin:0;font-weight:400;font-size:38px;color:#ffe3b0;text-shadow:0 4px 0 rgba(0,0,0,.6),0 0 24px rgba(255,200,120,.35)}

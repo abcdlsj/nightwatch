@@ -2,7 +2,7 @@
 #roundChip,#goldChip,#hpChip{cursor:pointer}
 .chip.hp.low{animation:lowP 1s ease-in-out infinite alternate}
 @keyframes lowP{from{box-shadow:inset 0 0 0 2px rgba(255,90,90,.2)}to{box-shadow:inset 0 0 0 2px #ff5a5a,0 0 12px rgba(255,90,90,.6)}}
-#tipBub{position:fixed;left:50%;top:56px;transform:translate(-50%,-8px);z-index:92;width:max-content;max-width:min(400px,90vw);background:rgba(16,26,32,.97);border-radius:11px;padding:7px 12px 8px;
+#tipBub{position:fixed;left:50%;top:calc(56px + var(--sat));transform:translate(-50%,-8px);z-index:92;width:max-content;max-width:min(400px,90vw);background:rgba(16,26,32,.97);border-radius:11px;padding:7px 12px 8px;
   box-shadow:0 4px 0 rgba(0,0,0,.5),inset 0 0 0 2px #ffd166aa;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;cursor:pointer}
 #tipBub.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 #tipBub small{display:block;font-size:11px;letter-spacing:2px;color:#ffd166}

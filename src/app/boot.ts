@@ -30,7 +30,7 @@ import { enterEvent, finishStep, acquire, afterChange, gainRelic, sellCard } fro
 import { sheetActions } from '../ui/sheets';
 import { initDrag } from './prep/drag';
 import { setDrawer } from './prep/drawer';
-import { codexKill, markSeen } from '../game/meta';
+import { codexKill, markSeen, unlock } from '../game/meta';
 import { onBack, onPause, onResume } from '../platform/native';
 
 /* ---------- 装配 ---------- */
@@ -75,7 +75,7 @@ on('ach', (a: { n: string; d: string }) => {
   const n = $$('.achpop').length;
   const el = document.createElement('div');
   el.className = 'achpop';
-  el.style.top = 10 + n * 54 + 'px';
+  el.style.top = `calc(var(--sat) + ${10 + n * 54}px)`;
   el.innerHTML = `<small>${L.ui.ach.unlocked}</small><b>${a.n}</b><span>${a.d}</span>`;
   document.body.appendChild(el);
   SFX.play('merge');
@@ -86,7 +86,8 @@ on('ach', (a: { n: string; d: string }) => {
 function layout() {
   const avail = Math.min(440, innerWidth) - 16 - 8;
   LAYOUT.cw = Math.floor(avail / 8);
-  const vh = innerHeight;
+  /* 用 #app 实际可用高度（已扣掉刘海和底部横条），不用 innerHeight */
+  const vh = $('#app').clientHeight || innerHeight;
   LAYOUT.ch = Math.round(clamp(Math.min(LAYOUT.cw * 2, (vh - 330) / 2.6), 70, 104));
   document.documentElement.style.setProperty('--cw', LAYOUT.cw + 'px');
   document.documentElement.style.setProperty('--ch', LAYOUT.ch + 'px');
@@ -95,6 +96,15 @@ function layout() {
   requestAnimationFrame(fitField);
 }
 addEventListener('resize', layout);
+/* iOS WebView 刚启动时安全区还是 0，稍后才生效：#app 尺寸一变就重新排 */
+let lastAppH = 0;
+new ResizeObserver(() => {
+  const h = $('#app').clientHeight;
+  if (h !== lastAppH) {
+    lastAppH = h;
+    layout();
+  }
+}).observe($('#app'));
 
 /* ---------- 底栏 ---------- */
 $('#goBtn').onclick = () => {
@@ -167,5 +177,7 @@ requestAnimationFrame(loop);
     return B;
   },
   endScreen, codexKill, markSeen, closeSheet, titleScreen, heroSelect, setDrawer, openTree, startBattle, acquire, toPrep, newGame,
-  boardCards, newCard, afterChange, renderPreview, makeWave, enterEvent, finishStep, renderRelics, gainRelic, rollGear, withFit, rollTalents, stats, mastLv,
+  unlockTest: unlock, boardCards, newCard, afterChange, renderPreview, makeWave, enterEvent, finishStep, renderRelics, gainRelic, rollGear, withFit, rollTalents, stats, mastLv,
 };
+
+if (import.meta.env.VITE_LAYOUT_DEMO) import('./dev-demo').then((m) => m.runDemo());

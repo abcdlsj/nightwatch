@@ -2,6 +2,14 @@
 import './styles/index.css';
 import { initPlatform } from './platform/native';
 
+/* 测试用：?safe=62,34 模拟刘海和底部横条的安全区（浏览器里没有 env(safe-area-inset-*)） */
+const safe = new URLSearchParams(location.search).get('safe');
+if (safe) {
+  const [t, b] = safe.split(',').map((v) => (+v || 0) + 'px');
+  document.documentElement.style.setProperty('--sat', t);
+  document.documentElement.style.setProperty('--sab', b || '0px');
+}
+
 initPlatform()
   .catch((e) => console.error('平台初始化失败，退回网页存储', e))
   .then(() => import('./app/boot'));

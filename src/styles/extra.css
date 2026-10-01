@@ -14,5 +14,5 @@
 /* ---------- 隐藏事件 ---------- */
 .sletter{font-size:13px;line-height:1.7;text-align:left;color:#e8dcc0;margin-bottom:10px}
 .sletter span{display:block;text-align:right}
-.nstar{position:fixed;top:7%;right:16%;width:4px;height:4px;background:#fff7d0;box-shadow:0 0 6px 2px #ffe79a;pointer-events:none;animation:nstar 3s ease-in-out infinite}
+.nstar{position:fixed;top:calc(7% + var(--sat));right:16%;width:4px;height:4px;background:#fff7d0;box-shadow:0 0 6px 2px #ffe79a;pointer-events:none;animation:nstar 3s ease-in-out infinite}
 @keyframes nstar{50%{opacity:.5}}
