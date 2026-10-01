@@ -14,7 +14,7 @@ import { RELICS } from '../../src/data/relics';
 import { TALENTS } from '../../src/data/talents';
 import { makeWave } from '../../src/sim/waves';
 import { B, startBattle, simStep, setOnEnd } from '../../src/sim/battle';
-import { ARCHS, boardFor, relicsFor, talentsFor } from './builds';
+import { ARCHS, boardFor, relicsFor, talentsFor, carryFor } from './builds';
 import { TUNE } from '../../src/game/tuning';
 
 const RUNS = +(process.env.RUNS || 8);
@@ -42,6 +42,12 @@ function night(arch: string, r: number, seed: number, foeSet: string) {
     c.idx = x;
     x += c.size;
     G.cards.push(c);
+  }
+  const cr = carryFor(arch, r, G.cards.map((c) => c.key));
+  if (cr) {
+    const c = G.cards.find((x) => x.key === cr.key)!;
+    c.carry = true;
+    c.star = cr.star;
   }
   recalcMods();
   const wallMod = [...G.relics.map((k) => RELICS[k].m.wall || 0), ...G.skills.map((k) => TALENTS[k].m.wall || 0)].reduce((s, v) => s + v, 0);

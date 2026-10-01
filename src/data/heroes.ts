@@ -77,7 +77,7 @@ export const HEROES: Record<string, HeroDef> = {
  "li": {
   "col": "#8fd3ff",
   "portrait": "p_li",
-  "wall": 24,
+  "wall": 26,
   "gold": 11,
   "start": [
    [

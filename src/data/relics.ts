@@ -334,7 +334,7 @@ export const RELICS: Record<string, RelicDef> = {
   "t": 3,
   "ico": "gem:R",
   "m": {
-   "xtag_fire": 0.3,
+   "xtag_fire": 0.25,
    "burn": 1
   },
   "u": 1
@@ -361,7 +361,7 @@ export const RELICS: Record<string, RelicDef> = {
   "t": 3,
   "ico": "claw:l",
   "m": {
-   "xtag_blade": 0.3,
+   "xtag_blade": 0.25,
    "crit": 0.1
   },
   "u": 1

@@ -248,7 +248,13 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
 
 /** 占着棋盘正中（第 4、5 格） */
 export const isMid = (c: Card) => c.loc === 'board' && c.idx <= 4 && c.idx + c.size > 3;
-export const carryCard = () => G.cards.find((c) => c.carry && c.loc === 'board') || null;
+/** C 位；还没立 C 位时，「为 C 位服务」的卡就服务棋盘上伤害最高的那张 */
+export const carryCard = () =>
+  G.cards.find((c) => c.carry && c.loc === 'board') ||
+  boardCards()
+    .filter((c) => ITEMS[c.key].dmg > 0)
+    .sort((a, b) => stats(b, null).total / stats(b, null).cd - stats(a, null).total / stats(a, null).cd)[0] ||
+  null;
 /** 立 C 位：同一时间只有一张 */
 export function setCarry(c: Card) {
   for (const o of G.cards) if (o !== c) o.carry = false;

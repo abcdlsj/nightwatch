@@ -346,9 +346,9 @@ export default {
       ico: 'starfall',
       hint: '为主力点亮一颗星',
       pick: '让 {n} 成为你的星',
-      pickSub: '立为 C 位，再点亮一颗星辉（C 位倍率 +12%）',
+      pickSub: '立为 C 位，再点亮一颗星辉（C 位倍率 +10%）',
       star: '为 C 位 {n} 再点一颗星',
-      starSub: '星辉 {s} → {t}：C 位倍率每颗 +12%',
+      starSub: '星辉 {s} → {t}：C 位倍率每颗 +10%',
     },
   },
 

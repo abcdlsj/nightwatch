@@ -12,6 +12,8 @@ interface Arch {
   talents: string[];
   /** 任务卡：第几夜起变成什么 */
   quests?: Record<string, [number, string]>;
+  /** C 位候选（按优先级，棋盘上有哪张就立哪张；第 3 夜跃迁事件之后才有） */
+  carry?: string[];
 }
 
 export const ARCHS: Record<string, Arch> = {
@@ -53,6 +55,55 @@ export const ARCHS: Record<string, Arch> = {
     relics: ['grease', 'heart', 'earring', 'medal', 'pocketwatch', 'box'],
     talents: ['ying_10', 'ying_11', 'quick', 'ying_12'],
   },
+  drill: {
+    hero: 'ayla',
+    board: [[1, 'pike'], [1, 'banner'], [2, 'shieldwall'], [2, 'rally'], [3, 'tower'], [5, 'warhorn']],
+    relics: ['whet', 'spike', 'medal', 'scope', 'fang', 'venom'],
+    talents: ['ayla_10', 'sharp', 'ayla_11', 'ayla_12'],
+    carry: ['shieldwall', 'tower'],
+  },
+  cracker: {
+    hero: 'ying',
+    board: [[1, 'matchbox'], [1, 'crackers'], [2, 'stall'], [1, 'rocket'], [4, 'fireworks']],
+    relics: ['tinder', 'fusebox', 'medal', 'powder', 'oilcan', 'lampbook'],
+    talents: ['ying_20', 'ying_21', 'quick', 'ying_22'],
+    carry: ['fireworks', 'stall'],
+  },
+  turret: {
+    hero: 'jun',
+    board: [[2, 'caltrop'], [1, 'scaffold'], [1, 'turret'], [3, 'shellman'], [5, 'bigcannon']],
+    relics: ['plumb', 'blueprint', 'mortarboard', 'medal', 'grease', 'citadel'],
+    talents: ['jun_10', 'jun_11', 'jun_20', 'jun_12'],
+    carry: ['bigcannon', 'turret'],
+  },
+  works: {
+    hero: 'jun',
+    board: [[1, 'palisade'], [1, 'caltrop'], [1, 'watchtower'], [3, 'mortar'], [5, 'bastion']],
+    relics: ['blueprint', 'plumb', 'spike', 'medal', 'mortarboard', 'citadel'],
+    talents: ['jun_00', 'jun_01', 'jun_10', 'jun_02'],
+    carry: ['watchtower', 'mortar'],
+  },
+  chart: {
+    hero: 'li',
+    board: [[1, 'astrolabe'], [1, 'starseed'], [3, 'lens'], [2, 'comet'], [5, 'orrery']],
+    relics: ['telescope', 'starchart', 'compass', 'medal', 'fang', 'polaris'],
+    talents: ['li_00', 'li_01', 'li_20', 'li_02'],
+    carry: ['comet', 'starseed'],
+  },
+  frostar: {
+    hero: 'li',
+    board: [[1, 'frostar'], [1, 'starseed'], [2, 'rimelance'], [3, 'astrolabe'], [5, 'glacier']],
+    relics: ['icepack', 'starchart', 'charm', 'telescope', 'permafrost', 'polaris'],
+    talents: ['li_10', 'li_11', 'li_00', 'li_12'],
+    carry: ['rimelance', 'glacier'],
+  },
+  meteor: {
+    hero: 'li',
+    board: [[1, 'stardust'], [1, 'astrolabe'], [2, 'pulsar'], [4, 'starfire']],
+    relics: ['telescope', 'wire', 'starchart', 'medal', 'compass', 'polaris'],
+    talents: ['li_20', 'li_21', 'li_00', 'li_22'],
+    carry: ['starfire', 'pulsar'],
+  },
   lamp: {
     hero: 'ying',
     board: [[1, 'paperlamp'], [1, 'lamps'], [2, 'firefly'], [2, 'marquee'], [3, 'oilpot'], [4, 'skylantern']],
@@ -89,7 +140,7 @@ export function boardFor(arch: string, r: number): [string, number, string?][] {
 
 /** plain：只靠加法（不拿传说遗物、不用回响、最高金品质）；mult：凑出独立乘区和连锁 */
 export const MODE = (process.env.BUILD || 'plain') as 'plain' | 'mult';
-const LEGEND: Record<string, string> = { volt: 'shard', fire: 'dragonheart', blade: 'venom', ice: 'oath', poison: 'shard', mech: 'box', lamp: 'lampbook' };
+const LEGEND: Record<string, string> = { volt: 'shard', fire: 'dragonheart', blade: 'venom', ice: 'oath', poison: 'shard', mech: 'box', lamp: 'lampbook', drill: 'venom', cracker: 'lampbook', turret: 'citadel', works: 'citadel', chart: 'polaris', frostar: 'polaris', meteor: 'polaris' };
 
 export function relicsFor(arch: string, r: number) {
   const n = [0, 1, 1, 2, 3, 4, 5, 6][r - 1];
@@ -99,3 +150,12 @@ export function relicsFor(arch: string, r: number) {
   return list;
 }
 export const talentsFor = (arch: string, r: number) => ARCHS[arch].talents.slice(0, Math.ceil(r / 2));
+/** C 位：第 3 夜起有（跃迁事件）；璃每经过一次跃迁再点一颗星 */
+export function carryFor(arch: string, r: number, keys: string[]): { key: string; star: number } | null {
+  if (r < 3) return null;
+  const A = ARCHS[arch];
+  const order = [...(A.carry || []), ...keys];
+  const key = order.find((k) => keys.includes(k));
+  if (!key) return null;
+  return { key, star: A.hero === 'li' ? [3, 5, 7].filter((n) => n <= r).length : 0 };
+}
