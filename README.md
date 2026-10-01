@@ -59,7 +59,7 @@ npx cap open android              # Android Studio 打开（需要装 Android SD
 
 - 只支持竖屏；刘海和圆角靠 CSS 的 safe-area-inset 处理。
 - 原生壳里存档写进系统存储（`@capacitor/preferences`），第一次启动会把 WebView 里的旧数据搬过去；震动用系统震感；切后台自动静音；Android 返回键先关弹层和背包。这些都在 `src/platform/native.ts`，网页版不加载。
-- 图标和启动图：`node tools/make-app-assets.mjs` 生成 `resources/` 源图（现在是游戏里的灯笼像素图，占位用），再 `npx @capacitor/assets generate --assetPath resources` 导出各尺寸。
+- 图标和启动图：`node tools/make-app-assets.mjs` 生成 `resources/` 源图（三条从短到长的像素横线：黎明的光、守夜的火、城墙），再 `npx @capacitor/assets generate --assetPath resources` 导出各尺寸。
 
 ## 分层
 
