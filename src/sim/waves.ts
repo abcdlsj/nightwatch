@@ -5,12 +5,13 @@ import { clamp } from '../core/util';
 import { G, heat, type Wave } from '../game/state';
 import { foeKey } from '../game/foes';
 import { noScale } from '../game/prep';
+import { TUNE } from '../game/tuning';
 
 type Pack = (comp: Record<string, number>, n: number, t0: number, t1: number) => void;
 type Boss = (k: string, t: number) => void;
 
-/** 敌人血量倍率（首领和固定数值的除外） */
-export const hpScale = (r: number) => Math.pow(1.32, r - 1);
+/** 敌人血量倍率（首领和固定数值的除外）：每夜成长，第 6 夜起再加一截 */
+export const hpScale = (r: number) => Math.pow(TUNE.hpGrowth, r - 1) * Math.pow(TUNE.lateHp, Math.max(0, r - 5));
 
 export function makeWave(r: number): Wave {
   const S: Wave = [];

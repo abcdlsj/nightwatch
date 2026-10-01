@@ -21,6 +21,7 @@ export function modText(m: Mods) {
       const l = ML[k];
       if (p === 2) return `<i class="mg">${l}</i>`;
       const v = m[k];
+      if (p === 3) return `<i class="mg mx">${l} ×${+(1 + v).toFixed(2)}</i>`;
       const good = inv ? v < 0 : v > 0;
       const sv = k === 'range' ? -v : v;
       return `<i class="${good ? 'mg' : 'mb'}">${l} ${sv > 0 ? '+' : ''}${p ? Math.round(sv * 100) + '%' : sv}</i>`;
@@ -33,6 +34,7 @@ export function plainMods(m: Mods) {
   return Object.keys(m)
     .map((k) => {
       const [p] = MODL[k];
+      if (p === 3) return ML[k] + ' ×' + +(1 + m[k]).toFixed(2);
       return ML[k] + ' +' + (p ? Math.round(m[k] * 100) + '%' : m[k]);
     })
     .join(L.ui.common.comma);

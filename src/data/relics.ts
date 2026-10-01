@@ -246,10 +246,7 @@ export const RELICS: Record<string, RelicDef> = {
  "glass": {
   "t": 2,
   "ico": "gem:C",
-  "m": {
-   "dmg": 0.3,
-   "wall": -8
-  }
+  "m": {"xdmg": 0.25, "wall": -8}
  },
  "shell": {
   "t": 2,
@@ -316,10 +313,7 @@ export const RELICS: Record<string, RelicDef> = {
  "oath": {
   "t": 3,
   "ico": "scroll:R",
-  "m": {
-   "dmg": 0.25,
-   "wall": 10
-  },
+  "m": {"xdmg": 0.2, "wall": 10},
   "u": 1
  },
  "hourglass": {
@@ -333,37 +327,25 @@ export const RELICS: Record<string, RelicDef> = {
  "dragonheart": {
   "t": 3,
   "ico": "gem:R",
-  "m": {
-   "tag_fire": 0.4,
-   "burn": 1
-  },
+  "m": {"xtag_fire": 0.3, "burn": 1},
   "u": 1
  },
  "shard": {
   "t": 3,
   "ico": "gem:P",
-  "m": {
-   "dmg": 0.5,
-   "enemySpd": 0.1
-  },
+  "m": {"xdmg": 0.35, "enemySpd": 0.1},
   "u": 1
  },
  "box": {
   "t": 3,
   "ico": "book:s",
-  "m": {
-   "tag_mech": 0.3,
-   "startCharge": 0.3
-  },
+  "m": {"xtag_mech": 0.25, "startCharge": 0.3},
   "u": 1
  },
  "venom": {
   "t": 3,
   "ico": "claw:l",
-  "m": {
-   "tag_blade": 0.4,
-   "crit": 0.1
-  },
+  "m": {"xtag_blade": 0.3, "crit": 0.1},
   "u": 1
  },
  "dogtag": {
@@ -407,11 +389,7 @@ export const RELICS: Record<string, RelicDef> = {
   "ico": "scroll:b",
   "u": 1,
   "hero": "ayla",
-  "m": {
-   "dmg": 0.2,
-   "tag_mech": 0.2,
-   "wall": 6
-  }
+  "m": {"xdmg": 0.12, "tag_mech": 0.2, "wall": 6}
  },
  "stone": {
   "t": 2,
@@ -500,10 +478,7 @@ export const RELICS: Record<string, RelicDef> = {
   "ico": "book:y",
   "u": 1,
   "hero": "ying",
-  "m": {
-   "dmg": 0.2,
-   "s1": 0.3
-  }
+  "m": {"xdmg": 0.12, "s1": 0.3}
  },
  "kindling": {
   "t": 0,

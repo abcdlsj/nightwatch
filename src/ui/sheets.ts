@@ -73,9 +73,9 @@ export function openSheet(src: SheetSrc) {
   if (it.dmg > 0) {
     let f = '(' + st.base + (st.flat ? ' + ' + ADJ.sharp.n + st.flat : '') + ')';
     if (st.psum) f += ' × (1 + ' + st.pct.map((p) => p[0] + ' ' + Math.round(p[1] * 100) + '%').join(' + ') + ')';
-    if (st.mult > 1) f += ' × ' + ADJ.deadly.n + '1.5';
+    for (const [l, v] of st.xs) f += ' × ' + l + +v.toFixed(2);
     /* 没有加成时算式就是它自己，不单占一行 */
-    rows += row(S.dmg, String(Math.round(st.total))) + (st.flat || st.psum || st.mult > 1 ? `<div><span></span><span class="f">${f}</span></div>` : '');
+    rows += row(S.dmg, String(Math.round(st.total))) + (st.flat || st.psum || st.xs.length ? `<div><span></span><span class="f">${f}</span></div>` : '');
     rows += row(S.crit, t('sheet.critV', { n: Math.round(st.crit * 100) }));
     if (it.chain) rows += row(S.chain, String(chainOf(c)));
     if (it.multi) rows += row(S.multi, t('sheet.multiV', { n: it.multi }));

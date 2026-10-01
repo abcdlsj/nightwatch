@@ -5,6 +5,7 @@ import { L } from '../i18n';
 import { vr } from '../core/rng';
 import { G, type Card, type CardSpec, type Zone } from './state';
 import { mv } from './mods';
+import { TUNE } from './tuning';
 
 let UID = 1;
 
@@ -137,12 +138,17 @@ export function fitSpd(c: Card) {
 }
 
 /* ---------------- 伤害公式 ----------------
- * (基础 + 固定) × (1 + Σ百分比) × Π独立乘区 × 暴击 */
+ * (基础 + 固定) × (1 + Σ加成) × Π独立乘区 × 暴击 × 连锁倍率 × 目标易伤
+ * 独立乘区：致命、钻品质、传说遗物、6 层羁绊……每一项单独相乘，后期主要靠它们 */
+/** 连锁倍率：被回响、齐鸣、遗物带出来的出手，每深一层加一截（系数见 tuning.ts） */
+export const comboMul = (depth: number) => 1 + TUNE.combo * Math.min(TUNE.comboMax, Math.max(0, depth));
 export interface Stats {
   base: number;
   flat: number;
   pct: [string, number][];
   psum: number;
+  /** 独立乘区：每一项单独相乘 [名字, 倍率] */
+  xs: [string, number][];
   mult: number;
   total: number;
   cd: number;
@@ -193,7 +199,16 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
     if (mv('full') && occ('board').every(Boolean)) mp('full', T.full);
   }
   const psum = pct.reduce((s2, p) => s2 + p[1], 0);
-  const mult = a === 'deadly' ? 1.5 : 1;
+  const xs: [string, number][] = [];
+  if (a === 'deadly') xs.push([ADJ.deadly.n, 1.5]);
+  if (c.tier >= 3) xs.push([T.diamond, TUNE.diamond]);
+  const xm = (k: string, l: string) => {
+    const v = mv(k);
+    if (v) xs.push([l, 1 + v]);
+  };
+  xm('xdmg', T.bonus);
+  xm('xtag_' + it.tag, T.bonus + '·' + L.terms.tags[it.tag]);
+  const mult = xs.reduce((m, x) => m * x[1], 1);
   const total = (base + flat) * Math.max(0.1, 1 + psum) * mult;
   let cd = it.cd * U.c[s];
   if (a === 'twin') cd *= 1.6;
@@ -208,7 +223,7 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
   }
   if (mv('t_last') && G.wall < G.wallMax * 0.35) spd += 0.25;
   spd = Math.max(0.3, spd + mv('spd') + fitSpd(c as Card));
-  return { base, flat, pct, psum, mult, total, cd: Math.max(0.25, cd / spd), cdRaw: it.cd, crit: 0.05 + (a === 'precise' ? 0.2 : 0) + mv('crit') };
+  return { base, flat, pct, psum, xs, mult, total, cd: Math.max(0.25, cd / spd), cdRaw: it.cd, crit: 0.05 + (a === 'precise' ? 0.2 : 0) + mv('crit') };
 }
 
 /* ---------------- 价格 ---------------- */

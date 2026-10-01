@@ -9,8 +9,9 @@ export let M: Mods = {};
 
 export function recalcMods() {
   const m: Mods = {};
+  /* 普通修正项相加；x 开头的是独立乘区，多个来源相乘（存的是 倍率-1） */
   const add = (x: Mods) => {
-    for (const k in x) m[k] = (m[k] || 0) + x[k];
+    for (const k in x) m[k] = k[0] === 'x' ? (1 + (m[k] || 0)) * (1 + x[k]) - 1 : (m[k] || 0) + x[k];
   };
   for (const r of G.relics) add(RELICS[r].m);
   for (const s of G.skills) if (TALENTS[s]) add(TALENTS[s].m);

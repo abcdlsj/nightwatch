@@ -11,6 +11,7 @@ import { boardCards, neighbors, rightOf, maxAmmo, stats, finishQuests } from '..
 import { unlock } from '../game/meta';
 import { synCount } from '../game/synergy';
 import { world, RANGE0, ex, ey } from './world';
+import { TUNE } from '../game/tuning';
 import { view } from './view';
 import { CARD_HOOKS, RELIC_HOOKS, TALENT_HOOKS, passiveSrc } from './hooks';
 import { trigger, stepProj } from './combat';
@@ -199,10 +200,19 @@ export function simStep(dt: number) {
 /* ---------------- 目标 ---------------- */
 export const phased = (e: { d: { phase?: number }; ph: number }) => !!e.d.phase && (B!.t + e.ph) % 3.2 > 2.0;
 export const rising = (e: { emerge?: boolean; bornT: number }) => !!e.emerge && B!.t - e.bornT < 0.5;
-/** 最靠近城墙、能被打到的敌人 */
+/** 卡牌的目标：最靠近城墙、能被打到的敌人。
+ * 精英和首领算「更靠前」一截（TUNE.eliteFocus），不然它们跟在小怪后面，单体输出的卡永远打不到，直到撞墙 */
 export function front() {
-  let b: Enemy | null = null;
-  for (const e of B!.en) if (!e.dead && e.y >= world.range && !phased(e) && !rising(e) && (!b || e.y > b.y)) b = e;
+  let b: Enemy | null = null,
+    bv = -1;
+  for (const e of B!.en) {
+    if (e.dead || e.y < world.range || phased(e) || rising(e)) continue;
+    const v = e.y + (e.d.elite || e.d.boss ? TUNE.eliteFocus : 0);
+    if (v > bv) {
+      bv = v;
+      b = e;
+    }
+  }
   return b;
 }
 export const hasTarget = () => !!front();

@@ -1,5 +1,5 @@
 /* 从旧版数据迁移而来，直接在这里改 */
-/** 修正项：[显示方式, 越小越好]。显示方式 0 数值、1 百分比、2 只显示说明 */
+/** 修正项：[显示方式, 越小越好]。显示方式 0 数值、1 百分比、2 只显示说明、3 独立乘区（键以 x 开头，多个来源相乘） */
 export const MODL: Record<string, [number, number?]> = {
  "dmg": [
   1
@@ -191,5 +191,12 @@ export const MODL: Record<string, [number, number?]> = {
  ],
  "tag_poison": [
   1
- ]
+ ],
+ "xdmg": [3],
+ "xtag_blade": [3],
+ "xtag_fire": [3],
+ "xtag_ice": [3],
+ "xtag_volt": [3],
+ "xtag_mech": [3],
+ "xtag_poison": [3]
 } as never;

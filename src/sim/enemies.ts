@@ -12,6 +12,7 @@ import { world, K, ex, ey, WALLY } from './world';
 import { view } from './view';
 import { B, bt, later, emit, finish } from './battle';
 import { hpScale } from './waves';
+import { TUNE } from '../game/tuning';
 import { hurt } from './combat';
 import type { Enemy } from './types';
 
@@ -21,7 +22,7 @@ export function spawn(type: string, x?: number | null, y?: number | null): Enemy
   const b = bt();
   const d = EN[type];
   const sc = d.fixed
-    ? G.round > 8 ? Math.pow(1.4, G.round - 8) : 1
+    ? (G.round > 8 ? Math.pow(1.4, G.round - 8) : 1) * (d.boss ? TUNE.bossHp : 1)
     : hpScale(G.round) * (G.round === 1 ? 0.5 : G.round === 2 ? 0.6 : 0.7) * (heat(1) ? 1.15 : 1) * (heat(2) && (d.boss || d.elite) ? 1.25 : 1) * (wg('iron') ? 1.3 : 1);
   const e: Enemy = {
     d, type, x: x != null ? x : rnd(0.08, 0.92), y: y != null ? y : -0.04, x0: 0, hp: d.hp * sc, maxHp: d.hp * sc, armor: d.armor, shield: 0,

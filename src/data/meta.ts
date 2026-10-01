@@ -171,7 +171,7 @@ export const SYN: Record<Tag, [number, Record<string, number>][]> = {
   [
    6,
    {
-    "tag_blade": 0.4
+    "xtag_blade": 0.3
    }
   ]
  ],
@@ -192,7 +192,7 @@ export const SYN: Record<Tag, [number, Record<string, number>][]> = {
   [
    6,
    {
-    "tag_fire": 0.4
+    "xtag_fire": 0.3
    }
   ]
  ],
@@ -212,7 +212,7 @@ export const SYN: Record<Tag, [number, Record<string, number>][]> = {
   [
    6,
    {
-    "tag_ice": 0.4
+    "xtag_ice": 0.3
    }
   ]
  ],
@@ -233,7 +233,7 @@ export const SYN: Record<Tag, [number, Record<string, number>][]> = {
   [
    6,
    {
-    "tag_volt": 0.4
+    "xtag_volt": 0.3
    }
   ]
  ],
@@ -273,7 +273,7 @@ export const SYN: Record<Tag, [number, Record<string, number>][]> = {
   [
    6,
    {
-    "tag_poison": 0.5
+    "xtag_poison": 0.35
    }
   ]
  ]

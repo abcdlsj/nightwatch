@@ -46,6 +46,7 @@ export default {
     right: '最右',
     lonely: '孤狼',
     full: '满员',
+    diamond: '钻',
   },
 
   battle: {

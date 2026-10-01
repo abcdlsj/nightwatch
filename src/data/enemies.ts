@@ -66,9 +66,9 @@ export const EN: Record<string, EnemyDef> = {
   "faction": "war"
  },
  "knight": {
-  "hp": 1200,
+  "hp": 1000,
   "spd": 0.022,
-  "armor": 4,
+  "armor": 3,
   "wall": 12,
   "spr": "b_knight",
   "sc": 1,

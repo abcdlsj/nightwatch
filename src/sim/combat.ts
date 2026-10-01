@@ -4,7 +4,8 @@ import { L } from '../i18n';
 import { rand, rnd, vr, vrnd } from '../core/rng';
 import { G, type Card } from '../game/state';
 import { mv } from '../game/mods';
-import { boardCards, stepOf, dmgMul, chainOf, chargeAmt, buffAmt, maxAmmo, stats, type Stats } from '../game/cards';
+import { TUNE } from '../game/tuning';
+import { boardCards, stepOf, dmgMul, chainOf, chargeAmt, buffAmt, maxAmmo, stats, comboMul, type Stats } from '../game/cards';
 import { unlock, codexKill } from '../game/meta';
 import { world, K, ex, ey } from './world';
 import { view } from './view';
@@ -45,10 +46,10 @@ function fire(c: Card, depth: number) {
   const st = stats(c, b.t);
   const nb = c.nb || [];
   if (it.dmg > 0) {
-    attack(c, st);
+    attack(c, st, depth);
     for (let i = 1; i < (it.multi || 1); i++)
       later(0.09 * i, () => {
-        if (!B!.over) attack(c, st);
+        if (!B!.over) attack(c, st, depth);
       });
   }
   if (it.stack) c.stk += it.stack;
@@ -136,7 +137,7 @@ function fire(c: Card, depth: number) {
   for (const n of nb) {
     if (n.adj !== 'echo' || n.frozen > 0) continue;
     n.echoLog = n.echoLog.filter((t) => t > b.t - 1);
-    if (n.echoLog.length >= 6) continue;
+    if (n.echoLog.length >= TUNE.echoPerSec) continue;
     n.echoLog.push(b.t);
     later(0.12, () => {
       const d = depth + 1;
@@ -195,13 +196,14 @@ function showChain(n: number) {
 /* ---------------- 攻击方式 ---------------- */
 type HitMods = { slow?: number; kb?: number; freeze?: number; vuln?: [number, number] | null; exec?: number; burnDur?: number; poisonDur?: number; burn?: number; poison?: number; pen?: number; splash?: number; burnTick?: number; poisonTick?: number };
 
-function attack(c: Card, st: Stats) {
+
+function attack(c: Card, st: Stats, depth = 0) {
   const b = bt();
   const it = ITEMS[c.key];
   const t = front();
   if (!t) return;
   const crit = rand() < st.crit;
-  let dmg = st.total * (crit ? 2 + mv('critDmg') : 1);
+  let dmg = st.total * (crit ? 2 + mv('critDmg') : 1) * comboMul(depth);
   if (c.anvil) {
     dmg *= 1 + c.anvil;
     c.anvil = 0;
@@ -369,7 +371,8 @@ function attack(c: Card, st: Stats) {
       list.forEach((e) => pts.push([ex(e), ey(e) - 5]));
       view.bolt(pts, it.tag === 'volt' ? '#fee761' : '#fff', 0.16);
       list.forEach((e, i) => {
-        H_(e, i ? 0.6 : 1);
+        /* 第一跳 60%，之后每跳递减：叠再多弹跳次数，总收益也有上限 */
+        H_(e, i ? TUNE.bounceFirst * Math.pow(TUNE.bounceDecay, i - 1) : 1);
         if (i) emit('bounce', { e, src: c });
       });
       break;

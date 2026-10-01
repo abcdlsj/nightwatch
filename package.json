@@ -14,6 +14,8 @@
     "test": "vitest run",
     "e2e": "node tests/e2e/smoke.mjs",
     "layout": "node tests/e2e/layout.mjs",
+    "balance": "vitest run -c vitest.balance.config.ts tests/balance/run.balance.ts",
+    "bench": "vitest run -c vitest.balance.config.ts tests/balance/bench.balance.ts --reporter=verbose",
     "shots": "node tests/e2e/shots.mjs",
     "check": "npm run typecheck && npm test && npm run build",
     "art": "python3 tools/pixelgen.py",

@@ -1,0 +1,101 @@
+/* 各流派的成型阵容：到第 N 夜大概会有哪些卡、什么品质、哪些遗物和天赋。
+ * 卡按棋盘顺序写（辅助卡贴着主力），[从第几夜有, 卡, 词缀?]；任务卡在完成后换成新卡。 */
+import { ITEMS } from '../../src/data/cards';
+import { RELICS } from '../../src/data/relics';
+
+/** [从第几夜有, 卡, 词缀?, 到第几夜为止?] */
+type Slot = [number, string, string?, number?];
+interface Arch {
+  hero: string;
+  board: Slot[];
+  relics: string[];
+  talents: string[];
+  /** 任务卡：第几夜起变成什么 */
+  quests?: Record<string, [number, string]>;
+}
+
+export const ARCHS: Record<string, Arch> = {
+  volt: {
+    hero: 'mo',
+    board: [[1, 'appwand'], [1, 'arcbottle'], [3, 'prism'], [2, 'stormflask'], [4, 'tesla']],
+    quests: { appwand: [3, 'thunderking'] },
+    relics: ['wire', 'cloud', 'notes', 'stormeye', 'coil', 'medal'],
+    talents: ['mo_20', 'quick', 'mo_21', 'mo_22'],
+  },
+  fire: {
+    hero: 'mo',
+    board: [[1, 'vial'], [1, 'sparkwick'], [2, 'cannon'], [3, 'fuse'], [4, 'dragon']],
+    relics: ['tinder', 'oil', 'wisp', 'powder', 'dragonheart', 'medal'],
+    talents: ['mo_00', 'quick', 'mo_01', 'mo_02'],
+  },
+  blade: {
+    hero: 'ayla',
+    board: [[1, 'dagger'], [1, 'oathsword'], [3, 'warhorn'], [2, 'xbow'], [4, 'axe']],
+    quests: { oathsword: [4, 'nightsword'] },
+    relics: ['whet', 'spike', 'scope', 'fang', 'medal', 'venom'],
+    talents: ['ayla_10', 'sharp', 'ayla_11', 'ayla_12'],
+  },
+  ice: {
+    hero: 'mo',
+    board: [[1, 'condenser'], [1, 'frostvial', undefined, 4], [1, 'vial', undefined, 4], [2, 'frost'], [3, 'rime'], [5, 'blizzard']],
+    relics: ['icepack', 'charm', 'permafrost', 'medal', 'timer', 'glass'],
+    talents: ['mo_10', 'quick', 'mo_11', 'mo_12'],
+  },
+  poison: {
+    hero: 'mo',
+    board: [[1, 'needle'], [1, 'acidvial', undefined, 4], [2, 'gasbomb'], [2, 'snakekiss', undefined, 4], [3, 'concentrate'], [5, 'miasma']],
+    relics: ['expired', 'medal', 'timer', 'scope', 'fang', 'shard'],
+    talents: ['quick', 'sharp', 'heavy', 'early'],
+  },
+  mech: {
+    hero: 'ying',
+    board: [[1, 'gear'], [1, 'windup', undefined, 3], [2, 'clockwork'], [3, 'anvil'], [4, 'pendulum']],
+    relics: ['grease', 'heart', 'earring', 'medal', 'pocketwatch', 'box'],
+    talents: ['ying_10', 'ying_11', 'quick', 'ying_12'],
+  },
+  lamp: {
+    hero: 'ying',
+    board: [[1, 'paperlamp'], [1, 'lamps'], [2, 'firefly'], [2, 'marquee'], [3, 'oilpot'], [4, 'skylantern']],
+    relics: ['jarflies', 'oilcan', 'tinder', 'medal', 'lampbook', 'pocketwatch'],
+    talents: ['ying_00', 'ying_01', 'quick', 'ying_02'],
+  },
+};
+
+/** 第 N 夜的大致品质：前两夜铜/银，中期银，后期金，最后两夜主力一张钻 */
+const TIER = [0, 0, 1, 1, 1, 2, 2, 2];
+
+export function boardFor(arch: string, r: number): [string, number, string?][] {
+  const A = ARCHS[arch];
+  const out: [string, number, string?][] = [];
+  let used = 0;
+  const mult = MODE === 'mult';
+  A.board.forEach(([from, key0, adj0, until], i) => {
+    if (r < from || (until && r > until)) return;
+    /* 凑乘区：第 5 夜起主力旁边两张输出卡带回响 */
+    const adj = adj0 || (mult && r >= 5 && (i === 1 || i === 2) ? 'echo' : undefined);
+    let key = key0;
+    const q = A.quests?.[key0];
+    if (q && r >= q[0]) key = q[1];
+    const it = ITEMS[key];
+    if (used + it.size > 8) return;
+    used += it.size;
+    /* 晚拿到的卡品质低一档；最后两夜第一张主力是钻 */
+    let tier = Math.max(it.t, TIER[r - 1] - (r - from >= 2 ? 0 : 1));
+    if (mult && r >= 7 && out.length === 0) tier = 3;
+    out.push([key, Math.min(mult ? 3 : 2, tier), it.dmg > 0 || !adj ? adj : undefined]);
+  });
+  return out;
+}
+
+/** plain：只靠加法（不拿传说遗物、不用回响、最高金品质）；mult：凑出独立乘区和连锁 */
+export const MODE = (process.env.BUILD || 'plain') as 'plain' | 'mult';
+const LEGEND: Record<string, string> = { volt: 'shard', fire: 'dragonheart', blade: 'venom', ice: 'oath', poison: 'shard', mech: 'box', lamp: 'lampbook' };
+
+export function relicsFor(arch: string, r: number) {
+  const n = [0, 1, 1, 2, 3, 4, 5, 6][r - 1];
+  const ok = (k: string) => RELICS[k] && (!RELICS[k].hero || RELICS[k].hero === ARCHS[arch].hero) && RELICS[k].t < 3 && k !== 'glass';
+  const list = ARCHS[arch].relics.filter(ok).slice(0, n);
+  if (MODE === 'mult' && r >= 6) list.push(LEGEND[arch]);
+  return list;
+}
+export const talentsFor = (arch: string, r: number) => ARCHS[arch].talents.slice(0, Math.ceil(r / 2));
