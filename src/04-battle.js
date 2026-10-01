@@ -60,7 +60,7 @@ function toClient(x,y){const fr=F.cv.getBoundingClientRect();return[fr.left+x*F.
 /* ================= 战斗 ================= */
 function startBattle(){
   if(!boardCards().length){toast('棋盘上一张卡都没有');SFX.play('bad');return;}
-  cancelDrag();closeSheet();if(G.drawer)setDrawer(false);G.phase='battle';
+  cancelDrag();closeSheet();if(G.drawer)setDrawer(false);G.phase='battle';codexSweep();
   const amb=!!G.fightWave;let wave=G.fightWave||G.nextWave;if(!amb&&G.prep.wager==='horde')wave=hordeWave(wave);const special=wave.some(s=>EN[s.type].boss)?'boss':'battle';BG.set(special);
   B={t:0,spawns:wave,si:0,en:[],pr:[],epr:[],graves:[],sched:[],shield:0,maxChain:0,wallLost:0,endT:0,over:false,acc:0,boss:null,greed:0,kills:0,flags:{},rlog:{},
     beats:amb?[]:nightInfo(G.round).beats,bi:0,surges:(wave.surges||[]).slice(),lowSaid:false,wager:amb?null:(G.prep.wager||null),ambush:amb,maxCombo:0,combo:0,maxHit:0,slowT:0};clearVO();
@@ -88,7 +88,7 @@ function spawn(type,x,y){
     flash:0,ph:Math.random()*6.28,armorB:0,hasteB:0,healT:rnd(1.5,3),bornT:B.t,raiseT:rnd(3,5),lobT:d.lob?d.lob[0]*.6:d.fbolt?d.fbolt*.6:0,sprK:null,revealed:false,dashT:0,hardT:0,ii:0,it:d.intents?d.intents[0].t:0,dead:false};
   e.x0=e.x;B.en.push(e);if((d.boss||d.elite||d.big)&&!B.flags['met'+type]){B.flags['met'+type]=1;later(1.2,()=>say('hero',BARKS.elite,2));}if(!d.fixed&&e.y<0)for(let i=0;i<4;i++)part(ex(e)+rnd(-4,4),F.top+rnd(0,3),rnd(-8,8),rnd(5,20),.5,Math.random()<.5?'#a64ca6':'#5d275d',1);
   if(!d.fixed&&e.y>.1){e.emerge=!d.mimic;const c=d.col||'#94b0c2';ring(ex(e),ey(e)-2,2,10*K(),c,.45);for(let i=0;i<10;i++)part(ex(e)+rnd(-5,5),ey(e)-rnd(0,2),rnd(-18,18),-rnd(15,40),.5,Math.random()<.5?c:'#4a3326',1);}if(d.boss||d.elite){B.boss=e;$('#bossbar').hidden=false;$('#bossName').textContent=d.n;if(FOEB[type])say(type,FOEB[type].spawn,3);}
-  if(!d.fixed)meetFoe(type);
+  if(!d.fixed)meetFoe(type);else if(!G.seenFoes||!G.seenFoes[type]){(G.seenFoes=G.seenFoes||{})[type]=1;markSeen(type);}
   return e;
 }
 const RANGE0=.13;let RANGE=.13;
@@ -340,7 +340,7 @@ function surge(){banner('大军压境','#ff8a5b');SFX.play('intent');SFX.play('b
   say('soldier',BARKS.soldierSurge,2);say('hero',BARKS.surge,2);}
 function fmt(v){v=Math.round(v);return v>=10000?Math.round(v/1000)+'k':String(v);}
 function kill(e,src){
-  e.dead=true;B.kills++;SFX.play('kill');comboKill(e);if(e.type==='eye'&&B.t-e.bornT<=25)unlock('quickeye');if(B.kills===1)say('hero',BARKS.first,1);
+  e.dead=true;B.kills++;codexKill(e.type);SFX.play('kill');comboKill(e);if(e.type==='eye'&&B.t-e.bornT<=25)unlock('quickeye');if(B.kills===1)say('hero',BARKS.first,1);
   B.kt=(B.kt||[]).filter(t=>t>B.t-2);B.kt.push(B.t);if(B.kt.length>=8){B.kt=[];say('hero',BARKS.streak,1);}
   emit('kill',{e,src,burning:e.burnT>0,poisoned:e.poisonT>0,frozen:e.frzT>0,elite:!!(e.d.elite||e.d.boss)});
   const n=e.d.boss?60:e.d.elite?36:12;for(let i=0;i<n;i++)part(ex(e),ey(e)-5,rnd(-50,50),rnd(-60,20),rnd(.3,.7),Math.random()<.6?e.d.col:'#1a1c2c',Math.random()<.5?2:1);
@@ -497,7 +497,7 @@ function winBattle(){
   const total=rows.reduce((s,r)=>s+r[1],0);
   showReport(was,rows,total);
 }
-function showReport(was,rows,total){
+function showReport(was,rows,total){codexSweep();
   const rp=$('#report');const bc=G.cards.filter(c=>c.bTrig>0||c.bDmg>0||supOf(c)||(c.loc==='board'&&ITEMS[c.key].passive)).sort((a,b)=>b.bDmg-a.bDmg);const mx=Math.max(1,...bc.map(c=>c.bDmg));
   rp.innerHTML=`<div class="rp-title win">第${was}夜 · ${pickLine(RPT.win)}</div>
   <div class="rp-list">${bc.map((c,i)=>`<div class="rp-row" style="animation-delay:${i*.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${SPR[c.key].url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${(c.bDmg/mx*100).toFixed(1)}"></i></div><b>${c.bDmg?fmt(c.bDmg):supOf(c)?'<em>辅助</em>':ITEMS[c.key].passive?'<em>被动</em>':'0'}<small>×${c.bTrig}</small></b>${srcLine(c)}</div>`).join('')||'<div class="rp-meta">这一夜没有卡出手</div>'}</div>
@@ -514,7 +514,7 @@ function showReport(was,rows,total){
 }
 function loseBattle(){B.over=true;if(G.run)G.run.kills+=B.kills;G.phase='over';SFX.play('lose');G.bestChain=Math.max(G.bestChain,B.maxChain);banner(pickLine(RPT.fall),'#ff6b5b');setTimeout(()=>playStory(STORY.lose,()=>endScreen(false)),1400);}
 function endScreen(win){
-  const sc=$('#screen');BG.set(win?'shop':'over');
+  const sc=$('#screen');BG.set(win?'shop':'over');recordRun(win);
   const best=G.cards.slice().sort((a,b)=>b.bDmg-a.bDmg)[0];const R=G.run||freshRun();const endl=!!G.endless;if(endl)endlessLost();else{META.runs++;saveMeta();}const mg=endl?null:mastGain(win);
   const got=R.got.map(id=>ACHM[id]).filter(Boolean);
   sc.innerHTML=`<div class="scr"><img class="por-big" src="${SPR[HEROES[G.hero].portrait].url}" alt=""><h1 style="color:${win||endl?'#ffe79a':'#ff8a80'}">${win?'黎明到来':endl?'长夜无尽':'长夜未尽'}</h1><div class="logo-sub">${HEROES[G.hero].n} · ${HEROES[G.hero].title}</div>
@@ -528,8 +528,8 @@ function endScreen(win){
   ${mastNote(mg)}
   ${R.newHeat?`<div class="newheat">解锁了 <b>长夜 ${R.newHeat}</b>：${HEATS[R.newHeat]}</div>`:''}
   ${got.length?`<div class="rules res achgot"><div><span>这局解锁的成就</span></div>${got.map(a=>`<div><i>★</i><span><b>${a.n}</b> ${a.d}</span></div>`).join('')}</div>`:''}
-  ${win?'<button class="btn gold big" id="endlessBtn">接着守下去</button>':''}<button class="btn red big" id="againBtn">再守一次</button></div>`;
-  clearSave();sc.hidden=false;$('#againBtn').onclick=()=>{SFX.ensure();SFX.play('ui');sc.hidden=true;heroSelect();};if($('#endlessBtn'))$('#endlessBtn').onclick=()=>{SFX.ensure();SFX.play('merge');continueEndless();};
+  ${win?'<button class="btn gold big" id="endlessBtn">接着守下去</button>':''}<button class="btn red big" id="againBtn">再守一次</button><button class="btn alt sm" id="hisBtn2">翻翻过往守夜</button></div>`;
+  clearSave();sc.hidden=false;$('#againBtn').onclick=()=>{SFX.ensure();SFX.play('ui');sc.hidden=true;heroSelect();};$('#hisBtn2').onclick=()=>{SFX.ensure();openHistory();};if($('#endlessBtn'))$('#endlessBtn').onclick=()=>{SFX.ensure();SFX.play('merge');continueEndless();};
 }
 function titleScreen(){
   const sc=$('#screen');BG.set('title');
@@ -541,9 +541,9 @@ function titleScreen(){
   <div><i>4</i><span>撑过8个夜晚，打倒北边来的首领；每两夜有一次夜谈，能学个新天赋</span></div></div>
   ${loadSave()?`<button class="btn gold big" id="contBtn">继续 · ${HEROES[loadSave().hero].n} 第${loadSave().round}夜</button>`:''}
   <button class="btn ${loadSave()?'alt':'red'} big" id="startBtn">${loadSave()?'新的守夜':'开始游戏'}</button>
-  <div class="tbtns"><button class="btn alt" id="achBtn">成就 ${achCount()} / ${ACH.length}${META.heatMax?' · 长夜 '+META.heatMax:''}</button><button class="btn alt" id="cdxBtn">卡牌图鉴</button><button class="btn alt" id="sndBtn" style="flex:none">${AUDIO_L[audioMode][0]}</button></div></div>`;
+  <div class="tbtns"><button class="btn alt" id="achBtn">成就 ${achCount()} / ${ACH.length}${META.heatMax?' · 长夜 '+META.heatMax:''}</button><button class="btn alt" id="cdxBtn">图鉴</button><button class="btn alt" id="hisBtn">过往守夜</button><button class="btn alt" id="sndBtn" style="flex:none">${AUDIO_L[audioMode][0]}</button></div></div>`;
   sc.hidden=false;$('#startBtn').onclick=()=>{SFX.ensure();SFX.play('merge');heroSelect();};
-  $('#achBtn').onclick=()=>{SFX.ensure();openAch();};$('#cdxBtn').onclick=()=>{SFX.ensure();openCodex();};$('#sndBtn').onclick=()=>{SFX.ensure();cycleAudio();$('#sndBtn').textContent=AUDIO_L[audioMode][0];};
+  $('#achBtn').onclick=()=>{SFX.ensure();openAch();};$('#cdxBtn').onclick=()=>{SFX.ensure();openCodex();};$('#hisBtn').onclick=()=>{SFX.ensure();openHistory();};$('#sndBtn').onclick=()=>{SFX.ensure();cycleAudio();$('#sndBtn').textContent=AUDIO_L[audioMode][0];};
   if($('#contBtn'))$('#contBtn').onclick=()=>{SFX.ensure();SFX.play('merge');sc.hidden=true;resumeSave();};
 }
 function heroSelect(){
@@ -609,7 +609,7 @@ function loop(now){
   requestAnimationFrame(loop);
 }
 layout();titleScreen();requestAnimationFrame(loop);
-window.__game={endScreen,winBattle,heroSelect,setDrawer,openTree,G,get B(){return B;},startBattle,acquire,toPrep,newGame,boardCards,newCard,afterChange,renderPreview,makeWave,enterEvent,finishStep,renderRelics,gainRelic,MUSIC,rollGear,withFit,rollTalents,stats,TALENTS,mastLv};
+window.__game={endScreen,codexKill,markSeen,closeSheet,titleScreen,META,winBattle,heroSelect,setDrawer,openTree,G,get B(){return B;},startBattle,acquire,toPrep,newGame,boardCards,newCard,afterChange,renderPreview,makeWave,enterEvent,finishStep,renderRelics,gainRelic,MUSIC,rollGear,withFit,rollTalents,stats,TALENTS,mastLv};
 })();
 </script>
 </body>

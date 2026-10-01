@@ -1,5 +1,5 @@
 
-/* ================= 体验：背景音乐 / 提示 / 卡牌图鉴 / 今晚情报 =================
+/* ================= 体验：背景音乐 / 提示 / 今晚情报 =================
  * 背景音乐全用 WebAudio 现场合成，不带音频文件。跟着 BG.set 的场景自动换曲。
  * 声音开关三档存在 localStorage（chain-audio）：0 全开 / 1 只留音效 / 2 全静音。
  */
@@ -113,24 +113,7 @@ function readyHtml(){
 function loseNote(){if(!B||!B.wallBy)return '';const ks=Object.keys(B.wallBy).sort((a,b)=>B.wallBy[b]-B.wallBy[a]);if(!ks.length)return '';
   const d=EN[ks[0]];return `<div class="rules res lose-why"><div><span>这夜漏过去最多的</span><i style="margin-left:auto">${d.n} · 撞墙 ${Math.ceil(B.wallBy[ks[0]])}</i></div>${d.tip?`<div><span class="lw">${d.tip}</span></div>`:''}</div>`;}
 
-/* ---------- 卡牌图鉴：所有卡都能翻，专属卡标出是谁的 ---------- */
-function openCodex(tab){SFX.play('ui');const sh=$('#sheet');sh.classList.add('top');
-  const tabs=[['all','通用'],...Object.keys(HEROES).map(k=>[k,HEROES[k].n+'专属'])];tab=tab||'all';
-  const keys=Object.keys(ITEMS).filter(k=>{const it=ITEMS[k];return !it.noPool&&(tab==='all'?!it.hero:it.hero===tab);})
-    .sort((a,b)=>ITEMS[a].t-ITEMS[b].t||ITEMS[a].size-ITEMS[b].size);
-  sh.innerHTML=`<div class="sh cdx-sh" role="dialog" aria-label="卡牌图鉴"><h3>卡牌图鉴 <small class="spn">${keys.length} 张</small></h3>
-    <div class="cdx-tabs">${tabs.map(([k,n])=>`<button class="btn sm${k===tab?' on':''}" data-t="${k}">${n}</button>`).join('')}</div>
-    <p class="muted2">${tab==='all'?'谁都能在店里碰到的卡。':'只有选'+HEROES[tab].n+'才会出现在店里。'}点一张看详情。</p>
-    <div class="cdx"></div><div class="sh-btns"><button class="btn" id="cdxClose">关闭</button></div></div>`;
-  const grid=sh.querySelector('.cdx');
-  for(const k of keys){const b=document.createElement('button');b.className='cdx-i';const ce=document.createElement('div');
-    paintCard(ce,{key:k,tier:ITEMS[k].t,adj:null,size:ITEMS[k].size,dl:0,hoard:0},'static');b.appendChild(ce);
-    b.insertAdjacentHTML('beforeend',`<span>${ITEMS[k].n}</span>`);
-    b.onclick=()=>{openSheet({kind:'codex',offer:{card:{key:k,tier:ITEMS[k].t,adj:null,size:ITEMS[k].size,dl:0,hoard:0},sold:true,price:0}});
-      const bt=$('#shBtns');if(bt){const r=document.createElement('button');r.className='btn';r.textContent='返回图鉴';r.onclick=()=>openCodex(tab);bt.prepend(r);}};
-    grid.appendChild(b);}
-  sh.querySelectorAll('.cdx-tabs .btn').forEach(b=>b.onclick=()=>openCodex(b.dataset.t));
-  sh.hidden=false;$('#cdxClose').onclick=closeSheet;sh.onclick=e=>{if(e.target===sh)closeSheet();};}
+/* 卡牌图鉴搬到了 03g-codex.js，跟遗物、天赋、敌人图鉴放在一起 */
 
 /* 有自己声音的卡：八音盒放那首曲子的下一个音，战鼓咚一下 */
 ITEMS.musicbox.snd='mbox';ITEMS.wardrum.snd='drum';
