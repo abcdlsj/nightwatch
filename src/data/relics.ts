@@ -246,7 +246,10 @@ export const RELICS: Record<string, RelicDef> = {
  "glass": {
   "t": 2,
   "ico": "gem:C",
-  "m": {"xdmg": 0.25, "wall": -8}
+  "m": {
+   "xdmg": 0.25,
+   "wall": -8
+  }
  },
  "shell": {
   "t": 2,
@@ -313,7 +316,10 @@ export const RELICS: Record<string, RelicDef> = {
  "oath": {
   "t": 3,
   "ico": "scroll:R",
-  "m": {"xdmg": 0.2, "wall": 10},
+  "m": {
+   "xdmg": 0.2,
+   "wall": 10
+  },
   "u": 1
  },
  "hourglass": {
@@ -327,25 +333,37 @@ export const RELICS: Record<string, RelicDef> = {
  "dragonheart": {
   "t": 3,
   "ico": "gem:R",
-  "m": {"xtag_fire": 0.3, "burn": 1},
+  "m": {
+   "xtag_fire": 0.3,
+   "burn": 1
+  },
   "u": 1
  },
  "shard": {
   "t": 3,
   "ico": "gem:P",
-  "m": {"xdmg": 0.35, "enemySpd": 0.1},
+  "m": {
+   "xdmg": 0.35,
+   "enemySpd": 0.1
+  },
   "u": 1
  },
  "box": {
   "t": 3,
   "ico": "book:s",
-  "m": {"xtag_mech": 0.25, "startCharge": 0.3},
+  "m": {
+   "xtag_mech": 0.25,
+   "startCharge": 0.3
+  },
   "u": 1
  },
  "venom": {
   "t": 3,
   "ico": "claw:l",
-  "m": {"xtag_blade": 0.3, "crit": 0.1},
+  "m": {
+   "xtag_blade": 0.3,
+   "crit": 0.1
+  },
   "u": 1
  },
  "dogtag": {
@@ -389,7 +407,11 @@ export const RELICS: Record<string, RelicDef> = {
   "ico": "scroll:b",
   "u": 1,
   "hero": "ayla",
-  "m": {"xdmg": 0.12, "tag_mech": 0.2, "wall": 6}
+  "m": {
+   "xdmg": 0.12,
+   "tag_mech": 0.2,
+   "wall": 6
+  }
  },
  "stone": {
   "t": 2,
@@ -478,7 +500,10 @@ export const RELICS: Record<string, RelicDef> = {
   "ico": "book:y",
   "u": 1,
   "hero": "ying",
-  "m": {"xdmg": 0.12, "s1": 0.3}
+  "m": {
+   "xdmg": 0.12,
+   "s1": 0.3
+  }
  },
  "kindling": {
   "t": 0,
@@ -657,6 +682,78 @@ export const RELICS: Record<string, RelicDef> = {
   "m": {
    "s1": 0.12,
    "startCharge": 0.15
+  }
+ },
+ "blueprint": {
+  "t": 0,
+  "ico": "scroll:N",
+  "hero": "jun",
+  "m": {
+   "shieldStart": 5,
+   "wall": 3
+  }
+ },
+ "plumb": {
+  "t": 1,
+  "ico": "claw:N",
+  "hero": "jun",
+  "m": {
+   "tag_mech": 0.15,
+   "s2": 0.12
+  }
+ },
+ "mortarboard": {
+  "t": 2,
+  "ico": "book:N",
+  "hero": "jun",
+  "m": {
+   "aoe": 0.2,
+   "startCharge": 0.15
+  }
+ },
+ "citadel": {
+  "t": 3,
+  "ico": "badge:N",
+  "u": 1,
+  "hero": "jun",
+  "m": {
+   "xdmg": 0.15,
+   "wall": 10
+  }
+ },
+ "telescope": {
+  "t": 0,
+  "ico": "orb:c",
+  "hero": "li",
+  "m": {
+   "crit": 0.06
+  }
+ },
+ "starchart": {
+  "t": 1,
+  "ico": "scroll:c",
+  "hero": "li",
+  "m": {
+   "tag_volt": 0.12,
+   "tag_ice": 0.12
+  }
+ },
+ "compass": {
+  "t": 2,
+  "ico": "ring:c",
+  "hero": "li",
+  "m": {
+   "startCharge": 0.2,
+   "critDmg": 0.4
+  }
+ },
+ "polaris": {
+  "t": 3,
+  "ico": "gem:c",
+  "u": 1,
+  "hero": "li",
+  "m": {
+   "xcarry": 0.3
   }
  }
 } as unknown as Record<string, RelicDef>;

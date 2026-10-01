@@ -67,7 +67,7 @@ await pg.click('#startBtn');
 await pg.waitForTimeout(400);
 await pg.click(`.hero >> nth=${HERO}`);
 await pg.waitForTimeout(400);
-await pg.click(`.kit >> nth=${process.pid % 3}`);
+await pg.click(`.kit >> nth=${process.pid % (await pg.locator('.kit').count())}`);
 await pg.waitForTimeout(800);
 if (SHOTS) mkdirSync('shots', { recursive: true });
 let result = 'lost';

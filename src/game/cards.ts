@@ -213,7 +213,7 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
   const xs: [string, number][] = [];
   if (a === 'deadly') xs.push([ADJ.deadly.n, 1.5]);
   if (c.tier >= 3) xs.push([T.diamond, TUNE.diamond]);
-  if (c.carry) xs.push([T.carry, TUNE.carry * (1 + TUNE.star * ((c as Card).star || 0))]);
+  if (c.carry) xs.push([T.carry, TUNE.carry * (1 + TUNE.star * ((c as Card).star || 0)) * (1 + mv('xcarry'))]);
   /* 【站位】 */
   if (c.loc === 'board') {
     const nb = c.nb || neighbors(c as Card);

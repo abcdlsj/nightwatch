@@ -71,6 +71,8 @@ const ACH_OK: Record<string, (R: RunStats) => unknown> = {
   h_ayla: () => G.hero === 'ayla',
   h_mo: () => G.hero === 'mo',
   h_ying: () => G.hero === 'ying',
+  h_jun: () => G.hero === 'jun',
+  h_li: () => G.hero === 'li',
   frost: () => G.foeSet === 'frost',
   bothsets: () => META.sets.dark && META.sets.frost,
   pure: (R) => R.lastPure,

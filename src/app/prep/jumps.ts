@@ -96,6 +96,39 @@ const JUMPS: Record<string, () => { opts: Opt[] }> = {
 
 /** 这一夜备战一共几站：平时 3 站，跃迁夜多一站 */
 export const prepStops = () => (hasJump() ? 4 : 3);
+/* 钧「布防图」：定一处主炮位（C 位 + 城墙上限）；或者领一张流派卡 */
+JUMPS.jun = () => {
+  const n = 2 + G.round;
+  const opts: Opt[] = byDmg(board())
+    .slice(0, 2)
+    .map((c) => ({ card: c, label: t('jump.jun.pick', { n: ITEMS[c.key].n }), sub: t('jump.jun.pickSub', { n }), act: () => {
+      crown(c);
+      G.wallMax += n;
+      G.wall += n;
+    } }));
+  for (const p of pathsOf('jun').filter((x) => pathOpen('jun', x)).slice(-1))
+    opts.push({ ico: 'cannon', label: t('jump.jun.path', { p: p.n }), sub: L.ui.jump.jun.pathSub, act: () => {
+      gift((it) => p.cards.some((k) => ITEMS[k] === it), 1);
+    } });
+  return { opts };
+};
+/* 璃「星象」：已经有 C 位就再为它点一颗星（倍率一路往上叠）；也可以换一颗星 */
+JUMPS.li = () => {
+  const cur = board().find((c) => c.carry);
+  const opts: Opt[] = [];
+  if (cur)
+    opts.push({ card: cur, label: t('jump.li.star', { n: ITEMS[cur.key].n }), sub: t('jump.li.starSub', { s: cur.star || 0, t: (cur.star || 0) + 1 }), act: () => {
+      cur.star = (cur.star || 0) + 1;
+      crown(cur);
+    } });
+  for (const c of byDmg(board()).filter((x) => x !== cur).slice(0, cur ? 2 : 3))
+    opts.push({ card: c, label: t('jump.li.pick', { n: ITEMS[c.key].n }), sub: L.ui.jump.li.pickSub, act: () => {
+      c.star = Math.max(c.star || 0, 1);
+      crown(c);
+    } });
+  return { opts };
+};
+
 export const hasJump = () => JUMP_NIGHTS.includes(G.round) && !G.endless && !!JUMPS[G.hero];
 
 export function startJump(): PrepStop {

@@ -47,6 +47,8 @@ export interface ItemDef {
   chargeCarry?: number;
   /** 辅助：触发时 C 位下一击 +值 */
   buffCarry?: number;
+  /** 触发时给城墙加护盾（品质越高越多） */
+  shieldGain?: number;
   /* 文案 */
   n: string; d: string; f: string; lore?: string; dn?: string; dl?: string;
   /** 任务说明（如「累计闪电弹跳」） */

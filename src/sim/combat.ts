@@ -142,6 +142,10 @@ function fire(c: Card, depth: number) {
     }
   }
   if (c.adj === 'ignite' && c.right) chargeCard(c.right, 0.1, c);
+  if (it.shieldGain) {
+    b.shield += it.shieldGain * (1 + 0.4 * stepOf(c));
+    view.hud();
+  }
   if (c.adj === 'sturdy') {
     b.shield += c.size * (c.tier + 1);
     view.hud();

@@ -44,6 +44,7 @@ export function numText(c: Card) {
   if (it.chargeCarry) return '+' + Math.round(it.chargeCarry * (1 + 0.2 * stepOf(c)) * 100) + '%';
   if (it.buffCarry) return '+' + Math.round(it.buffCarry * (1 + 0.2 * stepOf(c)) * 100) + '%';
   if (it.auraNb) return '+' + Math.round(it.auraNb * 100) + '%';
+  if (it.shieldGain) return t('card.shield', { n: Math.round(it.shieldGain * (1 + 0.4 * stepOf(c))) });
   const v = Math.round(stats(c, null).total);
   return v >= 10000 ? (v / 1000).toFixed(1) + 'k' : String(v);
 }

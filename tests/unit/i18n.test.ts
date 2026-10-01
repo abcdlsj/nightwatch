@@ -34,6 +34,22 @@ describe('zh-CN 语言包', () => {
     expect(lack(HEROES, zh.heroes.heroes)).toEqual([]);
     expect(ACH.filter((a) => !(zh.meta.ach as any)[a.id]?.n)).toEqual([]);
   });
+  it('按人物区分的台词覆盖所有人物（新加人物时别漏）', () => {
+    const miss: string[] = [];
+    const walk = (v: any, path: string) => {
+      if (v && typeof v === 'object' && !Array.isArray(v)) {
+        if ('ayla' in v && 'mo' in v) {
+          for (const h of Object.keys(HEROES)) if (v[h] == null) miss.push(`${path} 缺 ${h}`);
+          return;
+        }
+        for (const k in v) walk(v[k], path + '.' + k);
+      } else if (Array.isArray(v)) v.forEach((x, i) => walk(x, `${path}[${i}]`));
+    };
+    walk(zh.story, 'story');
+    walk(zh.ui, 'ui');
+    expect(miss).toEqual([]);
+  });
+
   it('数据文件里没有夹带中文（文案都在语言包里）', () => {
     const bad: string[] = [];
     for (const f of walk('src/data'))

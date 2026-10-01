@@ -209,7 +209,8 @@ export default {
   "t_plague": "中毒的敌人死了，一半的毒会传给旁边的敌人",
   "t_frostlens": "冻住敌人时，旁边的敌人减速40%",
   "t_sweep": "【兵器】卡暴击时，目标身边的敌人挨同样一下",
-  "tag_poison": "【毒】卡伤害"
+  "tag_poison": "【毒】卡伤害",
+  "xcarry": "C 位伤害"
  },
  "tcat": {
   "atk": "进攻",

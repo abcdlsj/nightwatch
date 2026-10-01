@@ -393,6 +393,154 @@ export const TALENTS: Record<string, TalentDef> = {
    "kspd_weapon": 0.08,
    "ammoSpd": 0.1
   }
+ },
+ "jun_00": {
+  "cat": "def",
+  "r": 0,
+  "m": {
+   "wall": 8
+  },
+  "hero": "jun"
+ },
+ "jun_01": {
+  "cat": "def",
+  "r": 1,
+  "m": {
+   "shieldStart": 8
+  },
+  "hero": "jun"
+ },
+ "jun_02": {
+  "cat": "def",
+  "r": 2,
+  "m": {
+   "regen": 5,
+   "wall": 8
+  },
+  "hero": "jun"
+ },
+ "jun_10": {
+  "cat": "atk",
+  "r": 0,
+  "m": {
+   "tag_mech": 0.2
+  },
+  "hero": "jun"
+ },
+ "jun_11": {
+  "cat": "atk",
+  "r": 1,
+  "m": {
+   "aoe": 0.3
+  },
+  "hero": "jun"
+ },
+ "jun_12": {
+  "cat": "atk",
+  "r": 2,
+  "m": {
+   "s3": 0.35,
+   "s2": 0.2
+  },
+  "hero": "jun"
+ },
+ "jun_20": {
+  "cat": "tech",
+  "r": 0,
+  "m": {
+   "startCharge": 0.25
+  },
+  "hero": "jun"
+ },
+ "jun_21": {
+  "cat": "tech",
+  "r": 1,
+  "m": {
+   "spd": 0.12
+  },
+  "hero": "jun"
+ },
+ "jun_22": {
+  "cat": "tech",
+  "r": 2,
+  "m": {
+   "full": 0.3
+  },
+  "hero": "jun"
+ },
+ "li_00": {
+  "cat": "tech",
+  "r": 0,
+  "m": {
+   "xcarry": 0.1
+  },
+  "hero": "li"
+ },
+ "li_01": {
+  "cat": "tech",
+  "r": 1,
+  "m": {
+   "startCharge": 0.25
+  },
+  "hero": "li"
+ },
+ "li_02": {
+  "cat": "tech",
+  "r": 2,
+  "m": {
+   "xcarry": 0.2
+  },
+  "hero": "li"
+ },
+ "li_10": {
+  "cat": "atk",
+  "r": 0,
+  "m": {
+   "tag_ice": 0.2
+  },
+  "hero": "li"
+ },
+ "li_11": {
+  "cat": "atk",
+  "r": 1,
+  "m": {
+   "slowVuln": 0.3
+  },
+  "hero": "li"
+ },
+ "li_12": {
+  "cat": "atk",
+  "r": 2,
+  "m": {
+   "tag_ice": 0.35,
+   "slow": 0.3
+  },
+  "hero": "li"
+ },
+ "li_20": {
+  "cat": "atk",
+  "r": 0,
+  "m": {
+   "crit": 0.08
+  },
+  "hero": "li"
+ },
+ "li_21": {
+  "cat": "atk",
+  "r": 1,
+  "m": {
+   "critDmg": 0.6
+  },
+  "hero": "li"
+ },
+ "li_22": {
+  "cat": "atk",
+  "r": 2,
+  "m": {
+   "tag_volt": 0.3,
+   "chain": 1
+  },
+  "hero": "li"
  }
 } as unknown as Record<string, TalentDef>;
 

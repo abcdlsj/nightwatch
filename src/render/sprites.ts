@@ -2,8 +2,11 @@
 import { PAL, SHADE } from '../data/art/palette';
 import { SPRITES as GEN, SHAPES } from '../data/art/generated';
 import { HAND_SPRITES } from '../data/art/hand';
+import { ALIAS } from '../data/art/alias';
 
 const ROWS: Record<string, string[]> = { ...HAND_SPRITES, ...GEN };
+/* 换色图 */
+for (const [k, [base, map]] of Object.entries(ALIAS)) ROWS[k] = ROWS[base].map((r) => [...r].map((ch) => map[ch] || ch).join(''));
 
 function mk(rows: string[], fill?: string) {
   const h = rows.length,

@@ -198,5 +198,6 @@ export const MODL: Record<string, [number, number?]> = {
  "xtag_ice": [3],
  "xtag_volt": [3],
  "xtag_mech": [3],
- "xtag_poison": [3]
+ "xtag_poison": [3],
+ "xcarry": [3]
 } as never;

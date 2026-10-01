@@ -40,6 +40,14 @@ export const ACH: { id: string; w?: number; n: string; d: string }[] = [
   "w": 1
  },
  {
+  "id": "h_jun",
+  "w": 1
+ },
+ {
+  "id": "h_li",
+  "w": 1
+ },
+ {
   "id": "frost",
   "w": 1
  },
