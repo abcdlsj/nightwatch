@@ -32,6 +32,7 @@ open dist/index.html  # 直接打开能玩；要看到自带字体，用 python3
 | `src/03e-mastery.js` | 熟练：每个守夜人各自的轻量局外成长（存在 `chain-meta-v1` 的 `mast`） |
 | `src/03g-codex.js` | 图鉴（卡牌、遗物、天赋、敌人，碰到过才解锁）和过往守夜（每局结束记一条，最多 40 条），都存在 `chain-meta-v1` 的 `cx` / `hist` |
 | `src/03f-more.js` | 起手三选一、商店锁卡、拦路精英、霜潮专属敌人、深渊母巢、无尽长夜，以及这几个新敌人的像素图 |
+| `src/03g-secrets.js` | 隐藏事件：满足特定条件才会出现的小事件和剧情分支（不改战斗规则，内容见文件头注释，有剧透） |
 | `src/04-battle.js` | 波次、敌人行为、战场渲染、触发与连锁、伤害结算、流程、存档、主循环 |
 | `tools/smoke_test.py` | Playwright 冒烟测试：机器人自动打一整局 |
 | `tools/pixelgen.py` | 像素美术生成器：几何图元 + 自动描边 + 自动明暗，`--preview` 出预览图 |
