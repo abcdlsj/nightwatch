@@ -202,6 +202,20 @@ function drawNum(x: CanvasRenderingContext2D, str: string, cx: number, cy: numbe
     }
   }
 }
+/** 非数字的飘字（「壳」「碎」「处决」）：用缝合像素字体，12px 是它的原生字号，加一圈深色描边 */
+function drawWord(x: CanvasRenderingContext2D, str: string, cx: number, cy: number, col: string) {
+  x.font = "12px 'Fusion Pixel', sans-serif";
+  x.textAlign = 'center';
+  x.textBaseline = 'top';
+  const px = Math.round(cx),
+    py = Math.round(cy) - 3;
+  x.fillStyle = '#1a1c2c';
+  for (const [ox, oy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1]]) x.fillText(str, px + ox, py + oy);
+  x.fillStyle = col;
+  x.fillText(str, px, py);
+}
+const isDigits = (s: string) => /^[0-9k!+\-x]+$/.test(s);
+
 export function drawField(dt: number) {
   const x = F.ctx,
     W = world.W,
@@ -300,8 +314,8 @@ export function drawField(dt: number) {
     n.life -= dt;
     n.y -= (n.life > 0.5 ? 28 : 6) * dt;
     if (n.life < 0.2 && Math.floor(n.life * 30) % 2) continue;
-    /* 只有数字字形；「壳」「处决」这类字会画成 0（旧版如此，见 README 已知问题） */
-    drawNum(x, n.str, n.x, n.y, n.col, n.s);
+    if (isDigits(n.str)) drawNum(x, n.str, n.x, n.y, n.col, n.s);
+    else drawWord(x, n.str, n.x, n.y, n.col);
   }
   F.nums = F.nums.filter((n) => n.life > 0);
 }

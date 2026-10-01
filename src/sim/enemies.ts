@@ -114,18 +114,17 @@ export function enemyStep(dt: number) {
         hurt(e, e.burnD * 0.5, e.burnSrc, false, { burnTick: 1 });
         if (e.dead) continue;
       }
-      /* 注意：旧版里中毒的结算写在了灼烧的块里面，只有同时在燃烧时才掉毒血。原样保留，改不改见 README 的「已知问题」 */
-      if (e.poisonT > 0) {
-        e.poisonT -= dt;
-        e.poisonTick += dt;
-        if (e.poisonTick >= 0.5) {
-          e.poisonTick -= 0.5;
-          hurt(e, e.poisonD * 0.5, e.poisonSrc, false, { poisonTick: 1 });
-          if (vr() < 0.35) view.part(ex(e), ey(e) - 8, vrnd(-12, 12), vrnd(-24, -4), 0.45, '#7ddc5f', 1);
-          if (e.dead) continue;
-        }
-      }
       if (vr() < 0.25) view.part(ex(e) + vrnd(-4, 4), ey(e) - vrnd(2, 8), vrnd(-5, 5), -vrnd(10, 25), 0.4, vr() < 0.5 ? '#ef7d57' : '#ffcd75', 1);
+    }
+    if (e.poisonT > 0) {
+      e.poisonT -= dt;
+      e.poisonTick += dt;
+      if (e.poisonTick >= 0.5) {
+        e.poisonTick -= 0.5;
+        hurt(e, e.poisonD * 0.5, e.poisonSrc, false, { poisonTick: 1 });
+        if (vr() < 0.35) view.part(ex(e), ey(e) - 8, vrnd(-12, 12), vrnd(-24, -4), 0.45, '#7ddc5f', 1);
+        if (e.dead) continue;
+      }
     }
     if (e.d.intents) {
       e.it -= dt;

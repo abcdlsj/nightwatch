@@ -6,12 +6,14 @@
 @font-face{font-family:'Fusion Pixel';src:url(/fonts/fusion.woff2) format('woff2');font-display:swap}
 /* 数字：缩到八成，跟旁边的汉字一样高；声明整段字重，免得浏览器给像素字硬加粗 */
 @font-face{font-family:'PixNum';src:url(/fonts/fusion.woff2) format('woff2');unicode-range:U+0030-0039;font-weight:100 900;size-adjust:80%;font-display:swap}
+/* 箭头、音符：标题字体里没有，iOS 回退系统字体时会显示成空白，统一用缝合像素画 */
+@font-face{font-family:'PixSym';src:url(/fonts/fusion.woff2) format('woff2');unicode-range:U+2190-21FF,U+2660-267F;font-weight:100 900;font-display:swap}
 :root{
   --bg:#0f1c20; --panel:#1c2a30; --panel2:#25363d; --edge:#3a525c; --ink:#fbf7ee; --muted:#9fb3ba;
   --red:#e2473b; --blue:#2c8fe0; --gold:#f2a93b; --green:#35a86b; --purple:#8e5bd8;
   --card:#f0e4c7; --cink:#2a2130;
-  --zh:'PixNum','ZCOOL QingKe HuangYou','PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans CJK SC',sans-serif;
-  --px:'PixNum','Pixelify Sans','ZCOOL QingKe HuangYou','Noto Sans CJK SC',ui-monospace,monospace;
+  --zh:'PixNum','PixSym','ZCOOL QingKe HuangYou','PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans CJK SC',sans-serif;
+  --px:'PixNum','PixSym','Pixelify Sans','ZCOOL QingKe HuangYou','Noto Sans CJK SC',ui-monospace,monospace;
   --body:'Fusion Pixel','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif;
   --cw:46px; --ch:90px;
   box-sizing:border-box;

@@ -163,12 +163,6 @@ npm run art                              # 重新生成 src/data/art/generated.t
 python3 tools/pixelgen.py --preview      # 另外输出 shots/ 下的预览图（需要 Pillow）
 ```
 
-## 已知问题（迁移时发现，保持旧版行为未改）
-
-- 中毒只有在敌人同时燃烧时才掉血：旧版把中毒结算写进了灼烧的代码块里（`src/sim/enemies.ts` 里有注释）。改掉会让毒流派明显变强，需要重新调平衡。
-- 战场飘字只有数字字形：「壳」「碎」「处决」会画成 0（`src/render/field.ts` 的 `drawNum`）。
-- iOS 上「→」「♪」不显示（标题页规则、声音按钮）：字体子集里这几个符号是空字形，不会回退到系统字体。
-
 ## 路线图
 
 - [x] 工程化：TypeScript + Vite，分层，可复现随机数，无界面战斗模拟
