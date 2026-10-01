@@ -11,7 +11,7 @@ import { recalcMods } from './mods';
 export interface SaveData {
   hero: string; round: number; gold: number; wall: number; wallMax: number; relics: string[]; skills: string[]; foeSet: string;
   bestChain: number; heat: number; run: RunStats | null; boss8: string; endless: boolean; lock: Offer | null;
-  cards: { key: string; tier: number; adj: string | null; loc: any; idx: number; hoard: number; grow: number; qp: number }[];
+  cards: { key: string; tier: number; adj: string | null; loc: any; idx: number; hoard: number; grow: number; qp: number; carry?: boolean; star?: number }[];
   secret?: Record<string, number>;
   /** 新版加的：种子和随机数状态（旧存档没有，读的时候另起一个） */
   seed?: number;
@@ -23,7 +23,7 @@ export function saveGame(rngState = rng.state) {
   const s: SaveData = {
     hero: G.hero, round: G.round, gold: G.gold, wall: G.wall, wallMax: G.wallMax, relics: G.relics, skills: G.skills, foeSet: G.foeSet,
     bestChain: G.bestChain, heat: G.heat || 0, run: G.run, boss8: G.boss8, endless: !!G.endless, lock: G.lock || null,
-    cards: G.cards.map((c) => ({ key: c.key, tier: c.tier, adj: c.adj, loc: c.loc, idx: c.idx, hoard: c.hoard, grow: c.grow || 0, qp: c.qp || 0 })),
+    cards: G.cards.map((c) => ({ key: c.key, tier: c.tier, adj: c.adj, loc: c.loc, idx: c.idx, hoard: c.hoard, grow: c.grow || 0, qp: c.qp || 0, carry: c.carry || undefined, star: c.star || undefined })),
     secret: G.secret, seed: G.seed, rng: rngState,
   };
   store.setJson(KEYS.save, s);
@@ -50,6 +50,8 @@ export function restoreSave(s: SaveData | null): boolean {
     c.hoard = d.hoard || 0;
     c.grow = d.grow || 0;
     c.qp = d.qp || 0;
+    c.carry = !!d.carry;
+    c.star = d.star || 0;
     G.cards.push(c);
   }
   recalcMods();

@@ -7,9 +7,9 @@ import { L, t } from '../../i18n';
 import { rand, pick, shuffled } from '../../core/rng';
 import { clamp } from '../../core/util';
 import { G, type Card, type Offer, type PrepStop } from '../../game/state';
-import { stats, sellValue } from '../../game/cards';
+import { stats, sellValue, basePrice, setCarry } from '../../game/cards';
 import { unlock, foundSecret, mastLv } from '../../game/meta';
-import { rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers } from '../../game/loot';
+import { rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, rollItem } from '../../game/loot';
 import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, type Dest } from '../../game/prep';
 import { heat } from '../../game/state';
 import { SFX } from '../../audio/sfx';
@@ -19,6 +19,7 @@ import { $, restart } from '../../ui/dom';
 import { elOf, renderOwned, repaint } from '../../ui/card-view';
 import { updateHUD, renderRelics, toast, tipOnce } from '../../ui/hud';
 import { renderPrep } from './view';
+import { prepStops } from './jumps';
 
 /* ---------------- 进一站 ---------------- */
 export function enterEvent(id: string) {
@@ -156,8 +157,120 @@ export function enterEvent(id: string) {
       cur.text = `<div class="sletter">${L.story.secretBank}</div>` + cur.text;
     }
   }
+  else enterMore(id, cur);
   P.cur = cur;
   renderPrep();
+}
+
+/** 第二批备战事件：选择都有实际代价和收获 */
+function enterMore(id: string, cur: PrepStop) {
+  const T = L.ui.prep;
+  const dmgCards = () => G.cards.filter((c) => ITEMS[c.key].dmg > 0).sort((a, b) => stats(b, null).total - stats(a, null).total);
+  const choice = (hint: string, opts: any[]) => Object.assign(cur, { mode: 'choice', hint, opts });
+  if (id === 'refugee')
+    choice(T.refugeeHint, shuffled(G.cards).slice(0, 3).map((c) => {
+      const n = 2 + 2 * c.tier + c.size;
+      return { card: c, label: t('prep.giveAway', { n: ITEMS[c.key].n }), sub: t('prep.wallUp', { n }), act: () => {
+        removeCard(c);
+        G.wallMax += n;
+        G.wall += n;
+        SFX.play('merge');
+        renderOwned();
+        finishStep();
+      } };
+    }));
+  else if (id === 'auction') {
+    const of = makeOffer(null, { black: 1 });
+    of.price = Math.round(of.price * 1.2);
+    Object.assign(cur, { mode: 'shop', refresh: 0, offers: [of] });
+  } else if (id === 'ritual')
+    choice('', [{ ico: 'altar', label: T.ritualGo, sub: t('prep.wallDown', { n: 5 }), act: () => {
+      G.wallMax = Math.max(5, G.wallMax - 5);
+      G.wall = Math.min(G.wall, G.wallMax);
+      SFX.play('hurt');
+      relicChoice(cur, '', withFit(rollGear(3, 2)));
+      renderPrep();
+    } }]);
+  else if (id === 'recycle') {
+    const bag = G.cards.filter((c) => c.loc === 'stash');
+    const g = bag.reduce((s, c) => s + basePrice(c.key, c.adj, c.tier), 0);
+    Object.assign(cur, { mode: 'reward', text: t('prep.recycleText', { n: bag.length, g }), apply: () => {
+      bag.forEach(removeCard);
+      gainGold(g);
+      renderOwned();
+    } });
+  } else if (id === 'hone')
+    choice(T.honeHint, dmgCards().slice(0, 3).map((c) => {
+      const n = 3 + G.round;
+      return { card: c, label: ITEMS[c.key].n, sub: t('prep.growBy', { n }), act: () => {
+        c.grow = (c.grow || 0) + n;
+        repaint(c);
+        renderOwned();
+        SFX.play('merge');
+        restart(elOf(c), 'merge');
+        finishStep();
+      } };
+    }));
+  else if (id === 'pilgrim') Object.assign(cur, { mode: 'pick', offers: [0, 1].map(() => makeOffer((it) => it.hero === G.hero, { free: 1 })) });
+  else if (id === 'swap')
+    choice(T.swapHint, shuffled(G.cards.filter((c) => c.tier < 3)).slice(0, 3).map((c) => ({ card: c, label: ITEMS[c.key].n, sub: T.swapSub, act: () => {
+      const k = rollItem((it) => it.size === c.size && it !== ITEMS[c.key]);
+      c.key = k;
+      c.tier = Math.min(3, Math.max(c.tier, ITEMS[k].t) + 1);
+      c.qp = 0;
+      repaint(c);
+      afterMerge();
+      renderOwned();
+      SFX.play('merge');
+      FX.burstAt(elOf(c), TIERS[c.tier].c, 24);
+      toast(t('prep.swapped', { n: ITEMS[k].n, t: TIERS[c.tier].n }));
+      finishStep();
+    } })));
+  else if (id === 'tutor')
+    choice(T.tutorHint, dmgCards().slice(0, 3).map((c) => {
+      const a = rollRareAdj(c);
+      return { card: c, label: `${ITEMS[c.key].n} → 【${ADJ[a].n}】`, sub: ADJ[a].d + t('prep.cost', { n: 5 }), act: () => {
+        if (G.gold < 5) {
+          toast(T.noGold);
+          SFX.play('bad');
+          return;
+        }
+        G.gold -= 5;
+        c.adj = a;
+        repaint(c);
+        renderOwned();
+        SFX.play('merge');
+        finishStep();
+      } };
+    }));
+  else if (id === 'camp')
+    choice('', [
+      { ico: 'drop', label: T.campRest, sub: t('prep.wallHeal', { n: 6 }), act: () => {
+        G.wall = Math.min(G.wallMax, G.wall + 6);
+        SFX.play('merge');
+        updateHUD();
+        finishStep();
+      } },
+      { ico: 'book:P', label: T.campTalk, sub: T.campTalkSub, act: () => {
+        Object.assign(cur, { mode: 'talent', who: 'soldier', intro: [['soldier', L.story.campLine]], picks: rollTalents(2), title: cur.ev.n });
+        renderPrep();
+      } },
+    ]);
+  else if (id === 'drill')
+    choice(T.drillHint, dmgCards().filter((c) => c.loc === 'board').slice(0, 3).map((c) => ({ card: c, label: t('prep.makeCarry', { n: ITEMS[c.key].n }), sub: T.carrySub, act: () => {
+      setCarry(c);
+      for (const o of G.cards) repaint(o);
+      renderOwned();
+      SFX.play('merge');
+      restart(elOf(c), 'merge');
+      finishStep();
+    } })));
+}
+
+/** 给一张卡挑一个稀有词缀（不打伤害的卡只给辅助词缀） */
+function rollRareAdj(c: Card) {
+  const pool = Object.keys(ADJ).filter((k) => ADJ[k].r === 2 && k !== c.adj);
+  return pick(pool);
 }
 
 /* ---------------- 夜谈 / 学天赋 ---------------- */
@@ -170,10 +283,44 @@ export function startTalk() {
 export function answerTalk(cur: PrepStop, ans: string, re: string, cat: string) {
   cur.ans = ans;
   cur.re = re;
+  cur.gain = talkReward(cat);
   cur.mode = 'talent';
   cur.picks = rollTalents((heat(8) ? 2 : 3) + (mastLv() >= 2 ? 1 : 0), cat);
   renderPrep();
 }
+/** 夜谈的回答当场给东西：攻 → 一张卡，守 → 城墙，术 → 遗物，财 → 金币 */
+function talkReward(cat: string): string {
+  const T = L.ui.prep;
+  if (cat === 'atk') {
+    const tags = G.cards.filter((c) => c.loc === 'board').map((c) => ITEMS[c.key].tag);
+    const main = tags.sort((a, b) => tags.filter((x) => x === b).length - tags.filter((x) => x === a).length)[0];
+    const of = makeOffer(main ? (it) => it.tag === main && it.dmg > 0 : null, { free: 1 });
+    const r = acquireState(of, null);
+    if (r.ok) {
+      afterChange(r.card);
+      return t('prep.talkCard', { n: ITEMS[r.card.key].n });
+    }
+    gainGold(4);
+    return t('prep.talkGold', { n: 4 });
+  }
+  if (cat === 'def') {
+    G.wallMax += 4;
+    G.wall += 4;
+    updateHUD();
+    return t('prep.talkWall', { n: 4 });
+  }
+  if (cat === 'tech') {
+    const r = rollGear(1, 0, 1)[0];
+    if (r) {
+      gainRelicState(r);
+      renderRelics(r);
+      return t('prep.talkRelic', { n: RELICS[r].n });
+    }
+  }
+  gainGold(5);
+  return t('prep.talkGold', { n: 5 }) + (cat === 'eco' ? '' : T.talkFallback);
+}
+
 export function endTalk(cur: PrepStop) {
   if (cur.talk) {
     G.prep.talkDone = true;
@@ -238,7 +385,7 @@ export function finishStep() {
   if (P.step < 3) rollDoors();
   renderPrep();
   SFX.play('ui');
-  if (P.step >= 3) restart($('#goBtn'), 'bump');
+  if (P.step >= prepStops()) restart($('#goBtn'), 'bump');
 }
 
 /* ---------------- 拿卡 / 卖卡 / 合成 ---------------- */
@@ -281,7 +428,7 @@ export function sellCard(c: Card) {
 }
 
 /** 合成后的表现：音效、震动、提示、钻卡成就 */
-function afterMerge() {
+export function afterMerge() {
   const merged = checkMerges();
   if (!merged.length) return;
   merged.forEach(repaint);

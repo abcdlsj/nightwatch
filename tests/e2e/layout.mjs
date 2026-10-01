@@ -15,6 +15,10 @@ mkdirSync(out, { recursive: true });
 const engine = arg('engine', 'webkit') === 'chromium' ? chromium : webkit;
 const b = await engine.launch();
 const pg = await b.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 2, hasTouch: true });
+/* 测试用存档：人物全部解锁 */
+await pg.addInitScript(() => {
+  if (!localStorage.getItem('chain-meta-v1')) localStorage.setItem('chain-meta-v1', JSON.stringify({ heroes: { ayla: 1, mo: 1, ying: 1, jun: 1, li: 1 } }));
+});
 const errs = [];
 const problems = [];
 pg.on('pageerror', (e) => errs.push(String(e)));

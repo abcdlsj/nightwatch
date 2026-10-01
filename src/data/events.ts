@@ -138,5 +138,59 @@ export const EVENTS: Record<string, EventDef> = {
   "ico": "oathsword",
   "cat": "rare",
   "w": 0
+ },
+ "refugee": {
+  "ico": "drop",
+  "cat": "misc",
+  "w": 0.8
+ },
+ "auction": {
+  "ico": "mask",
+  "cat": "shop",
+  "w": 0.6,
+  "minR": 3
+ },
+ "ritual": {
+  "ico": "altar",
+  "cat": "relic",
+  "w": 0.6,
+  "minR": 2
+ },
+ "recycle": {
+  "ico": "bag",
+  "cat": "misc",
+  "w": 0.6
+ },
+ "hone": {
+  "ico": "whetstone",
+  "cat": "up",
+  "w": 0.8
+ },
+ "pilgrim": {
+  "ico": "lantern",
+  "cat": "free",
+  "w": 0.7
+ },
+ "swap": {
+  "ico": "dice",
+  "cat": "up",
+  "w": 0.7,
+  "minR": 2
+ },
+ "tutor": {
+  "ico": "wand",
+  "cat": "up",
+  "w": 0.6,
+  "minR": 2
+ },
+ "camp": {
+  "ico": "furnace",
+  "cat": "misc",
+  "w": 0.7
+ },
+ "drill": {
+  "ico": "dummy",
+  "cat": "up",
+  "w": 0.7
  }
 } as unknown as Record<string, EventDef>;

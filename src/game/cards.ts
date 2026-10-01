@@ -197,11 +197,31 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
     if (bc[bc.length - 1] === c) mp('right', T.right);
     if (mv('lonely') && !(c.nb || neighbors(c as Card)).length) mp('lonely', T.lonely);
     if (mv('full') && occ('board').every(Boolean)) mp('full', T.full);
+    /* 【站位】：相邻同类卡、旁边的军旗这类加成 */
+    const nb = c.nb || neighbors(c as Card);
+    if (it.lineKind) {
+      const n = nb.filter((x) => ITEMS[x.key].kind === it.lineKind!.kind).length;
+      if (n) pct.push([L.terms.kinds[it.lineKind.kind] + '×' + n, it.lineKind.pct * n]);
+    }
+    if (it.dmg > 0)
+      for (const n of nb) {
+        const av = ITEMS[n.key].auraNb;
+        if (av) pct.push([ITEMS[n.key].n, av * (isMid(n) ? 2 : 1)]);
+      }
   }
   const psum = pct.reduce((s2, p) => s2 + p[1], 0);
   const xs: [string, number][] = [];
   if (a === 'deadly') xs.push([ADJ.deadly.n, 1.5]);
   if (c.tier >= 3) xs.push([T.diamond, TUNE.diamond]);
+  if (c.carry) xs.push([T.carry, TUNE.carry * (1 + TUNE.star * ((c as Card).star || 0))]);
+  /* 【站位】 */
+  if (c.loc === 'board') {
+    const nb = c.nb || neighbors(c as Card);
+    const bc = boardCards();
+    if (it.posMid && isMid(c as Card)) xs.push([T.pos, 1 + it.posMid]);
+    if (it.posEdge && (bc[0] === c || bc[bc.length - 1] === c)) xs.push([T.pos, 1 + it.posEdge]);
+    if (it.flank && nb.length === 2 && nb.every((n) => ITEMS[n.key].dmg === 0)) xs.push([T.pos, 1 + it.flank]);
+  }
   const xm = (k: string, l: string) => {
     const v = mv(k);
     if (v) xs.push([l, 1 + v]);
@@ -224,6 +244,15 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
   if (mv('t_last') && G.wall < G.wallMax * 0.35) spd += 0.25;
   spd = Math.max(0.3, spd + mv('spd') + fitSpd(c as Card));
   return { base, flat, pct, psum, xs, mult, total, cd: Math.max(0.25, cd / spd), cdRaw: it.cd, crit: 0.05 + (a === 'precise' ? 0.2 : 0) + mv('crit') };
+}
+
+/** 占着棋盘正中（第 4、5 格） */
+export const isMid = (c: Card) => c.loc === 'board' && c.idx <= 4 && c.idx + c.size > 3;
+export const carryCard = () => G.cards.find((c) => c.carry && c.loc === 'board') || null;
+/** 立 C 位：同一时间只有一张 */
+export function setCarry(c: Card) {
+  for (const o of G.cards) if (o !== c) o.carry = false;
+  c.carry = true;
 }
 
 /* ---------------- 价格 ---------------- */

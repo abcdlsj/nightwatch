@@ -24,7 +24,7 @@ if (seedArg) url += (url.includes('?') ? '&' : '?') + 'seed=' + seedArg.slice(7)
 
 const BOT = `()=>{const g=__game,G=g.G;const P=G.prep;
  if(G.phase!=='prep')return 'wait';
- if(P.step>=3)return 'ready';
+ if(P.step>=3&&!P.cur)return 'ready';
  if(!P.cur){const pref=['train','field','grocer','altar','parcel','shop','black','giant','smith','forge','storm','frostshop','chest','furnace','enchant','job','bank','spring','gamble','ambush'];
    const d=P.doors.slice().sort((a,b)=>(pref.indexOf(a)+99)%120-(pref.indexOf(b)+99)%120)[0];g.enterEvent(d);return 'enter '+d;}
  const c=P.cur;
@@ -54,6 +54,10 @@ async function skip(pg) {
 
 const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
 const pg = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+/* 测试用存档：人物全部解锁 */
+await pg.addInitScript(() => {
+  if (!localStorage.getItem('chain-meta-v1')) localStorage.setItem('chain-meta-v1', JSON.stringify({ heroes: { ayla: 1, mo: 1, ying: 1, jun: 1, li: 1 } }));
+});
 const errs = [];
 pg.on('pageerror', (e) => errs.push(String(e)));
 pg.on('console', (m) => m.type() === 'error' && errs.push('console: ' + m.text()));

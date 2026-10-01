@@ -8,6 +8,10 @@ const out = arg('out', 'shots');
 mkdirSync(out, { recursive: true });
 const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
 const pg = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+/* 测试用存档：人物全部解锁 */
+await pg.addInitScript(() => {
+  if (!localStorage.getItem('chain-meta-v1')) localStorage.setItem('chain-meta-v1', JSON.stringify({ heroes: { ayla: 1, mo: 1, ying: 1, jun: 1, li: 1 } }));
+});
 const errs = [];
 pg.on('pageerror', (e) => errs.push(String(e)));
 const shot = (n) => pg.screenshot({ path: `${out}/${n}.png` });

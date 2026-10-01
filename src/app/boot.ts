@@ -31,6 +31,9 @@ import { enterEvent, finishStep, acquire, afterChange, gainRelic, sellCard } fro
 import { sheetActions } from '../ui/sheets';
 import { initDrag } from './prep/drag';
 import { setDrawer } from './prep/drawer';
+import { prepStops } from './prep/jumps';
+import { setPrepTotal } from '../ui/hud';
+setPrepTotal(prepStops);
 import { codexKill, markSeen, unlock } from '../game/meta';
 import { onBack, onPause, onResume } from '../platform/native';
 
@@ -110,7 +113,7 @@ new ResizeObserver(() => {
 /* ---------- 底栏 ---------- */
 $('#goBtn').onclick = () => {
   SFX.ensure();
-  if (G.phase === 'prep' && G.prep.step >= 3) startBattle();
+  if (G.phase === 'prep' && G.prep.step >= prepStops()) startBattle();
 };
 $('#bagBtn').onclick = () => {
   SFX.ensure();

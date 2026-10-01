@@ -16,6 +16,12 @@ export const resetGoldBump = () => {
   shownGold = null;
 };
 
+/** 这一夜备战几站（跃迁夜 4 站），由备战流程注册 */
+let prepTotal = () => 3;
+export const setPrepTotal = (f: () => number) => {
+  prepTotal = f;
+};
+
 export function updateHUD() {
   const T = L.ui.hud;
   $('#roundV').textContent = String(Math.min(G.round, G.maxRound));
@@ -38,9 +44,10 @@ export function updateHUD() {
   $('#treeN').textContent = '';
   const go = $('#goBtn') as HTMLButtonElement;
   if (G.phase === 'prep') {
-    const s = G.prep.step;
-    go.disabled = s < 3;
-    go.textContent = s < 3 ? t('hud.prepStep', { s }) : T.fight;
+    const s = G.prep.step,
+      m = prepTotal();
+    go.disabled = s < m;
+    go.textContent = s < m ? t('hud.prepStep', { s, m }) : T.fight;
   } else if (G.phase === 'battle') {
     go.disabled = true;
     go.textContent = T.inBattle;

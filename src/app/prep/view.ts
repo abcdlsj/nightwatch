@@ -26,6 +26,7 @@ import { talentText } from '../../ui/sheets';
 import { startDragOffer } from './drag';
 import { enterEvent, finishStep, startTalk, answerTalk, endTalk, learnTalent, gainGold, buyGear } from './actions';
 import { startAmbush } from '../flow';
+import { startJump, prepStops } from './jumps';
 
 const fitTag = () => `<small class="gt fit">${L.ui.prep.fit}</small>`;
 
@@ -112,19 +113,22 @@ export function renderPrep() {
   const P = G.prep,
     body = $('#pbody');
   const T = L.ui.prep;
-  $('#stepPips').innerHTML = [0, 1, 2].map((i) => `<i class="${i < P.step ? 'done' : i === P.step ? 'now' : ''}"></i>`).join('');
+  const stops = prepStops();
+  $('#stepPips').innerHTML = [...Array(stops).keys()].map((i) => `<i class="${i < P.step ? 'done' : i === P.step ? 'now' : ''}"></i>`).join('');
   body.innerHTML = '';
-  if (P.step >= 3) {
+  /* 跃迁夜：三站走完后多一站，定 C 位 */
+  if (P.step === 3 && stops === 4 && !P.cur) P.cur = startJump();
+  if (P.step >= stops) {
     body.innerHTML = readyHtml() + wagerHtml();
     bindWagers();
     updateHUD();
     return;
   }
-  if (!P.cur && P.talk && !P.talkDone) startTalk();
+  if (!P.cur && P.talk && !P.talkDone && P.step < 3) startTalk();
   const cur = P.cur;
   $('#prep').classList.toggle('talking', !!cur && (cur.mode === 'talk' || cur.mode === 'talent'));
   if (!cur) {
-    body.insertAdjacentHTML('beforeend', `<div class="ptitle">${T.where}<span>${t('prep.stop', { n: P.step + 1 })}</span></div>`);
+    body.insertAdjacentHTML('beforeend', `<div class="ptitle">${T.where}<span>${t('prep.stop', { n: P.step + 1, m: stops })}</span></div>`);
     const list = document.createElement('div');
     list.className = 'doors';
     P.doors.forEach((id) => {
@@ -187,6 +191,9 @@ export function renderPrep() {
         paintCard(ce, o.card, 'static');
         h.appendChild(ce);
         b.appendChild(h);
+        b.insertAdjacentHTML('beforeend', `<div><b>${o.label}</b><span>${o.sub}</span></div>`);
+      } else if (o.ico) {
+        b.insertAdjacentHTML('beforeend', `<img class="ricon" src="${icon(o.ico).url}" alt="">`);
         b.insertAdjacentHTML('beforeend', `<div><b>${o.label}</b><span>${o.sub}</span></div>`);
       } else {
         const R0 = RELICS[o.relic];
@@ -358,7 +365,7 @@ function renderTalk(cur: PrepStop, body: HTMLElement) {
     const [w, tx] = lines[cur.said.length];
     cur.said.push([w, pickLine(tx)]);
   }
-  log.innerHTML = cur.ans ? tline('hero', cur.ans) + tline(cur.who, cur.re) : cur.said.map(([w, tx]: [string, string]) => tline(w, tx)).join('');
+  log.innerHTML = cur.ans ? tline('hero', cur.ans) + tline(cur.who, cur.re) + (cur.gain ? `<div class="ev-hint gain">${cur.gain}</div>` : '') : cur.said.map(([w, tx]: [string, string]) => tline(w, tx)).join('');
   body.appendChild(log);
   const list = document.createElement('div');
   list.className = 'opts';

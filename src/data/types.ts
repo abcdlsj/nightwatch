@@ -32,6 +32,21 @@ export interface ItemDef {
   quest?: { n: number; into: string };
   /** 【成长】：永久加基础伤害，跨夜保留 */
   grow?: number;
+  /* 【站位】：按所在格子算的独立乘区 */
+  /** 占着棋盘正中（第 4、5 格）时 ×(1+值) */
+  posMid?: number;
+  /** 在棋盘最左或最右时 ×(1+值) */
+  posEdge?: number;
+  /** 左右两边都是辅助卡（不打伤害）时 ×(1+值) */
+  flank?: number;
+  /** 辅助：相邻的输出卡伤害 +值（加成区）；自己在正中时翻倍 */
+  auraNb?: number;
+  /** 每有一张相邻的某类卡，伤害 +pct（加成区） */
+  lineKind?: { kind: Kind; pct: number };
+  /** 辅助：触发时为 C 位充能 */
+  chargeCarry?: number;
+  /** 辅助：触发时 C 位下一击 +值 */
+  buffCarry?: number;
   /* 文案 */
   n: string; d: string; f: string; lore?: string; dn?: string; dl?: string;
   /** 任务说明（如「累计闪电弹跳」） */

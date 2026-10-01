@@ -5,7 +5,7 @@ import { rand, rnd, vr, vrnd } from '../core/rng';
 import { G, type Card } from '../game/state';
 import { mv } from '../game/mods';
 import { TUNE } from '../game/tuning';
-import { boardCards, stepOf, dmgMul, chainOf, chargeAmt, buffAmt, maxAmmo, stats, comboMul, type Stats } from '../game/cards';
+import { boardCards, stepOf, dmgMul, chainOf, chargeAmt, buffAmt, maxAmmo, stats, comboMul, carryCard, type Stats } from '../game/cards';
 import { unlock, codexKill } from '../game/meta';
 import { world, K, ex, ey } from './world';
 import { view } from './view';
@@ -131,6 +131,16 @@ function fire(c: Card, depth: number) {
       c.bBf++;
       view.link(c, n, '#73eff7', 0.25);
     }
+  /* 为 C 位服务的辅助卡 */
+  const cc = it.chargeCarry || it.buffCarry ? carryCard() : null;
+  if (cc && cc !== c) {
+    if (it.chargeCarry) chargeCard(cc, it.chargeCarry * (1 + 0.2 * stepOf(c)), c);
+    if (it.buffCarry) {
+      cc.anvil = Math.max(cc.anvil || 0, it.buffCarry * (1 + 0.2 * stepOf(c)));
+      c.bBf++;
+      view.link(c, cc, '#ffd166', 0.25);
+    }
+  }
   if (c.adj === 'ignite' && c.right) chargeCard(c.right, 0.1, c);
   if (c.adj === 'sturdy') {
     b.shield += c.size * (c.tier + 1);

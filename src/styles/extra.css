@@ -32,3 +32,7 @@
 .tog{flex:none;width:42px;height:24px;border-radius:12px;background:#33424a;position:relative;transition:background .15s}
 .tog::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:9px;background:#9fb3ba;transition:left .15s,background .15s}
 .tog.on{background:#3c7a52}.tog.on::after{left:21px;background:#e8fff0}
+
+/* ---------- C 位 ---------- */
+.card.carry .inner{box-shadow:0 0 0 2px #ffd166,0 0 10px rgba(255,209,102,.55)}
+.card .cw{position:absolute;right:-5px;top:-7px;width:17px;height:17px;border-radius:5px;background:#ffd166;color:#1a1c2c;font-size:12px;line-height:17px;text-align:center;box-shadow:0 2px 0 rgba(0,0,0,.4);z-index:3}

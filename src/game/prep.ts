@@ -1,5 +1,5 @@
 /* 备战规则：选门、加码、拿卡/卖卡/合成、拿遗物/学天赋。只改状态，界面由 app/ 刷新 */
-import { ADJ } from '../data/cards';
+import { ADJ, ITEMS } from '../data/cards';
 import { EVENTS } from '../data/events';
 import { EN, ELITES } from '../data/enemies';
 import { RELICS } from '../data/relics';
@@ -31,6 +31,14 @@ const EVENT_NEED: Record<string, () => boolean> = {
   furnace: () => G.cards.length >= 2,
   mentor: () => Object.keys(TALENTS).some(talentOk),
   ambush: () => G.round !== 4 && (G.round < 8 || G.endless) && !(G.prep && G.prep.fought),
+  refugee: () => G.cards.length >= 3,
+  ritual: () => G.wallMax > 15,
+  recycle: () => G.cards.some((c) => c.loc === 'stash'),
+  hone: () => G.cards.some((c) => ITEMS[c.key].dmg > 0),
+  pilgrim: () => G.cards.length > 0,
+  swap: () => G.cards.some((c) => c.tier < 3),
+  tutor: () => G.gold >= 5 && G.cards.some((c) => ITEMS[c.key].dmg > 0),
+  drill: () => G.cards.some((c) => c.loc === 'board' && ITEMS[c.key].dmg > 0),
   /* 隐藏事件不进随机池，只由下面的 SECRET_DOORS 塞进来 */
   s_letter: () => false,
   s_karl: () => false,
@@ -197,6 +205,8 @@ export function checkMerges(): Card[] {
       t.hoard += a.hoard;
       t.grow = (t.grow || 0) + (a.grow || 0);
       t.qp = Math.max(t.qp || 0, a.qp || 0);
+      if (a.carry) t.carry = true;
+      t.star = Math.max(t.star || 0, a.star || 0);
       removeCard(a);
       t.tier++;
       if (t.loc === 'temp') {

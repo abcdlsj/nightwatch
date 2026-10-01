@@ -17,6 +17,10 @@ export interface Card {
   grow: number;
   /** 任务进度 */
   qp: number;
+  /** C 位：这局的主力，自带独立乘区（同一时间只有一张） */
+  carry?: boolean;
+  /** 星辉：璃的跃迁事件给 C 位叠的层数，每层再乘一截 */
+  star?: number;
   /** 卡面闪光动画的错开延迟（纯表现） */
   dl: string | number;
   /* ---- 战斗中 ---- */
