@@ -61,7 +61,7 @@ function lockBtn(o,of,cur){
   const b=document.createElement('button');b.className='lockb'+(of.locked?' on':'');b.textContent=of.locked?'锁':'留';b.title='锁住：下一家店还卖它';
   b.onclick=e=>{e.stopPropagation();SFX.ensure();SFX.play('ui');
     if(of.locked){of.locked=false;G.lock=null;}
-    else{for(const x of cur.offers)x.locked=false;of.locked=true;G.lock={card:Object.assign({},of.card),price:of.price};tipOnce('lock','锁住的卡会出现在下一家店里，价钱不变，直到你买下或者解锁。一次只能锁一张。',200);}
+    else{for(const x of cur.offers)x.locked=false;of.locked=true;G.lock={card:Object.assign({},of.card),price:of.price};tipOnce('lock','锁住的卡价钱不变。一次只能锁一张。',200);}
     renderPrep();};
   o.appendChild(b);if(of.locked)o.classList.add('locked');
 }
@@ -161,7 +161,7 @@ function frostExtra(r,pack){if(G.foeSet!=='frost')return;
 function frostBolt(e){const bc=boardCards().filter(c=>c.frozen<=0);if(!bc.length)return;const c=pick(bc);
   const fr=F.cv.getBoundingClientRect();const r=c.el.getBoundingClientRect();
   bolt([[ex(e),ey(e)-6],[(r.left+r.width/2-fr.left)/F.s,F.H]],'#c2f4ff',.25,true);SFX.play('intent');
-  c.frozen=1.5;c.el.classList.add('frozen');tipOnce('frozen','「'+ITEMS[c.key].n+'」被冻住了，过一会儿自己会化开。');}
+  c.frozen=1.5;c.el.classList.add('frozen');}
 
 /* ---------- 第二个首领：深渊母巢 ---------- */
 EN.brood={n:'深渊母巢',hp:11000,spd:.011,armor:2,wall:99,spr:'b_brood',sc:1,boss:1,fixed:1,col:'#7ddc5f',faction:FACTIONS.abyss,
@@ -194,7 +194,7 @@ EVENTS.ambush={n:'拦路',ico:'berserker',cat:'fight',w:.75,minR:2,d:'一个大�
 function enterAmbush(cur){const k=foeKey(pick(ELITES));Object.assign(cur,{mode:'ambush',foe:k});}
 function ambushHtml(cur){const d=EN[cur.foe];
   return `<div class="amb"><img src="${SPR[d.spr].url}" alt=""><div><b>${d.n}</b><p>${d.tip}</p><p>${d.intents.map(t=>'【'+t.n+'】'+t.d).join('<br>')}</p></div></div>
-  <div class="ev-hint">带着几只小怪。打完拿 ${ambushGold()} 金；在它撞墙之前打倒它，再从三件好遗物里挑一件</div>`;}
+  <div class="ev-hint">打完拿 ${ambushGold()} 金；撞墙前打倒它，再挑一件好遗物</div>`;}
 function ambushGold(){return 3+Math.floor(G.round/2);}
 function ambushWave(k){const S=[{type:k,t:1.2,x:.5,y:-.04}];
   for(const s of G.nextWave){if(s.t>9)break;const d=EN[s.type];if(d.boss||d.elite||d.cargo)continue;S.push({type:s.type,t:s.t+2.5,x:s.x,y:s.y});}

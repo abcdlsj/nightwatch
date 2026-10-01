@@ -64,7 +64,7 @@ function openAch(){SFX.play('ui');const sh=$('#sheet');sh.classList.add('top');
 /* ---- 长夜（难度进阶），逐档叠加 ---- */
 const HEATS=['正常难度','敌人血量 +15%','精英和首领血量再 +25%','商店里的卡都贵 1 金','城墙上限 -15%','每一波敌人多 15%','每夜工钱少 1 金','敌人移速 +10%','夜谈只给两个选项'];
 const heat=n=>(G.heat||0)>=n;
-function heatHtml(){const h=META.heatSel;return h?HEATS.slice(1,h+1).map((t,i)=>`<i>${i+1}</i> ${t}`).join('<br>'):'想更难？守到黎明一次就能解锁长夜 1';}
+function heatHtml(){const h=META.heatSel;return h?HEATS.slice(1,h+1).map((t,i)=>`<i>${i+1}</i> ${t}`).join('<br>'):HEATS[0];}
 function heatBar(){if(!META.heatMax)return '';
   return `<div class="heatsel"><button class="btn sm" id="hMinus" aria-label="降低难度">‹</button><div><b>长夜 ${META.heatSel}</b><small id="heatD">${heatHtml()}</small></div><button class="btn sm" id="hPlus" aria-label="提高难度">›</button></div>`;}
 function bindHeat(){const f=d=>{META.heatSel=clamp(META.heatSel+d,0,META.heatMax);saveMeta();SFX.play('ui');const b=document.querySelector('.heatsel b');b.textContent='长夜 '+META.heatSel;$('#heatD').innerHTML=heatHtml();};
@@ -81,11 +81,10 @@ const WAGERS={
 const wg=k=>B&&B.wager===k;
 function rollWagers(){return shuffled(Object.keys(WAGERS)).slice(0,2);}
 function wagerHtml(){const P=G.prep;if(G.round>=G.maxRound)return '';if(!P.wagers)P.wagers=rollWagers();
-  return `<div class="wagers"><div class="wg-t">加码？<small>今晚更难，守住有赏</small></div>${P.wagers.map(k=>{const W=WAGERS[k];
+  return `<div class="wagers"><div class="wg-t">加码？</div>${P.wagers.map(k=>{const W=WAGERS[k];
     return `<button class="wg${P.wager===k?' on':''}" data-w="${k}"><b>${W.n}</b><span>${W.d}</span><em>${W.r}</em></button>`;}).join('')}</div>`;}
 function bindWagers(){document.querySelectorAll('.wg').forEach(b=>b.onclick=()=>{SFX.ensure();const k=b.dataset.w;G.prep.wager=G.prep.wager===k?null:k;SFX.play(G.prep.wager?'intent':'ui');
-  document.querySelectorAll('.wg').forEach(x=>x.classList.toggle('on',x.dataset.w===G.prep.wager));
-  if(G.prep.wager)toast('加码「'+WAGERS[k].n+'」：'+WAGERS[k].d);});}
+  document.querySelectorAll('.wg').forEach(x=>x.classList.toggle('on',x.dataset.w===G.prep.wager));});}
 /* 胜利结算：返回战报里要加的行 */
 function wagerPay(){const W=WAGERS[B.wager];if(!W)return[];G.run.wagers++;const rows=[];const lb='加码·'+W.n;
   if(W.gold)rows.push([lb,W.gold]);

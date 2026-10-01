@@ -84,14 +84,14 @@ function tipOnce(key,html,delay){if(tipSeen[key])return;tipSeen[key]=1;try{local
 $('#roundChip').onclick=()=>{SFX.ensure();SFX.play('ui');const R=Math.min(G.round,G.maxRound);
   showTip('夜晚',`第 <b>${R}</b> 夜 / 共 ${G.maxRound} 夜：${nightInfo(R).title}。<br>第 4 夜有精英，最后一夜是首领。${G.heat?'<br>当前难度：长夜 '+G.heat:''}`,4200,true);};
 $('#goldChip').onclick=()=>{SFX.ensure();SFX.play('coin');
-  showTip('金币',`手上 <b>${G.gold}</b> 金，买卡、刷新、买遗物都靠它。<br>每夜打完发工钱，手上每存 6 金多给 1 金利息（最多 ${3+mv('interest')}）。`,4800,true);};
+  showTip('金币',`每夜打完发工钱，手上每存 6 金多给 1 金利息（最多 ${3+mv('interest')}）。`,4800,true);};
 $('#hpChip').onclick=()=>{SFX.ensure();SFX.play('ui');
-  showTip('城墙',`城墙 <b>${Math.ceil(G.wall)}</b> / ${G.wallMax}。怪摸到墙就掉砖，掉光这局就结束。${B&&B.shield>0?'<br>蓝色数字是护盾，先扣护盾再扣墙。':''}${mv('regen')?'<br>每夜打完会补 '+mv('regen')+' 砖。':''}`,4800,true);};
+  showTip('城墙',`怪摸到墙就掉砖，掉光这局就结束。${B&&B.shield>0?'<br>蓝色数字是护盾，先扣护盾再扣墙。':''}${mv('regen')?'<br>每夜打完会补 '+mv('regen')+' 砖。':''}`,4800,true);};
 
 /* ---------- 准备好了：今晚情报 ---------- */
-const PTIPS=['输出卡放中间，两边摆能充能、能加伤的卡，一次带俩。','同名同品质两张自动合成，背包里的也算。','卡上的小数字是单次伤害，点开能看冷却和加成怎么算的。',
-  '钱别一次花光，每存 6 金下一夜多给 1 金。','有【装填】【充能】字样的卡，要挨着别的卡才有用。','首领的下一招写在血条下面，读条满了才放。',
-  '冰能减速、冻住怪，墙前面多一秒就多打一轮。','打不过的时候，回头看看战报里哪张卡没出力。','词缀的效果点开卡就能看到，合成时会留下更好的那个。',
+const PTIPS=['输出卡放中间，两边摆能充能、能加伤的卡，一次带俩。','同名同品质两张自动合成，背包里的也算。','卡上的小数字是单次伤害。',
+  '钱别一次花光，每存 6 金下一夜多给 1 金。','有【装填】【充能】字样的卡，要挨着别的卡才有用。',
+  '冰能减速、冻住怪，墙前面多一秒就多打一轮。','打不过的时候，回头看看战报里哪张卡没出力。','合成时，词缀留下更好的那个。',
   '背包里的卡不上场，但合成和出售都算它。','同元素凑够张数有羁绊，全队都吃加成。','毒和火是持续伤害，适合打血厚的大家伙。'];
 function readyHtml(){
   const P=G.prep;const cnt={};G.nextWave.forEach(s=>cnt[s.type]=(cnt[s.type]||0)+1);

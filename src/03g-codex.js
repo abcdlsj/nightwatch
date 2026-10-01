@@ -42,7 +42,6 @@ function openHistory(){SFX.play('ui');const H=META.hist;
   const per=Object.keys(HEROES).map(k=>{const hs=H.filter(h=>h.h===k);if(!hs.length)return '';
     const w=hs.filter(h=>h.w).length,top=hs.reduce((a,h)=>h.en>a.en||(h.en===a.en&&h.r>a.r)?h:a,hs[0]);
     return `<div><span>${HEROES[k].n}</span><i style="margin-left:auto">${hs.length} 局 · 守住 ${w} · 最好 ${top.en?'黎明+'+top.en:top.w?'黎明':'第'+top.r+'夜'}</i></div>`;}).join('');
-  const lost=Math.max(0,(META.runs||0)-H.length);
   const sh=sheetOpen(`<div class="sh cdx-sh" role="dialog" aria-label="过往守夜"><h3>过往守夜 <small class="spn">${H.length} 局</small></h3>
     <p class="muted2">一共守过 ${META.runs||0} 次，守到黎明 ${META.wins||0} 次${META.endBest?'，黎明后最多又撑了 '+META.endBest+' 夜':''}。</p>
     ${per?`<div class="rules res hs-sum">${per}</div>`:''}
@@ -51,8 +50,7 @@ function openHistory(){SFX.play('ui');const H=META.hist;
         <img class="ricon" src="${HEROES[h.h]?SPR[He.portrait].url:''}" alt=""><div><b>${hResult(h)}<small class="gt">${He.n}</small></b>
         <span class="hs-sub">${hDate(h.t)} · ${(FOESETS[h.set]||FOESETS.dark).n}${h.heat?' · 长夜 '+h.heat:''} · 杀 ${h.k}</span>
         <span class="hs-cards">${h.bd.map(c=>ITEMS[c[0]]?`<img src="${SPR[c[0]].url}" alt="" style="--tc:${TIERS[c[1]].c}">`:'').join('')}</span></div></button>`;}).join('')
-      :'<p class="muted2">还没有记下来的局。守一夜试试。</p>'}
-      ${lost&&H.length<HIST_MAX?`<p class="muted2">更早的 ${lost} 局是在有这一页之前打的，没记下来。</p>`:''}</div>
+      :'<p class="muted2">还没有记录。</p>'}</div>
     <div class="sh-btns"><button class="btn" id="hsClose">关闭</button></div></div>`);
   $('#hsClose').onclick=closeSheet;
   sh.querySelectorAll('.hs-row').forEach(b=>b.onclick=()=>openRunDetail(+b.dataset.i));}
@@ -95,7 +93,7 @@ function cxCards(sub){SFX.play('ui');sub=sub||'all';const X=META.cx.c;
   const got=keys.filter(k=>X[k]!=null).length;
   const sh=sheetOpen(`<div class="sh cdx-sh" role="dialog" aria-label="卡牌图鉴">${cxHead('card',pool.filter(k=>X[k]!=null).length,pool.length)}
     <div class="cdx-tabs">${tabs.map(([k,n])=>`<button class="btn sm${k===sub?' on':''}" data-t="${k}">${n}</button>`).join('')}</div>
-    <p class="muted2">${sub==='all'?'谁都能在店里碰到的卡。':'只有选'+HEROES[sub].n+'才会出现在店里。'}拿到过 ${got} / ${keys.length}，灰的是还没拿到过的。卡面是你拿到过的最高品质。</p>
+    <p class="muted2">${sub==='all'?'':'只有选'+HEROES[sub].n+'才会出现在店里。'}拿到过 ${got} / ${keys.length}。卡面是拿到过的最高品质。</p>
     <div class="cdx"></div><div class="sh-btns"><button class="btn" id="cdxClose">关闭</button></div></div>`);
   const grid=sh.querySelector('.cdx');
   for(const k of keys){const b=document.createElement('button');b.className='cdx-i'+(X[k]==null?' lock':'');const tier=X[k]==null?ITEMS[k].t:X[k];
@@ -109,7 +107,6 @@ function cxGroups(obj,keys){const g=[['',keys.filter(k=>!obj[k].hero)]];for(cons
 function cxRelics(){SFX.play('ui');const X=META.cx.r;
   const keys=Object.keys(RELICS).filter(k=>RELICS[k].m&&GT[RELICS[k].t]).sort((a,b)=>RELICS[a].t-RELICS[b].t);
   const sh=sheetOpen(`<div class="sh cdx-sh" role="dialog" aria-label="遗物图鉴">${cxHead('relic',keys.filter(k=>X[k]).length,keys.length)}
-    <p class="muted2">拿到过的遗物。问号的还没碰上过，品质先告诉你。</p>
     <div class="tlist">${cxGroups(RELICS,keys).map(([n,ks])=>(n?`<div class="hs-h">${n}</div>`:'')+ks.map(r=>{const R0=RELICS[r],c=GT[R0.t].c,ok=X[r];
       return `<div class="trow${ok?'':' cx-lock'}" style="--gc:${c}"><img class="ricon" src="${icon(R0.ico).url}" alt=""><div>${ok?`<b>${R0.n}<small class="gt">${GT[R0.t].n}</small></b><div class="mods">${modText(R0.m)}</div>${R0.f?`<em>${R0.f}</em>`:''}`:`${cxLock}<small class="gt">${GT[R0.t].n}</small>`}</div></div>`;}).join('')).join('')}</div>
     <div class="sh-btns"><button class="btn" id="cdxClose">关闭</button></div></div>`);cxBind(sh);}
@@ -117,7 +114,7 @@ function cxRelics(){SFX.play('ui');const X=META.cx.r;
 function cxTalents(){SFX.play('ui');const X=META.cx.t;
   const keys=Object.keys(TALENTS).sort((a,b)=>TALENTS[a].r-TALENTS[b].r);
   const sh=sheetOpen(`<div class="sh cdx-sh" role="dialog" aria-label="天赋图鉴">${cxHead('talent',keys.filter(k=>X[k]).length,keys.length)}
-    <p class="muted2">学会过的天赋。夜谈、过路人、残破的手札都能学。</p>
+    <p class="muted2">夜谈、过路人、残破的手札都能学。</p>
     <div class="tlist">${cxGroups(TALENTS,keys).map(([n,ks])=>(n?`<div class="hs-h">${n}</div>`:'')+ks.map(id=>{const T=TALENTS[id],C=TCAT[T.cat]||TCAT.atk,ok=X[id];
       return `<div class="trow${ok?'':' cx-lock'}" style="--gc:${C.c}"><img class="ricon" src="${icon(C.ico).url}" alt=""><div>${ok?`<b>${T.n}<small class="gt">${C.n}</small></b><div class="mods">${talentText(id)}</div>${T.say?`<em>“${T.say}”</em>`:''}`:`${cxLock}<small class="gt">${C.n}</small>`}</div></div>`;}).join('')).join('')}</div>
     <div class="sh-btns"><button class="btn" id="cdxClose">关闭</button></div></div>`);cxBind(sh);}
@@ -127,7 +124,6 @@ const FOE_G=['亡者与深渊','霜潮','精英','首领'];
 function cxFoes(){SFX.play('ui');
   const keys=Object.keys(EN).filter(k=>SPR[EN[k].spr]);const got=keys.filter(foeSeen).length;
   const sh=sheetOpen(`<div class="sh cdx-sh" role="dialog" aria-label="敌人图鉴">${cxHead('foe',got,keys.length)}
-    <p class="muted2">城外来过的东西。见过一次就记下来，点开看它会干什么。</p>
     <div class="cx-foes">${FOE_G.map((n,g)=>{const ks=keys.filter(k=>foeGroup(k)===g);return ks.length?`<div class="hs-h">${n} <small>${ks.filter(foeSeen).length} / ${ks.length}</small></div><div class="cdx">${ks.map(k=>{const ok=foeSeen(k);
       return `<button class="cdx-i cx-foe${ok?'':' lock'}" data-k="${k}"${ok?'':' disabled'}><img src="${SPR[EN[k].spr].url}" alt=""><span>${ok?EN[k].n:'？？？'}</span></button>`;}).join('')}</div>`:'';}).join('')}</div>
     <div class="sh-btns"><button class="btn" id="cdxClose">关闭</button></div></div>`);

@@ -78,7 +78,7 @@ function startBattle(){
   banner(amb?'拦路 · '+bd.n:nightInfo(G.round).title,G.round===8||amb?'#ff6b5b':G.round===4?'#ffb37a':'#fff');
   SFX.play(G.round>=8||G.round===4?'intent':'ui');
   if(B.wager)later(.6,()=>banner('加码 · '+WAGERS[B.wager].n,'#ff8a5b'));
-  tipOnce('battle','卡会自己打：底下的进度条转满就出手。左下角的 1× 能调快。',1600);if(bd)tipOnce('boss','首领血条下面写着它的下一招，进度条走满就放。',2600);
+  
   emit('start',{});
 }
 function later(dt,f){B.sched.push({t:dt,f});}
@@ -154,15 +154,15 @@ function freeze(e,t,src){if(e.dead)return;let d=t*(e.d.boss||e.d.elite?.5:1);if(
   if(d>e.frzT){e.frzT=d;ring(ex(e),ey(e)-5,2,10*K(),'#c2f4ff',.3);}emit('freeze',{e,src});}
 function vuln(e,t,a){e.vulnT=Math.max(e.vulnT,t);e.vulnA=Math.max(e.vulnA,a);}
 function wallHit(e){e.dead=true;if(!B.wallBy)B.wallBy={};B.wallBy[e.type]=(B.wallBy[e.type]||0)+e.d.wall;damageWall(e.d.wall,ex(e),e.d.bomb?'boom':null);if(!B.over&&e.d.chill)chillCard(e.d.chill);if(B.ambush&&e.d.elite)B.fled=1;}
-function chillCard(t){const bc=boardCards().filter(c=>c.frozen<=0);if(!bc.length)return;const c=pick(bc);c.frozen=t;c.el.classList.add('frozen');if(Math.random()<.5)say('hero',BARKS.freeze,1);tipOnce('frozen','「'+ITEMS[c.key].n+'」被冻住了，过一会儿自己会化开。');}
+function chillCard(t){const bc=boardCards().filter(c=>c.frozen<=0);if(!bc.length)return;const c=pick(bc);c.frozen=t;c.el.classList.add('frozen');if(Math.random()<.5)say('hero',BARKS.freeze,1);}
 function damageWall(d,xx,kind){
   const e={x:xx/F.W,y:1};if(wg('brittle'))d*=1.5;if(B.ambush)d*=.5;const ab=Math.min(B.shield,d);B.shield-=ab;d-=ab;if(G.run)G.run.wallLost+=d;if(kind==='boom'){boom(xx,WALLY()-2,16*K(),'#ef7d57');}
   G.wall-=d;B.wallLost+=d;F.wallFlash=.4;F.shake=Math.max(F.shake,d>0?4:1.5);SFX.play('hurt');
   for(let i=0;i<10;i++)part(ex(e)+rnd(-6,6),WALLY(),rnd(-30,30),-rnd(20,50),.5,'#e43b44',2);
   if(d>0)num(ex(e),WALLY()-6,'-'+Math.ceil(d),'#ff5a5a',2);
-  restart($('#hpChip'),'shake');updateHUD();if(d>0){buzz(d>=5?60:25);tipOnce('wall','有怪摸到城墙了。顶上那颗红心就是城墙，掉光这局就结束。点它能看说明。',300);}
+  restart($('#hpChip'),'shake');updateHUD();if(d>0){buzz(d>=5?60:25);tipOnce('wall','城墙掉光，这局就结束。',300);}
   emit('wall',{d});if(B.over)return;
-  if(d>0){if(!B.lowSaid&&G.wall<G.wallMax*.35&&G.wall>0){B.lowSaid=true;say('hero',BARKS.low,2);tipOnce('low','城墙快撑不住了。下一夜多上几张输出卡，或者去找能补墙的遗物和天赋。',1500);}else if(Math.random()<.5)say('hero',BARKS.hurt,1);else say('soldier',BARKS.soldierHurt,1);}
+  if(d>0){if(!B.lowSaid&&G.wall<G.wallMax*.35&&G.wall>0){B.lowSaid=true;say('hero',BARKS.low,2);tipOnce('low','下一夜多上几张输出卡，或者去找能补墙的遗物和天赋。',1500);}else if(Math.random()<.5)say('hero',BARKS.hurt,1);else say('soldier',BARKS.soldierHurt,1);}
   if(G.wall<=0){if(B.ambush){ambushLose();return;}G.wall=0;loseBattle();}
 }
 function doIntent(e){
@@ -189,7 +189,7 @@ function trigger(c,depth,src){
 function fire(c,depth){
   if(B.over)return;
   const it=ITEMS[c.key];if(c.ammo===0)return;c.bTrig++;restart(c.el,'pop');SFX.play(it.snd||'fire',it.tag);
-  if(c.ammo>0){c.ammo--;setAmmo(c);if(c.ammo===0&&!B.flags.emptySaid){B.flags.emptySaid=1;say('hero',BARKS.empty,1);tipOnce('ammo','「'+it.n+'」弹药打光了，这一夜就歇着了。下一夜会补满，挨着能【装填】的卡也能补。');}}
+  if(c.ammo>0){c.ammo--;setAmmo(c);if(c.ammo===0&&!B.flags.emptySaid){B.flags.emptySaid=1;say('hero',BARKS.empty,1);tipOnce('ammo','弹药下一夜补满，挨着【装填】的卡也能补。');}}
   const st=stats(c,B.t);
   if(it.dmg>0){attack(c,st);for(let i=1;i<(it.multi||1);i++)later(.09*i,()=>{if(!B.over)attack(c,st);});}
   if(it.stack)c.stk+=it.stack;
@@ -509,7 +509,7 @@ function showReport(was,rows,total){codexSweep();
   const cash=$('#cash');let i=0;
   const next=()=>{if(i<rows.length){const r=rows[i];cash.insertAdjacentHTML('beforeend',`<div class="cash-row"><span>${r[0]}</span><b>${r[3]||(r[2]?'+'+r[2]:'+'+r[1])}</b></div>`);SFX.play('coin');i++;setTimeout(next,220);}
     else{cash.insertAdjacentHTML('beforeend',`<div class="cash-row total"><span>合计</span><b>+${total}</b></div>`);}};
-  setTimeout(next,400);tipOnce('report','每夜打完发工钱。手上每存 6 金多给 1 金利息，攒点钱不亏。上面的条是每张卡这夜打了多少。',900);
+  setTimeout(next,400);tipOnce('report','手上每存 6 金，多给 1 金利息。',900);
   $('#cashBtn').onclick=()=>{SFX.ensure();const r=$('#cashBtn').getBoundingClientRect();FX.coins(r.left+r.width/2,r.top,Math.min(total,10));G.gold+=total;G.round++;$('#report').hidden=true;nightStory(()=>toPrep());};
 }
 function loseBattle(){B.over=true;if(G.run)G.run.kills+=B.kills;G.phase='over';SFX.play('lose');G.bestChain=Math.max(G.bestChain,B.maxChain);banner(pickLine(RPT.fall),'#ff6b5b');setTimeout(()=>playStory(STORY.lose,()=>endScreen(false)),1400);}
@@ -552,7 +552,7 @@ function heroSelect(){
     return `<button class="hero" data-h="${k}" style="--hc:${H.col}"><img class="por" src="${SPR[H.portrait].url}" alt=""><div class="hn"><b>${H.n}</b><small>${H.title}</small></div>
     <div class="htag">${H.tag}</div><div class="hstat"><span>城墙 <b>${H.wall}</b></span><span>金币 <b>${H.gold}</b></span>${mastHtml(k)}</div><p>${H.desc}</p>
     <div class="hmeta"><div class="hcards">${H.start.map(s=>`<img src="${SPR[s[0]].url}" alt="${ITEMS[s[0]].n}">`).join('')}</div></div>
-    <em>“${H.intro}”</em></button>`;}).join('')}</div><p class="mastline">熟练：守住一夜 +1。${MAST_SHORT.map((p,i)=>`${i+1}级${p}`).join(' · ')}</p><button class="btn alt sm" id="cdxBtn2">每个人的专属卡，去卡牌图鉴里翻</button></div>`;
+    <em>“${H.intro}”</em></button>`;}).join('')}</div><p class="mastline">熟练：守住一夜 +1。${MAST_SHORT.map((p,i)=>`${i+1}级${p}`).join(' · ')}</p><button class="btn alt sm" id="cdxBtn2">专属卡图鉴</button></div>`;
   sc.hidden=false;bindHeat();$('#cdxBtn2').onclick=()=>{SFX.ensure();openCodex(Object.keys(HEROES)[0]);};
   sc.querySelectorAll('.hero').forEach(b=>b.onclick=()=>{SFX.ensure();SFX.play('merge');sc.hidden=true;newGame(b.dataset.h);});
 }

@@ -48,7 +48,7 @@ enterEvent=function(id){
     const tier=Math.min(2,mine.length?Math.max(...mine):1);
     cur.offers=[{card:{key:'oathsword',tier,adj:null,size:ITEMS.oathsword.size,dl:0,hoard:0},price:0,sold:false}];
     foundSecret('karl');G.prep.cur=cur;renderPrep();
-    tipOnce('s_karl','两把剑是同一块铁打的。和你手里那把同品质，拿上就会合在一起。',300);return;}
+    tipOnce('s_karl','两把剑是同一块铁打的。',300);return;}
   _enterEvent(id);
   if(id==='bank'&&G.gold===7){const cur=G.prep.cur;foundSecret('bank');
     cur.text=`<div class="sletter">账房先生抬起了头。<br>“七。七百年了，总算有人揣着正好七个子儿进来。”<br>“灰袍年轻时在这儿存过一笔钱，说天一亮就来取。他一次都没来过。”<br>“那笔钱的利息，早够买下整座学院了。你说，他是不是从来就没打算让天亮？”</div>`+cur.text;renderPrep();}
