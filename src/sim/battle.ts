@@ -14,7 +14,7 @@ import { world, RANGE0, ex, ey } from './world';
 import { TUNE } from '../game/tuning';
 import { view } from './view';
 import { CARD_HOOKS, RELIC_HOOKS, TALENT_HOOKS, passiveSrc } from './hooks';
-import { trigger, stepProj } from './combat';
+import { trigger, stepProj, canFire } from './combat';
 import { spawn, enemyStep, stepERocks, surge } from './enemies';
 import type { Battle, Enemy } from './types';
 
@@ -101,7 +101,7 @@ export function startBattle(o: StartOpts): Battle {
     lowSaid: false, wager: o.wager, ambush: o.ambush, maxCombo: 0, combo: 0, maxHit: 0, slowT: 0,
   };
   for (const c of G.cards) {
-    Object.assign(c, { charge: 0, mom: 0, bDmg: 0, bTrig: 0, bSrc: {}, bCh: 0, bHs: 0, bRl: 0, bBf: 0, bTr: 0, frozen: 0, echoLog: [], evLog: {}, hasteT: 0, stk: 0, lastT: -9, rage: 0, cnt: 0 });
+    Object.assign(c, { charge: 0, mom: 0, bDmg: 0, bTrig: 0, bSrc: {}, bCh: 0, bHs: 0, bRl: 0, bBf: 0, bTr: 0, frozen: 0, echoLog: [], evLog: {}, hasteT: 0, stk: 0, lastT: -9, lastFire: -9, rage: 0, cnt: 0 });
     c.ammo = maxAmmo(c);
     view.cardFlag(c, 'frozen', false);
     view.cardFlag(c, 'haste', false);
@@ -178,7 +178,9 @@ export function simStep(dt: number) {
       c.charge += (dt / st.cd) * (c.hasteT > 0 ? 2 : 1);
     }
     if (c.charge >= 1) {
+      /* 离上次触发不到一个普朗克时间：先攒着，下一帧再说 */
       if (ITEMS[c.key].dmg > 0 && !hasTarget()) c.charge = 1;
+      else if (!canFire(c)) c.charge = Math.min(c.charge, 1.5);
       else {
         c.charge -= 1;
         if (c.charge > 1) c.charge = 0.99;

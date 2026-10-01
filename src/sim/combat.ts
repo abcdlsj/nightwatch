@@ -14,9 +14,13 @@ import { spawn, comboKill } from './enemies';
 import type { Enemy, Projectile } from './types';
 
 /* ---------------- 触发与连锁 ---------------- */
+/** 这张卡现在能不能再触发（离上次触发够不够一个普朗克时间） */
+export const canFire = (c: Card) => bt().t - c.lastFire >= TUNE.planck - 1e-9;
+
 export function trigger(c: Card, depth: number, src?: string) {
   const b = bt();
-  if (depth > 10 || b.over || c.ammo === 0) return;
+  if (depth > 10 || b.over || c.ammo === 0 || !canFire(c)) return;
+  c.lastFire = b.t;
   if (c.bSrc) {
     const k = src || L.ui.report.chained;
     c.bSrc[k] = (c.bSrc[k] || 0) + 1;
@@ -136,9 +140,6 @@ function fire(c: Card, depth: number) {
   emit('use', { c, depth });
   for (const n of nb) {
     if (n.adj !== 'echo' || n.frozen > 0) continue;
-    n.echoLog = n.echoLog.filter((t) => t > b.t - 1);
-    if (n.echoLog.length >= TUNE.echoPerSec) continue;
-    n.echoLog.push(b.t);
     later(0.12, () => {
       const d = depth + 1;
       if (B!.over || d > 10) return;

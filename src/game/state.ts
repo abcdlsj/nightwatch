@@ -30,6 +30,8 @@ export interface Card {
   rage: number;
   cnt: number;
   lastT: number;
+  /** 上次触发的时间（普朗克时间限制用） */
+  lastFire: number;
   /** 战场上的出手位置（战场坐标，由界面量出来或按格子估算） */
   ox: number;
   nb: Card[] | null;
