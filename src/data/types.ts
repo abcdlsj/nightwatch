@@ -93,7 +93,7 @@ export interface HeroDef {
   n: string; title: string; tag: string; desc: string; intro: string;
 }
 
-export interface KitDef { cards: [string, number][]; gold?: number; n: string; d: string }
+export interface KitDef { cards: [string, number][]; gold?: number; /** 属于哪个流派（流派没解锁时这套起手也锁着） */ path: string; n: string; d: string }
 
 /** 按人物区分的台词：字符串、随机一句、或 {ayla:'',mo:''} */
 export type Line = string | string[] | { [hero: string]: Line } | null | undefined;

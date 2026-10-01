@@ -7,7 +7,7 @@ import { unlock } from '../game/meta';
 import { nightTitle } from '../game/nights';
 import { B } from '../sim/battle';
 import { SFX } from '../audio/sfx';
-import { audioMode, cycleAudio } from '../audio/settings';
+import { SETTINGS } from '../platform/settings';
 import { $, $$, restart } from './dom';
 import { UI } from './state';
 
@@ -78,7 +78,12 @@ export function banner(msg: string, col?: string) {
 const TIPQ: [string, string, number][] = [];
 let tipEl: HTMLElement | null = null,
   tipT: ReturnType<typeof setTimeout> | null = null;
-const tipSeen: Record<string, number> = store.json(KEYS.tips, {});
+let tipSeen: Record<string, number> = store.json(KEYS.tips, {});
+/** 设置里「重新显示新手提示」 */
+export function resetTips() {
+  tipSeen = {};
+  store.setJson(KEYS.tips, tipSeen);
+}
 
 export function showTip(label: string, html: string, ms?: number, now?: boolean) {
   if (!tipEl) {
@@ -111,24 +116,13 @@ function nextTip(first?: boolean) {
   tipT = setTimeout(() => nextTip(), ms);
 }
 export function tipOnce(key: string, html: string, delay?: number) {
-  if (tipSeen[key]) return;
+  if (tipSeen[key] || !SETTINGS.tips) return;
   tipSeen[key] = 1;
   store.setJson(KEYS.tips, tipSeen);
   setTimeout(() => {
     showTip(L.ui.tips.label, html);
     SFX.play('hint');
   }, delay || 0);
-}
-
-/** 声音按钮显示当前档 */
-export function audioLabel() {
-  return (L.meta.audio as string[][])[audioMode][0];
-}
-export function toggleAudio() {
-  cycleAudio();
-  $('#muteBtn').textContent = audioLabel();
-  toast((L.meta.audio as string[][])[audioMode][1]);
-  if (audioMode < 2) SFX.play('ui');
 }
 
 /** 顶栏三个数字点一下有说明 */

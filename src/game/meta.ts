@@ -1,12 +1,14 @@
 /* 局外进度：成就、长夜难度、熟练、图鉴、过往守夜、隐藏事件计数。
  * 都存在 chain-meta-v1 里，跟单局存档分开，删档不丢。 */
-import { ACH, MAST_LV, HIST_MAX, HEAT_MAX } from '../data/meta';
+import { ACH, MAST_LV, HIST_MAX } from '../data/meta';
+import { heatWon, unlockNextHero } from './unlocks';
 import { ITEMS } from '../data/cards';
 import { emitEv } from '../core/events';
 import { store, KEYS } from '../platform/storage';
 import { G, freshRun, type RunStats } from './state';
 import { rollGear } from './loot';
 import { RELICS } from '../data/relics';
+import { HEROES, HERO_ORDER } from '../data/heroes';
 import { recalcMods } from './mods';
 
 export interface HistEntry {
@@ -26,6 +28,10 @@ export interface Meta {
   cx: { c: Record<string, number>; r: Record<string, number>; t: Record<string, number>; k: Record<string, number> };
   hist: HistEntry[];
   secrets: Record<string, number>;
+  /** 解锁了的人物 */
+  heroes?: Record<string, number>;
+  /** 每个人物各自的长夜难度：最高解锁到几档、现在选的几档 */
+  heat?: Record<string, { max: number; sel: number }>;
 }
 
 function loadMeta(): Meta {
@@ -34,6 +40,19 @@ function loadMeta(): Meta {
   if (!m.cx) m.cx = { c: {}, r: {}, t: {}, k: {} };
   if (!m.hist) m.hist = [];
   if (!m.secrets) m.secrets = {};
+  /* 旧存档迁移：玩过的人物都解锁；守到过黎明的人物，下一个也解锁；全局长夜进度分给每个解锁的人物 */
+  if (!m.heroes) {
+    m.heroes = { [HERO_ORDER[0]]: 1 };
+    for (const h of m.hist) {
+      if (HEROES[h.h]) m.heroes[h.h] = 1;
+      const nx = HERO_ORDER[HERO_ORDER.indexOf(h.h) + 1];
+      if (h.w && nx) m.heroes[nx] = 1;
+    }
+  }
+  if (!m.heat) {
+    m.heat = {};
+    for (const h in m.heroes) m.heat[h] = { max: m.heatMax || 0, sel: Math.min(m.heatSel || 0, m.heatMax || 0) };
+  }
   return m;
 }
 export const META: Meta = loadMeta();
@@ -78,11 +97,13 @@ export function runWon() {
   const R = G.run || freshRun();
   META.wins++;
   META.sets[G.foeSet] = 1;
-  if (G.heat >= META.heatMax && META.heatMax < HEAT_MAX) {
-    META.heatMax = G.heat + 1;
-    META.heatSel = META.heatMax;
-    R.newHeat = META.heatMax;
+  /* 难度按人物各自解锁；META.heatMax 记所有人物里最高的一档（标题页显示用） */
+  const nh = heatWon(G.hero, G.heat);
+  if (nh) {
+    R.newHeat = nh;
+    META.heatMax = Math.max(META.heatMax, nh);
   }
+  R.newHero = unlockNextHero(G.hero) || undefined;
   saveMeta();
   for (const a of ACH) if (a.w && (!ACH_OK[a.id] || ACH_OK[a.id](R))) unlock(a.id);
 }

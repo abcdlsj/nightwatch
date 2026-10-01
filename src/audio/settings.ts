@@ -1,21 +1,16 @@
-/* 声音三档：0 全开 / 1 只留音效 / 2 全静音。存在 chain-audio */
-import { store, KEYS } from '../platform/storage';
+/* 声音和震动跟着玩家设置走 */
 import { vibrate } from '../platform/haptics';
+import { SETTINGS, onSettings } from '../platform/settings';
 import { SFX } from './sfx';
 import { MUSIC } from './music';
 
-export let audioMode = +(store.get(KEYS.audio) || 0) || 0;
-
 export function applyAudio() {
-  SFX.setMuted(audioMode === 2);
-  MUSIC.enable(audioMode === 0);
+  SFX.setMuted(!SETTINGS.sfx);
+  MUSIC.enable(SETTINGS.music);
 }
-export function cycleAudio() {
-  audioMode = (audioMode + 1) % 3;
-  store.set(KEYS.audio, String(audioMode));
-  applyAudio();
-}
-/** 震动跟着声音开关：全静音时也不震 */
+onSettings(applyAudio);
+
+/** 震动：设置里关了就不震 */
 export function buzz(p: number | number[]) {
-  if (audioMode < 2) vibrate(p);
+  if (SETTINGS.haptics) vibrate(p);
 }

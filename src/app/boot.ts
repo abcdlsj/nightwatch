@@ -19,7 +19,8 @@ import { MUSIC, initMusic } from '../audio/music';
 import { applyAudio } from '../audio/settings';
 import { $, $$, applyStaticText } from '../ui/dom';
 import { LAYOUT, buildCells, renderOwned, paintCharges, setAfterRender } from '../ui/card-view';
-import { updateHUD, toast, bindHudTips, audioLabel, toggleAudio, renderRelics } from '../ui/hud';
+import { updateHUD, toast, bindHudTips, renderRelics } from '../ui/hud';
+import { openSettings } from '../ui/settings';
 import { domView, paintBossbar } from '../ui/battle-view';
 import { openTree, openBag, openSyn, closeSheet } from '../ui/sheets';
 import { UI } from '../ui/state';
@@ -45,7 +46,7 @@ initSfx();
 initMusic();
 onScene((n) => MUSIC.set(n));
 applyAudio();
-$('#muteBtn').textContent = audioLabel();
+$('#muteBtn').textContent = '⚙';
 setView(domView);
 initFlow();
 initDrag();
@@ -133,7 +134,7 @@ $('#speedBtn').onclick = () => {
 };
 $('#muteBtn').onclick = () => {
   SFX.ensure();
-  toggleAudio();
+  openSettings();
 };
 
 /* ---------- 主循环：模拟按 1/60 秒定步长推进，画面每帧画一次 ---------- */

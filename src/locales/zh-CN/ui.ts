@@ -270,6 +270,28 @@ export default {
 
   ach: { unlocked: '成就解锁' },
 
+  settings: {
+    title: '设置',
+    music: '音乐',
+    musicD: '现场合成的背景音乐',
+    sfx: '音效',
+    sfxD: '出手、命中、金币这些声音',
+    haptics: '震动',
+    hapticsD: '合成、城墙挨打时手机震一下',
+    shake: '震屏',
+    shakeD: '爆炸、暴击时战场晃一下',
+    nums: '伤害数字',
+    numsD: '战场上飘出来的伤害数字',
+    tips: '新手提示',
+    tipsD: '第一次碰到某件事时弹出的小提示',
+    resetTips: '重新显示提示',
+    tipsDone: '小提示会重新出现',
+    wipe: '清除所有进度',
+    wipeSure: '再点一次确认清除',
+    wiped: '进度已清除',
+    version: '版本 {v}',
+  },
+
   story: {
     narr: '旁白',
     knight: '暗影骑士 · 卡尔',
@@ -310,6 +332,9 @@ export default {
     mastLine: '熟练：守住一夜 +1。',
     mastLv: '{n}级{p}',
     codex: '专属卡图鉴',
+    locked: '还没解锁',
+    unlockBy: '用{h}守到黎明一次解锁',
+    pathLock: '熟练{n}级',
   },
 
   kits: {
@@ -336,6 +361,8 @@ export default {
     mastUp: '，升到 <b>{lv}</b> 级：{p}',
     mastLv: '（{lv} 级）',
     newHeat: '解锁了 <b>长夜 {h}</b>：{d}',
+    newHero: '新的守夜人加入了：<b>{h}</b> · {t}',
+    newPath: '{h}解锁了新流派「<b>{p}</b>」：专属卡开始进店',
     gotAch: '这局解锁的成就',
     goOn: '接着守下去',
     again: '再守一次',

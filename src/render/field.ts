@@ -4,6 +4,7 @@ import { DIG } from '../data/art/hand';
 import { vr, vrnd } from '../core/rng';
 import { fmt } from '../core/util';
 import { RM } from '../platform/env';
+import { SETTINGS } from '../platform/settings';
 import { G } from '../game/state';
 import { B, phased, rising } from '../sim/battle';
 import { world, K, ex, ey, WALLY } from '../sim/world';
@@ -126,6 +127,7 @@ export function num(x: number, y: number, str: string, col: string, s: number) {
 }
 /** 伤害飘字：暴击和持续伤害都显示；同屏多了以后普通伤害只抽一部分显示 */
 export function dmgNum(e: Enemy, a: number, crit: boolean, kind: 'burn' | 'poison' | null) {
+  if (!SETTINGS.nums) return;
   const big = crit || a >= 150;
   if (crit || kind || F.nums.length < 28 || (e.d.boss || e.d.elite ? vr() < 0.25 : vr() < 0.5))
     num(ex(e) + vrnd(-7, 7), ey(e) - 10 - vrnd(0, 5), fmt(a) + (crit ? '!' : ''), kind === 'poison' ? '#7ddc5f' : kind === 'burn' ? '#ef7d57' : crit ? '#fee761' : '#ffffff', big ? 2 : 1);
@@ -223,7 +225,7 @@ export function drawField(dt: number) {
   if (!x) return;
   x.setTransform(1, 0, 0, 1, 0, 0);
   x.clearRect(0, 0, W, H);
-  if (F.shake > 0 && !RM) x.translate(Math.round(vrnd(-1, 1) * F.shake), Math.round(vrnd(-1, 1) * F.shake));
+  if (F.shake > 0 && !RM && SETTINGS.shake) x.translate(Math.round(vrnd(-1, 1) * F.shake), Math.round(vrnd(-1, 1) * F.shake));
   F.shake = Math.max(0, F.shake - dt * 18);
   x.fillStyle = '#0a0c14';
   x.fillRect(-4, -4, W + 8, H + 8);

@@ -4,7 +4,7 @@ import { RELICS } from '../data/relics';
 import { TALENTS, TCAT } from '../data/talents';
 import { EN, FOESETS } from '../data/enemies';
 import { EVENTS } from '../data/events';
-import { HEROES, KITS } from '../data/heroes';
+import { HEROES, KITS, PATHS } from '../data/heroes';
 import { ACH, WAGERS } from '../data/meta';
 import { VOICES } from '../data/voices';
 import type { LocalePack } from './index';
@@ -30,6 +30,7 @@ export function applyLocale(P: LocalePack) {
   }
   for (const k in HEROES) Object.assign(HEROES[k], (P.heroes.heroes as any)[k]);
   for (const k in KITS) KITS[k].forEach((kit, i) => Object.assign(kit, (P.heroes.kits as any)[k]?.[i]));
+  for (const k in PATHS) for (const p of PATHS[k]) Object.assign(p, (P.heroes as any).paths?.[k]?.[p.id]);
   for (const a of ACH) Object.assign(a, (P.meta.ach as any)[a.id]);
   TIERS.forEach((t, i) => (t.n = P.terms.tiers[i]));
   GT.forEach((t, i) => (t.n = P.terms.relicGrades[i]));

@@ -59,4 +59,5 @@ export const KEYS = {
   tips: 'chain-tips',
   bestiary: 'chain-bestiary',
   lang: 'chain-lang',
+  settings: 'chain-settings',
 };

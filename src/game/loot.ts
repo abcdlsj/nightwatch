@@ -6,6 +6,7 @@ import { FIT_CHANCE } from '../data/meta';
 import { rand, pick } from '../core/rng';
 import { G, heat, type Offer } from './state';
 import { basePrice, hasKind, hasTag, hasGrow, hasAmmo, hasBig } from './cards';
+import { cardOpen } from './unlocks';
 
 /* ---------------- 卡牌 ---------------- */
 export function rollAdj(key: string, force?: boolean, exclude?: string | null, maxTier?: number) {
@@ -29,7 +30,7 @@ export function rollItem(filter?: ItemFilter | null) {
   const pool: [string, number][] = [];
   for (const k in ITEMS) {
     const it = ITEMS[k];
-    if (it.noPool || (it.hero && it.hero !== G.hero)) continue;
+    if (it.noPool || (it.hero && it.hero !== G.hero) || !cardOpen(k)) continue;
     if (filter && !filter(it)) continue;
     if (it.t === 2 && R < 2) continue;
     const w = (it.size === 1 ? 4 : it.size === 2 ? 3 : R >= 4 ? 2.5 : 1.3) * (it.hero ? 1.4 : 1);

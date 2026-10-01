@@ -9,7 +9,7 @@ import { pick, reseed, newSeed, rng } from '../core/rng';
 import { G, freshRun, type PrepStop } from '../game/state';
 import { recalcMods } from '../game/mods';
 import { boardCards } from '../game/cards';
-import { META, codexSweep, runWon, mastStart } from '../game/meta';
+import { codexSweep, runWon, mastStart } from '../game/meta';
 import { rollDoors, hordeWave, ambushWave, ambushGold, placeKit } from '../game/prep';
 import { rollGear, withFit } from '../game/loot';
 import { nightInfo } from '../game/nights';
@@ -50,15 +50,17 @@ export function newGame(hero: string) {
   reseed(G.seed);
   G.hero = hero || G.hero;
   const H = HEROES[G.hero];
-  const hh = Math.min(META.heatSel || 0, META.heatMax || 0);
-  const w0 = Math.round(H.wall * (hh >= 4 ? 0.85 : 1));
+
   Object.assign(G, {
-    heat: hh, run: freshRun(), round: 1, maxRound: 8, endless: false, lock: null, fightWave: null, gold: H.gold, wall: w0, wallMax: w0,
+    heat: 0, run: freshRun(), round: 1, maxRound: 8, endless: false, lock: null, fightWave: null, gold: H.gold, wall: H.wall, wallMax: H.wall,
     cards: [], relics: [], skills: [], bestChain: 0, secret: {}, foeSet: pick(Object.keys(FOESETS)), boss8: pick(['eye', 'brood']),
   });
   recalcMods();
   renderRelics();
-  pickKit((kit) => {
+  pickKit((kit, hh) => {
+    /* 长夜难度在起手页里选：第 4 档起城墙上限 -15% */
+    G.heat = hh;
+    G.wall = G.wallMax = Math.round(H.wall * (hh >= 4 ? 0.85 : 1));
     placeKit(kit.cards);
     if (kit.gold) G.gold = Math.max(0, G.gold + kit.gold);
     mastStart();

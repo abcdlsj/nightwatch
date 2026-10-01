@@ -86,6 +86,8 @@ export interface RunStats {
   lastSmall?: boolean;
   lastBig?: boolean;
   newHeat?: number;
+  /** 这局解锁的新人物 */
+  newHero?: string;
   hid?: number;
 }
 

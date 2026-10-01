@@ -8,13 +8,14 @@ import { shuffled } from '../core/rng';
 import { clamp } from '../core/util';
 import { G, freshRun } from '../game/state';
 import { META, ACHM, saveMeta, achCount, mastLv, mastNext, mastGain, recordRun, endlessLost } from '../game/meta';
+import { heroList, heroUnlocked, heroNeeds, heatOf, pathsOf, pathOpen, kitOpen } from '../game/unlocks';
 import { loadSave, clearSave } from '../game/save';
 import { B } from '../sim/battle';
 import { setScene } from '../render/background';
 import { spr } from '../render/sprites';
 import { SFX } from '../audio/sfx';
 import { $ } from '../ui/dom';
-import { audioLabel, toggleAudio } from '../ui/hud';
+import { openSettings } from '../ui/settings';
 import { openAch } from '../ui/sheets';
 import { loseNote } from '../ui/report';
 import { openCodex, openHistory } from '../ui/codex';
@@ -31,7 +32,7 @@ export function titleScreen() {
   <div class="rules">${(T.rules as string[]).map((r, i) => `<div><i>${i + 1}</i><span>${r}</span></div>`).join('')}</div>
   ${sv && HEROES[sv.hero] ? `<button class="btn gold big" id="contBtn">${t('title.cont', { h: HEROES[sv.hero].n, r: sv.round })}</button>` : ''}
   <button class="btn ${sv ? 'alt' : 'red'} big" id="startBtn">${sv ? T.newRun : T.start}</button>
-  <div class="tbtns"><button class="btn alt" id="achBtn">${t('title.ach', { n: achCount(), max: ACH.length })}${META.heatMax ? t('title.heat', { h: META.heatMax }) : ''}</button><button class="btn alt" id="cdxBtn">${T.codex}</button><button class="btn alt" id="hisBtn">${T.history}</button><button class="btn alt" id="sndBtn" style="flex:none">${audioLabel()}</button></div></div>`;
+  <div class="tbtns"><button class="btn alt" id="achBtn">${t('title.ach', { n: achCount(), max: ACH.length })}${META.heatMax ? t('title.heat', { h: META.heatMax }) : ''}</button><button class="btn alt" id="cdxBtn">${T.codex}</button><button class="btn alt" id="hisBtn">${T.history}</button><button class="btn alt" id="sndBtn" style="flex:none" aria-label="${L.ui.settings.title}">⚙</button></div></div>`;
   sc.hidden = false;
   $('#startBtn').onclick = () => {
     SFX.ensure();
@@ -52,8 +53,7 @@ export function titleScreen() {
   };
   $('#sndBtn').onclick = () => {
     SFX.ensure();
-    toggleAudio();
-    $('#sndBtn').textContent = audioLabel();
+    openSettings(() => titleScreen());
   };
   if ($('#contBtn'))
     $('#contBtn').onclick = () => {
@@ -67,23 +67,25 @@ export function titleScreen() {
 }
 
 /* ---------------- 选人 ---------------- */
-function heatHtml() {
-  const h = META.heatSel;
+/** 长夜难度：每个人物各自解锁，起手页里选 */
+function heatHtml(h: number) {
   const H = L.meta.heats as string[];
   return h ? H.slice(1, h + 1).map((x, i) => `<i>${i + 1}</i> ${x}`).join('<br>') : H[0];
 }
-function heatBar() {
-  if (!META.heatMax) return '';
+function heatBar(hero: string) {
+  const Hh = heatOf(hero);
+  if (!Hh.max) return '';
   const T = L.ui.heroes;
-  return `<div class="heatsel"><button class="btn sm" id="hMinus" aria-label="${T.heatDown}">‹</button><div><b>${t('heroes.heat', { h: META.heatSel })}</b><small id="heatD">${heatHtml()}</small></div><button class="btn sm" id="hPlus" aria-label="${T.heatUp}">›</button></div>`;
+  return `<div class="heatsel"><button class="btn sm" id="hMinus" aria-label="${T.heatDown}">‹</button><div><b>${t('heroes.heat', { h: Hh.sel })}</b><small id="heatD">${heatHtml(Hh.sel)}</small></div><button class="btn sm" id="hPlus" aria-label="${T.heatUp}">›</button></div>`;
 }
-function bindHeat() {
+function bindHeat(hero: string) {
+  const Hh = heatOf(hero);
   const f = (d: number) => {
-    META.heatSel = clamp(META.heatSel + d, 0, META.heatMax);
+    Hh.sel = clamp(Hh.sel + d, 0, Hh.max);
     saveMeta();
     SFX.play('ui');
-    (document.querySelector('.heatsel b') as HTMLElement).textContent = t('heroes.heat', { h: META.heatSel });
-    $('#heatD').innerHTML = heatHtml();
+    (document.querySelector('.heatsel b') as HTMLElement).textContent = t('heroes.heat', { h: Hh.sel });
+    $('#heatD').innerHTML = heatHtml(Hh.sel);
   };
   if ($('#hMinus')) {
     $('#hMinus').onclick = (e) => {
@@ -101,27 +103,36 @@ function mastHtml(h: string) {
     nx = mastNext(h);
   return `<span class="hmast">${L.ui.heroes.mast} <b>${lv}</b>${nx ? `<small>${t('heroes.mastNext', { n: nx })}</small>` : ''}</span>`;
 }
+/** 流派一览：解锁了的亮着，没解锁的写要几级熟练 */
+function pathsHtml(h: string) {
+  return `<div class="hpaths">${pathsOf(h)
+    .map((p) => (pathOpen(h, p) ? `<span class="on">${p.n}</span>` : `<span>${p.n}<small>${t('heroes.pathLock', { n: p.mast })}</small></span>`))
+    .join('')}</div>`;
+}
 
 export function heroSelect() {
   const sc = $('#screen');
   const T = L.ui.heroes;
   setScene('title');
-  sc.innerHTML = `<div class="scr"><h1 style="font-size:32px">${T.title}</h1>${heatBar()}<div class="heroes">${Object.keys(HEROES)
+  sc.innerHTML = `<div class="scr"><h1 style="font-size:32px">${T.title}</h1><div class="heroes">${heroList()
     .map((k) => {
       const H = HEROES[k];
+      if (!heroUnlocked(k))
+        return `<button class="hero locked" data-h="${k}" style="--hc:#56656b" disabled><img class="por" src="${spr(H.portrait).url}" alt=""><div class="hn"><b>${H.n}</b><small>${H.title}</small></div>
+    <div class="htag">${T.locked}</div><p>${t('heroes.unlockBy', { h: HEROES[heroNeeds(k)].n })}</p></button>`;
+      const hh = heatOf(k).max;
       return `<button class="hero" data-h="${k}" style="--hc:${H.col}"><img class="por" src="${spr(H.portrait).url}" alt=""><div class="hn"><b>${H.n}</b><small>${H.title}</small></div>
-    <div class="htag">${H.tag}</div><div class="hstat"><span>${T.wall} <b>${H.wall}</b></span><span>${T.gold} <b>${H.gold}</b></span>${mastHtml(k)}</div><p>${H.desc}</p>
-    <div class="hmeta"><div class="hcards">${H.start.map((s) => `<img src="${spr(s[0]).url}" alt="${ITEMS[s[0]].n}">`).join('')}</div></div>
+    <div class="htag">${H.tag}</div><div class="hstat"><span>${T.wall} <b>${H.wall}</b></span><span>${T.gold} <b>${H.gold}</b></span>${mastHtml(k)}${hh ? `<span>${t('heroes.heat', { h: hh })}</span>` : ''}</div><p>${H.desc}</p>
+    ${pathsHtml(k)}
     <em>“${H.intro}”</em></button>`;
     })
     .join('')}</div><p class="mastline">${T.mastLine}${(L.meta.mastShort as string[]).map((p, i) => t('heroes.mastLv', { n: i + 1, p })).join(' · ')}</p><button class="btn alt sm" id="cdxBtn2">${T.codex}</button></div>`;
   sc.hidden = false;
-  bindHeat();
   $('#cdxBtn2').onclick = () => {
     SFX.ensure();
-    openCodex(Object.keys(HEROES)[0]);
+    openCodex(heroList()[0]);
   };
-  sc.querySelectorAll<HTMLElement>('.hero').forEach(
+  sc.querySelectorAll<HTMLElement>('.hero:not(.locked)').forEach(
     (b) =>
       (b.onclick = () => {
         SFX.ensure();
@@ -132,29 +143,34 @@ export function heroSelect() {
   );
 }
 
-/* ---------------- 起手三选一（每人四套，第一套固定出现） ---------------- */
-export function pickKit(done: (k: KitDef) => void) {
+/* ---------------- 起手三选一（第一套固定出现；没解锁流派的起手套不出现，在下面列出解锁条件） ---------------- */
+export function pickKit(done: (k: KitDef, heat: number) => void) {
   const H = HEROES[G.hero];
-  const all = KITS[G.hero] || [{ n: '', d: '', cards: H.start.map((s) => [s[0], s[1]] as [string, number]) }];
-  const list = [all[0], ...shuffled(all.slice(1))].slice(0, 3);
+  const all = KITS[G.hero] || [{ n: '', d: '', path: '', cards: H.start.map((s) => [s[0], s[1]] as [string, number]) }];
+  const open = all.filter((k) => kitOpen(G.hero, k));
+  const list = [open[0], ...shuffled(open.slice(1))].slice(0, 3);
   const sc = $('#screen');
   const T = L.ui.kits;
   setScene('title');
   sc.innerHTML = `<div class="scr"><img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="font-size:28px">${T.title}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
+  ${heatBar(G.hero)}
   <div class="kits">${list
-    .map(
-      (k, i) => `<button class="kit" data-i="${i}" style="--hc:${H.col}"><div class="kc">${k.cards.map((c) => `<img src="${spr(c[0]).url}" alt="${ITEMS[c[0]].n}">`).join('')}</div>
-  <div><b>${k.n}</b><span>${k.cards.map((c) => ITEMS[c[0]].n + (c[1] > ITEMS[c[0]].t ? '（' + TIERS[c[1]].n + '）' : '')).join(' · ')}${k.gold ? t('kits.gold', { g: (k.gold > 0 ? '+' : '') + k.gold }) : ''}</span><span>${k.d}</span></div></button>`,
-    )
-    .join('')}</div></div>`;
+    .map((k, i) => {
+      const p = pathsOf(G.hero).find((x) => x.id === k.path);
+      return `<button class="kit" data-i="${i}" style="--hc:${H.col}"><div class="kc">${k.cards.map((c) => `<img src="${spr(c[0]).url}" alt="${ITEMS[c[0]].n}">`).join('')}</div>
+  <div><b>${k.n}${p ? `<small class="gt">${p.n}</small>` : ''}</b><span>${k.cards.map((c) => ITEMS[c[0]].n + (c[1] > ITEMS[c[0]].t ? '（' + TIERS[c[1]].n + '）' : '')).join(' · ')}${k.gold ? t('kits.gold', { g: (k.gold > 0 ? '+' : '') + k.gold }) : ''}</span><span>${k.d}</span></div></button>`;
+    })
+    .join('')}</div>
+  ${pathsHtml(G.hero)}</div>`;
   sc.hidden = false;
+  bindHeat(G.hero);
   sc.querySelectorAll<HTMLElement>('.kit').forEach(
     (b) =>
       (b.onclick = () => {
         SFX.ensure();
         SFX.play('merge');
         sc.hidden = true;
-        done(list[+b.dataset.i!]);
+        done(list[+b.dataset.i!], heatOf(G.hero).sel);
       }),
   );
 }
@@ -174,6 +190,7 @@ export function endScreen(win: boolean) {
     saveMeta();
   }
   const mg = endl ? null : mastGain(win);
+  const newPaths = mg && mg.up ? pathsOf(G.hero).filter((p) => p.mast === mg.lv) : [];
   const got = R.got.map((id) => ACHM[id]).filter(Boolean);
   const H = HEROES[G.hero];
   const row = (a: string, b: string | number) => `<div><span>${a}</span><i style="margin-left:auto">${b}</i></div>`;
@@ -191,6 +208,8 @@ export function endScreen(win: boolean) {
   ${endNote}${win ? '' : loseNote(B)}
   ${mastNote}
   ${R.newHeat ? `<div class="newheat">${t('end.newHeat', { h: R.newHeat, d: (L.meta.heats as string[])[R.newHeat] })}</div>` : ''}
+  ${newPaths.map((p) => `<div class="newheat">${t('end.newPath', { h: H.n, p: p.n })}</div>`).join('')}
+  ${R.newHero ? `<div class="newheat">${t('end.newHero', { h: HEROES[R.newHero].n, t: HEROES[R.newHero].title })}</div>` : ''}
   ${got.length ? `<div class="rules res achgot"><div><span>${T.gotAch}</span></div>${got.map((a) => `<div><i>★</i><span><b>${a.n}</b> ${a.d}</span></div>`).join('')}</div>` : ''}
   ${win ? `<button class="btn gold big" id="endlessBtn">${T.goOn}</button>` : ''}<button class="btn red big" id="againBtn">${T.again}</button><button class="btn alt sm" id="hisBtn2">${T.history}</button></div>`;
   clearSave();
