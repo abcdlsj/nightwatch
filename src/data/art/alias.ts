@@ -44,7 +44,4 @@ export const ALIAS: Record<string, [string, Record<string, string>]> = {
   stardust: ['spark', FIRE2ICE],
   starfire: ['phoenix', FIRE2PURPLE],
   pulsar: ['thunder', { Y: 'C', g: 'b', s: 'd', w: 'c' }],
-  /* 新人物立绘 */
-  p_jun: ['p_ayla', { o: 'm', y: 'n', R: 'N', r: 'n', Y: 'y' }],
-  p_li: ['p_mo', { P: 'C', p: 'c', a: 'g', l: 'w' }],
 };
