@@ -8,6 +8,8 @@ export const TUNE = {
   planck: 0.25,
   /** C 位的独立乘区 */
   carry: 1.25,
+  /** 狼牙拍这类「护盾转伤害」的卡，护盾最多算多少点 */
+  shieldDmgCap: 40,
   /** 星辉每层 */
   star: 0.1,
   /** 钻品质的独立乘区 */

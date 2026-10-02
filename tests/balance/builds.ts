@@ -104,6 +104,41 @@ export const ARCHS: Record<string, Arch> = {
     talents: ['li_20', 'li_21', 'li_00', 'li_22'],
     carry: ['starfire', 'pulsar'],
   },
+  line: {
+    hero: 'jun',
+    board: [[1, 'powderkeg'], [1, 'beacontower'], [2, 'beehive'], [3, 'gunner'], [5, 'trebuchet']],
+    relics: ['plumb', 'blueprint', 'mortarboard', 'medal', 'grease', 'citadel'],
+    talents: ['jun_20', 'jun_21', 'jun_10', 'jun_22'],
+    carry: ['trebuchet', 'beehive'],
+  },
+  bulwark: {
+    hero: 'jun',
+    board: [[1, 'palisade'], [1, 'stakes'], [2, 'spikewall'], [3, 'mason'], [4, 'moat']],
+    relics: ['blueprint', 'plumb', 'spike', 'medal', 'mortarboard', 'citadel'],
+    talents: ['jun_00', 'jun_01', 'jun_10', 'jun_02'],
+    carry: ['spikewall', 'moat'],
+  },
+  scope: {
+    hero: 'li',
+    board: [[1, 'starseed'], [1, 'sextant'], [2, 'comet'], [3, 'spyglass'], [4, 'wishstar'], [5, 'northstar']],
+    relics: ['telescope', 'starchart', 'compass', 'medal', 'fang', 'polaris'],
+    talents: ['li_00', 'li_01', 'li_20', 'li_02'],
+    carry: ['comet', 'starseed'],
+  },
+  aurora: {
+    hero: 'li',
+    board: [[1, 'frostar'], [1, 'starseed'], [2, 'icemoon'], [3, 'rimeglass'], [5, 'aurora']],
+    relics: ['icepack', 'starchart', 'charm', 'telescope', 'permafrost', 'polaris'],
+    talents: ['li_10', 'li_11', 'li_00', 'li_12'],
+    carry: ['icemoon', 'aurora'],
+  },
+  nova: {
+    hero: 'li',
+    board: [[1, 'fallstar'], [1, 'astrolabe'], [2, 'nova'], [4, 'galaxy']],
+    relics: ['telescope', 'wire', 'starchart', 'medal', 'compass', 'polaris'],
+    talents: ['li_20', 'li_21', 'li_00', 'li_22'],
+    carry: ['galaxy', 'nova'],
+  },
   lamp: {
     hero: 'ying',
     board: [[1, 'paperlamp'], [1, 'lamps'], [2, 'firefly'], [2, 'marquee'], [3, 'oilpot'], [4, 'skylantern']],
@@ -140,7 +175,7 @@ export function boardFor(arch: string, r: number): [string, number, string?][] {
 
 /** plain：只靠加法（不拿传说遗物、不用回响、最高金品质）；mult：凑出独立乘区和连锁 */
 export const MODE = (process.env.BUILD || 'plain') as 'plain' | 'mult';
-const LEGEND: Record<string, string> = { volt: 'shard', fire: 'dragonheart', blade: 'venom', ice: 'oath', poison: 'shard', mech: 'box', lamp: 'lampbook', drill: 'venom', cracker: 'lampbook', turret: 'citadel', works: 'citadel', chart: 'polaris', frostar: 'polaris', meteor: 'polaris' };
+const LEGEND: Record<string, string> = { volt: 'shard', fire: 'dragonheart', blade: 'venom', ice: 'oath', poison: 'shard', mech: 'box', lamp: 'lampbook', drill: 'venom', cracker: 'lampbook', turret: 'citadel', works: 'citadel', chart: 'polaris', frostar: 'polaris', meteor: 'polaris', line: 'citadel', bulwark: 'citadel', scope: 'polaris', aurora: 'polaris', nova: 'polaris' };
 
 export function relicsFor(arch: string, r: number) {
   const n = [0, 1, 1, 2, 3, 4, 5, 6][r - 1];

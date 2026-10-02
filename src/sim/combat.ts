@@ -132,9 +132,15 @@ function fire(c: Card, depth: number) {
       view.link(c, n, '#73eff7', 0.25);
     }
   /* 为 C 位服务的辅助卡 */
-  const cc = it.chargeCarry || it.buffCarry ? carryCard() : null;
+  const cc = it.chargeCarry || it.buffCarry || it.hasteCarry || it.critCarry || it.freezeCarry ? carryCard() : null;
   if (cc && cc !== c) {
     if (it.chargeCarry) chargeCard(cc, it.chargeCarry * (1 + 0.2 * stepOf(c)), c);
+    if (it.hasteCarry) haste(cc, it.hasteCarry * (1 + 0.2 * stepOf(c)), c);
+    if (it.critCarry) {
+      cc.sure = true;
+      view.link(c, cc, '#fff4cf', 0.25);
+    }
+    if (it.freezeCarry) cc.frostNext = Math.max(cc.frostNext || 0, it.freezeCarry * (1 + 0.2 * stepOf(c)));
     if (it.buffCarry) {
       cc.anvil = Math.max(cc.anvil || 0, it.buffCarry * (1 + 0.2 * stepOf(c)));
       c.bBf++;
@@ -217,13 +223,16 @@ function attack(c: Card, st: Stats, depth = 0) {
   const it = ITEMS[c.key];
   const t = front();
   if (!t) return;
-  const crit = rand() < st.crit;
-  let dmg = st.total * (crit ? 2 + mv('critDmg') : 1) * comboMul(depth);
+  const crit = rand() < st.crit || !!c.sure;
+  c.sure = false;
+  const sh = it.shieldDmg ? Math.min(b.shield, TUNE.shieldDmgCap) * it.shieldDmg * dmgMul(c) * (st.total / Math.max(1, st.base + st.flat)) : 0;
+  let dmg = (st.total + sh) * (crit ? 2 + mv('critDmg') : 1) * comboMul(depth);
   if (c.anvil) {
     dmg *= 1 + c.anvil;
     c.anvil = 0;
   }
-  const mods: HitMods = { slow: c.adj === 'chill' ? 0.3 : 0, kb: c.adj === 'heavy' ? 0.035 : 0, freeze: it.freeze || 0, vuln: it.vuln || null, exec: it.exec || 0, burnDur: it.burnDur || 0, poisonDur: it.poisonDur || 0 };
+  const mods: HitMods = { slow: c.adj === 'chill' ? 0.3 : 0, kb: c.adj === 'heavy' ? 0.035 : 0, freeze: Math.max(it.freeze || 0, c.frostNext || 0), vuln: it.vuln || null, exec: it.exec || 0, burnDur: it.burnDur || 0, poisonDur: it.poisonDur || 0 };
+  c.frostNext = 0;
   const bm = crit && it.critBurn ? it.critBurn : 1;
   const W = world.W,
     H = world.H;
@@ -272,7 +281,7 @@ function attack(c: Card, st: Stats, depth = 0) {
       view.ring(ex(t), y0 - 4, 2, 18 * K(), '#ffcd75', 0.3);
       view.sfx('boom');
       for (let i = 0; i < 14; i++) view.part(vrnd(0, W), y0 - 4 + vrnd(-2, 2), swing * vrnd(30, 80), vrnd(-10, 10), 0.3, '#ffe79a', 1);
-      for (const en of b.en) if (!en.dead && en.y >= world.range - 0.05 && Math.abs(ey(en) - y0) <= band) H_(en);
+      for (const en of b.en) if (!en.dead && en.y >= world.range - 0.05 && Math.abs(ey(en) - y0) <= band) H_(en, 1, it.slow ? { slow: it.slow } : null);
       break;
     }
     case 'slash': {

@@ -29,6 +29,10 @@ export interface Card {
   frozen: number;
   hasteT: number;
   anvil: number;
+  /** 下一击必定暴击（千里镜） */
+  sure?: boolean;
+  /** 下一击附带冻结的秒数（冰晶镜） */
+  frostNext?: number;
   ammo: number | null;
   stk: number;
   rage: number;

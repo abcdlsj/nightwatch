@@ -102,6 +102,40 @@ export const CARD_HOOKS: Record<string, CardHook> = {
   marquee: { on: { charge: (c, x) => { if (x.c !== c && x.c.size === 1) c.charge = Math.min(1.5, c.charge + 0.04); } } },
   lamps: { onWin: (c) => grow(c, countKind('lamp')) },
   ffjar: { on: { use: (c, x) => { if (x.c.key === 'musicbox') reload(c, 2, x.c); } } },
+  mason: {
+    on: {
+      wall: (c) => {
+        const b = bt();
+        if (c.lastT > b.t - 2) return;
+        c.lastT = b.t;
+        view.cardFx(c, 'pop');
+        b.shield += 1 * (1 + 0.4 * stepOf(c));
+        view.hud();
+      },
+    },
+  },
+  beacontower: {
+    on: {
+      use: (c, x) => {
+        const nb = c.nb || [];
+        if (x.c === c || !nb.includes(x.c) || nb.length < 2) return;
+        const o = nb.find((n) => n !== x.c)!;
+        view.link(x.c, c, '#ff9a3b', 0.18);
+        chargeCard(o, 0.15 + 0.05 * stepOf(c), c);
+      },
+    },
+  },
+  wishstar: {
+    on: {
+      kill: (c, x) => {
+        const b = bt();
+        if (!x.src || !x.src.carry || c.lastT > b.t - 0.33) return;
+        c.lastT = b.t;
+        view.cardFx(c, 'pop');
+        for (const o of boardCards()) if (o !== c && !ITEMS[o.key].dmg) chargeCard(o, 0.06 + 0.02 * stepOf(c), c);
+      },
+    },
+  },
   pocketwatch: { on: { start: (c) => { for (const o of boardCards()) if (o !== c && o.size === 1) haste(o, 3, c); } } },
 };
 

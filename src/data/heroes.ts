@@ -431,13 +431,13 @@ export const PATHS: Record<string, PathDef[]> = {
     { id: 'cracker', mast: 2, cards: ['firecracker', 'crackers', 'rocket', 'fireworks', 'matchbox', 'stall'], n: '', d: '' },
   ],
   jun: [
-    { id: 'turret', mast: 0, cards: ['turret', 'scaffold', 'bigcannon', 'mortar', 'shellman'], n: '', d: '' },
-    { id: 'works', mast: 1, cards: ['palisade', 'caltrop', 'watchtower', 'bastion'], n: '', d: '' },
-    { id: 'line', mast: 2, cards: ['powderkeg', 'crossbows', 'cogline'], n: '', d: '' },
+    { id: 'turret', mast: 0, cards: ['turret', 'scaffold', 'bigcannon', 'mortar', 'shellman', 'gunner', 'grapeshot', 'bombard'], n: '', d: '' },
+    { id: 'works', mast: 1, cards: ['palisade', 'caltrop', 'watchtower', 'bastion', 'moat', 'spikewall', 'mason', 'stakes'], n: '', d: '' },
+    { id: 'line', mast: 2, cards: ['powderkeg', 'crossbows', 'cogline', 'beehive', 'beacontower', 'trebuchet'], n: '', d: '' },
   ],
   li: [
-    { id: 'chart', mast: 0, cards: ['astrolabe', 'lens', 'comet', 'starseed', 'orrery'], n: '', d: '' },
-    { id: 'frost', mast: 1, cards: ['frostar', 'glacier', 'rimelance'], n: '', d: '' },
-    { id: 'meteor', mast: 2, cards: ['stardust', 'starfire', 'pulsar'], n: '', d: '' },
+    { id: 'chart', mast: 0, cards: ['astrolabe', 'lens', 'comet', 'starseed', 'orrery', 'sextant', 'spyglass', 'wishstar'], n: '', d: '' },
+    { id: 'frost', mast: 1, cards: ['frostar', 'glacier', 'rimelance', 'northstar', 'rimeglass', 'aurora', 'icemoon'], n: '', d: '' },
+    { id: 'meteor', mast: 2, cards: ['stardust', 'starfire', 'pulsar', 'fallstar', 'galaxy', 'nova'], n: '', d: '' },
   ],
 };

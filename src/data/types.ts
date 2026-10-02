@@ -49,6 +49,14 @@ export interface ItemDef {
   buffCarry?: number;
   /** 触发时给城墙加护盾（品质越高越多） */
   shieldGain?: number;
+  /** 伤害额外加上城墙护盾 ×值，和基础伤害一样吃加成与乘区（护盾最多算 TUNE.shieldDmgCap 点） */
+  shieldDmg?: number;
+  /** 辅助：触发时 C 位【加速】若干秒 */
+  hasteCarry?: number;
+  /** 辅助：触发时 C 位下一击必定暴击 */
+  critCarry?: number;
+  /** 辅助：触发时 C 位下一击附带【冻结】若干秒 */
+  freezeCarry?: number;
   /* 文案 */
   n: string; d: string; f: string; lore?: string; dn?: string; dl?: string;
   /** 任务说明（如「累计闪电弹跳」） */
