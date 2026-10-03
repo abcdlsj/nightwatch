@@ -1,6 +1,6 @@
 /* 生成原生壳的图标和启动图源文件（resources/），再用 @capacitor/assets 导出各尺寸：
  *   node tools/make-app-assets.mjs && npx @capacitor/assets generate --assetPath resources
- * 图标：八根柔软的彩色弧线从中心向外散开，圆头、渐变、带一点柔光。
+ * 图标：八根粗短的弧线从实心圆点向外散开，每根一种颜色，圆头、带一点柔光。
  * 启动图仍是三条从短到长的像素横线——黎明的光、守夜的火、城墙。按整数倍放大，像素不糊 */
 import { chromium } from 'playwright';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -65,7 +65,7 @@ const rays = (opt) =>
         x.fillRect(0, 0, size, size);
       }
       const C = size / 2,
-        R = size * 0.42 * k;
+        R = size * 0.32 * k;
       const COLS = ['#ff8a5b', '#ffd166', '#a7f070', '#73eff7', '#7aa8ff', '#c38cff', '#ff95dc', '#ff5a8a'];
       const N = COLS.length;
       x.lineCap = 'round';
@@ -73,17 +73,13 @@ const rays = (opt) =>
       for (let i = 0; i < N; i++) {
         const a = (i / N) * Math.PI * 2 - Math.PI / 2;
         const len = R * (i % 2 ? 0.86 : 1);
-        const r0 = R * 0.16;
+        const r0 = R * 0.1;
         /* 每根往同一个方向轻轻弯：控制点比终点多转一点 */
         const p0 = [C + Math.cos(a) * r0, C + Math.sin(a) * r0];
         const p1 = [C + Math.cos(a + 0.42) * len * 0.6, C + Math.sin(a + 0.42) * len * 0.6];
         const p2 = [C + Math.cos(a + 0.18) * len, C + Math.sin(a + 0.18) * len];
-        const gr = x.createLinearGradient(p0[0], p0[1], p2[0], p2[1]);
-        gr.addColorStop(0, COLS[i] + '33');
-        gr.addColorStop(0.35, COLS[i]);
-        gr.addColorStop(1, COLS[(i + 1) % N]);
-        x.strokeStyle = gr;
-        x.lineWidth = size * 0.05 * k;
+        x.strokeStyle = COLS[i];
+        x.lineWidth = size * 0.085 * k;
         x.shadowColor = COLS[i];
         x.shadowBlur = size * 0.04 * k;
         x.beginPath();
@@ -91,6 +87,13 @@ const rays = (opt) =>
         x.quadraticCurveTo(p1[0], p1[1], p2[0], p2[1]);
         x.stroke();
       }
+      /* 实心的中心：盖住线条根部 */
+      x.shadowColor = '#fff4cf';
+      x.shadowBlur = size * 0.05 * k;
+      x.fillStyle = '#fff4cf';
+      x.beginPath();
+      x.arc(C, C, R * 0.3, 0, Math.PI * 2);
+      x.fill();
       x.shadowBlur = 0;
       return cv.toDataURL('image/png');
     },
