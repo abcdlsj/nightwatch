@@ -14,6 +14,7 @@ import { B, bt, later, emit, finish } from './battle';
 import { hpScale } from './waves';
 import { TUNE } from '../game/tuning';
 import { hurt } from './combat';
+import { frenzy } from './combo';
 import type { Enemy } from './types';
 
 const wg = (k: string) => !!B && B.wager === k;
@@ -371,12 +372,13 @@ export function comboKill(e: Enemy) {
   if (c >= 50) unlock('combo50');
   if (c >= 120) unlock('combo120');
   if (c >= 5) view.combo(c);
+  const fz = frenzy(c);
   if (c % 25 === 0) {
     G.gold++;
     view.coins(ex(e), ey(e), 1);
     view.sfx('coin');
     view.hud();
     const T = L.ui.battle.comboBanner;
-    view.banner(c >= 75 ? T[2] : c >= 50 ? T[1] : T[0], '#ffb37a');
+    if (!fz) view.banner(c >= 75 ? T[2] : c >= 50 ? T[1] : T[0], '#ffb37a');
   }
 }

@@ -4,13 +4,13 @@ import { EN } from '../../data/enemies';
 import { EVENTS } from '../../data/events';
 import { RELICS } from '../../data/relics';
 import { TALENTS, TCAT } from '../../data/talents';
-import { WAGERS, SYN } from '../../data/meta';
+import { WAGERS, SYN, SYN2 } from '../../data/meta';
 import { L, t } from '../../i18n';
 import { vr, rand } from '../../core/rng';
 import type { Tag } from '../../data/types';
 import { G, type Offer, type PrepStop } from '../../game/state';
 import { boardCards, fits } from '../../game/cards';
-import { synCount, synLevel } from '../../game/synergy';
+import { synCount, synLevel, synPairs } from '../../game/synergy';
 import { modText, plainMods, pickLine } from '../../game/text';
 import { nightInfo } from '../../game/nights';
 import { rollWagers, ambushGold, EVENT_FILTER } from '../../game/prep';
@@ -50,9 +50,19 @@ export function renderPreview() {
 
 /* ---------------- 羁绊条：凑到新的一层时提示 ---------------- */
 let synPrev: ReturnType<typeof synCount> | null = null;
+const pairName = (k: string) => L.terms.syn2[k as keyof typeof L.terms.syn2];
 export function renderSyn() {
   const el = $('#pvSyn');
   const n = synCount();
+  const pairs = synPairs(n);
+  if (G.phase === 'prep' && synPrev) {
+    const old = synPairs(synPrev);
+    const nw = pairs.find((k) => !old.includes(k));
+    if (nw) {
+      toast(t('prep.syn2Up', { n: pairName(nw), m: plainMods(SYN2[nw].m) }));
+      SFX.play('merge');
+    }
+  }
   if (G.phase === 'prep' && synPrev) {
     for (const tg in n) {
       const a = synLevel(tg as Tag, n[tg as Tag]!),
@@ -76,7 +86,8 @@ export function renderSyn() {
           const nx = SYN[tg][lv];
           return `<span class="sy${lv ? ' on' : ''}" style="--tagc:${TAGC[tg]}">${L.terms.tags[tg]}<b>${n[tg]}</b>${nx ? '<small>/' + nx[0] + '</small>' : ''}</span>`;
         })
-        .join('')
+        .join('') +
+      pairs.map((k) => `<span class="sy on pair" style="--tagc:${TAGC[SYN2[k].a]};--tagc2:${TAGC[SYN2[k].b]}">${pairName(k)}</span>`).join('')
     : '';
 }
 

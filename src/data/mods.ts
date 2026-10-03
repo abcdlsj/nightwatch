@@ -1,6 +1,24 @@
 /* 从旧版数据迁移而来，直接在这里改 */
 /** 修正项：[显示方式, 越小越好]。显示方式 0 数值、1 百分比、2 只显示说明、3 独立乘区（键以 x 开头，多个来源相乘） */
 export const MODL: Record<string, [number, number?]> = {
+ "rx": [
+  1
+ ],
+ "rx_melt": [
+  1
+ ],
+ "rx_shatter": [
+  1
+ ],
+ "rx_overload": [
+  1
+ ],
+ "rx_toxic": [
+  1
+ ],
+ "rx_super": [
+  1
+ ],
  "dmg": [
   1
  ],

@@ -3,14 +3,14 @@ import { ITEMS, ADJ, TIERS, TAGC, GT, UPS } from '../data/cards';
 import { RELICS } from '../data/relics';
 import { TALENTS, TCAT } from '../data/talents';
 import { HEROES } from '../data/heroes';
-import { ACH, SYN, SECRET_N } from '../data/meta';
+import { ACH, SYN, SYN2, SECRET_N } from '../data/meta';
 import { L, t } from '../i18n';
 import type { Tag } from '../data/types';
 import { G, type Card, type Offer } from '../game/state';
 import { M } from '../game/mods';
 import { stats, chainOf, chargeAmt, buffAmt, maxAmmo, questN, sellValue } from '../game/cards';
 import { META, achCount } from '../game/meta';
-import { synCount } from '../game/synergy';
+import { synCount, synPairs } from '../game/synergy';
 import { modText, plainMods } from '../game/text';
 import { icon, spr } from '../render/sprites';
 import { SFX } from '../audio/sfx';
@@ -196,6 +196,7 @@ export function openSyn() {
   SFX.play('ui');
   const S = L.ui.sheet;
   const n = synCount();
+  const on = synPairs(n);
   show(`<div class="sh" role="dialog" aria-label="${S.syn}"><h3>${S.syn}</h3><p class="muted2">${S.synHow}</p>
     <div class="tlist">${(Object.keys(SYN) as Tag[])
       .map(
@@ -204,6 +205,15 @@ export function openSyn() {
             .map(([k, m]) => `<span style="opacity:${(n[tg] || 0) >= k ? 1 : 0.45}">${t('sheet.synAt', { k })}${plainMods(m)}</span>`)
             .join('')}</div></div>`,
       )
+      .join('')}</div>
+    <h3>${S.syn2}</h3><p class="muted2">${S.syn2How}</p>
+    <div class="tlist">${Object.keys(SYN2)
+      .sort((a, b) => +on.includes(b) - +on.includes(a))
+      .map((k) => {
+        const { a, b, m } = SYN2[k];
+        const T2 = L.terms.tags;
+        return `<div class="trow syn2" style="--gc:${TAGC[a]};--gc2:${TAGC[b]};opacity:${on.includes(k) ? 1 : 0.5}"><div><b>${L.terms.syn2[k as keyof typeof L.terms.syn2]}</b><span>${t('sheet.syn2Need', { a: T2[a], an: Math.min(2, n[a] || 0), b: T2[b], bn: Math.min(2, n[b] || 0) })}</span><span>${plainMods(m)}</span></div></div>`;
+      })
       .join('')}</div>
     <div class="sh-btns"><button class="btn" id="yClose">${S.close}</button></div></div>`);
   $('#yClose').onclick = closeSheet;

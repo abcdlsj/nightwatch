@@ -123,7 +123,7 @@ export function play(k: string, p?: string | number) {
   if (!ac || muted) return;
   const now = performance.now();
   const lk = k === 'echo' ? k + p : k;
-  if (last[lk] && now - last[lk] < (k === 'hit' ? 60 : 40)) return;
+  if (last[lk] && now - last[lk] < (k === 'hit' ? 60 : k === 'react' ? 120 : 40)) return;
   last[lk] = now;
   switch (k) {
     case 'fire': tone(TP[p as string] || 400, 0.05, 'square', 0.018, 1.4); break;
@@ -152,6 +152,17 @@ export function play(k: string, p?: string | number) {
       break;
     }
     case 'drum': tone(110, 0.18, 'sine', 0.09, 0.45); noise(0.05, 0.05); break;
+    case 'react': {
+      const f = ({ melt: 660, shatter: 1320, overload: 880, toxic: 330, super: 1100 } as Record<string, number>)[p as string] || 700;
+      tone(f, 0.08, 'square', 0.03, 1.5);
+      tone(f * 1.5, 0.1, 'triangle', 0.025, 0.8, 0.04);
+      if (p === 'shatter' || p === 'overload') noise(0.1, 0.06);
+      break;
+    }
+    case 'streak':
+      [392, 523, 659, 784].forEach((f, i) => tone(f * (p === 'frenzy' ? 1.25 : 1), 0.09, 'square', 0.035, 1.1, i * 0.045));
+      noise(0.15, 0.07);
+      break;
     case 'hint': tone(880, 0.08, 'triangle', 0.03); tone(1175, 0.14, 'triangle', 0.03, 1, 0.07); break;
   }
 }

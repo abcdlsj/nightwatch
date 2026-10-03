@@ -26,6 +26,7 @@ export const domView: SimView = {
     field.boom(x, y, r, col);
     SFX.play('boom');
   },
+  hit: field.hit,
   shake: field.shake,
   wallFlash() {
     field.wallFlash();

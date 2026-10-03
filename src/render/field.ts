@@ -162,6 +162,59 @@ export function boom(x: number, y: number, r: number, col: string) {
     part(x, y, Math.cos(a) * s, Math.sin(a) * s, vrnd(0.2, 0.5), vr() < 0.5 ? col : '#ffcd75', 2);
   }
 }
+/** 命中：按出手卡的元素出不同的迸溅；暴击加一圈亮环，击杀炸得更开 */
+const HITC: Record<string, [string, string]> = {
+  blade: ['#ffffff', '#dfe6ee'], fire: ['#ffcd75', '#ef7d57'], ice: ['#c2f4ff', '#73eff7'],
+  volt: ['#fee761', '#ffffff'], mech: ['#ffd166', '#c28a4d'], poison: ['#a7f070', '#7ddc5f'],
+};
+export function hit(x: number, y: number, tag: string | null, crit: boolean, kill: boolean) {
+  const [c0, c1] = HITC[tag || ''] || ['#ffffff', '#ffffff'];
+  const k = (crit ? 1.6 : 1) * (kill ? 1.5 : 1);
+  const n = Math.round(4 * k);
+  switch (tag) {
+    case 'blade': {
+      const d = vr() < 0.5 ? 1 : -1;
+      bolt([[x - 6 * d * k, y - 5 * k], [x + 6 * d * k, y + 3 * k]], c0, crit ? 0.12 : 0.07, true);
+      for (let i = 0; i < n; i++) part(x, y, d * vrnd(20, 60), vrnd(-30, 10), 0.2, vr() < 0.5 ? c0 : c1, 1);
+      break;
+    }
+    case 'fire':
+      for (let i = 0; i < n + 2; i++) part(x + vrnd(-3, 3), y + vrnd(-2, 2), vrnd(-15, 15), -vrnd(30, 70), vrnd(0.3, 0.5), vr() < 0.5 ? c0 : c1, vr() < 0.3 ? 2 : 1);
+      break;
+    case 'ice':
+      for (let i = 0; i < n; i++) {
+        const a = vr() * 6.28,
+          s = vrnd(25, 55);
+        part(x, y, Math.cos(a) * s, Math.sin(a) * s - 20, 0.3, vr() < 0.5 ? c0 : c1, 2);
+      }
+      ring(x, y, 1, 5 * k, c1, 0.18);
+      break;
+    case 'volt':
+      for (let i = 0; i < Math.ceil(n / 2); i++) {
+        const a = vr() * 6.28,
+          r = vrnd(5, 9) * k;
+        bolt([[x, y], [x + Math.cos(a) * r, y + Math.sin(a) * r]], c0, 0.08);
+      }
+      for (let i = 0; i < n; i++) part(x, y, vrnd(-50, 50), vrnd(-50, 20), 0.15, c1, 1);
+      break;
+    case 'mech':
+      for (let i = 0; i < n + 1; i++) part(x, y, vrnd(-60, 60), vrnd(-60, 0), vrnd(0.2, 0.4), vr() < 0.6 ? c0 : c1, vr() < 0.4 ? 2 : 1);
+      break;
+    case 'poison':
+      for (let i = 0; i < n; i++) part(x + vrnd(-3, 3), y, vrnd(-20, 20), vrnd(-40, -10), vrnd(0.35, 0.55), vr() < 0.5 ? c0 : c1, 2);
+      break;
+    default:
+      for (let i = 0; i < 3; i++) part(x, y, vrnd(-30, 30), vrnd(-40, 5), 0.25, '#ffffff', 1);
+  }
+  if (crit) {
+    ring(x, y, 2, 10, c0, 0.22);
+    ring(x, y, 1, 6, '#ffffff', 0.12);
+  }
+  if (kill) for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * 6.28;
+    part(x, y, Math.cos(a) * 70, Math.sin(a) * 70, 0.22, c0, 1);
+  }
+}
 export const shake = (n: number) => {
   F.shake = Math.max(F.shake, n);
 };

@@ -4,12 +4,13 @@ import { $ } from '../ui/dom';
 import { spr } from './sprites';
 
 type Item =
-  | { k: 'link'; pts: number[][]; col: string; life: number; max: number }
+  | { k: 'link'; pts: number[][]; col: string; life: number; max: number; hit?: boolean }
   | { k: 'p'; x: number; y: number; vx: number; vy: number; col: string; life: number; max: number }
   | { k: 'coin'; x0: number; y0: number; x1: number; y1: number; t: number; dur: number; life?: number };
 
 let cv: HTMLCanvasElement, x: CanvasRenderingContext2D;
 let items: Item[] = [];
+const hits: [number, number, string][] = [];
 
 export function initOverlay() {
   cv = $('#fx') as HTMLCanvasElement;
@@ -88,6 +89,25 @@ export const FX = {
         x.strokeStyle = '#fff';
         x.lineWidth = 1;
         x.stroke();
+        /* 光点沿线跑到接收的卡，在前 60% 的时间里跑完，到了迸一下 */
+        const k = Math.min(1, (1 - it.life / it.max) / 0.6);
+        const f = k * (it.pts.length - 1),
+          i0 = Math.min(it.pts.length - 2, Math.floor(f)),
+          r = f - i0;
+        const [ax, ay] = it.pts[i0],
+          [bx, by] = it.pts[i0 + 1];
+        const hx = ax + (bx - ax) * r,
+          hy = ay + (by - ay) * r;
+        if (k < 1) {
+          x.globalAlpha = 1;
+          x.fillStyle = it.col;
+          x.fillRect(Math.round(hx) - 4, Math.round(hy) - 4, 8, 8);
+          x.fillStyle = '#fff';
+          x.fillRect(Math.round(hx) - 2, Math.round(hy) - 2, 4, 4);
+        } else if (!it.hit) {
+          it.hit = true;
+          hits.push([hx, hy, it.col]);
+        }
       } else {
         it.t += dt;
         if (it.t < 0) continue;
@@ -101,6 +121,7 @@ export const FX = {
       }
     }
     x.globalAlpha = 1;
+    for (const [hx, hy, col] of hits.splice(0)) this.burst(hx, hy, col, 6);
     items = items.filter((it) => (it.k === 'coin' ? it.t < 0 || (it.life ?? 1) > 0 : it.life > 0));
   },
 };

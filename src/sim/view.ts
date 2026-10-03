@@ -13,6 +13,8 @@ export interface SimView {
   ring(x: number, y: number, r0: number, r1: number, col: string, life: number): void;
   bolt(pts: [number, number][], col: string, life: number, straight?: boolean): void;
   boom(x: number, y: number, r: number, col: string): void;
+  /** 命中迸溅：tag 是出手卡的元素（灼烧、中毒跳伤按火、毒算） */
+  hit(x: number, y: number, tag: string | null, crit: boolean, kill: boolean): void;
   shake(n: number): void;
   wallFlash(): void;
   coins(x: number, y: number, n: number): void;
@@ -38,7 +40,7 @@ export interface SimView {
 
 const noop = () => {};
 export const nullView: SimView = {
-  part: noop, num: noop, dmgNum: noop, ring: noop, bolt: noop, boom: noop, shake: noop, wallFlash: noop, coins: noop,
+  part: noop, num: noop, dmgNum: noop, ring: noop, bolt: noop, boom: noop, hit: noop, shake: noop, wallFlash: noop, coins: noop,
   cardFx: noop, cardFlag: noop, cardAmmo: noop, cardNum: noop, link: noop,
   sfx: noop, say: noop, toast: noop, banner: noop, tip: noop, hud: noop, boss: noop, meetFoe: noop, chain: noop, combo: noop, buzz: noop,
 };

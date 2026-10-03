@@ -31,6 +31,8 @@ export interface Enemy {
   raised?: boolean;
   shellN?: number;
   lowSaid?: boolean;
+  /** 元素反应的内置冷却（到这个时刻前不再反应） */
+  rxT?: number;
 }
 
 export interface Projectile {
@@ -81,4 +83,7 @@ export interface Battle {
   slowT: number;
   kt?: number[];
   wallBy?: Record<string, number>;
+  /** 本场元素反应、流派连招次数 */
+  rxN?: number;
+  stkN?: number;
 }

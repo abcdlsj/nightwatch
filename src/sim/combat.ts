@@ -11,6 +11,7 @@ import { world, K, ex, ey } from './world';
 import { view } from './view';
 import { B, bt, later, emit, front, phased, dist } from './battle';
 import { spawn, comboKill } from './enemies';
+import { react, was, streak } from './combo';
 import type { Enemy, Projectile } from './types';
 
 /* ---------------- 触发与连锁 ---------------- */
@@ -49,6 +50,7 @@ function fire(c: Card, depth: number) {
   }
   const st = stats(c, b.t);
   const nb = c.nb || [];
+  streak(c, st);
   if (it.dmg > 0) {
     attack(c, st, depth);
     for (let i = 1; i < (it.multi || 1); i++)
@@ -215,7 +217,7 @@ function showChain(n: number) {
 }
 
 /* ---------------- 攻击方式 ---------------- */
-type HitMods = { slow?: number; kb?: number; freeze?: number; vuln?: [number, number] | null; exec?: number; burnDur?: number; poisonDur?: number; burn?: number; poison?: number; pen?: number; splash?: number; burnTick?: number; poisonTick?: number };
+type HitMods = { rx?: number; slow?: number; kb?: number; freeze?: number; vuln?: [number, number] | null; exec?: number; burnDur?: number; poisonDur?: number; burn?: number; poison?: number; pen?: number; splash?: number; burnTick?: number; poisonTick?: number };
 
 
 function attack(c: Card, st: Stats, depth = 0) {
@@ -534,11 +536,14 @@ export function hurt(e: Enemy, amt: number, src: Card | null, crit: boolean, o: 
     view.sfx('intent');
     view.ring(ex(e), ey(e) - 5, 2, 14 * K(), '#ffcd75', 0.3);
   }
-  if (e.slowT > 0 && mv('slowVuln')) amt *= 1 + mv('slowVuln');
-  if (e.vulnT > 0) amt *= 1 + e.vulnA;
+  /* 元素反应的追加伤害按已经结算过的那一下算，不再吃易伤和护甲 */
+  if (!o.rx) {
+    if (e.slowT > 0 && mv('slowVuln')) amt *= 1 + mv('slowVuln');
+    if (e.vulnT > 0) amt *= 1 + e.vulnA;
+  }
+  const w0 = was(e);
   let a = Math.max(1, amt - Math.max(0, e.armor + e.armorB + (e.hardT > 0 ? 10 : 0) - (o.pen || 0) - mv('pen')));
-  if (o.burnTick) a = Math.max(1, amt);
-  if (o.poisonTick) a = Math.max(1, amt);
+  if (o.burnTick || o.poisonTick || o.rx) a = Math.max(1, amt);
   if (e.shield > 0) {
     const s = Math.min(e.shield, a);
     e.shield -= s;
@@ -587,7 +592,7 @@ export function hurt(e: Enemy, amt: number, src: Card | null, crit: boolean, o: 
   }
   if (o.freeze) freeze(e, o.freeze, src);
   if (o.vuln) vuln(e, o.vuln[0], o.vuln[1]);
-  if (!tick) {
+  if (!tick && !o.rx) {
     emit('hit', { e, src, crit, a, splash: !!o.splash });
     if (crit) emit('crit', { e, src, a });
   }
@@ -597,7 +602,8 @@ export function hurt(e: Enemy, amt: number, src: Card | null, crit: boolean, o: 
     e.hp = 0;
   }
   if (o.kb && !e.d.boss) e.y = Math.max(-0.03, e.y - o.kb * (e.d.elite ? 0.3 : 1));
-  for (let i = 0; i < 3; i++) view.part(ex(e), ey(e) - 5, vrnd(-30, 30), vrnd(-40, 5), 0.25, '#ffffff', 1);
+  if (src && !tick && !o.rx && !e.dead && e.hp > 0) react(e, a, src, crit, w0, !!o.burn);
+  view.hit(ex(e), ey(e) - 5, o.burnTick ? 'fire' : o.poisonTick ? 'poison' : src ? ITEMS[src.key].tag : null, crit, e.hp <= 0);
   if (e.hp <= 0) kill(e, src);
 }
 
