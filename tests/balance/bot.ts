@@ -9,7 +9,7 @@ import type { Tag } from '../../src/data/types';
 import { reseed, pick, rng } from '../../src/core/rng';
 import { G, freshRun, type Card, type Offer } from '../../src/game/state';
 import { recalcMods } from '../../src/game/mods';
-import { stats, sellValue, chainOf, zoneN, fits } from '../../src/game/cards';
+import { stats, sellValue, chainOf, zoneN, fits, setCarry } from '../../src/game/cards';
 import { rollGear, gearPrice, makeOffer, withFit, rollTalents } from '../../src/game/loot';
 import { rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, placeKit, EVENT_FILTER } from '../../src/game/prep';
 import { nightRewards } from '../../src/game/rewards';
@@ -102,7 +102,9 @@ function buyFrom(offers: Offer[], focus: Focus, free: boolean) {
       .filter((o) => !o.sold && o.price <= G.gold)
       .filter((o) => {
         const dup = G.cards.some((c) => c.key === o.card.key && c.tier === o.card.tier);
-        return free || dup || used + o.card.size <= 8 || offerWorth(o, focus) > weakest;
+        /* 钱多（14 以上）时，差不多好的也买：留在背包等合成 */
+        const bar = G.gold >= 14 ? weakest * 0.7 : weakest;
+        return free || dup || used + o.card.size <= 8 || offerWorth(o, focus) > bar;
       })
       .sort((x, y) => offerWorth(y, focus) - offerWorth(x, focus));
     const of = cands[0];
@@ -145,6 +147,35 @@ const SHOP_FOR: Record<string, string[]> = {
   blade: ['smith', 'armory'], mech: ['smith'], fire: ['forge'], volt: ['storm'], ice: ['frostshop'], poison: ['apothecary'], any: [],
 };
 
+/* 跃迁事件（第 3、5、7 夜之前多一站）：照 src/app/prep/jumps.ts 的效果，挑每个人物最直接的那项 */
+const JUMP_NIGHTS = [3, 5, 7];
+const bestDmg = (focus: Focus, f: (c: Card) => boolean = () => true) =>
+  G.cards.filter((c) => c.loc === 'board' && ITEMS[c.key].dmg > 0 && f(c)).sort((a, b) => cardScore(b, focus) * b.size - cardScore(a, focus) * a.size)[0];
+function jump(focus: Focus) {
+  const h = G.hero;
+  if (h === 'mo') {
+    const tags: Tag[] = ['fire', 'ice', 'volt', 'poison'];
+    const tg = (focus !== 'any' && tags.includes(focus) ? focus : ITEMS[bestDmg(focus, (c) => tags.includes(ITEMS[c.key].tag))?.key]?.tag) || 'fire';
+    const of = makeOffer((it) => it.tag === tg && it.dmg > 0, { free: 1 });
+    of.card.tier = Math.min(2, of.card.tier + 1);
+    if (!acquireState(of, null).ok) G.gold += 5;
+    checkMerges();
+    arrange(focus);
+    const c = bestDmg(focus, (x) => ITEMS[x.key].tag === tg);
+    if (c) setCarry(c);
+    return;
+  }
+  const cur = G.cards.find((c) => c.carry && c.loc === 'board');
+  const c = h === 'li' && cur ? cur : h === 'ying' ? bestDmg(focus, (x) => x.size === 1) || bestDmg(focus) : bestDmg(focus);
+  if (!c) return;
+  setCarry(c);
+  if (h === 'ayla') c.grow = (c.grow || 0) + 4 + G.round;
+  else if (h === 'ying' && c.tier < 3) c.tier++, checkMerges();
+  else if (h === 'jun') (G.wallMax += 2 + G.round), (G.wall += 2 + G.round);
+  else if (h === 'li') c.star = cur === c ? (c.star || 0) + 1 : Math.max(c.star || 0, 1);
+  recalcMods();
+}
+
 function prep(focus: Focus) {
   G.phase = 'prep';
   G.prep = { step: 0, cur: null, doors: [], talk: G.round % 2 === 1 };
@@ -152,12 +183,17 @@ function prep(focus: Focus) {
     const picks = rollTalents(3, 'atk');
     if (picks.length) learnTalentState(picks[0]);
   }
+  if (JUMP_NIGHTS.includes(G.round)) jump(focus);
   for (let step = 0; step < 3; step++) {
     G.prep.step = step;
     rollDoors();
     const rich = G.gold >= 14;
-    const pref = [...SHOP_FOR[focus], ...(rich ? ['black', 'grocer'] : []), 'shop', 'giant', 'altar', 'field', 'train', 'grocer', 'chest', 'parcel', 'black', 'armory', 'forge', 'storm', 'smith', 'frostshop', 'apothecary', 'job', 'bank'];
-    const d = G.prep.doors.slice().sort((a, b) => ((pref.indexOf(a) + 99) % 140) - ((pref.indexOf(b) + 99) % 140))[0];
+    /* 墙掉了四成以上先去补 */
+    const hurt = G.wall < G.wallMax * 0.6 ? ['spring', 'camp'] : [];
+    const pref = [...hurt, ...SHOP_FOR[focus], ...(rich ? ['black', 'grocer'] : []), 'shop', 'giant', 'altar', 'field', 'manual', 'train', 'grocer', 'chest', 'parcel', 'black', 'armory', 'forge', 'storm', 'smith', 'frostshop', 'apothecary', 'job', 'bank'];
+    /* 不在偏好表里的门（机器人不会处理）排最后 */
+    const rank = (id: string) => (pref.includes(id) ? pref.indexOf(id) : 999);
+    const d = G.prep.doors.slice().sort((a, b) => rank(a) - rank(b))[0];
     const ev = EVENTS[d];
     if (!ev) continue;
     if (ev.cat === 'shop') {
@@ -184,7 +220,10 @@ function prep(focus: Focus) {
         c.tier++;
         checkMerges();
       }
-    } else if (d === 'job') G.gold += 3;
+    } else if (d === 'spring') G.wall = Math.min(G.wallMax, G.wall + 8);
+    else if (d === 'camp' && hurt.length) G.wall = Math.min(G.wallMax, G.wall + 6);
+    else if (d === 'manual') buyFrom([0, 1].map(() => makeOffer((it) => it.hero === G.hero && it.t >= 1, { free: 1 })), focus, true);
+    else if (d === 'job') G.gold += 3;
     else if (d === 'bank') G.gold += Math.max(2, Math.min(10, Math.round(G.gold * 0.3)));
     arrange(focus);
   }
