@@ -1,4 +1,4 @@
-# 代号：连锁（Project Chain）
+# 守夜人（Night Watch）
 
 竖屏自动战斗构筑卡牌游戏。底层是可精算的伤害流水线，表层是满屏打怪的爽感。
 参考：大巴扎（尺寸与相邻）、杀戮尖塔（意图与路线）、吸血鬼幸存者（自动战斗）、小丑牌（表现与数字爆炸）、土豆兄弟（物品堆叠）。
@@ -67,7 +67,8 @@ npx cap open android              # Android Studio 打开（需要装 Android SD
 
 - 只支持竖屏；刘海和圆角靠 CSS 的 safe-area-inset 处理。
 - 原生壳里存档写进系统存储（`@capacitor/preferences`），第一次启动会把 WebView 里的旧数据搬过去；震动用系统震感；切后台自动静音；Android 返回键先关弹层和背包。这些都在 `src/platform/native.ts`，网页版不加载。
-- 图标和启动图：`node tools/make-app-assets.mjs` 生成 `resources/` 源图（三条从短到长的像素横线：黎明的光、守夜的火、城墙），再 `npx @capacitor/assets generate --assetPath resources` 导出各尺寸。
+- 应用名：对外统一叫 Night Watch（网页标题、主屏、iOS / Android 显示名），游戏里的中文名是「守夜人」。
+- 图标和启动图：`node tools/make-app-assets.mjs` 生成 `resources/` 源图和网页图标 `public/icons/`（一幅 32×32 像素画：远处的月、近处的地、暗红的城墙、墙头提灯的人），再 `npx @capacitor/assets generate --ios --android --assetPath resources` 导出原生各尺寸（别漏 `--ios --android`，不然它会改写 manifest）。
 
 ## 分层
 

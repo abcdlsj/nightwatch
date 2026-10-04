@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">连锁</string>
-    <string name="title_activity_main">连锁</string>
+    <string name="app_name">Night Watch</string>
+    <string name="title_activity_main">Night Watch</string>
     <string name="package_name">com.abcdlsj.nightwatch</string>
     <string name="custom_url_scheme">com.abcdlsj.nightwatch</string>
 </resources>

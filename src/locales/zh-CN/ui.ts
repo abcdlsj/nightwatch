@@ -1,6 +1,6 @@
 /* 界面文字（简体中文）。参数写成 {名字}，由 t() 替换；可以带少量 HTML */
 export default {
-  docTitle: '连锁 · 守到黎明',
+  docTitle: 'Night Watch',
   common: { colon: '：', comma: '，', period: '。' },
 
   hud: {
@@ -391,8 +391,8 @@ export default {
   },
 
   title: {
-    logoAria: '连锁',
-    logo: ['连', '锁'],
+    logoAria: '守夜人',
+    logo: ['守', '夜', '人'],
     tagline: '长夜第七百年。守住最后一道城墙，直到黎明。',
     rules: [
       '每夜之前能走三个地方：逛店、开箱子、捡遗物……',

@@ -1,7 +1,8 @@
 /* 生成原生壳的图标和启动图源文件（resources/），再用 @capacitor/assets 导出各尺寸：
  *   node tools/make-app-assets.mjs && npx @capacitor/assets generate --assetPath resources
- * 图标：八根 S 形波浪线从中心向外飘开，像丝带；每根一种颜色，圆头、带一点柔光。
- * 启动图仍是三条从短到长的像素横线——黎明的光、守夜的火、城墙。按整数倍放大，像素不糊 */
+ * 图标和启动图是同一幅 32×32 像素画：远处一轮月，近处的地，最前面一线暗红的城墙，墙头一个提灯的人。
+ * 大半画面是天，留白给故事。按整数倍放大，像素不糊；安卓自适应图标和 PWA 的 maskable 会被裁成圆，
+ * 月亮和人都放在中间 80% 的圆里 */
 import { chromium } from 'playwright';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
@@ -48,87 +49,95 @@ const draw = (opt) =>
     },
     { PAL, ...opt },
   );
-/* 图标：k 是线条整体占画面的比例（安卓自适应图标的前景要缩进安全区） */
-const rays = (opt) =>
+/* 32×32 像素：天空由深到浅、远处一轮月、地平线上的远山、近处的地、最前面一线暗红的城墙和墙头一个提灯的人 */
+function grid() {
+  const N = 32, g = [...Array(N)].map(() => Array(N).fill(null));
+  const set = (x, y, c) => { if (x >= 0 && y >= 0 && x < N && y < N) g[y][x] = c; };
+  // 天空：四段，交界处一行棋盘格过渡
+  const sky = ['#0b1519', '#0e1b20', '#112227', '#15292f', '#193036'];
+  const bandH = [0, 6, 11, 15, 19];
+  for (let y = 0; y < N; y++) {
+    let i = 0; for (let k = 0; k < bandH.length; k++) if (y >= bandH[k]) i = k;
+    for (let x = 0; x < N; x++) {
+      let c = sky[i];
+      if (i > 0 && y === bandH[i] && (x + y) % 2 === 0) c = sky[i - 1];
+      set(x, y, c);
+    }
+  }
+  // 星：很少几颗
+  set(5, 4, '#6f858c'); set(13, 2, '#4a5e65'); set(27, 13, '#4a5e65'); set(9, 10, '#3d5057');
+  // 月：直径 7，右上；左上亮、右下一弯暗面
+  const mx = 21.5, my = 8.5, R = 3.6;
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    const d = Math.hypot(x + 0.5 - mx, y + 0.5 - my);
+    if (d <= R) {
+      const shade = (x + 0.5 - mx) + (y + 0.5 - my) > 2.6;
+      set(x, y, shade ? '#cbc1a0' : '#f1e9cb');
+    } else if (d <= R + 1.1) set(x, y, '#1a2c32');
+  }
+  set(20, 7, '#e2d8b8'); // 月面一处淡斑
+  // 远山：一条起伏的线，比天空亮一点点（被月光照着的雾）
+  const far = (x) => Math.round(21 - 1.6 * Math.sin(x * 0.33 + 1.2) - 1.1 * Math.sin(x * 0.71 + 0.4));
+  for (let x = 0; x < N; x++) for (let y = far(x); y < N; y++) set(x, y, y === far(x) ? '#24393f' : '#1c2e34');
+  // 近地：更暗，缓坡
+  const near = (x) => Math.round(25 - 1.2 * Math.sin(x * 0.18 + 2.4));
+  for (let x = 0; x < N; x++) for (let y = near(x); y < N; y++) set(x, y, y === near(x) ? '#18272c' : '#111d21');
+  // 前景：城墙，带垛口，暗红
+  const wy = 28;
+  for (let x = 0; x < N; x++) {
+    for (let y = wy; y < N; y++) set(x, y, y === wy ? '#4a1d22' : y === N - 1 ? '#22100f' : '#36161a');
+    if (x % 4 < 2) set(x, wy - 1, '#3e191d');
+  }
+  // 墙头的人：在左三分之一，面朝月亮；手里一盏灯，灯光把墙头照红一点
+  const px = 9, K = '#070b0d';
+  set(px + 1, wy - 6, K);
+  for (const [dy, x0, x1] of [[5, 0, 2], [4, 0, 2], [3, 0, 2], [2, -1, 2], [1, -1, 2]]) for (let x = x0; x <= x1; x++) set(px + x, wy - dy, K);
+  set(px + 3, wy - 4, K); // 伸出去的手
+  set(px + 4, wy - 4, '#3a2a20');
+  set(px + 4, wy - 3, '#f2b24b'); // 灯
+  set(px + 4, wy - 2, '#5a2a1e');
+  set(px + 3, wy, '#5e2626'); set(px + 4, wy, '#73302a'); set(px + 5, wy, '#5e2626');
+  return g;
+}
+
+/* 把 32×32 的画按整数倍画到 size×size（cover：铺满）或居中放在 bg 底色上（scale 指定倍数时） */
+const SCENE = grid();
+const scene = (opt) =>
   pg.evaluate(
-    ({ size, bg, k }) => {
+    ({ g, size, scale, bg }) => {
       const cv = document.createElement('canvas');
       cv.width = cv.height = size;
       const x = cv.getContext('2d');
       if (bg) {
         x.fillStyle = bg;
         x.fillRect(0, 0, size, size);
-        const g = x.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size * 0.5);
-        g.addColorStop(0, 'rgba(255,240,220,.10)');
-        g.addColorStop(1, 'rgba(255,240,220,0)');
-        x.fillStyle = g;
-        x.fillRect(0, 0, size, size);
       }
-      const C = size / 2,
-        R = size * 0.39 * k;
-      const COLS = ['#ff8a5b', '#ffd166', '#a7f070', '#73eff7', '#7aa8ff', '#c38cff', '#ff95dc', '#ff5a8a'];
-      const N = COLS.length;
-      x.lineCap = 'round';
-      x.lineJoin = 'round';
-      for (let i = 0; i < N; i++) {
-        const a = (i / N) * Math.PI * 2;
-        /* 半径往外走，角度按正弦来回摆，越往外摆得越开 */
-        const pt = (t) => {
-          const r = R * (0.12 + 0.88 * t),
-            th = a + Math.sin(t * Math.PI * 2) * 0.18 * t;
-          return [C + Math.cos(th) * r, C + Math.sin(th) * r];
-        };
-        const p0 = pt(0),
-          p2 = pt(1);
-        const gr = x.createLinearGradient(p0[0], p0[1], p2[0], p2[1]);
-        gr.addColorStop(0, COLS[i] + '33');
-        gr.addColorStop(0.35, COLS[i]);
-        gr.addColorStop(1, COLS[i] + 'ee');
-        x.strokeStyle = gr;
-        x.lineWidth = size * 0.04 * k;
-        x.shadowColor = COLS[i];
-        x.shadowBlur = size * 0.045 * k;
-        x.beginPath();
-        for (let t = 0; t <= 1.001; t += 0.02) {
-          const [px, py] = pt(t);
-          t ? x.lineTo(px, py) : x.moveTo(px, py);
+      const k = scale || size / 32;
+      const o = (size - 32 * k) / 2;
+      for (let j = 0; j < 32; j++)
+        for (let i = 0; i < 32; i++) {
+          x.fillStyle = g[j][i];
+          x.fillRect(Math.floor(o + i * k), Math.floor(o + j * k), Math.ceil(k), Math.ceil(k));
         }
-        x.stroke();
-      }
-      x.shadowBlur = 0;
       return cv.toDataURL('image/png');
     },
-    opt,
+    { g: SCENE, ...opt },
   );
 const save = (f, url) => writeFileSync('resources/' + f, Buffer.from(url.split(',')[1], 'base64'));
-/* 32×32 网格：三条两格粗的横线，两端各收一格暗色，留出像素台阶 */
-const line = (len, mid, edge) => {
-  const pad = (32 - len) / 2;
-  return '.'.repeat(pad) + edge + mid.repeat(len - 2) + edge + '.'.repeat(pad);
-};
-const blank = '.'.repeat(32);
-const LINES = [
-  ...Array(10).fill(blank),
-  line(8, 'Y', 'y'), line(8, 'Y', 'y'),
-  blank, blank, blank,
-  line(14, 'o', 'R'), line(14, 'o', 'R'),
-  blank, blank, blank,
-  line(22, 'g', 's'), line(22, 'g', 's'),
-  ...Array(10).fill(blank),
-];
-const lantern = LINES;
-save('icon-only.png', await rays({ size: 1024, bg: BG, k: 1 }));
-save('icon-foreground.png', await rays({ size: 1024, bg: null, k: 0.62 }));
-save('icon-background.png', await draw({ rows: [''], size: 1024, scale: 1, bg: BG, glow: false }));
+save('icon-only.png', await scene({ size: 1024 }));
+/* 安卓自适应图标：整幅画放在背景层，前景层留空（画面本身就是一整块，裁成圆也完整） */
+save('icon-foreground.png', await draw({ rows: [''], size: 1024, scale: 1, bg: null, glow: false }));
+save('icon-background.png', await scene({ size: 1024 }));
 /* 网页版装到主屏用的图标（public/icons/，manifest 和 apple-touch-icon 引用）。
  * maskable：安卓会裁成圆形或圆角方形，内容缩进安全区 */
 const pub = (f, url) => writeFileSync('public/icons/' + f, Buffer.from(url.split(',')[1], 'base64'));
 mkdirSync('public/icons', { recursive: true });
-pub('icon-192.png', await rays({ size: 192, bg: BG, k: 1 }));
-pub('icon-512.png', await rays({ size: 512, bg: BG, k: 1 }));
-pub('maskable-512.png', await rays({ size: 512, bg: BG, k: 0.8 }));
-pub('apple-touch-icon.png', await rays({ size: 180, bg: BG, k: 1 }));
-save('splash.png', await draw({ rows: lantern, size: 2732, scale: 12, bg: BG, glow: false }));
-save('splash-dark.png', await draw({ rows: lantern, size: 2732, scale: 12, bg: BG, glow: false }));
+pub('icon-192.png', await scene({ size: 192 }));
+pub('icon-512.png', await scene({ size: 512 }));
+pub('maskable-512.png', await scene({ size: 512 }));
+pub('apple-touch-icon.png', await scene({ size: 180 }));
+pub('favicon-64.png', await scene({ size: 64 }));
+save('splash.png', await scene({ size: 2732, scale: 24, bg: '#0b1519' }));
+save('splash-dark.png', await scene({ size: 2732, scale: 24, bg: '#0b1519' }));
 await b.close();
 console.log('resources/ 已生成');

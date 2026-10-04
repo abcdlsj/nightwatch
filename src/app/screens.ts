@@ -29,7 +29,7 @@ export function titleScreen() {
   const T = L.ui.title;
   setScene('title');
   const sv = loadSave();
-  sc.innerHTML = `<div class="scr"><div class="logo" aria-label="${T.logoAria}"><span>${T.logo[0]}</span><span>${T.logo[1]}</span></div><div class="logo-sub">PROJECT CHAIN</div>
+  sc.innerHTML = `<div class="scr"><div class="logo" aria-label="${T.logoAria}">${(T.logo as string[]).map((c) => `<span>${c}</span>`).join('')}</div><div class="logo-sub">NIGHT WATCH</div>
   <p class="tagline">${T.tagline}</p>
   <div class="rules">${(T.rules as string[]).map((r, i) => `<div><i>${i + 1}</i><span>${r}</span></div>`).join('')}</div>
   ${sv && HEROES[sv.hero] ? `<button class="btn gold big" id="contBtn">${t('title.cont', { h: HEROES[sv.hero].n, r: sv.round })}</button>` : ''}

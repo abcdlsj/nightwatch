@@ -6,7 +6,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
  * appId 上架前定下来就不能再改（App Store / Google Play 都按它认应用） */
 const config: CapacitorConfig = {
   appId: 'com.abcdlsj.nightwatch',
-  appName: '连锁',
+  appName: 'Night Watch',
   webDir: 'dist',
   backgroundColor: '#0f1c20',
   ios: {
