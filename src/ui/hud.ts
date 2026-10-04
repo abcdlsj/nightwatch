@@ -118,6 +118,9 @@ function nextTip(first?: boolean) {
   const [l, h, ms] = TIPQ[0];
   tipEl!.innerHTML = `<small>${l}</small><p>${h}</p>`;
   tipEl!.className = '';
+  /* 首领血条和「下一招」在顶上时，气泡挪到它下面，别挡住 */
+  const bar = $('#bossbar');
+  tipEl!.style.top = bar.hidden ? '' : `${bar.getBoundingClientRect().bottom + 6}px`;
   void tipEl!.offsetWidth;
   tipEl!.className = 'show';
   tipT = setTimeout(() => nextTip(), ms);
