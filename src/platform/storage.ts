@@ -60,4 +60,5 @@ export const KEYS = {
   bestiary: 'chain-bestiary',
   lang: 'chain-lang',
   settings: 'chain-settings',
+  iosHint: 'nw-ios-hint',
 };

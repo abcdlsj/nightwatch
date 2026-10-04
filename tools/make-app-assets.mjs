@@ -120,6 +120,14 @@ const lantern = LINES;
 save('icon-only.png', await rays({ size: 1024, bg: BG, k: 1 }));
 save('icon-foreground.png', await rays({ size: 1024, bg: null, k: 0.62 }));
 save('icon-background.png', await draw({ rows: [''], size: 1024, scale: 1, bg: BG, glow: false }));
+/* 网页版装到主屏用的图标（public/icons/，manifest 和 apple-touch-icon 引用）。
+ * maskable：安卓会裁成圆形或圆角方形，内容缩进安全区 */
+const pub = (f, url) => writeFileSync('public/icons/' + f, Buffer.from(url.split(',')[1], 'base64'));
+mkdirSync('public/icons', { recursive: true });
+pub('icon-192.png', await rays({ size: 192, bg: BG, k: 1 }));
+pub('icon-512.png', await rays({ size: 512, bg: BG, k: 1 }));
+pub('maskable-512.png', await rays({ size: 512, bg: BG, k: 0.8 }));
+pub('apple-touch-icon.png', await rays({ size: 180, bg: BG, k: 1 }));
 save('splash.png', await draw({ rows: lantern, size: 2732, scale: 12, bg: BG, glow: false }));
 save('splash-dark.png', await draw({ rows: lantern, size: 2732, scale: 12, bg: BG, glow: false }));
 await b.close();

@@ -47,6 +47,14 @@ tools/                像素图生成、字体子集化、缺字检查
 docs/                 字体授权说明
 ```
 
+## 装到主屏（网页版）
+
+网页版是 PWA：iPhone 用 Safari 打开，点「分享 → 添加到主屏幕」；安卓 Chrome 会自己提示安装。从主屏打开时全屏、没有浏览器栏，断网也能玩。
+
+- `public/manifest.webmanifest`：名字、竖屏、图标（`public/icons/`，由 `node tools/make-app-assets.mjs` 生成）。
+- `public/sw.js`：离线缓存。页面先走网络，带哈希的资源直接用缓存；每次构建换一个缓存版本（`__BUILD_ID__`）。只在正式构建的网页版注册，原生壳和开发服务器不注册。
+- 从主屏打开时 `<html>` 带 `standalone` 类；iOS Safari 里没装的话，标题页会提示一次怎么装（`src/platform/pwa.ts`）。
+
 ## 手机（iOS / Android）
 
 原生壳用 Capacitor，工程在 `ios/` 和 `android/`，配置在 `capacitor.config.ts`（appId `com.abcdlsj.nightwatch`，上架前定下来就不能再改）。

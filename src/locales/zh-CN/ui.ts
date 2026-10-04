@@ -408,6 +408,8 @@ export default {
     codex: '图鉴',
     history: '过往守夜',
     star: '借来的星，还回去了',
+    installIOS: '点 Safari 底部的「分享」，选「添加到主屏幕」：全屏玩，断网也能打开。',
+    installClose: '不再提示',
   },
 
   heroes: {

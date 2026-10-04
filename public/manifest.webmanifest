@@ -1,0 +1,18 @@
+{
+  "name": "Night Watch",
+  "short_name": "Night Watch",
+  "description": "竖屏像素风自动战斗构筑：摆卡、合成、连锁触发，守住最后一道城墙，撑到黎明。",
+  "lang": "zh-CN",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1c20",
+  "theme_color": "#0f1c20",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

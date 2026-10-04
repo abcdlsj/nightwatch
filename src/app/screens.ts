@@ -19,6 +19,8 @@ import { openSettings } from '../ui/settings';
 import { openAch } from '../ui/sheets';
 import { loseNote } from '../ui/report';
 import { openCodex, openHistory } from '../ui/codex';
+import { canInstallIOS } from '../platform/pwa';
+import { store, KEYS } from '../platform/storage';
 import { newGame, resumeSave, continueEndless } from './flow';
 
 /* ---------------- 标题 ---------------- */
@@ -62,6 +64,14 @@ export function titleScreen() {
       sc.hidden = true;
       resumeSave();
     };
+  /* iOS Safari 里：提示装到主屏（全屏、离线）。点叉不再提示 */
+  if (canInstallIOS() && !store.get(KEYS.iosHint)) {
+    sc.querySelector('.scr')!.insertAdjacentHTML('beforeend', `<div class="ioshint"><span>${T.installIOS}</span><button class="btn sm" id="iosX" aria-label="${T.installClose}">×</button></div>`);
+    $('#iosX').onclick = () => {
+      store.set(KEYS.iosHint, '1');
+      document.querySelector('.ioshint')?.remove();
+    };
+  }
   /* 借来的星还回去了：挂在标题页的天上 */
   if (META.secrets.star) sc.insertAdjacentHTML('beforeend', `<i class="nstar" title="${T.star}"></i>`);
 }
