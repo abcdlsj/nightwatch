@@ -5,7 +5,7 @@ import { mv } from './mods';
 export type RewardKey = 'wage' | 'eliteDown' | 'relicGold' | 'interest' | 'noBrick';
 
 export function nightRewards(was: number, wallLost: number): [RewardKey, number][] {
-  const rows: [RewardKey, number][] = [['wage', 3 + Math.floor(Math.min(was, 8) / 2) - (heat(6) ? 1 : 0)]];
+  const rows: [RewardKey, number][] = [['wage', 3 + Math.floor(Math.min(was, 9) / 2) - (heat(6) ? 1 : 0)]];
   if (was === 4) rows.push(['eliteDown', 4]);
   const interest = Math.min(3 + mv('interest'), Math.floor(G.gold / 6));
   if (mv('winGold')) rows.push(['relicGold', mv('winGold')]);

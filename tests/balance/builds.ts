@@ -148,7 +148,7 @@ export const ARCHS: Record<string, Arch> = {
 };
 
 /** 第 N 夜的大致品质：前两夜铜/银，中期银，后期金，最后两夜主力一张钻 */
-const TIER = [0, 0, 1, 1, 1, 2, 2, 2];
+const TIER = [0, 0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
 
 export function boardFor(arch: string, r: number): [string, number, string?][] {
   const A = ARCHS[arch];
@@ -178,7 +178,7 @@ export const MODE = (process.env.BUILD || 'plain') as 'plain' | 'mult';
 const LEGEND: Record<string, string> = { volt: 'shard', fire: 'dragonheart', blade: 'venom', ice: 'oath', poison: 'shard', mech: 'box', lamp: 'lampbook', drill: 'venom', cracker: 'lampbook', turret: 'citadel', works: 'citadel', chart: 'polaris', frostar: 'polaris', meteor: 'polaris', line: 'citadel', bulwark: 'citadel', scope: 'polaris', aurora: 'polaris', nova: 'polaris' };
 
 export function relicsFor(arch: string, r: number) {
-  const n = [0, 1, 1, 2, 3, 4, 5, 6][r - 1];
+  const n = [0, 1, 1, 2, 3, 4, 5, 6, 6, 7, 7, 8, 8, 9, 9][r - 1];
   const ok = (k: string) => RELICS[k] && (!RELICS[k].hero || RELICS[k].hero === ARCHS[arch].hero) && RELICS[k].t < 3 && k !== 'glass';
   const list = ARCHS[arch].relics.filter(ok).slice(0, n);
   if (MODE === 'mult' && r >= 6) list.push(LEGEND[arch]);
@@ -192,5 +192,5 @@ export function carryFor(arch: string, r: number, keys: string[]): { key: string
   const order = [...(A.carry || []), ...keys];
   const key = order.find((k) => keys.includes(k));
   if (!key) return null;
-  return { key, star: A.hero === 'li' ? [3, 5, 7].filter((n) => n <= r).length : 0 };
+  return { key, star: A.hero === 'li' ? [3, 5, 7, 11].filter((n) => n <= r).length : 0 };
 }

@@ -15,7 +15,7 @@ beforeAll(() => { initLocale(); setOnEnd(() => {}); if (process.env.TUNE) Object
 it('why', () => {
   const arch = process.env.ARCH || 'ice', r = +(process.env.R || 4);
   const A = ARCHS[arch]; reseed(+(process.env.SEED || 1));
-  Object.assign(G, { hero: A.hero, heat: 0, run: freshRun(), round: r, gold: 0, wall: HEROES[A.hero].wall, wallMax: HEROES[A.hero].wall, cards: [], relics: relicsFor(arch, r), skills: talentsFor(arch, r), secret: {}, seenFoes: {}, foeSet: process.env.SET || 'dark', boss8: 'eye', phase: 'battle' });
+  Object.assign(G, { hero: A.hero, heat: 0, run: freshRun(), round: r, gold: 0, wall: HEROES[A.hero].wall, wallMax: HEROES[A.hero].wall, cards: [], relics: relicsFor(arch, r), skills: talentsFor(arch, r), secret: {}, seenFoes: {}, foeSet: process.env.SET || 'dark', boss9: 'eye', phase: 'battle' });
   let x = 0; for (const [k, t, a] of boardFor(arch, r)) { const c = newCard(k, t, a || null); c.loc = 'board'; c.idx = x; x += c.size; G.cards.push(c); }
   const cr = carryFor(arch, r, G.cards.map((c) => c.key));
   if (cr) { const c = G.cards.find((x) => x.key === cr.key)!; c.carry = true; c.star = cr.star; }

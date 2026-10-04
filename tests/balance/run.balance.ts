@@ -11,6 +11,8 @@ import { playRun, type Focus, type RunLog } from './bot';
 const RUNS = +(process.env.RUNS || 20);
 const FOCI = (process.env.FOCUS || 'blade,fire,ice,volt,mech,poison,any').split(',') as Focus[];
 const HEAT = +(process.env.HEAT || 0);
+/** FULL=1：跑完整游戏线（15 夜） */
+const FULL = !!+(process.env.FULL || 0);
 
 beforeAll(() => {
   initLocale();
@@ -22,11 +24,11 @@ it('平衡报告', () => {
   const rows: string[] = [];
   for (const focus of FOCI) {
     const mine: RunLog[] = [];
-    for (const hero of Object.keys(HEROES)) for (let i = 0; i < RUNS; i++) mine.push(playRun(hero, focus, 1000 * i + hero.length * 7 + 13, { heat: HEAT }));
+    for (const hero of Object.keys(HEROES)) for (let i = 0; i < RUNS; i++) mine.push(playRun(hero, focus, 1000 * i + hero.length * 7 + 13, { heat: HEAT, full: FULL }));
     logs.push(...mine);
     const win = mine.filter((r) => r.win).length / mine.length;
-    const avg = mine.reduce((s, r) => s + (r.win ? 9 : r.night), 0) / mine.length;
-    const pass = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => Math.round((mine.filter((r) => r.night > n || r.win).length / mine.length) * 100));
+    const avg = mine.reduce((s, r) => s + (r.win ? r.night + 1 : r.night), 0) / mine.length;
+    const pass = [...Array(mine[0].nights.length > 9 || FULL ? 15 : 9).keys()].map((i) => i + 1).map((n) => Math.round((mine.filter((r) => r.night > n || r.win).length / mine.length) * 100));
     const tops: Record<string, number> = {};
     for (const r of mine) for (const n of r.nights.slice(-1)) tops[n.topCard.split('@')[0]] = (tops[n.topCard.split('@')[0]] || 0) + 1;
     const topList = Object.entries(tops).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => `${k}×${v}`).join(' ');

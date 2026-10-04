@@ -94,7 +94,7 @@ export const playLose = (done: () => void) => playStory(L.story.lose as Page[], 
 /** 黎明：首领不同第一句不同；满足条件时多出隐藏剧情（借来的星、第七百零一下） */
 export function playWin(done: () => void) {
   const S = L.story as any;
-  const pages: Page[] = [{ who: 'narr', t: G.boss8 === 'brood' ? S.winBrood : S.win[0].t }, ...S.win.slice(1)];
+  const pages: Page[] = [{ who: 'narr', t: S.winBy[G.boss9] || S.win[0].t }, ...S.win.slice(1)];
   const onBoard = (k: string) => boardCards().some((c) => c.key === k);
   if (G.hero === 'mo' && onBoard('starfall')) {
     foundSecret('star');

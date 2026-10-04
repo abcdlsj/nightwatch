@@ -16,6 +16,7 @@ import { nightRewards } from '../../src/game/rewards';
 import { nightInfo } from '../../src/game/nights';
 import { makeWave } from '../../src/sim/waves';
 import { B, startBattle, simStep, settleWin } from '../../src/sim/battle';
+import { finalBosses, lastNight, jumpNights, nightKind } from '../../src/game/plan';
 
 export type Focus = Tag | 'any';
 
@@ -148,7 +149,7 @@ const SHOP_FOR: Record<string, string[]> = {
 };
 
 /* 跃迁事件（第 3、5、7 夜之前多一站）：照 src/app/prep/jumps.ts 的效果，挑每个人物最直接的那项 */
-const JUMP_NIGHTS = [3, 5, 7];
+
 const bestDmg = (focus: Focus, f: (c: Card) => boolean = () => true) =>
   G.cards.filter((c) => c.loc === 'board' && ITEMS[c.key].dmg > 0 && f(c)).sort((a, b) => cardScore(b, focus) * b.size - cardScore(a, focus) * a.size)[0];
 function jump(focus: Focus) {
@@ -183,7 +184,7 @@ function prep(focus: Focus) {
     const picks = rollTalents(3, 'atk');
     if (picks.length) learnTalentState(picks[0]);
   }
-  if (JUMP_NIGHTS.includes(G.round)) jump(focus);
+  if (jumpNights().includes(G.round)) jump(focus);
   for (let step = 0; step < 3; step++) {
     G.prep.step = step;
     rollDoors();
@@ -278,13 +279,16 @@ function battle(r: number): NightLog {
   return log;
 }
 
-export function playRun(hero: string, focus: Focus, seed: number, opts: { heat?: number } = {}): RunLog {
+export function playRun(hero: string, focus: Focus, seed: number, opts: { heat?: number; full?: boolean } = {}): RunLog {
   reseed(seed);
   const H = HEROES[hero];
   Object.assign(G, {
-    hero, heat: opts.heat || 0, run: freshRun(), round: 1, maxRound: 8, endless: false, lock: null, fightWave: null, gold: H.gold, wall: H.wall, wallMax: H.wall,
-    cards: [], relics: [], skills: [], bestChain: 0, secret: {}, seenFoes: {}, foeSet: pick(Object.keys(FOESETS)), boss8: pick(['eye', 'brood']), speed: 1,
+    hero, heat: opts.heat || 0, run: freshRun(), round: 1, maxRound: 9, endless: false, lock: null, fightWave: null, gold: H.gold, wall: H.wall, wallMax: H.wall,
+    cards: [], relics: [], skills: [], bestChain: 0, secret: {}, seenFoes: {}, foeSet: pick(Object.keys(FOESETS)), speed: 1, full: !!opts.full, gems: {}, arc: 0,
   });
+  G.boss9 = pick(finalBosses());
+  G.boss12 = pick(finalBosses().filter((k) => k !== G.boss9));
+  G.maxRound = lastNight();
   void rng;
   const kits = KITS[hero];
   /* 起手：挑和流派最搭的一套 */
@@ -293,14 +297,16 @@ export function playRun(hero: string, focus: Focus, seed: number, opts: { heat?:
   if (kit.gold) G.gold = Math.max(0, G.gold + kit.gold);
   recalcMods();
   const nights: NightLog[] = [];
-  for (let r = 1; r <= 8; r++) {
+  const last = lastNight();
+  for (let r = 1; r <= last; r++) {
     G.round = r;
     prep(focus);
+    if (nightKind(r) === 'quiet') break;
     const n = battle(r);
     nights.push(n);
     if (n.result !== 'win') return done(false, r);
   }
-  return done(true, 8);
+  return done(true, last);
   function done(win: boolean, night: number): RunLog {
     return {
       hero, focus, seed, win, night, nights,

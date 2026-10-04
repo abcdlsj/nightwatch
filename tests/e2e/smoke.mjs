@@ -71,7 +71,8 @@ await pg.click(`.kit >> nth=${process.pid % (await pg.locator('.kit').count())}`
 await pg.waitForTimeout(800);
 if (SHOTS) mkdirSync('shots', { recursive: true });
 let result = 'lost';
-for (let rnd = 1; rnd <= 8; rnd++) {
+const MAX = await pg.evaluate(() => __game.G.maxRound);
+for (let rnd = 1; rnd <= MAX; rnd++) {
   await skip(pg);
   for (let k = 0; k < 300; k++) {
     const r = await pg.evaluate(`(${BOT})()`);
@@ -101,12 +102,12 @@ for (let rnd = 1; rnd <= 8; rnd++) {
   const info = await pg.evaluate(() => ({ ph: __game.G.phase, w: __game.G.wall }));
   console.log('  ', JSON.stringify(info), 'maxEnemies', maxn);
   if (info.ph === 'report') {
-    if (rnd === 8) { result = 'won'; break; }
+    if (rnd === MAX) { result = 'won'; break; }
     await pg.waitForTimeout(300);
     await pg.click('#cashBtn');
     await pg.waitForTimeout(500);
   } else {
-    if (rnd === 8 && info.ph !== 'over') result = 'won';
+    if (rnd === MAX && info.ph !== 'over') result = 'won';
     break;
   }
 }

@@ -141,7 +141,15 @@ export interface GameState {
   firstPrep: boolean;
   heat: number;
   run: RunStats | null;
-  boss8: string;
+  /** 第 9 夜的首领；完整线第 12 夜的首领 */
+  boss9: string;
+  boss12: string;
+  /** 完整游戏线（15 夜） */
+  full: boolean;
+  /** 宝石：1 拿了，-1 没要，没有键表示还没遇到 */
+  gems: Record<string, number>;
+  /** 这局走的是人物的第几套剧情 */
+  arc: number;
   endless: boolean;
   lock: Offer | null;
   seenFoes: Record<string, number>;
@@ -156,7 +164,7 @@ export const G: GameState = {
   skills: [],
   phase: 'title',
   round: 1,
-  maxRound: 8,
+  maxRound: 9,
   gold: 10,
   wall: 25,
   wallMax: 25,
@@ -170,7 +178,11 @@ export const G: GameState = {
   firstPrep: true,
   heat: 0,
   run: null,
-  boss8: 'eye',
+  boss9: 'eye',
+  boss12: 'brood',
+  full: false,
+  gems: {},
+  arc: 0,
   endless: false,
   lock: null,
   seenFoes: {},

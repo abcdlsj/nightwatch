@@ -21,6 +21,8 @@ export const canFire = (c: Card) => bt().t - c.lastFire >= TUNE.planck - 1e-9;
 export function trigger(c: Card, depth: number, src?: string) {
   const b = bt();
   if (depth > 10 || b.over || c.ammo === 0 || !canFire(c)) return;
+  /* 哑钟的噤声：卡牌之间不再互相带动 */
+  if (depth > 0 && b.flags.hushT > b.t) return;
   c.lastFire = b.t;
   if (c.bSrc) {
     const k = src || L.ui.report.chained;
@@ -695,6 +697,15 @@ export function kill(e: Enemy, src: Card | null) {
     G.gold++;
     b.greed++;
     view.coins(ex(e), ey(e), 1);
+    view.hud();
+  }
+  /* 雾母偷走的钱：打倒她连本带利还回来 */
+  if (e.d.boss && b.flags.stolen) {
+    const back = b.flags.stolen + 3;
+    b.flags.stolen = 0;
+    G.gold += back;
+    view.coins(ex(e), ey(e), Math.min(back, 10));
+    view.sfx('coin');
     view.hud();
   }
   if (e.d.boss || e.d.elite) {

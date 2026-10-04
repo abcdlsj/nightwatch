@@ -10,9 +10,13 @@ import { rollGear } from './loot';
 import { RELICS } from '../data/relics';
 import { HEROES, HERO_ORDER } from '../data/heroes';
 import { recalcMods } from './mods';
+import { pick } from '../core/rng';
+import { finalBosses, lastNight } from './plan';
 
 export interface HistEntry {
   id: number; t: number; h: string; w: number; r: number; en: number; heat: number; set: string; boss: string;
+  /** 完整游戏线 */
+  full?: number;
   k: number; cb: number; ch: number; bd: [string, number, string | 0][]; best: [string, number, string | 0] | null;
   rl: string[]; sk: string[]; ach: string[]; by: string | null; gold: number;
 }
@@ -32,6 +36,8 @@ export interface Meta {
   heroes?: Record<string, number>;
   /** 每个人物各自的长夜难度：最高解锁到几档、现在选的几档 */
   heat?: Record<string, { max: number; sel: number }>;
+  /** 第 9 夜首领轮换：每个人物这一轮已经打过的首领 */
+  bossCycle?: Record<string, string[]>;
 }
 
 function loadMeta(): Meta {
@@ -82,7 +88,7 @@ const ACH_OK: Record<string, (R: RunStats) => unknown> = {
   heat1: () => G.heat >= 1,
   heat4: () => G.heat >= 4,
   heat8: () => G.heat >= 8,
-  brood: () => G.boss8 === 'brood',
+  brood: () => G.boss9 === 'brood',
 };
 
 export function unlock(id: string) {
@@ -108,6 +114,21 @@ export function runWon() {
   R.newHero = unlockNextHero(G.hero) || undefined;
   saveMeta();
   for (const a of ACH) if (a.w && (!ACH_OK[a.id] || ACH_OK[a.id](R))) unlock(a.id);
+}
+
+/* ---------------- 第 9 夜首领轮换：这个人物还没打过的先来，五个都打过一轮再重新开始 ---------------- */
+export function nextBoss(hero: string) {
+  const all = finalBosses();
+  const seen = META.bossCycle?.[hero] || [];
+  const pool = all.filter((k) => !seen.includes(k));
+  return pick(pool.length ? pool : all);
+}
+export function markBoss(hero: string, k: string) {
+  const C = (META.bossCycle ||= {});
+  const seen = (C[hero] ||= []);
+  if (!seen.includes(k)) seen.push(k);
+  if (finalBosses().every((x) => seen.includes(x))) C[hero] = [];
+  saveMeta();
 }
 
 /* ---------------- 熟练：每个守夜人各自的轻量局外成长 ---------------- */
@@ -148,7 +169,7 @@ export function mastStart() {
 /** 一局结束时记账，返回这局加了多少、升到几级 */
 export function mastGain(win: boolean) {
   const h = G.hero;
-  const add = win ? G.maxRound + 2 : Math.max(0, G.round - 1);
+  const add = win ? lastNight() + 2 : Math.max(0, G.round - 1);
   if (!add) return null;
   const lv0 = mastLv(h);
   META.mast = META.mast || {};
@@ -205,8 +226,8 @@ export function recordRun(win: boolean, wallBy: Record<string, number> | null) {
   const best = G.cards.slice().sort((a, b) => (b.bDmg || 0) - (a.bDmg || 0))[0];
   const old = endl && R.hid ? META.hist.find((h) => h.id === R.hid) : null;
   const e: HistEntry = {
-    id: old ? old.id : Date.now(), t: Date.now(), h: G.hero, w: win || endl ? 1 : 0, r: endl ? 8 : Math.min(G.round, 8),
-    en: endl ? Math.max(0, G.round - 9) : 0, heat: G.heat || 0, set: G.foeSet || 'dark', boss: G.boss8 || 'eye',
+    id: old ? old.id : Date.now(), t: Date.now(), h: G.hero, w: win || endl ? 1 : 0, r: endl ? lastNight() : Math.min(G.round, lastNight()),
+    en: endl ? Math.max(0, G.round - endFrom()) : 0, heat: G.heat || 0, set: G.foeSet || 'dark', boss: G.boss9 || 'eye', full: G.full ? 1 : 0,
     k: R.kills || 0, cb: R.maxCombo || 0, ch: G.bestChain || 1, bd: board,
     best: best && best.bDmg ? [best.key, best.tier, best.adj || 0] : null, rl: G.relics.slice(), sk: G.skills.slice(),
     ach: (old ? old.ach : []).concat(R.got || []), by: win || endl ? null : by, gold: G.gold,
@@ -221,8 +242,10 @@ export function recordRun(win: boolean, wallBy: Record<string, number> | null) {
 }
 
 /* ---------------- 无尽长夜 ---------------- */
+/** 无尽长夜是从第几夜之后开始的（普通 9 夜、完整线 15 夜） */
+export const endFrom = () => lastNight() + 1;
 export function endlessLost() {
-  const n = Math.max(0, G.round - 9);
+  const n = Math.max(0, G.round - endFrom());
   if (n > (META.endBest || 0)) {
     META.endBest = n;
     saveMeta();

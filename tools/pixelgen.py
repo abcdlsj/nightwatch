@@ -3540,6 +3540,71 @@ def big_foes():
     c.line(27, 3, 27, 29, 'x', 1); c.rect(25, 1, 29, 5, 'C'); c.px(27, 3, 'b', True); c.px(26, 2, 'w', True)
     c.ell(23, 17, 2.4, 2, 'd')
     E['e_priest'] = c.done()
+
+    # 哑钟：晨钟城丢了七百年的大吕。铜钟生满铜绿，钟口朝下，裂了一道缝漏出一点光；钟舌是一截白骨，两根断锁链垂到地上
+    c = Cv(48, 48)
+    for (x0, x1) in ((11, 5), (37, 43)):                                                              # 锁链：一节亮一节暗
+        for i in range(0, 19):
+            t = i / 18; x = x0 + (x1 - x0) * t; y = 12 + 34 * t
+            c.px(x, y, 'g' if i % 2 else 's'); c.px(x + (1 if x1 > x0 else -1) * .6, y + 1, 'd')
+    c.rect(19, 1, 29, 3, 'd'); c.ell(24, 3, 4.5, 3, 's'); c.ell(24, 3, 2.2, 1.4, 'k', True)
+    def bw(y):  # 钟身每一行的半宽：顶上圆肩，腰身收一点，钟口外撇
+        if y < 10: return 7 + (y - 5) * 2.2
+        if y < 30: return 17 + (y - 10) * .12
+        return 19.4 + (y - 30) ** 1.6 * .35
+    for y in range(5, 41):
+        w = bw(y)
+        for x in range(round(24 - w), round(24 + w) + 1): c.px(x, y, 'n' if x > 24 + w * .45 else 'N')
+    for y in range(7, 38):
+        w = bw(y)
+        for x in range(round(24 - w * .8), round(24 - w * .35)): c.px(x, y, 'y')                       # 左边受光
+    for y in (13, 14, 33, 34):
+        w = bw(y); c.line(24 - w + 1, y, 24 + w - 1, y, 'm', 1, True)                                  # 两道箍
+    for x in range(12, 37, 3): c.px(x, 23, 'm', True); c.px(x + 1, 24, 'm', True)                      # 铭文
+    for (x, y0, ln) in ((31, 15, 9), (15, 16, 6), (34, 26, 7), (20, 26, 4), (12, 33, 3), (28, 9, 4)):   # 铜绿往下淌
+        for k in range(ln): c.px(x + (k % 3 == 2), y0 + k, 't' if k < ln - 2 else 'G', True)
+    c.line(26, 6, 24, 15, 'k', 1, True); c.line(24, 15, 27, 23, 'k', 1, True); c.line(27, 23, 25, 32, 'k', 1, True)   # 裂缝
+    c.px(24, 16, 'Y', True); c.px(26, 22, 'y', True)
+    c.ell(24, 41, 18, 2.6, 'k', True)
+    c.line(24, 40, 24, 45, 'w', 1); c.ell(24, 46, 2.2, 1.5, 'w'); c.px(23, 46, 'k', True); c.px(25, 46, 'k', True)
+    E['b_bell'] = c.done()
+
+    # 雾母：一团比城墙还高的雾，披着兜帽，帽子里只有两点冷光；雾里浮着几张没有五官的脸，两只长手拖进雾里
+    c = Cv(48, 48)
+    for (x, y, rx, ry) in ((24, 26, 17, 16), (14, 34, 9, 9), (34, 33, 10, 10), (24, 38, 16, 7), (24, 12, 9, 10)): c.ell(x, y, rx, ry, 'g')
+    for (x, y, rx, ry) in ((21, 22, 9, 10), (14, 32, 5, 5), (19, 12, 5, 6)): c.ell(x, y, rx, ry, 'w')
+    for (x, y) in ((7, 22), (41, 20), (4, 30), (44, 28), (10, 15), (38, 13)): c.ell(x, y, 2.4, 1.6, 'g')   # 飘出去的雾丝
+    c.poly([(24, 1), (32, 7), (34, 17), (24, 21), (14, 17), (16, 7)], 's'); c.poly([(24, 3), (30, 8), (31, 15), (24, 19), (17, 15), (18, 8)], 'g')
+    c.ell(24, 13, 5, 5.5, 'k', True); c.px(22, 13, 'C', True); c.px(26, 13, 'C', True)
+    for (x0, y0, x1, y1) in ((15, 20, 6, 40), (33, 20, 42, 40)):
+        c.line(x0, y0, x1, y1, 's', 2); c.line(x1, y1, x1 + (2 if x1 > 24 else -2), y1 + 5, 'g', 1)
+        for k in range(3): c.px(x1 - 1 + k, y1 + 1, 's')
+    for (x, y) in ((18, 28), (29, 26), (24, 35), (13, 37), (35, 36)):                                   # 雾里的脸：一圈暗，三个凹点
+        c.ell(x, y, 2.4, 2.9, 'g'); c.px(x - 1, y - 1, 'd', True); c.px(x + 1, y - 1, 'd', True); c.px(x, y + 1, 's', True)
+    for y in range(38, 48):                                                                             # 底下散成颗粒
+        for x in range(0, 48):
+            if c.get(x, y) != '.' and (x * 5 + y * 11) % 7 < (y - 37) // 2: c.px(x, y, '.')
+    E['b_mist'] = c.done(hl={**HL, 'g': 'w', 's': 'g'})
+
+    # 攻城王：一座会走的城门楼。石头垛口、门洞里的狼牙闸、门楼上一面黑红的旗，两侧搭着云梯，底下四个大木轮
+    c = Cv(48, 48)
+    c.rect(8, 12, 40, 38, 's'); c.rect(10, 14, 38, 36, 'g')
+    for x in range(8, 41, 5): c.rect(x, 9, x + 2, 12, 's')                                           # 垛口
+    for (y, x0, x1) in ((18, 10, 38), (24, 10, 38), (30, 10, 38)): c.line(x0, y, x1, y, 's', 1, True)   # 砖缝
+    for y, off in ((14, 0), (20, 3), (26, 0), (32, 3)):
+        for x in range(10 + off, 38, 6): c.px(x, y + 2, 's', True)
+    c.poly([(17, 38), (17, 25), (24, 20), (31, 25), (31, 38)], 'k', True)                            # 门洞
+    for x in range(18, 31, 2): c.line(x, 25, x, 32 + (x % 4) // 2, 'd', 1, True); c.px(x, 33 + (x % 4) // 2, 'g', True)   # 狼牙闸
+    c.px(21, 36, 'R', True); c.px(27, 36, 'R', True)                                                  # 门里的眼睛
+    c.rect(13, 16, 15, 18, 'k', True); c.rect(33, 16, 35, 18, 'k', True); c.px(14, 17, 'o', True); c.px(34, 17, 'o', True)   # 射孔里的火光
+    c.line(24, 0, 24, 9, 'x', 1); c.poly([(25, 0), (34, 2), (31, 4), (34, 6), (25, 6)], 'e'); c.px(28, 3, 'w', True)   # 旗
+    for sx in (1, -1):                                                                                 # 云梯
+        xa, xb = (4, 7) if sx > 0 else (44, 41)
+        c.line(xa, 14, xa, 40, 'n', 1); c.line(xb, 12, xb, 40, 'N', 1)
+        for y in range(15, 40, 4): c.line(min(xa, xb), y, max(xa, xb), y, 'n', 1)
+    c.rect(6, 38, 42, 41, 'x')
+    for x in (11, 20, 29, 38): c.ell(x, 43, 4, 4, 'n'); c.ell(x, 43, 1.5, 1.5, 'm', True); c.line(x - 3, 43, x + 3, 43, 'm', 1, True)
+    E['b_siege'] = c.done()
     return E
 
 

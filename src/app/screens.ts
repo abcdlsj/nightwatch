@@ -7,7 +7,8 @@ import { L, t } from '../i18n';
 import { shuffled } from '../core/rng';
 import { clamp } from '../core/util';
 import { G, freshRun } from '../game/state';
-import { META, ACHM, saveMeta, achCount, mastLv, mastNext, mastGain, recordRun, endlessLost } from '../game/meta';
+import { META, ACHM, saveMeta, achCount, mastLv, mastNext, mastGain, recordRun, endlessLost, endFrom } from '../game/meta';
+import { lastNight } from '../game/plan';
 import { heroList, heroUnlocked, heroNeeds, heatOf, pathsOf, pathOpen, kitOpen } from '../game/unlocks';
 import { loadSave, clearSave } from '../game/save';
 import { B } from '../sim/battle';
@@ -204,12 +205,12 @@ export function endScreen(win: boolean) {
   const got = R.got.map((id) => ACHM[id]).filter(Boolean);
   const H = HEROES[G.hero];
   const row = (a: string, b: string | number) => `<div><span>${a}</span><i style="margin-left:auto">${b}</i></div>`;
-  const endNote = endl ? `<div class="newheat">${t('end.endlessNote', { n: Math.max(0, G.round - 9) })}${META.endBest ? t('end.endlessBest', { n: META.endBest }) : ''}</div>` : '';
+  const endNote = endl ? `<div class="newheat">${t('end.endlessNote', { n: Math.max(0, G.round - endFrom()) })}${META.endBest ? t('end.endlessBest', { n: META.endBest }) : ''}</div>` : '';
   const mastNote = mg
     ? `<div class="newheat">${t('end.mast', { h: H.n, n: mg.add })}${mg.up ? t('end.mastUp', { lv: mg.lv, p: (L.meta.mastPerk as string[])[mg.lv - 1] }) : t('end.mastLv', { lv: mg.lv })}</div>`
     : '';
   sc.innerHTML = `<div class="scr"><img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="color:${win || endl ? '#ffe79a' : '#ff8a80'}">${win ? T.dawn : endl ? T.endless : T.lost}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
-  <div class="rules res">${row(T.reached, endl ? t('end.reachedEndless', { r: G.round }) : t('end.reachedR', { r: Math.min(G.round, 8) }))}
+  <div class="rules res">${row(T.reached, endl ? t('end.reachedEndless', { r: G.round }) : t('end.reachedR', { r: Math.min(G.round, lastNight()), m: lastNight() }))}
   ${G.heat ? row(T.heat, t('heroes.heat', { h: G.heat })) : ''}
   ${row(T.relicsTalents, t('end.relicsTalentsV', { r: G.relics.length, t: G.skills.length }))}
   ${row(T.bestChain, '×' + (G.bestChain || 1))}

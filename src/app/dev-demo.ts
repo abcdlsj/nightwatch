@@ -34,8 +34,8 @@ export async function runDemo() {
   await step(() => ($('#board .card') as HTMLElement).dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))); // 卡牌详情（下一步抬手）
   await step(() => {
     g.closeSheet();
-    g.G.round = 8;
-    g.G.nextWave = g.makeWave(8);
+    g.G.round = 9;
+    g.G.nextWave = g.makeWave(9);
     $('#goBtn')!.click();
   }); // 首领战
   await step(() => g.unlockTest('dawn')); // 成就弹窗

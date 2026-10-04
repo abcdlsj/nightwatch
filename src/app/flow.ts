@@ -9,7 +9,8 @@ import { pick, reseed, newSeed, rng } from '../core/rng';
 import { G, freshRun, type PrepStop } from '../game/state';
 import { recalcMods } from '../game/mods';
 import { boardCards } from '../game/cards';
-import { codexSweep, runWon, mastStart } from '../game/meta';
+import { codexSweep, runWon, mastStart, nextBoss, markBoss } from '../game/meta';
+import { NIGHTS, nightKind, lastNight, finalBosses } from '../game/plan';
 import { rollDoors, hordeWave, ambushWave, ambushGold, placeKit } from '../game/prep';
 import { rollGear, withFit } from '../game/loot';
 import { nightInfo } from '../game/nights';
@@ -52,9 +53,11 @@ export function newGame(hero: string) {
   const H = HEROES[G.hero];
 
   Object.assign(G, {
-    heat: 0, run: freshRun(), round: 1, maxRound: 8, endless: false, lock: null, fightWave: null, gold: H.gold, wall: H.wall, wallMax: H.wall,
-    cards: [], relics: [], skills: [], bestChain: 0, secret: {}, foeSet: pick(Object.keys(FOESETS)), boss8: pick(['eye', 'brood']),
+    heat: 0, run: freshRun(), round: 1, maxRound: NIGHTS, endless: false, lock: null, fightWave: null, gold: H.gold, wall: H.wall, wallMax: H.wall,
+    cards: [], relics: [], skills: [], bestChain: 0, secret: {}, foeSet: pick(Object.keys(FOESETS)), full: false, gems: {}, arc: 0,
   });
+  G.boss9 = nextBoss(G.hero);
+  G.boss12 = pick(finalBosses().filter((k) => k !== G.boss9));
   recalcMods();
   renderRelics();
   pickKit((kit, hh) => {
@@ -138,6 +141,7 @@ export function startBattle() {
   let wave = G.fightWave || G.nextWave!;
   if (!amb && G.prep.wager === 'horde') wave = hordeWave(wave);
   setScene(wave.some((s) => EN[s.type].boss) ? 'boss' : 'battle');
+  if (!amb && G.round === NIGHTS && !G.endless) markBoss(G.hero, G.boss9);
   clearVO();
   clearFieldFx();
   $('#prep').hidden = true;
@@ -150,8 +154,10 @@ export function startBattle() {
     return el ? clientToFieldX(el) : ((c.idx + c.size / 2) / 8) * world.W;
   };
   updateHUD();
-  banner(amb ? t('battle.ambushTitle', { n: bd!.n }) : nightInfo(G.round).title, G.round === 8 || amb ? '#ff6b5b' : G.round === 4 ? '#ffb37a' : '#fff');
-  SFX.play(G.round >= 8 || G.round === 4 ? 'intent' : 'ui');
+  const nk = nightKind(G.round);
+  const hard = amb || nk === 'boss' || nk === 'hidden';
+  banner(amb ? t('battle.ambushTitle', { n: bd!.n }) : nightInfo(G.round).title, hard ? '#ff6b5b' : nk === 'elite' ? '#ffb37a' : '#fff');
+  SFX.play(hard || nk === 'elite' ? 'intent' : 'ui');
   simStart({ wave, ambush: amb, wager: amb ? null : G.prep.wager || null, beats: amb ? [] : nightInfo(G.round).beats });
   updateHUD();
 }
@@ -305,9 +311,9 @@ function ambushLose(_b: Battle) {
 
 /* ---------------- 无尽长夜 ---------------- */
 export function continueEndless() {
+  G.round = lastNight() + 1;
   G.endless = true;
   G.maxRound = 999;
-  G.round = 9;
   if (G.run) {
     G.run.got = [];
     G.run.newHeat = 0;

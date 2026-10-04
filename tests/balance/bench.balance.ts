@@ -16,10 +16,14 @@ import { makeWave } from '../../src/sim/waves';
 import { B, startBattle, simStep, setOnEnd } from '../../src/sim/battle';
 import { ARCHS, boardFor, relicsFor, talentsFor, carryFor } from './builds';
 import { TUNE } from '../../src/game/tuning';
+import { finalBosses } from '../../src/game/plan';
 
 const RUNS = +(process.env.RUNS || 8);
 const PICK = (process.env.ARCH || Object.keys(ARCHS).join(',')).split(',');
 const HEAT = +(process.env.HEAT || 0);
+/** FULL=1：测完整游戏线 15 夜 */
+const FULL = !!+(process.env.FULL || 0);
+const LAST = FULL ? 15 : 9;
 if (process.env.TUNE) Object.assign(TUNE, JSON.parse(process.env.TUNE));
 
 beforeAll(() => {
@@ -32,8 +36,9 @@ function night(arch: string, r: number, seed: number, foeSet: string) {
   reseed(seed);
   const H = HEROES[A.hero];
   Object.assign(G, {
-    hero: A.hero, heat: HEAT, run: freshRun(), round: r, maxRound: 8, endless: false, gold: 0, wall: H.wall, wallMax: H.wall, cards: [], relics: relicsFor(arch, r),
-    skills: talentsFor(arch, r), secret: {}, seenFoes: {}, foeSet, boss8: seed % 2 ? 'eye' : 'brood', phase: 'battle', speed: 1,
+    hero: A.hero, heat: HEAT, run: freshRun(), round: r, maxRound: LAST, endless: false, gold: 0, wall: H.wall, wallMax: H.wall, cards: [], relics: relicsFor(arch, r),
+    skills: talentsFor(arch, r), secret: {}, seenFoes: {}, foeSet, phase: 'battle', speed: 1, full: FULL, gems: FULL ? { red: 1, blue: 1, green: 1 } : {},
+    boss9: finalBosses()[seed % finalBosses().length], boss12: finalBosses()[(seed + 2) % finalBosses().length],
   });
   let x = 0;
   for (const [key, tier, adj] of boardFor(arch, r)) {
@@ -71,7 +76,7 @@ it('成型阵容逐夜', () => {
   for (const arch of PICK) {
     const cells: string[] = [];
     const rec: unknown[] = [];
-    for (let r = 1; r <= 8; r++) {
+    for (let r = 1; r <= LAST; r++) {
       const res: ReturnType<typeof night>[] = [];
       for (let i = 0; i < RUNS; i++) res.push(night(arch, r, 7919 * i + r * 31 + 1, i % 2 ? 'frost' : 'dark'));
       const win = res.filter((x) => x.win).length / res.length;
@@ -84,7 +89,7 @@ it('成型阵容逐夜', () => {
     out[arch] = rec;
     lines.push(`${arch.padEnd(8)} ${cells.join('')}`);
   }
-  console.log(`\n模式 ${process.env.BUILD || "plain"}，难度 ${HEAT}，每格 ${RUNS} 局。格式：守住比例-平均掉墙\n${'流派'.padEnd(7)} ${[1, 2, 3, 4, 5, 6, 7, 8].map((n) => ('第' + n + '夜').padEnd(7)).join('')}\n` + lines.join('\n'));
+  console.log(`\n模式 ${process.env.BUILD || "plain"}，难度 ${HEAT}，每格 ${RUNS} 局。格式：守住比例-平均掉墙\n${'流派'.padEnd(7)} ${[...Array(LAST).keys()].map((n) => ('第' + (n + 1) + '夜').padEnd(7)).join('')}\n` + lines.join('\n'));
   mkdirSync('shots', { recursive: true });
   writeFileSync('shots/bench.json', JSON.stringify(out, null, 1));
 }, 3_600_000);

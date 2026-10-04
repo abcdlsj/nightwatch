@@ -1,6 +1,6 @@
 /* 敌人：出场、移动、光环、意图（首领招式）、撞墙、远程、复活 */
 import { EN } from '../data/enemies';
-import { L } from '../i18n';
+import { L, t } from '../i18n';
 import { rand, rnd, pick, vr, vrnd } from '../core/rng';
 import { clamp, fmt } from '../core/util';
 import { G, heat } from '../game/state';
@@ -11,11 +11,12 @@ import { foeKey } from '../game/foes';
 import { world, K, ex, ey, WALLY } from './world';
 import { view } from './view';
 import { B, bt, later, emit, finish } from './battle';
-import { hpScale } from './waves';
+import { hpScale, fixedScale } from './waves';
 import { TUNE } from '../game/tuning';
 import { hurt } from './combat';
 import { frenzy } from './combo';
 import type { Enemy } from './types';
+import type { Card } from '../game/state';
 
 const wg = (k: string) => !!B && B.wager === k;
 
@@ -23,7 +24,7 @@ export function spawn(type: string, x?: number | null, y?: number | null): Enemy
   const b = bt();
   const d = EN[type];
   const sc = d.fixed
-    ? (G.round > 8 ? Math.pow(1.4, G.round - 8) : 1) * (d.boss ? TUNE.bossHp : 1)
+    ? fixedScale(G.round) * (d.boss ? TUNE.bossHp : 1)
     : hpScale(G.round) * (G.round === 1 ? 0.5 : G.round === 2 ? 0.6 : 0.7) * (heat(1) ? 1.15 : 1) * (heat(2) && (d.boss || d.elite) ? 1.25 : 1) * (wg('iron') ? 1.3 : 1);
   const e: Enemy = {
     d, type, x: x != null ? x : rnd(0.08, 0.92), y: y != null ? y : -0.04, x0: 0, hp: d.hp * sc, maxHp: d.hp * sc, armor: d.armor, shield: 0,
@@ -235,78 +236,159 @@ export function damageWall(d: number, xx: number, kind?: 'boom' | null) {
   if (G.wall <= 0) finish('lose');
 }
 
-/* ---------------- 意图（首领、精英的招式） ---------------- */
+/* ---------------- 意图（首领、精英的招式） ----------------
+ * 招式表：每招一个函数，收到放招的敌人和招式参数 v（数量 / 秒数 / 比例，不填用默认）、k（招来的小怪）。
+ * 数据里的首领（含模组加的）只能从这张表里挑招式组合。 */
+type IntentFn = (e: Enemy, v: number | undefined, k: string | undefined) => void;
+/** 在首领身边招一批小怪 */
+function summonAt(e: Enemy, k: string, n: number, spread: number, dy = 0) {
+  for (let i = 0; i < n; i++) {
+    const s = spawn(foeKey(k), clamp(e.x + (n === 1 ? 0 : (i / (n - 1) - 0.5) * 2 * spread) + rnd(-0.03, 0.03), 0.05, 0.95), Math.max(-0.02, e.y + dy));
+    s.x0 = s.x;
+  }
+}
+const randomCards = (n: number) => {
+  const bc = boardCards().filter((c) => c.frozen <= 0);
+  const out: Card[] = [];
+  for (let i = 0; i < n && bc.length; i++) out.push(bc.splice(Math.floor(rand() * bc.length), 1)[0]);
+  return out;
+};
+export const INTENTS: Record<string, IntentFn> = {
+  /** 护盾：最大血量的 v（默认 15%） */
+  shield: (e, v) => {
+    e.shield += e.maxHp * (v ?? 0.15);
+  },
+  /** 冲锋：v 秒内三倍速 */
+  dash: (e, v) => {
+    e.dashT = v ?? 2;
+  },
+  /** 硬化：v 秒内护甲 +10 */
+  harden: (e, v) => {
+    e.hardT = v ?? 4;
+  },
+  /** 召唤蝙蝠（k 可换） */
+  summon: (e, v, k) => summonAt(e, k || 'bat', v ?? 6, 0.25, -0.02),
+  /** 凝视：随机冻住你 v 张卡 3 秒 */
+  gaze: (_e, v) => {
+    for (const c of randomCards(v ?? 2)) {
+      c.frozen = 3;
+      view.cardFlag(c, 'frozen', true);
+    }
+    view.toast(L.ui.battle.gazed);
+    view.say('hero', L.story.barks.freeze, 2);
+  },
+  /** 怒吼：身边的敌人一起冲锋 3 秒 */
+  roar: (e) => {
+    const R = 40 * K();
+    for (const o of bt().en) if (!o.dead && o !== e && Math.hypot(ex(o) - ex(e), ey(o) - ey(e)) <= R) o.dashT = Math.max(o.dashT || 0, 3);
+    view.ring(ex(e), ey(e) - 6, 4, R, '#e43b44', 0.5);
+  },
+  /** 震地：冻住你一张卡 2 秒 */
+  quake: () => {
+    for (const c of randomCards(1)) {
+      c.frozen = 2;
+      view.cardFlag(c, 'frozen', true);
+    }
+    view.shake(6);
+  },
+  /** 招骷髅（k 可换） */
+  skels: (e, v, k) => summonAt(e, k || 'skel', v ?? 3, 0.08, -0.03),
+  /** 产卵：招虫子 */
+  brood: (e, v, k) => summonAt(e, k || 'bug', v ?? 4, 0.22, 0.02),
+  /** 吸走你所有卡的充能（剩 1-v） */
+  drain: (_e, v) => {
+    for (const c of boardCards()) {
+      c.charge *= 1 - (v ?? 0.5);
+      view.cardFx(c, 'shake');
+    }
+    view.toast(L.ui.battle.drained);
+  },
+  /** 蜕壳：护盾 v */
+  molt: (e, v) => {
+    e.shield += e.maxHp * (v ?? 0.12);
+  },
+  /* ---- 哑钟 ---- */
+  /** 敲丧钟：最近倒下的 v 个敌人变成游魂站起来；坟不够就在钟边上冒出来 */
+  toll: (e, v) => {
+    const b = bt();
+    const n = v ?? 4;
+    const gs = b.graves.splice(-n);
+    for (const g of gs) {
+      const s = spawn(foeKey('ghost'), g.x, g.y);
+      s.raised = true;
+      s.x0 = s.x;
+      view.ring(ex(s), ey(s) - 4, 1, 10 * K(), '#c9b37a', 0.35);
+    }
+    if (gs.length < n) summonAt(e, 'ghost', n - gs.length, 0.18, 0.03);
+    view.ring(ex(e), ey(e), 4, 80 * K(), '#c9b37a', 0.4);
+  },
+  /** 噤声：v 秒内卡牌之间不再互相带动（回响、齐鸣、遗物带出的出手都不算） */
+  hush: (_e, v) => {
+    const b = bt();
+    b.flags.hushT = b.t + (v ?? 4);
+    view.toast(L.ui.battle.hushed);
+  },
+  /** 余音：场上每个敌人得到最大血量 v 的护盾 */
+  knell: (e, v) => {
+    for (const o of bt().en) if (!o.dead && o !== e) o.shield += o.maxHp * (v ?? 0.15);
+    view.ring(ex(e), ey(e), 4, 120 * K(), '#fff1b0', 0.35);
+  },
+  /* ---- 雾母 ---- */
+  /** 雾幕：v 秒内射程线往下压，敌人要走得更近才打得到 */
+  veil: (_e, v) => {
+    const b = bt();
+    b.flags.veilT = b.t + (v ?? 5);
+    view.toast(L.ui.battle.veiled);
+  },
+  /** 引魂：所有小怪冲锋 v 秒 */
+  lure: (e, v) => {
+    for (const o of bt().en) if (!o.dead && o !== e && !o.d.boss) o.dashT = Math.max(o.dashT || 0, v ?? 2);
+  },
+  /** 摸金：偷走 v 金（打倒她连本带利还回来） */
+  pilfer: (e, v) => {
+    const b = bt();
+    const n = Math.min(G.gold, v ?? 2);
+    if (!n) return;
+    G.gold -= n;
+    b.flags.stolen = (b.flags.stolen || 0) + n;
+    view.coins(ex(e), ey(e), n);
+    view.hud();
+    view.toast(t('battle.pilfered', { n }));
+  },
+  /* ---- 攻城王 ---- */
+  /** 放兵：v 个骷髅加一个盾卫 */
+  deploy: (e, v, k) => {
+    summonAt(e, k || 'skel', v ?? 4, 0.14, 0.04);
+    summonAt(e, 'shieldb', 1, 0, 0.05);
+  },
+  /** 齐射：2 秒内往城墙上砸 v 块石头 */
+  barrage: (e, v) => {
+    const n = v ?? 4;
+    for (let i = 0; i < n; i++) later(0.45 * i, () => !bt().over && !e.dead && lobRock(e, 1.5));
+  },
+  /** 撞城：v 秒三倍速往前冲 */
+  ram: (e, v) => {
+    e.dashT = v ?? 2.5;
+    view.shake(5);
+  },
+};
+
 function doIntent(e: Enemy) {
   const it = e.d.intents![e.ii];
   view.sfx('intent');
   view.shake(3);
   view.ring(ex(e), ey(e) - 8, 4, 40, '#ff5a5a', 0.45);
-  if (it.a === 'shield') e.shield += e.maxHp * 0.15;
-  if (it.a === 'dash') e.dashT = 2;
-  if (it.a === 'harden') e.hardT = 4;
-  if (it.a === 'summon')
-    for (let i = 0; i < 6; i++) {
-      const s = spawn(foeKey('bat'), clamp(e.x + rnd(-0.25, 0.25), 0.06, 0.94), Math.max(-0.02, e.y - 0.02));
-      s.x0 = s.x;
-    }
-  extraIntent(e, it.a);
-  if (it.a === 'gaze') {
-    const bc = boardCards();
-    for (let i = 0; i < 2 && bc.length; i++) {
-      const c = bc.splice(Math.floor(rand() * bc.length), 1)[0];
-      c.frozen = 3;
-      view.cardFlag(c, 'frozen', true);
-    }
-    view.toast(L.ui.battle.gazed);
-  }
+  INTENTS[it.a]?.(e, it.v, it.k);
   view.banner(it.n, '#ff8a70');
   const FOEB = L.story.foe as Record<string, any>;
-  if (FOEB[e.type] && FOEB[e.type].intent[it.a] && vr() < 0.7) view.say(e.type, FOEB[e.type].intent[it.a], 2);
-  if (it.a === 'gaze') view.say('hero', L.story.barks.freeze, 2);
+  if (FOEB[e.type] && FOEB[e.type].intent?.[it.a] && vr() < 0.7) view.say(e.type, FOEB[e.type].intent[it.a], 2);
   e.ii = (e.ii + 1) % e.d.intents!.length;
   e.it = e.d.intents![e.ii].t;
 }
 
-/** 精英招式和深渊母巢 */
-function extraIntent(e: Enemy, a: string) {
-  const b = bt();
-  if (a === 'roar') {
-    const R = 40 * K();
-    for (const o of b.en) if (!o.dead && o !== e && Math.hypot(ex(o) - ex(e), ey(o) - ey(e)) <= R) o.dashT = Math.max(o.dashT || 0, 3);
-    view.ring(ex(e), ey(e) - 6, 4, R, '#e43b44', 0.5);
-  }
-  if (a === 'quake') {
-    const bc = boardCards().filter((c) => c.frozen <= 0);
-    if (bc.length) {
-      const c = pick(bc);
-      c.frozen = 2;
-      view.cardFlag(c, 'frozen', true);
-    }
-    view.shake(6);
-  }
-  if (a === 'skels')
-    for (let i = 0; i < 3; i++) {
-      const s = spawn(foeKey('skel'), clamp(e.x + (i - 1) * 0.08, 0.05, 0.95), Math.max(-0.02, e.y - 0.03));
-      s.x0 = s.x;
-    }
-  if (a === 'brood')
-    for (let i = 0; i < 4; i++) {
-      const s = spawn(foeKey('bug'), clamp(e.x + rnd(-0.22, 0.22), 0.05, 0.95), Math.max(-0.02, e.y + 0.02));
-      s.x0 = s.x;
-    }
-  if (a === 'drain') {
-    for (const c of boardCards()) {
-      c.charge *= 0.5;
-      view.cardFx(c, 'shake');
-    }
-    view.toast(L.ui.battle.drained);
-  }
-  if (a === 'molt') e.shield += e.maxHp * 0.12;
-}
-
 /* ---------------- 远程：投石车 / 冰晶法师 ---------------- */
-function lobRock(e: Enemy) {
-  bt().epr.push({ x0: ex(e), y0: ey(e) - 6, x1: ex(e) + vrnd(-8, 8), y1: WALLY() - 1, t: 0, dur: 1.1 });
+function lobRock(e: Enemy, d?: number) {
+  bt().epr.push({ x0: ex(e), y0: ey(e) - 6, x1: ex(e) + vrnd(-8, 8), y1: WALLY() - 1, t: 0, dur: 1.1, d });
   view.sfx('fire', 'mech');
 }
 export function stepERocks(dt: number) {
@@ -316,7 +398,7 @@ export function stepERocks(dt: number) {
     if (r.t >= r.dur && !r.done) {
       r.done = true;
       for (let i = 0; i < 8; i++) view.part(r.x1, r.y1, vrnd(-30, 30), -vrnd(10, 40), 0.4, '#566c86', 2);
-      damageWall(b.en.length ? EN.catapult.lob![1] : 1, r.x1);
+      damageWall(r.d ?? (b.en.length ? EN.catapult.lob![1] : 1), r.x1);
       if (b.over) return;
     }
   }

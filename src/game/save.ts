@@ -2,15 +2,20 @@
 import { ITEMS } from '../data/cards';
 import { HEROES } from '../data/heroes';
 import { TALENTS } from '../data/talents';
+import { EN } from '../data/enemies';
 import { rng } from '../core/rng';
 import { store, KEYS } from '../platform/storage';
 import { G, freshRun, type Offer, type RunStats } from './state';
 import { newCard } from './cards';
 import { recalcMods } from './mods';
+import { NIGHTS, FULL_NIGHTS } from './plan';
 
 export interface SaveData {
   hero: string; round: number; gold: number; wall: number; wallMax: number; relics: string[]; skills: string[]; foeSet: string;
-  bestChain: number; heat: number; run: RunStats | null; boss8: string; endless: boolean; lock: Offer | null;
+  bestChain: number; heat: number; run: RunStats | null; boss9?: string; boss12?: string; full?: boolean; gems?: Record<string, number>; arc?: number;
+  /** 旧版（8 夜）存档里的首领 */
+  boss8?: string;
+  endless: boolean; lock: Offer | null;
   cards: { key: string; tier: number; adj: string | null; loc: any; idx: number; hoard: number; grow: number; qp: number; carry?: boolean; star?: number }[];
   secret?: Record<string, number>;
   /** 新版加的：种子和随机数状态（旧存档没有，读的时候另起一个） */
@@ -22,7 +27,8 @@ export interface SaveData {
 export function saveGame(rngState = rng.state) {
   const s: SaveData = {
     hero: G.hero, round: G.round, gold: G.gold, wall: G.wall, wallMax: G.wallMax, relics: G.relics, skills: G.skills, foeSet: G.foeSet,
-    bestChain: G.bestChain, heat: G.heat || 0, run: G.run, boss8: G.boss8, endless: !!G.endless, lock: G.lock || null,
+    bestChain: G.bestChain, heat: G.heat || 0, run: G.run, boss9: G.boss9, boss12: G.boss12, full: G.full, gems: G.gems, arc: G.arc,
+    endless: !!G.endless, lock: G.lock || null,
     cards: G.cards.map((c) => ({ key: c.key, tier: c.tier, adj: c.adj, loc: c.loc, idx: c.idx, hoard: c.hoard, grow: c.grow || 0, qp: c.qp || 0, carry: c.carry || undefined, star: c.star || undefined })),
     secret: G.secret, seed: G.seed, rng: rngState,
   };
@@ -38,7 +44,8 @@ export function restoreSave(s: SaveData | null): boolean {
   Object.assign(G, {
     hero: s.hero, round: s.round, gold: s.gold, wall: s.wall, wallMax: s.wallMax, foeSet: s.foeSet || 'dark', relics: s.relics || [],
     skills: (s.skills || []).filter((k) => TALENTS[k]), bestChain: s.bestChain || 0, heat: s.heat || 0, run: s.run || freshRun(),
-    boss8: s.boss8 || 'eye', endless: !!s.endless, maxRound: s.endless ? 999 : 8, lock: s.lock || null, fightWave: null, cards: [],
+    boss9: EN[s.boss9 || s.boss8 || ''] ? s.boss9 || s.boss8 : 'eye', boss12: EN[s.boss12 || ''] ? s.boss12 : 'brood', full: !!s.full, gems: s.gems || {}, arc: s.arc || 0,
+    endless: !!s.endless, maxRound: s.endless ? 999 : s.full ? FULL_NIGHTS : NIGHTS, lock: s.lock || null, fightWave: null, cards: [],
     secret: s.secret || {}, seed: s.seed ?? 0,
   });
   if (s.rng != null) rng.state = s.rng;

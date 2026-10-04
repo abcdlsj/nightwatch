@@ -88,6 +88,7 @@ export const EN: Record<string, EnemyDef> = {
   "faction": "dead"
  },
  "eye": {
+  "final": 1,
   "hp": 11000,
   "spd": 0.012,
   "armor": 3,
@@ -578,6 +579,7 @@ export const EN: Record<string, EnemyDef> = {
   "faction": "frost"
  },
  "brood": {
+  "final": 1,
   "hp": 11000,
   "spd": 0.011,
   "armor": 2,
@@ -600,6 +602,96 @@ export const EN: Record<string, EnemyDef> = {
    {
     "t": 8,
     "a": "molt"
+   }
+  ]
+ },
+ "mutebell": {
+  "final": 1,
+  "hp": 10000,
+  "spd": 0.012,
+  "armor": 2,
+  "wall": 99,
+  "spr": "b_bell",
+  "sc": 1,
+  "boss": 1,
+  "fixed": 1,
+  "col": "#c9b37a",
+  "faction": "dead",
+  "intents": [
+   {
+    "t": 7,
+    "a": "toll",
+    "v": 4
+   },
+   {
+    "t": 8,
+    "a": "hush",
+    "v": 4
+   },
+   {
+    "t": 9,
+    "a": "knell",
+    "v": 0.15
+   }
+  ]
+ },
+ "mistmother": {
+  "final": 1,
+  "hp": 9500,
+  "spd": 0.013,
+  "armor": 1,
+  "wall": 99,
+  "spr": "b_mist",
+  "sc": 1,
+  "boss": 1,
+  "fixed": 1,
+  "col": "#9fd8d0",
+  "faction": "swamp",
+  "intents": [
+   {
+    "t": 6,
+    "a": "veil",
+    "v": 5
+   },
+   {
+    "t": 8,
+    "a": "lure",
+    "v": 2
+   },
+   {
+    "t": 7,
+    "a": "pilfer",
+    "v": 2
+   }
+  ]
+ },
+ "siegelord": {
+  "final": 1,
+  "hp": 12500,
+  "spd": 0.009,
+  "armor": 4,
+  "wall": 99,
+  "spr": "b_siege",
+  "sc": 1,
+  "boss": 1,
+  "fixed": 1,
+  "col": "#c28a4d",
+  "faction": "war",
+  "intents": [
+   {
+    "t": 7,
+    "a": "deploy",
+    "v": 4
+   },
+   {
+    "t": 9,
+    "a": "barrage",
+    "v": 4
+   },
+   {
+    "t": 11,
+    "a": "ram",
+    "v": 2.5
    }
   ]
  }

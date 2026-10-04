@@ -9,6 +9,9 @@ import { KITS, HEROES } from '../../src/data/heroes';
 import { makeWave } from '../../src/sim/waves';
 import { B, startBattle, simStep, settleWin, setOnEnd } from '../../src/sim/battle';
 import { nightInfo } from '../../src/game/nights';
+import { finalBosses } from '../../src/game/plan';
+import { EN } from '../../src/data/enemies';
+import { INTENTS } from '../../src/sim/enemies';
 
 beforeAll(() => {
   initLocale();
@@ -17,7 +20,7 @@ beforeAll(() => {
 
 function newRun(hero: string, kit: number, seed: number, foeSet = 'dark') {
   reseed(seed);
-  Object.assign(G, { hero, foeSet, boss8: 'eye', round: 1, maxRound: 8, heat: 0, run: freshRun(), cards: [], relics: [], skills: [], gold: 10, endless: false, secret: {}, seenFoes: {} });
+  Object.assign(G, { hero, foeSet, boss9: 'eye', round: 1, maxRound: 9, heat: 0, run: freshRun(), cards: [], relics: [], skills: [], gold: 10, endless: false, secret: {}, seenFoes: {} });
   G.wall = G.wallMax = HEROES[hero].wall;
   placeKit(KITS[hero][kit].cards);
   recalcMods();
@@ -70,13 +73,21 @@ describe('战斗模拟', () => {
         expect(r.kills).toBeGreaterThan(0);
       });
 
-  it('第八夜首领（两种）都能打起来', () => {
-    for (const boss of ['eye', 'brood']) {
+  it('第九夜首领（五个）都能打起来，招式都认识', () => {
+    expect(finalBosses().length).toBe(5);
+    for (const boss of finalBosses()) {
+      for (const it of EN[boss].intents || []) expect(INTENTS[it.a], `${boss} 的招式 ${it.a}`).toBeTruthy();
       newRun('mo', 0, 77);
-      G.boss8 = boss;
-      const r = night(8);
+      G.boss9 = boss;
+      const r = night(9);
       expect(r.result).toBe('lose');
       expect(r.spawned).toBeGreaterThan(50);
     }
+  });
+
+  it('第八夜（首领前夜）带一个精英', () => {
+    newRun('ayla', 0, 5);
+    G.round = 8;
+    expect(makeWave(8).some((s) => EN[s.type].elite)).toBe(true);
   });
 });

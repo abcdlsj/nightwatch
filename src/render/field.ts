@@ -1,6 +1,7 @@
 /* 战场画布：低分辨率（约 180 格宽）像素画布，CSS 放大显示。
  * 负责城墙、敌人、弹道、粒子、飘字；模拟层通过 SimView 往这里塞特效。 */
 import { DIG } from '../data/art/hand';
+import { TUNE } from '../game/tuning';
 import { vr, vrnd } from '../core/rng';
 import { fmt } from '../core/util';
 import { RM } from '../platform/env';
@@ -313,11 +314,19 @@ export function drawField(dt: number) {
     x.fillRect(0, wy - 3, W, 10);
     F.wallFlash -= dt;
   }
-  /* 射程线 */
+  /* 射程线；雾母起雾时压低，线上面盖一层雾 */
   {
-    const ry = Math.round(world.top + world.range * (WALLY() - 2 - world.top));
+    const veil = B && B.flags.veilT > B.t ? TUNE.veil : 0;
+    const ry = Math.round(world.top + (world.range + veil) * (WALLY() - 2 - world.top));
+    if (veil) {
+      const g = x.createLinearGradient(0, world.top, 0, ry);
+      g.addColorStop(0, 'rgba(159,216,208,0)');
+      g.addColorStop(1, 'rgba(159,216,208,.22)');
+      x.fillStyle = g;
+      x.fillRect(0, world.top, W, ry - world.top);
+    }
     for (let xx = 0; xx < W; xx += 6) {
-      x.fillStyle = 'rgba(255,209,102,.22)';
+      x.fillStyle = veil ? 'rgba(159,216,208,.5)' : 'rgba(255,209,102,.22)';
       x.fillRect(xx, ry, 3, 1);
     }
   }

@@ -207,8 +207,10 @@ export const rising = (e: { emerge?: boolean; bornT: number }) => !!e.emerge && 
 export function front() {
   let b: Enemy | null = null,
     bv = -1;
+  /* 雾母的雾幕：射程线往下压 */
+  const rg = world.range + (B!.flags.veilT > B!.t ? TUNE.veil : 0);
   for (const e of B!.en) {
-    if (e.dead || e.y < world.range || phased(e) || rising(e)) continue;
+    if (e.dead || e.y < rg || phased(e) || rising(e)) continue;
     const v = e.y + (e.d.elite || e.d.boss ? TUNE.eliteFocus : 0);
     if (v > bv) {
       bv = v;

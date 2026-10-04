@@ -44,7 +44,7 @@ export interface Projectile {
   done: boolean;
 }
 
-export interface EnemyRock { x0: number; y0: number; x1: number; y1: number; t: number; dur: number; done?: boolean }
+export interface EnemyRock { x0: number; y0: number; x1: number; y1: number; t: number; dur: number; done?: boolean; /** 砸到城墙的伤害（不填按投石车） */ d?: number }
 
 export interface Battle {
   t: number;

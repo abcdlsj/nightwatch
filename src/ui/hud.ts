@@ -1,5 +1,6 @@
 /* 顶栏、底栏按钮、提示条、横幅、一次性新手提示 */
 import { L, t } from '../i18n';
+import { nightKind, lastNight } from '../game/plan';
 import { store, KEYS } from '../platform/storage';
 import { G } from '../game/state';
 import { mv } from '../game/mods';
@@ -26,8 +27,10 @@ export function updateHUD() {
   const T = L.ui.hud;
   $('#roundV').textContent = String(Math.min(G.round, G.maxRound));
   const rc = $('#roundChip');
-  rc.classList.toggle('elite', G.round === 4 || (G.round > 8 && (G.round - 8) % 2 === 1));
-  rc.classList.toggle('boss', G.round === 8 || (G.round > 8 && (G.round - 8) % 4 === 0));
+  const nk = nightKind(G.round);
+  const ek = G.round - lastNight();
+  rc.classList.toggle('elite', nk === 'elite' || (nk === 'endless' && ek % 2 === 1));
+  rc.classList.toggle('boss', nk === 'boss' || nk === 'hidden' || (nk === 'endless' && ek % 4 === 0));
   if (shownGold !== G.gold) {
     if (shownGold !== null) restart($('#goldChip'), 'bump');
     shownGold = G.gold;

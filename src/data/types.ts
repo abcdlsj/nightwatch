@@ -90,7 +90,9 @@ export interface TalentDef {
   n: string; say: string; d?: string;
 }
 
-export interface Intent { t: number; a: string; n: string; d: string }
+/** 首领 / 精英的招式：t 是距上一招的秒数，a 是招式（见 sim/enemies.ts 的 INTENTS），n 是招式的参数（数量、秒数、比例），
+ * k 是招来的小怪种类（不填用招式默认的）。名字 n 和说明 d 在语言包里 */
+export interface Intent { t: number; a: string; n: string; d: string; v?: number; k?: string }
 
 export interface EnemyDef {
   hp: number; spd: number; armor: number; wall: number; spr: string; sc: number; col: string; faction: string;
@@ -98,6 +100,10 @@ export interface EnemyDef {
   split?: number; splitInto?: string; aura?: number; heal?: number; guard?: number; haste?: number; bomb?: number; phase?: number;
   raise?: number; raiseAs?: string; cargo?: [string, number]; spr2?: string; mimic?: number; rage?: number; stopAt?: number;
   lob?: [number, number]; chill?: number; dive?: number; shell?: number; fbolt?: number;
+  /** 第 9 夜首领的候选 */
+  final?: number;
+  /** 某个守夜人的隐藏首领（完整游戏线第 15 夜） */
+  hidden?: string;
   intents?: Intent[];
   n: string; tip?: string; intro?: [string, string] | null;
 }
