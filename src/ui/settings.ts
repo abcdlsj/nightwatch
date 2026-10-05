@@ -60,11 +60,13 @@ function openExport(onReset?: () => void) {
   const T = L.ui.settings;
   const sh = sheetOpen(`<div class="sh" role="dialog" aria-label="${T.exportTitle}"><h3>${T.exportTitle}</h3><p>${T.exportD}</p>
     <textarea class="bk-code" id="bkCode" readonly rows="6">…</textarea>
-    <div class="sh-btns"><button class="btn" id="bkCopy" disabled>${T.copy}</button><button class="btn" id="bkBack">${L.ui.sheet.close}</button></div></div>`);
+    <div class="sh-btns"><button class="btn" id="bkCopy" disabled>${T.copy}</button><button class="btn" id="bkFile" disabled>${T.saveFile}</button></div>
+    <div class="sh-btns"><button class="btn" id="bkBack">${L.ui.sheet.close}</button></div></div>`);
   const ta = sh.querySelector<HTMLTextAreaElement>('#bkCode')!;
   exportCode().then((code) => {
     ta.value = code;
     ($('#bkCopy') as HTMLButtonElement).disabled = false;
+    ($('#bkFile') as HTMLButtonElement).disabled = false;
   });
   ta.onfocus = () => ta.select();
   $('#bkCopy').onclick = async () => {
@@ -77,7 +79,28 @@ function openExport(onReset?: () => void) {
       toast(T.copyFail);
     }
   };
+  $('#bkFile').onclick = () => saveFile(ta.value);
   $('#bkBack').onclick = () => openSettings(onReset);
+}
+
+/** 存成文件：iOS 上走系统分享面板（可选「存储到文件」放进 iCloud 云盘），其他地方直接下载 / save as a file: on iOS via the system share sheet (pick "Save to Files" for iCloud Drive), elsewhere a plain download */
+async function saveFile(code: string) {
+  const name = `nightwatch-${new Date().toISOString().slice(0, 10)}.txt`;
+  const file = new File([code], name, { type: 'text/plain' });
+  if (navigator.canShare?.({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file] });
+      return;
+    } catch (e) {
+      /* 用户关掉分享面板就算了 / the user dismissed the share sheet */
+      if ((e as Error).name === 'AbortError') return;
+    }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(file);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
 function openImport(onReset?: () => void) {
@@ -85,7 +108,16 @@ function openImport(onReset?: () => void) {
   const T = L.ui.settings;
   sheetOpen(`<div class="sh" role="dialog" aria-label="${T.importTitle}"><h3>${T.importTitle}</h3><p>${T.importD}</p>
     <textarea class="bk-code" id="bkIn" rows="6" placeholder="${T.importPh}" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
-    <div class="sh-btns"><button class="btn red" id="bkGo">${T.importGo}</button><button class="btn" id="bkBack">${L.ui.sheet.close}</button></div></div>`);
+    <input type="file" id="bkPick" accept=".txt,text/plain" hidden>
+    <div class="sh-btns"><button class="btn" id="bkOpen">${T.pickFile}</button><button class="btn red" id="bkGo">${T.importGo}</button></div>
+    <div class="sh-btns"><button class="btn" id="bkBack">${L.ui.sheet.close}</button></div></div>`);
+  const pick = $('#bkPick') as HTMLInputElement;
+  $('#bkOpen').onclick = () => pick.click();
+  pick.onchange = async () => {
+    const f = pick.files?.[0];
+    if (f) ($('#bkIn') as HTMLTextAreaElement).value = (await f.text()).trim();
+    pick.value = '';
+  };
   $('#bkGo').onclick = async () => {
     const ok = await importCode(($('#bkIn') as HTMLTextAreaElement).value);
     if (!ok) return toast(T.importBad);
