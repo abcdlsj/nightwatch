@@ -20,6 +20,10 @@ const RAW: Record<string, any> = {
   battle: { bpm: 132, prog: [[45, 'm'], [41, 'M'], [43, 'M'], [40, 'm']], bass: 'x.x.o.x.x.x.o.x.', bv: 0.02, bt: 'square', arp: '0.1.2.1.0.1.2.1.', av: 0.006, at: 'square', ao: 24,
     lead: ['76 - . 76 . 72 - . 74 - . 72 . 69 - .', '77 - . 77 . 72 - . 76 - . 72 . 69 - .', '79 - . 79 . 74 - . 77 - . 74 . 71 - .', '76 - . 79 . 83 - . 81 - . 79 . 76 - .'], lv: 0.018, lt: 'triangle',
     k: 'x.......x.x.....', s: '....x.......x...', h: 'x.x.x.x.x.x.x.x.' },
+  /* 后几夜的战斗：放慢、走小调，Neapolitan 降二级和属大三和弦压出紧张感 / battles in the late nights: slower and minor, with a Neapolitan flat-II and a major dominant for tension */
+  dread: { bpm: 112, prog: [[45, 'm'], [46, 'M'], [41, 'M'], [40, 'M']], bass: 'x.x.x.x.x.x.x.x.', bv: 0.024, bt: 'triangle', arp: '0...2...1...2...', av: 0.007, at: 'square', ao: 12,
+    lead: ['76 - - - - - 74 - 72 - - - 71 - - -', '74 - - - - - 77 - 74 - - - 70 - - -', '72 - - - 69 - - - 72 - - - 76 - - -', '76 - - - - - - - 71 - - - 68 - - -'], lv: 0.018, lt: 'triangle',
+    k: 'x.......x.......', s: '........x.......', h: '..x...x...x...x.' },
   boss: { bpm: 144, prog: [[38, 'm'], [46, 'M'], [43, 'm'], [45, 'M']], bass: 'xxo.xxo.xxo.xxo.', bv: 0.017, bt: 'sawtooth', arp: '0.1.2.1.0.1.2.1.', av: 0.006, at: 'square', ao: 24,
     lead: ['74 - - - 77 - - - 81 - - - 80 - 81 -', '82 - - - 81 - - - 77 - - - 74 - - -', '79 - - - 82 - - - 86 - - - 84 - 82 -', '81 - - - 85 - - - 88 - - - 85 - 81 -'], lv: 0.018, lt: 'triangle',
     k: 'x...x...x...x...', s: '....x.......x.x.', h: '..x...x...x...x.' },

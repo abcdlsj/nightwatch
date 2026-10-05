@@ -165,7 +165,8 @@ export function startBattle() {
   const amb = !!G.fightWave;
   let wave = G.fightWave || G.nextWave!;
   if (!amb && G.prep.wager === 'horde') wave = hordeWave(wave);
-  setScene(wave.some((s) => EN[s.type].boss) ? 'boss' : 'battle');
+  /* 第 6 夜起（含无尽）战斗曲换成更压抑的一首 / from night 6 on (endless included) battles switch to a darker track */
+  setScene(wave.some((s) => EN[s.type].boss) ? 'boss' : G.round >= 6 || G.endless ? 'dread' : 'battle');
   if (!amb && G.round === NIGHTS && !G.endless) markBoss(G.hero, G.boss9);
   clearVO();
   clearFieldFx();
