@@ -19,3 +19,5 @@
 .stat .f{font-size:12px!important;color:#c9b8ff}
 .sh-btns{display:flex;gap:8px}
 .sh-btns .btn{flex:1}
+.set-bk b{display:block;color:#fff;font-weight:400;font-size:15px;margin-bottom:2px}
+.bk-code{display:block;box-sizing:border-box;width:100%;margin:10px 0;padding:8px;border:1px solid var(--edge);border-radius:8px;background:rgba(0,0,0,.35);color:#d8e2e5;font:16px/1.35 ui-monospace,Menlo,monospace;word-break:break-all;resize:none;user-select:text;-webkit-user-select:text}
