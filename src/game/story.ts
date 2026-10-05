@@ -51,8 +51,9 @@ export function talkScene(r: number): any {
 /** 这个人物在第 r 夜（或某个首领夜）说的话：有就替换公共剧情里「hero」那几句 */
 export function heroBeats(r: number, boss: string | null): [number, string, any][] | null {
   const H = heroStory();
-  if (boss) return H.bosses?.[boss]?.beats || (r > 9 ? H.full?.nights?.[r] : null) || null;
-  if (r > 9) return H.full?.nights?.[r] || null;
+  /* 完整线的夜晚（含第 12、15 夜）先用完整线自己写的 */
+  if (r > 9) return H.full?.nights?.[r] || (boss ? H.bosses?.[boss]?.beats : null) || null;
+  if (boss) return H.bosses?.[boss]?.beats || null;
   return arcOf().nights?.[r] || null;
 }
 /** 开场：公共的开场之后，接上这套剧情自己的一两页 */
