@@ -378,6 +378,21 @@ export default {
     },
   },
 
+  workshop: {
+    title: '工坊',
+    steps: [
+      '想加自己的守夜人、卡牌、怪物和剧情？先在 GitHub 上 fork 这个项目。',
+      '在 mods/ 里加一个目录，照着 mods/_example 写你的内容：人物、专属卡、首领、遗物、剧情都行。',
+      '点下面的「部署到 Vercel」，选你 fork 出来的仓库，就有了一个只属于你的守夜人。',
+    ],
+    doc: '看教程',
+    deploy: '部署到 Vercel',
+    loaded: '这个版本装了 {n} 个模组',
+    none: '这个版本没有装模组。',
+    nothing: '什么都没加',
+    kinds: { sprites: '像素图', cards: '卡牌', relics: '遗物', talents: '天赋', enemies: '敌人', bosses: '首领', voices: '说话人', heroes: '人物' },
+  },
+
   settings: {
     title: '设置',
     music: '音乐',
@@ -427,6 +442,7 @@ export default {
     history: '过往守夜',
     star: '借来的星，还回去了',
     installIOS: '点 Safari 底部的「分享」，选「添加到主屏幕」：全屏玩，断网也能打开。',
+    workshop: '工坊',
     installClose: '不再提示',
   },
 

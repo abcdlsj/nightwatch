@@ -1,5 +1,6 @@
 /* 装配各层，绑定底栏按钮，跑主循环（由 src/main.ts 在平台层就绪后加载） */
 import { initLocale, L } from '../i18n';
+import { loadMods } from '../mod/load';
 import { on } from '../core/events';
 import { clamp } from '../core/util';
 import { G } from '../game/state';
@@ -39,6 +40,8 @@ import { onBack, onPause, onResume } from '../platform/native';
 
 /* ---------- 装配 ---------- */
 initLocale();
+/* 模组：在语言包填好之后合并进各张表 */
+loadMods();
 applyStaticText();
 document.title = L.ui.docTitle;
 for (const im of $$('[data-ico]')) (im as HTMLImageElement).src = spr(im.dataset.ico!).url;

@@ -11,7 +11,7 @@ import { recalcMods } from '../game/mods';
 import { boardCards } from '../game/cards';
 import { codexSweep, runWon, mastStart, nextBoss, markBoss, fullDone, nextArc } from '../game/meta';
 import { markPathWin } from '../game/unlocks';
-import { NIGHTS, GEM_NIGHTS, nightKind, lastNight, finalBosses } from '../game/plan';
+import { NIGHTS, FULL_NIGHTS, GEM_NIGHTS, nightKind, lastNight, finalBosses } from '../game/plan';
 import { rollDoors, hordeWave, ambushWave, ambushGold, placeKit } from '../game/prep';
 import { rollGear, withFit } from '../game/loot';
 import { nightInfo } from '../game/nights';
@@ -110,7 +110,9 @@ export function toPrep() {
   F.cv.style.display = 'none';
   const gem = G.full && !G.endless ? GEM_NIGHTS[G.round] : undefined;
   /* 宝石夜不再另有夜谈（宝石的剧情就是这夜的夜谈） */
-  G.prep = { step: 0, cur: null, doors: [], talk: G.round % 2 === 1 && !gem, gem: gem && G.gems[gem] == null ? gem : undefined };
+  /* 第 15 夜（完整线）不再夜谈：隐藏首领前那段戏，或者安静的天亮 */
+  const last = G.full && !G.endless && G.round === FULL_NIGHTS;
+  G.prep = { step: 0, cur: null, doors: [], talk: G.round % 2 === 1 && !gem && !last, gem: gem && G.gems[gem] == null ? gem : undefined };
   G.nextWave = makeWave(G.round);
   clearCharges();
   for (const c of G.cards) {

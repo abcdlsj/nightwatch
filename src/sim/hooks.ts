@@ -16,8 +16,8 @@ import { view } from './view';
 import { B, bt, later, near } from './battle';
 import { chargeCard, haste, reload, hurt, trigger, vuln } from './combat';
 
-type X = Record<string, any>;
-type CardHook = { on?: Record<string, (c: Card, x: X) => void>; onWin?: (c: Card) => void };
+export type X = Record<string, any>;
+export type CardHook = { on?: Record<string, (c: Card, x: X) => void>; onWin?: (c: Card) => void };
 
 /** 在 (X,Y) 半径 R 内的活着的敌人上执行 */
 const around = (X: number, Y: number, R: number, fn: (o: any) => void) => {

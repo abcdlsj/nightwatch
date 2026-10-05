@@ -131,6 +131,10 @@ export interface EventDef {
 
 export interface HeroDef {
   col: string; portrait: string; wall: number; gold: number;
+  /** 一开始就能选（模组加的人物默认这样） */
+  free?: number;
+  /** 跃迁事件用哪个人物的玩法（ayla / mo / ying / jun / li），不填就没有跃迁 */
+  jump?: string;
   /** 选人页展示的起手卡 [key, 品质, 格子] */
   start: [string, number, number][];
   n: string; title: string; tag: string; desc: string; intro: string;

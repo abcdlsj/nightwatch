@@ -21,6 +21,7 @@ import { openAch } from '../ui/sheets';
 import { loseNote } from '../ui/report';
 import { openCodex, openHistory } from '../ui/codex';
 import { canInstallIOS } from '../platform/pwa';
+import { openWorkshop } from '../ui/workshop';
 import { store, KEYS } from '../platform/storage';
 import { newGame, resumeSave, continueEndless } from './flow';
 
@@ -35,7 +36,7 @@ export function titleScreen() {
   <div class="rules">${(T.rules as string[]).map((r, i) => `<div><i>${i + 1}</i><span>${r}</span></div>`).join('')}</div>
   ${sv && HEROES[sv.hero] ? `<button class="btn gold big" id="contBtn">${t('title.cont', { h: HEROES[sv.hero].n, r: sv.round })}</button>` : ''}
   <button class="btn ${sv ? 'alt' : 'red'} big" id="startBtn">${sv ? T.newRun : T.start}</button>
-  <div class="tbtns"><button class="btn alt" id="achBtn">${t('title.ach', { n: achCount(), max: ACH.length })}${META.heatMax ? t('title.heat', { h: META.heatMax }) : ''}</button><button class="btn alt" id="cdxBtn">${T.codex}</button><button class="btn alt" id="hisBtn">${T.history}</button><button class="btn alt" id="sndBtn" style="flex:none" aria-label="${L.ui.settings.title}">⚙</button></div></div>`;
+  <div class="tbtns"><button class="btn alt" id="achBtn">${t('title.ach', { n: achCount(), max: ACH.length })}${META.heatMax ? t('title.heat', { h: META.heatMax }) : ''}</button><button class="btn alt" id="cdxBtn">${T.codex}</button><button class="btn alt" id="hisBtn">${T.history}</button><button class="btn alt" id="wsBtn">${T.workshop}</button><button class="btn alt" id="sndBtn" style="flex:none" aria-label="${L.ui.settings.title}">⚙</button></div></div>`;
   sc.hidden = false;
   $('#startBtn').onclick = () => {
     SFX.ensure();
@@ -53,6 +54,10 @@ export function titleScreen() {
   $('#hisBtn').onclick = () => {
     SFX.ensure();
     openHistory();
+  };
+  $('#wsBtn').onclick = () => {
+    SFX.ensure();
+    openWorkshop();
   };
   $('#sndBtn').onclick = () => {
     SFX.ensure();

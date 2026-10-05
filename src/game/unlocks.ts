@@ -6,10 +6,10 @@ import type { KitDef } from '../data/types';
 import { META, saveMeta, mastLv } from './meta';
 
 /* ---------------- 人物 ---------------- */
-export const heroUnlocked = (h: string) => !!META.heroes?.[h];
+export const heroUnlocked = (h: string) => !!META.heroes?.[h] || !!HEROES[h]?.free;
 export const heroList = () => HERO_ORDER.filter((h) => HEROES[h]);
 /** 解锁 h 需要先用谁守到黎明 */
-export const heroNeeds = (h: string) => HERO_ORDER[HERO_ORDER.indexOf(h) - 1];
+export const heroNeeds = (h: string) => HERO_ORDER[HERO_ORDER.indexOf(h) - 1] || HERO_ORDER[0];
 
 /** 用 h 守到黎明：解锁下一个人物，返回新解锁的人物（没有就是 null） */
 export function unlockNextHero(h: string): string | null {

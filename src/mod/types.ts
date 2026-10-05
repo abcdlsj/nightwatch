@@ -1,0 +1,55 @@
+/* 模组包的结构。一个模组是 mods/<名字>/index.ts 默认导出的一个 ModPack。
+ * 数据和文字写在一起（模组只写一种语言就行）；字段含义见 docs/modding.md。 */
+import type { ItemDef, RelicDef, TalentDef, EnemyDef, HeroDef, KitDef } from '../data/types';
+import type { PathDef } from '../data/heroes';
+import type { CardHook, X } from '../sim/hooks';
+
+/** 新人物：基本数据 + 起手套 + 流派 + 剧情 */
+export interface ModHero {
+  def: HeroDef;
+  kits: KitDef[];
+  paths: PathDef[];
+  /** 人物剧情，结构和 src/locales/zh-CN/story/ayla.ts 一样，可以只写一部分 */
+  story?: Record<string, any>;
+}
+
+export interface ModPack {
+  /** 模组的唯一名字（英文、数字、短横线） */
+  id: string;
+  /** 显示在工坊里的名字 */
+  name: string;
+  author?: string;
+  version?: string;
+  /** 一句话介绍 */
+  desc?: string;
+  /** 允许用同名的东西覆盖原版（默认不允许，重名会报错跳过） */
+  override?: boolean;
+  /** 像素图：名字 → 字母矩阵（字母见 src/data/art/palette.ts，'.' 是透明） */
+  sprites?: Record<string, string[]>;
+  cards?: Record<string, ItemDef>;
+  relics?: Record<string, RelicDef>;
+  talents?: Record<string, TalentDef>;
+  /** 敌人和首领；首领写 boss: 1、fixed: 1，再写 final: 1 就会进第九夜的轮换 */
+  enemies?: Record<string, EnemyDef>;
+  heroes?: Record<string, ModHero>;
+  /** 剧情里的说话人：头像（像素图名字）、颜色、名字 */
+  voices?: Record<string, { img: string; c: string; n: string }>;
+  /** 公共剧情的补充（新首领的当夜剧情、台词、黎明第一句……），按 src/locales/zh-CN/story.ts 的结构合并 */
+  story?: Record<string, any>;
+  /** 写代码的效果（fork 之后可以随便写）：卡牌、遗物、天赋的触发钩子 */
+  hooks?: {
+    cards?: Record<string, CardHook>;
+    relics?: Record<string, Record<string, (n: number, x: X) => void>>;
+    talents?: Record<string, Record<string, (x: X) => void>>;
+  };
+}
+
+/** 加载结果：哪些模组生效了、哪些东西有问题被跳过了 */
+export interface ModReport {
+  id: string;
+  name: string;
+  author?: string;
+  desc?: string;
+  added: Record<string, number>;
+  errors: string[];
+}

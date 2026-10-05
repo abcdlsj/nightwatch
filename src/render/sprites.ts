@@ -76,4 +76,11 @@ export function spr(spec: string): Sprite {
   return (cache[spec] = new Sprite(rows));
 }
 export const hasSpr = (k: string) => !!ROWS[k];
+/** 模组加的像素图（同名覆盖） */
+export function addSprites(more: Record<string, string[]>) {
+  for (const k in more) {
+    ROWS[k] = more[k];
+    delete cache[k];
+  }
+}
 export const icon = spr;

@@ -1,5 +1,5 @@
 """字体子集化：只保留游戏里用到的字，生成 public/fonts/*.woff2，并记下收录的字到 tools/font-chars.txt。
-改了文案、出现新汉字后跑一次：npm run fonts（屏幕上的字都在 src/locales 和 index.html 里）
+改了文案、出现新汉字后跑一次：npm run fonts（屏幕上的字都在 src/locales、mods 和 index.html 里）
 需要 fonttools 和 brotli（pip install fonttools brotli）。源字体来自 google/fonts 和 npm 上的 @fontsource/fusion-pixel-12px-proportional-sc（都是 OFL 授权），不存在时自动下载到 tools/.fontsrc/。"""
 import os, re, subprocess, urllib.request
 ROOT=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
@@ -20,8 +20,10 @@ def fetch(path,dst):
   open(dst,'wb').write(tf.extractfile('package/'+inner).read())
 def game_chars():
   s=set(open(os.path.join(ROOT,'index.html'),encoding='utf-8').read())
-  for d,_,fs in os.walk(os.path.join(ROOT,'src','locales')):
-    for f in fs: s|=set(re.sub(r'/\*[\s\S]*?\*/','',open(os.path.join(d,f),encoding='utf-8').read()))
+  for top in (('src','locales'),('mods',)):
+    for d,_,fs in os.walk(os.path.join(ROOT,*top)):
+      for f in fs:
+        if f.endswith('.ts'): s|=set(re.sub(r'/\*[\s\S]*?\*/','',open(os.path.join(d,f),encoding='utf-8').read()))
   return ''.join(sorted(c for c in s if ord(c)>0x7f))
 def main():
   os.makedirs(SRC,exist_ok=True); os.makedirs(OUT,exist_ok=True)

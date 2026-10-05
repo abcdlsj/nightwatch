@@ -9,6 +9,8 @@ import { stats, setCarry } from '../../game/cards';
 import { makeOffer } from '../../game/loot';
 import { acquireState } from '../../game/prep';
 import { pathsOf, pathOpen } from '../../game/unlocks';
+import { jumpNights } from '../../game/plan';
+import { HEROES } from '../../data/heroes';
 import { SFX } from '../../audio/sfx';
 import { FX } from '../../render/overlay';
 import { restart } from '../../ui/dom';
@@ -16,8 +18,6 @@ import { elOf, renderOwned, repaint } from '../../ui/card-view';
 import { toast } from '../../ui/hud';
 import { afterChange, afterMerge, finishStep } from './actions';
 
-/** 哪几夜之前有跃迁事件 */
-export const JUMP_NIGHTS = [3, 5, 7];
 
 type Opt = { card?: Card; ico?: string; label: string; sub: string; act: () => void };
 
@@ -48,7 +48,7 @@ function gift(filter: (it: (typeof ITEMS)[string]) => boolean, up: number) {
 }
 
 /** 每个人物的跃迁事件：标题、开场白、提示、选项 */
-const JUMPS: Record<string, () => { opts: Opt[] }> = {
+export const JUMPS: Record<string, () => { opts: Opt[] }> = {
   /* 艾拉「点将」：立一张输出卡为 C 位并加成长；或者要一张流派卡 */
   ayla: () => {
     const n = 4 + G.round;
@@ -59,7 +59,7 @@ const JUMPS: Record<string, () => { opts: Opt[] }> = {
         c.grow = (c.grow || 0) + n;
         repaint(c);
       } }));
-    const open = pathsOf('ayla').filter((p) => pathOpen('ayla', p));
+    const open = pathsOf(G.hero).filter((p) => pathOpen(G.hero, p));
     for (const p of open.slice(-1))
       opts.push({ ico: 'oathsword', label: t('jump.ayla.path', { p: p.n }), sub: L.ui.jump.ayla.pathSub, act: () => {
         gift((it) => p.cards.some((k) => ITEMS[k] === it), 1);
@@ -90,8 +90,8 @@ const JUMPS: Record<string, () => { opts: Opt[] }> = {
         if (c.tier < 3) c.tier++;
         repaint(c);
         restart(elOf(c), 'merge');
-        const p = pathsOf('ying').find((x) => x.cards.includes(c.key) && pathOpen('ying', x));
-        gift((it) => it.size === 1 && it.hero === 'ying' && (!p || p.cards.some((k) => ITEMS[k] === it)), 0);
+        const p = pathsOf(G.hero).find((x) => x.cards.includes(c.key) && pathOpen(G.hero, x));
+        gift((it) => it.size === 1 && it.hero === G.hero && (!p || p.cards.some((k) => ITEMS[k] === it)), 0);
         afterMerge();
       } })),
     };
@@ -110,7 +110,7 @@ JUMPS.jun = () => {
       G.wallMax += n;
       G.wall += n;
     } }));
-  for (const p of pathsOf('jun').filter((x) => pathOpen('jun', x)).slice(-1))
+  for (const p of pathsOf(G.hero).filter((x) => pathOpen(G.hero, x)).slice(-1))
     opts.push({ ico: 'cannon', label: t('jump.jun.path', { p: p.n }), sub: L.ui.jump.jun.pathSub, act: () => {
       gift((it) => p.cards.some((k) => ITEMS[k] === it), 1);
     } });
@@ -133,11 +133,13 @@ JUMPS.li = () => {
   return { opts };
 };
 
-export const hasJump = () => JUMP_NIGHTS.includes(G.round) && !G.endless && !!JUMPS[G.hero];
+/** 这个人物用哪一套跃迁（模组人物可以借用五个人物的玩法） */
+const jumpOf = () => HEROES[G.hero]?.jump || G.hero;
+export const hasJump = () => jumpNights().includes(G.round) && !G.endless && !!JUMPS[jumpOf()];
 
 export function startJump(): PrepStop {
-  const J = (L.ui.jump as any)[G.hero];
-  const { opts } = JUMPS[G.hero]();
+  const J = (L.ui.jump as any)[jumpOf()];
+  const { opts } = JUMPS[jumpOf()]();
   /* 选完算走完这一站 */
   for (const o of opts) {
     const f = o.act;
