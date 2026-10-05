@@ -115,14 +115,14 @@ export const ARCHS: Record<string, Arch> = {
   },
   bulwark: {
     hero: 'jun',
-    board: [[1, 'palisade'], [1, 'stakes'], [2, 'spikewall'], [3, 'mason'], [4, 'moat']],
+    board: [[1, 'palisade'], [1, 'sling'], [2, 'spikewall'], [3, 'mason'], [4, 'moat']],
     relics: ['blueprint', 'plumb', 'spike', 'medal', 'mortarboard', 'citadel'],
     talents: ['jun_00', 'jun_01', 'jun_10', 'jun_02'],
     carry: ['spikewall', 'moat'],
   },
   scope: {
     hero: 'li',
-    board: [[1, 'starseed'], [1, 'sextant'], [2, 'comet'], [3, 'spyglass'], [4, 'wishstar'], [5, 'northstar']],
+    board: [[1, 'starseed'], [1, 'astrolabe'], [2, 'comet'], [3, 'spyglass'], [4, 'wishstar'], [5, 'northstar']],
     relics: ['telescope', 'starchart', 'compass', 'medal', 'fang', 'polaris'],
     talents: ['li_00', 'li_01', 'li_20', 'li_02'],
     carry: ['comet', 'starseed'],
@@ -143,7 +143,7 @@ export const ARCHS: Record<string, Arch> = {
   },
   lamp: {
     hero: 'ying',
-    board: [[1, 'paperlamp'], [1, 'lamps'], [2, 'firefly'], [2, 'marquee'], [3, 'oilpot'], [4, 'skylantern']],
+    board: [[1, 'oilspill'], [1, 'lamps'], [2, 'firefly'], [2, 'marquee'], [3, 'oilpot'], [4, 'skylantern']],
     relics: ['jarflies', 'oilcan', 'tinder', 'medal', 'lampbook', 'pocketwatch'],
     talents: ['ying_00', 'ying_01', 'quick', 'ying_02'],
   },

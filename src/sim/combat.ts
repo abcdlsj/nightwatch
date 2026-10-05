@@ -5,11 +5,11 @@ import { rand, rnd, vr, vrnd } from '../core/rng';
 import { G, type Card } from '../game/state';
 import { mv } from '../game/mods';
 import { TUNE } from '../game/tuning';
-import { boardCards, stepOf, dmgMul, chainOf, chargeAmt, buffAmt, maxAmmo, stats, comboMul, carryCard, type Stats } from '../game/cards';
+import { boardCards, stepOf, dmgMul, chainOf, chargeAmt, buffAmt, maxAmmo, stats, comboMul, carryCard, countKind, kindOf, type Stats } from '../game/cards';
 import { unlock, codexKill } from '../game/meta';
 import { world, K, ex, ey } from './world';
 import { view } from './view';
-import { B, bt, later, emit, front, phased, dist } from './battle';
+import { B, bt, later, emit, front, phased, dist, targets, near } from './battle';
 import { spawn, comboKill } from './enemies';
 import { react, was, streak, ultimate, refOf } from './combo';
 import type { Enemy, Projectile } from './types';
@@ -39,10 +39,12 @@ function fire(c: Card, depth: number) {
   const it = ITEMS[c.key];
   if (c.ammo === 0) return;
   c.bTrig++;
+  let last = false;
   view.cardFx(c, 'pop');
   view.sfx(it.snd || 'fire', it.tag);
   if (c.ammo! > 0) {
     c.ammo!--;
+    last = c.ammo === 0;
     view.cardAmmo(c);
     if (c.ammo === 0 && !b.flags.emptySaid) {
       b.flags.emptySaid = 1;
@@ -60,14 +62,29 @@ function fire(c: Card, depth: number) {
     if (r) later(0.2, () => ultimate(it.tag, r.c, r.ref));
   }
   if (it.dmg > 0) {
-    attack(c, st, depth);
-    for (let i = 1; i < (it.multi || 1); i++)
+    /* 多重：本身的、按某类卡数加的、相邻某类卡加的、被带动时加的 / multicast: its own, plus per card of a type, per adjacent card of a type, and when fired by another card */
+    let m = it.multi || 1;
+    if (it.kindMulti) m += Math.min(4, countKind(it.kindMulti, c));
+    if (it.nbMulti) m += 2 * nb.filter((n) => kindOf(n) === it.nbMulti).length;
+    if (depth > 0 && it.chainMulti) m += it.chainMulti;
+    const sh: Shot = { i: 0, n: m, last };
+    attack(c, st, depth, sh);
+    for (let i = 1; i < m; i++)
       later(0.09 * i, () => {
-        if (!B!.over) attack(c, st, depth);
+        if (!B!.over) attack(c, st, depth, { i, n: m, last });
       });
+    if (it.swing) c.sw = Math.min(10, (c.sw || 0) + 1);
   }
   if (it.stack) c.stk += it.stack;
-  if (it.charge) for (const n of nb) if (!it.chargeKind || ITEMS[n.key].kind === it.chargeKind) chargeCard(n, chargeAmt(c), c);
+  if (it.charge) for (const n of nb) if (!it.chargeKind || ITEMS[n.key].kind === it.chargeKind) chargeCard(n, chargeAmt(c) * (it.chargeBig && n.size === 3 ? 2 : 1), c);
+  if (it.chargeHasted) for (const o of boardCards()) if (o !== c && o.hasteT > 0) chargeCard(o, it.chargeHasted * (1 + 0.25 * stepOf(c)), c);
+  if (it.buffTag)
+    for (const o of boardCards())
+      if (o !== c && ITEMS[o.key].tag === it.buffTag.tag && ITEMS[o.key].dmg > 0) {
+        o.anvil = Math.max(o.anvil || 0, it.buffTag.amt * (1 + 0.2 * stepOf(c)));
+        c.bBf++;
+        view.link(c, o, '#c2f4ff', 0.2);
+      }
   if (it.reload) for (const n of nb) if (!reload(n, it.reload, c) && it.reloadElse) chargeCard(n, it.reloadElse * (1 + 0.25 * stepOf(c)), c);
   if (it.hasteNb) for (const n of nb) haste(n, it.hasteNb * (1 + 0.2 * stepOf(c)), c);
   if (it.hasteKind) for (const o of boardCards()) if (o !== c && ITEMS[o.key].kind === it.hasteKind.kind) haste(o, it.hasteKind.t * (1 + 0.2 * stepOf(c)), c);
@@ -142,8 +159,17 @@ function fire(c: Card, depth: number) {
       view.link(c, n, '#73eff7', 0.25);
     }
   /* 为 C 位服务的辅助卡 / support cards that serve the carry */
-  const cc = it.chargeCarry || it.buffCarry || it.hasteCarry || it.critCarry || it.freezeCarry || it.stackCarry ? carryCard() : null;
+  const cc = it.chargeCarry || it.buffCarry || it.hasteCarry || it.critCarry || it.freezeCarry || it.stackCarry || it.triggerCarry ? carryCard() : null;
   if (cc && cc !== c) {
+    if (it.triggerCarry && depth < 10)
+      later(0.1, () => {
+        if (B!.over) return;
+        view.link(c, cc, '#fee761', 0.25);
+        showChain(depth + 2, c);
+        if (depth + 2 > B!.maxChain) B!.maxChain = depth + 2;
+        c.bTr++;
+        trigger(cc, depth + 1, it.n);
+      });
     if (it.stackCarry) {
       cc.stk += it.stackCarry * (1 + 0.25 * stepOf(c));
       view.link(c, cc, '#c2f4ff', 0.2);
@@ -165,7 +191,6 @@ function fire(c: Card, depth: number) {
   if (c.adj === 'ignite' && c.right) chargeCard(c.right, 0.1, c);
   if (it.shieldGain) addShield(it.shieldGain * (1 + 0.4 * stepOf(c)));
   if (c.adj === 'sturdy') addShield(c.size * (c.tier + 1));
-  if (c.adj === 'momentum') c.mom = Math.min(10, c.mom + 1);
   emit('use', { c, depth });
   for (const n of nb) {
     if (n.adj !== 'echo' || n.frozen > 0) continue;
@@ -188,6 +213,7 @@ function fire(c: Card, depth: number) {
 export function chargeCard(c: Card, amt: number, from?: Card | null) {
   if (c.frozen > 0) return;
   c.charge = Math.min(1.5, c.charge + amt);
+  if (from && from !== c) c.chN = (c.chN || 0) + 1;
   if (from && from !== c && from.bSrc) from.bCh += amt;
   if (from) view.link(from, c, '#ffa53b', 0.16);
   emit('charge', { c, from });
@@ -226,13 +252,50 @@ function showChain(n: number, c: Card) {
 type HitMods = { rx?: number; slow?: number; kb?: number; freeze?: number; vuln?: [number, number] | null; exec?: number; burnDur?: number; poisonDur?: number; burn?: number; poison?: number; pen?: number; splash?: number; burnTick?: number; poisonTick?: number };
 
 
-function attack(c: Card, st: Stats, depth = 0) {
+/** 多重里的第几下、共几下、是不是最后一发弹药 / which hit of the multicast, how many in total, and whether this is the last round of ammo */
+type Shot = { i: number; n: number; last: boolean };
+
+/** 按卡的选目标方式挑目标 / pick a target by the card's targeting rule */
+function pickTarget(it: (typeof ITEMS)[string]): Enemy | null {
+  if (!it.target) return front();
+  const ts = targets();
+  if (!ts.length) return null;
+  switch (it.target) {
+    case 'hp':
+      return ts.reduce((m, e) => (e.hp > m.hp ? e : m));
+    case 'back':
+      return ts.reduce((m, e) => (e.y < m.y ? e : m));
+    case 'rand':
+      return ts[Math.floor(rand() * ts.length)];
+    case 'elite':
+      return ts.find((e) => e.d.elite || e.d.boss) || front();
+    case 'burning':
+      return ts.filter((e) => e.burnT > 0).sort((p, q) => q.y - p.y)[0] || front();
+    case 'dense': {
+      const R = 22 * K();
+      let best = ts[0],
+        bn = -1;
+      for (const e of ts) {
+        let n = 0;
+        for (const o of ts) if (Math.hypot(ex(o) - ex(e), ey(o) - ey(e)) <= R) n++;
+        if (n > bn) {
+          bn = n;
+          best = e;
+        }
+      }
+      return best;
+    }
+  }
+  return front();
+}
+
+function attack(c: Card, st: Stats, depth = 0, shot: Shot = { i: 0, n: 1, last: false }) {
   const b = bt();
   const it = ITEMS[c.key];
-  const t = front();
+  const t = pickTarget(it);
   if (!t) return;
   /* 失星的星蚀：打不出暴击 / the Lost Star's eclipse: no crits */
-  const crit = (rand() < st.crit || !!c.sure) && !(b.flags.eclipseT > b.t);
+  const crit = (rand() < st.crit || !!c.sure || (!!it.lastCrit && shot.i === shot.n - 1)) && !(b.flags.eclipseT > b.t);
   c.sure = false;
   const sh = it.shieldDmg ? Math.min(b.shield, TUNE.shieldDmgCap) * it.shieldDmg * dmgMul(c) * (st.total / Math.max(1, st.base + st.flat)) : 0;
   let dmg = (st.total + sh) * (crit ? 2 + mv('critDmg') : 1) * comboMul(depth);
@@ -244,17 +307,125 @@ function attack(c: Card, st: Stats, depth = 0) {
   }
   /* 被别的卡带动出手（艾拉的军令） / fired by another card (Ayla's command) */
   if (depth > 0 && it.onChain) dmg *= 1 + it.onChain;
-  const mods: HitMods = { slow: c.adj === 'chill' ? 0.3 : 0, kb: c.adj === 'heavy' ? 0.035 : 0, freeze: Math.max(it.freeze || 0, c.frostNext || 0), vuln: it.vuln || null, exec: it.exec || 0, burnDur: it.burnDur || 0, poisonDur: it.poisonDur || 0, pen: it.pen || 0 };
+  if (it.hasteMul && c.hasteT > 0) dmg *= 1 + it.hasteMul;
+  if (it.multiRamp) dmg *= 1 + it.multiRamp * shot.i;
+  if (it.lastShot && shot.last) dmg *= 1 + it.lastShot;
+  /* 看场面的乘区：敌人多少、身上带着什么状态 / situational multipliers: how many enemies, and what statuses they carry */
+  if (it.crowd || it.perBurning || it.perPoisoned || it.perSlowed || it.perFrozen) {
+    const ts = targets();
+    const cnt = (f: (e: Enemy) => boolean) => Math.min(12, ts.filter(f).length);
+    if (it.crowd) dmg *= 1 + it.crowd * Math.min(12, ts.length);
+    if (it.perBurning) dmg *= 1 + it.perBurning * cnt((e) => e.burnT > 0);
+    if (it.perPoisoned) dmg *= 1 + it.perPoisoned * cnt((e) => e.poisonT > 0);
+    if (it.perSlowed) dmg *= 1 + it.perSlowed * cnt((e) => e.slowT > 0 || e.frzT > 0);
+    if (it.perFrozen) dmg *= 1 + it.perFrozen * cnt((e) => e.frzT > 0);
+  }
+  /* 交替出手：单数次点燃，双数次减速 / alternating shots: odd shots ignite, even shots slow */
+  let useBurn = !!it.burn,
+    useSlow = it.slow || 0;
+  if (it.alt) {
+    c.alt = (c.alt || 0) + 1;
+    if (c.alt % 2) useSlow = 0;
+    else {
+      useBurn = false;
+      useSlow = useSlow || 0.35;
+    }
+  }
+  /* 元素词缀：炽热、寒霜、剧毒、雷鸣 / element affixes: Fiery, Frosty, Toxic, Thunder */
+  const at = (c.adj && ADJ[c.adj]?.tag) || '';
+  const mods: HitMods = { slow: at === 'ice' ? 0.3 : 0, kb: c.adj === 'heavy' ? 0.035 : 0, freeze: Math.max(it.freeze || 0, c.frostNext || 0), vuln: it.vuln || null, exec: (it.exec || 0) + (it.execGrow ? Math.min(it.execGrow, Math.floor(b.kills / 10) * 0.01) : 0), burnDur: it.burnDur || 0, poisonDur: it.poisonDur || 0, pen: (it.pen || 0) + (it.armorMul ? 99 : 0) };
+  if (at === 'fire') mods.burn = Math.max(1, st.total * 0.15);
+  if (at === 'poison') mods.poison = Math.max(1, st.total * 0.12);
   c.frostNext = 0;
   const bm = crit && it.critBurn ? it.critBurn : 1;
   const W = world.W,
     H = world.H;
   const o = { x: c.ox, y: H + 3 };
-  const A = (it.aoe || 0) * K() * (1 + mv('aoe'));
-  const H_ = (e: Enemy, m?: number, extra?: HitMods | null) =>
-    hurt(e, dmg * (m || 1) * (it.frozenMul && e.frzT > 0 ? it.frozenMul : 1) * (it.burnMul && e.burnT > 0 ? it.burnMul : 1), c, crit, Object.assign({}, mods, extra || {}));
-  const burnAmt = () => it.burn! * dmgMul(c) * (1 + mv('burn'));
-  const poisonAmt = () => it.poison! * dmgMul(c) * (1 + mv('poison'));
+  const A = (it.aoe || 0) * K() * (1 + mv('aoe')) * (it.aoeKind ? 1 + it.aoeKind.pct * countKind(it.aoeKind.kind) : 1);
+  const burnAmt = () => (useBurn ? (it.burn || 0) * dmgMul(c) * (1 + mv('burn')) : 0);
+  const poisonAmt = () => (it.poison || 0) * dmgMul(c) * (1 + mv('poison'));
+  const hitMul = (e: Enemy) => {
+    let m = (it.frozenMul && e.frzT > 0 ? it.frozenMul : 1) * (it.burnMul && e.burnT > 0 ? it.burnMul : 1);
+    if (it.bossMul && (e.d.elite || e.d.boss)) m *= 1 + it.bossMul;
+    if (it.wallNear) m *= 1 + it.wallNear * Math.min(1, Math.max(0, (e.y - 0.4) / 0.5));
+    if (it.far) m *= 1 + it.far * Math.min(1, Math.max(0, (0.9 - e.y) / 0.7));
+    if (it.armorMul) m *= 1 + it.armorMul * Math.max(0, e.armor + e.armorB);
+    return m;
+  };
+  let first = true;
+  const H_ = (e: Enemy, m?: number, extra?: HitMods | null) => {
+    const ex0 = Object.assign({}, mods, extra || {});
+    if (useSlow && !ex0.slow) ex0.slow = useSlow;
+    /* 命中前的状态决定的效果 / effects decided by statuses before the hit */
+    if ((it.slowFrz || at === 'ice') && (e.slowT > 0 || e.frzT > 0)) ex0.freeze = Math.max(ex0.freeze || 0, it.slowFrz || 0.4);
+    if (it.burnExtend && e.burnT > 0) e.burnT = Math.min(12, e.burnT + it.burnExtend);
+    if (it.burnSlow && (ex0.burn || e.burnT > 0)) ex0.slow = Math.max(ex0.slow || 0, it.burnSlow);
+    if (it.burnPop && e.burnT > 0) {
+      const pop = e.burnD * e.burnT * it.burnPop;
+      e.burnT *= 1 - it.burnPop;
+      view.ring(ex(e), ey(e) - 6, 2, 12 * K(), '#ff7a2a', 0.3);
+      hurt(e, pop, c, false, { burnTick: 1 });
+      if (e.dead) return;
+    }
+    if (it.armorShred && e.poisonT > 0) e.armorB = Math.max(-5 - e.armor, e.armorB - it.armorShred);
+    const hp0 = e.hp;
+    const amt = dmg * (m || 1) * hitMul(e);
+    hurt(e, amt, c, crit, ex0);
+    const isFirst = first && e === t;
+    if (isFirst) first = false;
+    if (e.dead) {
+      /* 溢出：多出来的伤害劈给身后最近的敌人 / overflow: excess damage cleaves into the nearest enemy behind */
+      if (it.overkill && amt > hp0) {
+        const n = b.en.filter((x) => !x.dead && x.y <= e.y + 0.02 && Math.hypot(ex(x) - ex(e), ey(x) - ey(e)) <= 40 * K()).sort((p, q) => dist(p, e) - dist(q, e))[0];
+        if (n) {
+          view.bolt([[ex(e), ey(e) - 5], [ex(n), ey(n) - 5]], '#ff5a5a', 0.14, true);
+          hurt(n, (amt - hp0) * it.overkill, c, false, { rx: 1, splash: 1 });
+        }
+      }
+    } else {
+      if (it.burnStack) {
+        e.burnD += it.burnStack * dmgMul(c) * (1 + mv('burn'));
+        e.burnT = Math.max(e.burnT, 3);
+        e.burnSrc = c;
+      }
+      if (it.slowStack) {
+        e.slowT = 2;
+        e.slowA = Math.min(0.6, e.slowA + it.slowStack * (e.d.boss ? 0.5 : 1));
+      }
+      if (it.poisonX && e.poisonT > 0) e.poisonD = Math.min(e.poisonD * it.poisonX, e.poisonD + 50 * dmgMul(c));
+      if (it.poisonBurst && e.poisonD >= it.poisonBurst) {
+        const bu = e.poisonD * e.poisonT * 0.5;
+        e.poisonT *= 0.5;
+        view.ring(ex(e), ey(e) - 6, 2, 12 * K(), '#7ddc5f', 0.3);
+        hurt(e, bu, c, false, { poisonTick: 1 });
+      }
+    }
+    if (!isFirst) return;
+    /* 回旋：飞回来再打旁边另一个 / boomerang: fly back and hit another nearby enemy */
+    if (it.boomer)
+      later(0.15, () => {
+        if (B!.over) return;
+        const n = near(e, 40 * K())[0];
+        if (n) {
+          view.bolt([[ex(e), ey(e) - 5], [ex(n), ey(n) - 5]], '#dfe6ee', 0.12, true);
+          hurt(n, amt * it.boomer!, c, crit, Object.assign({}, mods));
+        }
+      });
+    /* 雷鸣：再跳一个敌人 / Thunder: arc to one more enemy */
+    if (at === 'volt' && it.fx !== 'bolt') {
+      const n = near(e, 50 * K())[0];
+      if (n) {
+        view.bolt([[ex(e), ey(e) - 5], [ex(n), ey(n) - 5]], '#fee761', 0.14);
+        hurt(n, amt * 0.5, c, false, Object.assign({}, mods, { splash: 1 }));
+        emit('bounce', { e: n, src: c });
+      }
+    }
+  };
+  /** 留一块地面效果 / leave a patch of ground effect */
+  const zoneAt = (x: number, y: number) => {
+    if (!it.zone) return;
+    (b.zones ||= []).push({ x, y, r: it.zone[1] * K(), t: it.zone[0], next: 0.5, dmg: dmg * 0.2, src: c, burn: burnAmt() || undefined, poison: it.poison ? poisonAmt() : undefined, slow: useSlow || undefined, col: it.poison ? '#7ddc5f' : useBurn ? '#ef7d57' : '#73eff7' });
+  };
   const inR = (x: number, y: number, R: number, fn: (e: Enemy) => void) => {
     for (const en of b.en) if (!en.dead && Math.hypot(ex(en) - x, ey(en) - y) <= R) fn(en);
   };
@@ -277,7 +448,7 @@ function attack(c: Card, st: Stats, depth = 0) {
       proj(o, t, { spd: 320, kind: 'knife' }, (e) => H_(e!));
       break;
     case 'firefly': {
-      const ts = b.en.filter((e) => !e.dead && e.y >= world.range && !phased(e)).sort((a, z) => z.y - a.y).slice(0, 3);
+      const ts = b.en.filter((e) => !e.dead && e.y >= world.range && !phased(e)).sort((a, z) => z.y - a.y).slice(0, it.kindShots ? 2 + Math.min(3, countKind(it.kindShots, c)) : 3);
       ts.forEach((e, i) =>
         later(i * 0.06, () => {
           if (B!.over) return;
@@ -320,6 +491,7 @@ function attack(c: Card, st: Stats, depth = 0) {
           view.ring(x0, y0, 3, A * 1.2, '#fee761', 0.5);
           view.shake(5);
           inR(x0, y0, A, (en) => H_(en, 1, { burn: burnAmt() }));
+          zoneAt(x0, y0);
         },
       });
       break;
@@ -338,6 +510,11 @@ function attack(c: Card, st: Stats, depth = 0) {
       for (let i = 0; i < 40; i++) view.part(vrnd(0, W), vrnd(world.top, H * 0.9), vrnd(-50, -20), vrnd(10, 40), vrnd(0.4, 0.8), vr() < 0.5 ? '#f4f4f4' : '#73eff7', 1);
       for (const en of b.en) if (!en.dead && en.y >= world.range) H_(en, 1, { slow: it.slow });
       break;
+    case 'rain':
+      view.ring(W / 2, H * 0.5, 4, W * 0.6, '#a7f070', 0.45);
+      for (let i = 0; i < 30; i++) view.part(vrnd(0, W), vrnd(world.top, H * 0.8), vrnd(-8, 8), vrnd(40, 80), vrnd(0.3, 0.6), vr() < 0.5 ? '#7ddc5f' : '#a7f070', 1);
+      for (const en of targets()) H_(en, 1, { poison: poisonAmt() });
+      break;
     case 'spark':
       proj(o, t, { spd: 230, kind: 'spark' }, (e) => H_(e!, 1, { burn: burnAmt() * bm }));
       break;
@@ -349,6 +526,7 @@ function attack(c: Card, st: Stats, depth = 0) {
         view.boom(x!, y!, A, '#7ddc5f');
         view.ring(x!, y!, 2, A * 0.7, '#a7f070', 0.4);
         inR(x!, y!, A, (en) => H_(en, 1, it.poison ? { poison: poisonAmt() } : null));
+        zoneAt(x!, y!);
       });
       break;
     case 'fslash': {
@@ -374,7 +552,7 @@ function attack(c: Card, st: Stats, depth = 0) {
         const beh = b.en
           .filter((x) => !x.dead && x !== e && x.y < e.y && Math.abs(ex(x) - ex(e)) < 26 * K())
           .sort((a, z) => z.y - a.y)
-          .slice(0, it.pierce);
+          .slice(0, it.pierce || 0);
         let prev = e;
         beh.forEach((x, i) => {
           const p0 = prev;
@@ -389,7 +567,9 @@ function attack(c: Card, st: Stats, depth = 0) {
       break;
     case 'bolt': {
       const list = [t];
-      while (list.length < 1 + chainOf(c)) {
+      let want = 1 + chainOf(c) + (at === 'volt' ? 1 : 0) + (it.killChain ? Math.floor(b.kills / it.killChain) : 0);
+      if (it.chainCrowd) want = Math.max(2, Math.min(it.chainCrowd, targets().length));
+      while (list.length < want) {
         const last = list[list.length - 1];
         let best: Enemy | null = null,
           bd = 70 * K();
@@ -407,17 +587,24 @@ function attack(c: Card, st: Stats, depth = 0) {
       const pts: [number, number][] = [[o.x, H]];
       list.forEach((e) => pts.push([ex(e), ey(e) - 5]));
       view.bolt(pts, it.tag === 'volt' ? '#fee761' : '#fff', 0.16);
+      /* 弹得越少伤害越高（彗星） / fewer bounces deal more (Comet) */
+      const few = it.fewHit ? 1 + it.fewHit * Math.max(0, want - list.length) : 1;
       list.forEach((e, i) => {
+        if (i && it.bouncePoison && e.poisonT > 0) e.poisonD += it.bouncePoison * dmgMul(c);
         /* 第一跳 60%，之后每跳递减：叠再多弹跳次数，总收益也有上限 / first hop 60%, decaying per hop after: stacking more bounces has a capped total payoff */
-        H_(e, i ? TUNE.bounceFirst * Math.pow(TUNE.bounceDecay, i - 1) : 1);
-        if (i) emit('bounce', { e, src: c });
+        H_(e, few * (i ? TUNE.bounceFirst * Math.pow(TUNE.bounceDecay, i - 1) : 1));
+        if (i) {
+          emit('bounce', { e, src: c });
+          if (it.bounceCharge) for (const n of c.nb || []) chargeCard(n, it.bounceCharge, c);
+        }
       });
       break;
     }
     case 'shell':
       proj(o, t, { spd: 0, kind: 'shell', arc: 1, dur: 0.42 }, (e, x, y) => {
-        view.boom(x!, y!, A, it.slow && !it.burn ? '#73eff7' : '#ef7d57');
-        inR(x!, y!, A, (en) => H_(en, 1, { ...(it.burn ? { burn: burnAmt() } : {}), ...(it.slow ? { slow: it.slow } : {}) }));
+        view.boom(x!, y!, A, useSlow && !useBurn ? '#73eff7' : '#ef7d57');
+        inR(x!, y!, A, (en) => H_(en, 1, { ...(useBurn ? { burn: burnAmt() } : {}), ...(useSlow ? { slow: useSlow } : {}) }));
+        zoneAt(x!, y!);
       });
       break;
     case 'quake': {
@@ -441,6 +628,7 @@ function attack(c: Card, st: Stats, depth = 0) {
       later(0.12, () => {
         view.boom(x, y, A, '#ef7d57');
         inR(x, y, A, (en) => H_(en, 1, { burn: burnAmt() }));
+        zoneAt(x, y);
       });
       break;
     }
@@ -548,6 +736,7 @@ export function hurt(e: Enemy, amt: number, src: Card | null, crit: boolean, o: 
     view.ring(ex(e), ey(e) - 5, 2, 14 * K(), '#ffcd75', 0.3);
   }
   /* 元素反应的追加伤害按已经结算过的那一下算，不再吃易伤和护甲 / reaction bonus damage is based on the already-resolved hit and no longer takes vulnerability or armor into account */
+  if (o.burnTick && e.poisonT > 0 && b.flags.lime) amt *= 1 + b.flags.lime;
   if (!o.rx) {
     if (e.slowT > 0 && mv('slowVuln')) amt *= 1 + mv('slowVuln');
     if (e.vulnT > 0) amt *= 1 + e.vulnA;
@@ -704,7 +893,7 @@ export function kill(e: Enemy, src: Card | null) {
       m.x0 = m.x;
     }
   }
-  if (src && src.adj === 'greedy' && rand() < 0.2) {
+  if (src && src.adj === 'golden' && rand() < 0.15) {
     G.gold++;
     b.greed++;
     view.coins(ex(e), ey(e), 1);

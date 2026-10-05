@@ -174,8 +174,8 @@ export function renderPrep() {
     P.doors.forEach((id) => {
       const e = EVENTS[id];
       const b = document.createElement('button');
-      b.className = 'door cat-' + e.cat;
-      b.innerHTML = `<img src="${icon(e.ico).url}" alt=""><div><b>${e.n}</b><span>${e.d}</span><em>${e.f}</em></div>`;
+      b.className = 'door cat-' + e.cat + ' rar' + (e.rar || 0);
+      b.innerHTML = `<img src="${icon(e.ico).url}" alt=""><div><b>${e.n}${e.rar ? `<i class="rarl">${L.terms.relicGrades[e.rar]}</i>` : ''}</b><span>${e.d}</span><em>${e.f}</em></div>`;
       b.onclick = () => {
         SFX.ensure();
         SFX.play('ui');
@@ -187,7 +187,7 @@ export function renderPrep() {
     if (P.next?.length)
       body.insertAdjacentHTML(
         'beforeend',
-        `<div class="nextstop"><span>${T.nextStop}</span>${P.next.map((id) => `<i class="cat-${EVENTS[id].cat}"><img src="${icon(EVENTS[id].ico).url}" alt="">${EVENTS[id].n}</i>`).join('')}</div>`,
+        `<div class="nextstop"><span>${T.nextStop}</span>${P.next.map((id) => `<i class="cat-${EVENTS[id].cat} rar${EVENTS[id].rar || 0}"><img src="${icon(EVENTS[id].ico).url}" alt="">${EVENTS[id].n}</i>`).join('')}</div>`,
       );
     updateHUD();
     return;

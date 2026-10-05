@@ -53,7 +53,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "rock",
   "kb": 0.04,
   "kind": "weapon",
-  "hero": "jun"
+  "hero": "jun",
+  "slowFrz": 0.3
  },
  "clock": {
   "size": 1,
@@ -73,11 +74,11 @@ export const ITEMS: Record<string, ItemDef> = {
   "t": 1,
   "up": "dmg",
   "cd": 2.4,
-  "dmg": 32,
+  "dmg": 26,
   "fx": "axe",
-  "pen": 4,
   "kind": "weapon",
-  "hero": "ayla"
+  "hero": "ayla",
+  "boomer": 0.6
  },
  "cannon": {
   "size": 2,
@@ -89,7 +90,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "shell",
   "aoe": 22,
   "kind": "firearm",
-  "hero": "jun"
+  "hero": "jun",
+  "target": "dense"
  },
  "frost": {
   "size": 2,
@@ -100,7 +102,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "dmg": 15,
   "fx": "ice",
   "slow": 0.4,
-  "hero": "mo"
+  "hero": "mo",
+  "perSlowed": 0.06
  },
  "tesla": {
   "size": 2,
@@ -112,7 +115,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "bolt",
   "chain": 4,
   "kind": "gadget",
-  "hero": "mo"
+  "hero": "mo",
+  "bounceCharge": 0.03
  },
  "anvil": {
   "size": 2,
@@ -145,7 +149,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "bolt",
   "chain": 6,
   "kind": "sky",
-  "hero": "mo"
+  "hero": "mo",
+  "chainCrowd": 8
  },
  "venom": {
   "size": 1,
@@ -196,7 +201,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "arrow",
   "pierce": 6,
   "hero": "ayla",
-  "kind": "weapon"
+  "kind": "weapon",
+  "far": 0.6
  },
  "vial": {
   "size": 1,
@@ -209,7 +215,9 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 16,
   "burn": 3,
   "hero": "mo",
-  "kind": "potion"
+  "kind": "potion",
+  "alt": 1,
+  "slow": 0.35
  },
  "prism": {
   "size": 2,
@@ -233,7 +241,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 40,
   "burn": 8,
   "hero": "mo",
-  "kind": "sky"
+  "kind": "sky",
+  "crowd": 0.04
  },
  "oilflask": {
   "size": 1,
@@ -246,7 +255,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 14,
   "burn": 3,
   "hero": "ayla",
-  "kind": "potion"
+  "kind": "potion",
+  "burnSlow": 0.2
  },
  "firebrand": {
   "size": 2,
@@ -257,7 +267,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "dmg": 20,
   "fx": "fslash",
   "burn": 4,
-  "hero": "ayla"
+  "hero": "ayla",
+  "burnExtend": 3
  },
  "detonate": {
   "size": 1,
@@ -281,10 +292,7 @@ export const ITEMS: Record<string, ItemDef> = {
   "poison": 3.5,
   "hero": "mo",
   "kind": "potion",
-  "vuln": [
-   2,
-   0.15
-  ]
+  "armorShred": 1
  },
  "plague": {
   "size": 2,
@@ -310,7 +318,11 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 40,
   "poison": 12,
   "hero": "mo",
-  "kind": "potion"
+  "kind": "potion",
+  "zone": [
+   5,
+   30
+  ]
  },
  "emberblade": {
   "size": 1,
@@ -333,9 +345,9 @@ export const ITEMS: Record<string, ItemDef> = {
   "cd": 2.6,
   "dmg": 26,
   "fx": "axe",
-  "pen": 6,
   "hero": "ayla",
-  "kind": "weapon"
+  "kind": "weapon",
+  "armorMul": 0.08
  },
  "arrowrain": {
   "size": 2,
@@ -343,23 +355,13 @@ export const ITEMS: Record<string, ItemDef> = {
   "t": 1,
   "up": "cd",
   "cd": 2.2,
-  "dmg": 14,
-  "fx": "arrow",
-  "pierce": 3,
+  "dmg": 9,
+  "fx": "knife",
   "hero": "ayla",
-  "kind": "weapon"
- },
- "brand": {
-  "size": 1,
-  "tag": "fire",
-  "t": 0,
-  "up": "dmg",
-  "cd": 1.8,
-  "dmg": 3,
-  "fx": "spark",
-  "burn": 4,
-  "hero": "ayla",
-  "burnDur": 6
+  "kind": "weapon",
+  "target": "rand",
+  "multi": 3,
+  "crowd": 0.03
  },
  "whetstone": {
   "size": 1,
@@ -385,7 +387,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "dmg": 40,
   "fx": "slash",
   "hero": "ayla",
-  "kind": "weapon"
+  "kind": "weapon",
+  "overkill": 1
  },
  "flamethrower": {
   "size": 2,
@@ -398,7 +401,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 20,
   "burn": 4,
   "hero": "ayla",
-  "kind": "firearm"
+  "kind": "firearm",
+  "perBurning": 0.08
  },
  "phoenix": {
   "size": 3,
@@ -434,7 +438,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "dmg": 2,
   "fx": "spark",
   "burn": 1,
-  "hero": "ayla"
+  "hero": "ayla",
+  "burnStack": 1
  },
  "executioner": {
   "size": 2,
@@ -445,7 +450,9 @@ export const ITEMS: Record<string, ItemDef> = {
   "dmg": 56,
   "fx": "knife",
   "hero": "ayla",
-  "kind": "weapon"
+  "kind": "weapon",
+  "target": "hp",
+  "bossMul": 0.5
  },
  "oilpit": {
   "size": 2,
@@ -458,7 +465,11 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 26,
   "burn": 5,
   "hero": "ayla",
-  "kind": "firearm"
+  "kind": "firearm",
+  "zone": [
+   4,
+   22
+  ]
  },
  "bloodrage": {
   "size": 1,
@@ -476,12 +487,13 @@ export const ITEMS: Record<string, ItemDef> = {
   "tag": "poison",
   "t": 0,
   "up": "cd",
-  "cd": 0.9,
-  "dmg": 3,
+  "cd": 1.2,
+  "dmg": 1,
   "fx": "sting",
-  "poison": 5.5,
+  "poison": 2,
   "hero": "mo",
-  "kind": "potion"
+  "kind": "potion",
+  "multi": 3
  },
  "snakekiss": {
   "size": 1,
@@ -493,7 +505,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "sting",
   "poison": 5,
   "hero": "mo",
-  "kind": "potion"
+  "kind": "potion",
+  "poisonBurst": 14
  },
  "acidrain": {
   "size": 2,
@@ -501,12 +514,12 @@ export const ITEMS: Record<string, ItemDef> = {
   "t": 1,
   "up": "dmg",
   "cd": 3,
-  "dmg": 7,
-  "fx": "gas",
-  "aoe": 24,
-  "poison": 6,
+  "dmg": 6,
+  "fx": "rain",
+  "poison": 3,
   "hero": "mo",
-  "kind": "potion"
+  "kind": "potion",
+  "perPoisoned": 0.08
  },
  "plagueburst": {
   "size": 2,
@@ -530,7 +543,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "bolt",
   "chain": 1,
   "hero": "mo",
-  "kind": "potion"
+  "kind": "potion",
+  "bouncePoison": 2
  },
  "stormflask": {
   "size": 2,
@@ -542,7 +556,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "bolt",
   "chain": 3,
   "hero": "mo",
-  "kind": "potion"
+  "kind": "potion",
+  "killChain": 20
  },
  "frostvial": {
   "size": 1,
@@ -554,7 +569,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "ice",
   "slow": 0.3,
   "hero": "mo",
-  "kind": "potion"
+  "kind": "potion",
+  "slowFrz": 0.6
  },
  "icebomb": {
   "size": 2,
@@ -567,7 +583,11 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 22,
   "hero": "mo",
   "kind": "potion",
-  "slow": 0.25
+  "slow": 0.25,
+  "zone": [
+   4,
+   20
+  ]
  },
  "concentrate": {
   "size": 2,
@@ -577,9 +597,9 @@ export const ITEMS: Record<string, ItemDef> = {
   "cd": 2.2,
   "dmg": 10,
   "fx": "sting",
-  "poison": 24,
   "hero": "mo",
-  "kind": "potion"
+  "kind": "potion",
+  "poisonX": 2
  },
  "miasma": {
   "size": 3,
@@ -592,7 +612,11 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 44,
   "poison": 32,
   "hero": "mo",
-  "kind": "potion"
+  "kind": "potion",
+  "aoeKind": {
+   "kind": "potion",
+   "pct": 0.1
+  }
  },
  "resonate": {
   "size": 1,
@@ -620,7 +644,11 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 34,
   "burn": 7,
   "hero": "mo",
-  "kind": "sky"
+  "kind": "sky",
+  "buffTag": {
+   "tag": "ice",
+   "amt": 0.4
+  }
  },
  "quicklime": {
   "size": 1,
@@ -632,7 +660,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "sting",
   "poison": 4,
   "hero": "mo",
-  "kind": "potion"
+  "kind": "potion",
+  "limeBurn": 0.5
  },
  "firefly": {
   "size": 1,
@@ -643,7 +672,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "dmg": 5,
   "fx": "firefly",
   "hero": "ying",
-  "kind": "lamp"
+  "kind": "lamp",
+  "kindShots": "lamp"
  },
  "musicbox": {
   "local": 1,
@@ -668,7 +698,11 @@ export const ITEMS: Record<string, ItemDef> = {
   "dmg": 66,
   "fx": "sweep",
   "hero": "ying",
-  "kind": "gadget"
+  "kind": "gadget",
+  "swing": [
+   0.25,
+   0.05
+  ]
  },
  "oilspill": {
   "size": 1,
@@ -704,28 +738,13 @@ export const ITEMS: Record<string, ItemDef> = {
   "t": 2,
   "up": "mix",
   "cd": 4,
-  "dmg": 34,
+  "dmg": 20,
   "fx": "meteor",
   "aoe": 36,
   "burn": 8,
   "hero": "ying",
-  "kind": "lamp"
- },
- "paperlamp": {
-  "size": 1,
-  "tag": "fire",
-  "t": 0,
-  "up": "dmg",
-  "cd": 1.4,
-  "dmg": 5,
-  "fx": "spark",
-  "burn": 2,
-  "hero": "ying",
   "kind": "lamp",
-  "per": {
-   "kind": "lamp",
-   "pct": 0.15
-  }
+  "kindMulti": "lamp"
  },
  "gear": {
   "size": 1,
@@ -736,7 +755,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "dmg": 7,
   "fx": "knife",
   "hero": "ying",
-  "kind": "weapon"
+  "kind": "weapon",
+  "hasteMul": 1
  },
  "windup": {
   "size": 1,
@@ -765,14 +785,17 @@ export const ITEMS: Record<string, ItemDef> = {
  },
  "paperkite": {
   "size": 2,
-  "tag": "mech",
+  "tag": "fire",
   "t": 1,
   "up": "cd",
   "cd": 2.4,
   "dmg": 7,
-  "fx": "firefly",
+  "fx": "shell",
   "hero": "ying",
-  "kind": "lamp"
+  "kind": "lamp",
+  "target": "dense",
+  "aoe": 18,
+  "burn": 2
  },
  "lamplight": {
   "size": 2,
@@ -785,7 +808,11 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 20,
   "burn": 3,
   "hero": "ying",
-  "kind": "lamp"
+  "kind": "lamp",
+  "lineKind": {
+   "kind": "lamp",
+   "pct": 0.3
+  }
  },
  "clockwork": {
   "size": 2,
@@ -793,11 +820,11 @@ export const ITEMS: Record<string, ItemDef> = {
   "t": 1,
   "up": "dmg",
   "cd": 2.2,
-  "dmg": 26,
+  "dmg": 14,
   "fx": "arrow",
-  "pierce": 1,
   "hero": "ying",
-  "kind": "weapon"
+  "kind": "weapon",
+  "kindMulti": "gadget"
  },
  "beacon": {
   "size": 3,
@@ -835,7 +862,9 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "fslash",
   "burn": 3,
   "hero": "ying",
-  "kind": "lamp"
+  "kind": "lamp",
+  "target": "burning",
+  "burnPop": 0.5
  },
  "mainspring": {
   "size": 3,
@@ -846,7 +875,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "dmg": 40,
   "fx": "sweep",
   "hero": "ying",
-  "kind": "gadget"
+  "kind": "gadget",
+  "perCharged": 0.08
  },
  "skylantern": {
   "size": 2,
@@ -859,7 +889,11 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 24,
   "burn": 4,
   "hero": "ying",
-  "kind": "lamp"
+  "kind": "lamp",
+  "zone": [
+   5,
+   20
+  ]
  },
  "toolbox": {
   "size": 1,
@@ -899,7 +933,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "ice",
   "slow": 0,
   "freeze": 1,
-  "hero": "li"
+  "hero": "li",
+  "target": "elite"
  },
  "rime": {
   "size": 2,
@@ -965,7 +1000,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "bolt",
   "chain": 4,
   "noPool": 1,
-  "hero": "mo"
+  "hero": "mo",
+  "stack": 1
  },
  "headxbow": {
   "size": 2,
@@ -978,7 +1014,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "pierce": 3,
   "ammo": 3,
   "kind": "weapon",
-  "hero": "ayla"
+  "hero": "ayla",
+  "target": "elite"
  },
  "armorer": {
   "size": 1,
@@ -1003,7 +1040,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "knife",
   "multi": 3,
   "kind": "firearm",
-  "hero": "ying"
+  "hero": "ying",
+  "lastCrit": 1
  },
  "smokebomb": {
   "size": 1,
@@ -1020,18 +1058,6 @@ export const ITEMS: Record<string, ItemDef> = {
   ],
   "kind": "potion",
   "hero": "mo"
- },
- "guillotine": {
-  "size": 3,
-  "tag": "blade",
-  "t": 2,
-  "up": "dmg",
-  "cd": 5,
-  "dmg": 40,
-  "fx": "axe",
-  "exec": 0.2,
-  "kind": "gadget",
-  "hero": "ayla"
  },
  "honeblade": {
   "grow": 1,
@@ -1251,7 +1277,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 14,
   "multi": 3,
   "kind": "firearm",
-  "hero": "ying"
+  "hero": "ying",
+  "multiRamp": 0.3
  },
  "wickcut": {
   "size": 1,
@@ -1261,9 +1288,9 @@ export const ITEMS: Record<string, ItemDef> = {
   "cd": 3,
   "dmg": 0,
   "fx": "none",
-  "hasteNb": 2,
   "kind": "gadget",
-  "hero": "ying"
+  "hero": "ying",
+  "chargeHasted": 0.2
  },
  "lamps": {
   "grow": 1,
@@ -1338,7 +1365,7 @@ export const ITEMS: Record<string, ItemDef> = {
   "pierce": 1,
   "kind": "weapon",
   "hero": "ayla",
-  "onChain": 0.6
+  "chainMulti": 2
  },
  "rocket": {
   "size": 1,
@@ -1367,7 +1394,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "burn": 2,
   "kind": "firearm",
   "hero": "ying",
-  "ammo": 3
+  "ammo": 3,
+  "lastShot": 2
  },
  "matchbox": {
   "size": 1,
@@ -1422,7 +1450,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "none",
   "charge": 0.2,
   "kind": "gadget",
-  "hero": "jun"
+  "hero": "jun",
+  "chargeBig": 1
  },
  "bigcannon": {
   "size": 3,
@@ -1484,9 +1513,9 @@ export const ITEMS: Record<string, ItemDef> = {
   "cd": 1.2,
   "dmg": 7,
   "fx": "knife",
-  "slow": 0.2,
   "kind": "weapon",
-  "hero": "jun"
+  "hero": "jun",
+  "slowStack": 0.12
  },
  "watchtower": {
   "size": 2,
@@ -1511,7 +1540,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "bell",
   "shieldGain": 5,
   "kind": "gadget",
-  "hero": "jun"
+  "hero": "jun",
+  "shieldDmg": 0.3
  },
  "powderkeg": {
   "size": 1,
@@ -1592,7 +1622,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "bolt",
   "chain": 4,
   "kind": "sky",
-  "hero": "li"
+  "hero": "li",
+  "fewHit": 0.5
  },
  "starseed": {
   "size": 1,
@@ -1603,20 +1634,20 @@ export const ITEMS: Record<string, ItemDef> = {
   "dmg": 8,
   "fx": "ice",
   "slow": 0.25,
-  "hero": "li"
+  "hero": "li",
+  "grow": 1
  },
  "orrery": {
   "size": 2,
   "tag": "mech",
   "t": 2,
   "up": "cd",
-  "cd": 3,
+  "cd": 4,
   "dmg": 0,
   "fx": "none",
-  "chargeCarry": 0.6,
-  "buffCarry": 0.3,
   "kind": "gadget",
-  "hero": "li"
+  "hero": "li",
+  "triggerCarry": 1
  },
  "frostar": {
   "size": 1,
@@ -1640,7 +1671,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "blizzard",
   "slow": 0.3,
   "kind": "sky",
-  "hero": "li"
+  "hero": "li",
+  "perFrozen": 0.15
  },
  "rimelance": {
   "size": 2,
@@ -1664,7 +1696,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "dmg": 4,
   "fx": "knife",
   "multi": 3,
-  "hero": "li"
+  "hero": "li",
+  "target": "rand"
  },
  "starfire": {
   "size": 3,
@@ -1677,7 +1710,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 36,
   "burn": 4,
   "kind": "sky",
-  "hero": "li"
+  "hero": "li",
+  "slowFrz": 0.5
  },
  "pulsar": {
   "size": 2,
@@ -1716,9 +1750,9 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "shell",
   "aoe": 14,
   "multi": 4,
-  "posMid": 0.35,
   "kind": "firearm",
-  "hero": "jun"
+  "hero": "jun",
+  "target": "rand"
  },
  "bombard": {
   "size": 3,
@@ -1732,7 +1766,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "burn": 3,
   "posMid": 0.5,
   "kind": "firearm",
-  "hero": "jun"
+  "hero": "jun",
+  "overkill": 0.5
  },
  "moat": {
   "size": 2,
@@ -1770,18 +1805,6 @@ export const ITEMS: Record<string, ItemDef> = {
   "kind": "gadget",
   "hero": "jun"
  },
- "stakes": {
-  "size": 1,
-  "tag": "blade",
-  "t": 0,
-  "up": "mix",
-  "cd": 1.6,
-  "dmg": 9,
-  "fx": "rock",
-  "kb": 0.035,
-  "kind": "weapon",
-  "hero": "jun"
- },
  "beehive": {
   "size": 2,
   "tag": "fire",
@@ -1790,14 +1813,11 @@ export const ITEMS: Record<string, ItemDef> = {
   "cd": 3,
   "dmg": 8,
   "fx": "knife",
-  "multi": 6,
-  "lineKind": {
-   "kind": "firearm",
-   "pct": 0.25
-  },
+  "multi": 5,
   "kind": "firearm",
   "hero": "jun",
-  "pen": 3
+  "pen": 3,
+  "nbMulti": "firearm"
  },
  "beacontower": {
   "size": 1,
@@ -1825,19 +1845,8 @@ export const ITEMS: Record<string, ItemDef> = {
    "pct": 0.4
   },
   "kind": "gadget",
-  "hero": "jun"
- },
- "sextant": {
-  "size": 1,
-  "tag": "mech",
-  "t": 0,
-  "up": "cd",
-  "cd": 2.6,
-  "dmg": 0,
-  "fx": "none",
-  "hasteCarry": 1,
-  "kind": "gadget",
-  "hero": "li"
+  "hero": "jun",
+  "far": 0.5
  },
  "spyglass": {
   "size": 1,
@@ -1900,7 +1909,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "slow": 0.3,
   "freeze": 0.5,
   "kind": "sky",
-  "hero": "li"
+  "hero": "li",
+  "crowd": 0.03
  },
  "icemoon": {
   "size": 2,
@@ -1910,8 +1920,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "cd": 2.2,
   "dmg": 16,
   "fx": "arrow",
-  "pierce": 2,
   "frozenMul": 1.8,
+  "pierce": 1,
   "kind": "sky",
   "hero": "li",
   "asCarry": 0.3
@@ -1927,7 +1937,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "aoe": 14,
   "burn": 1,
   "multi": 2,
-  "hero": "li"
+  "hero": "li",
+  "crowd": 0.03
  },
  "galaxy": {
   "size": 3,
@@ -2016,8 +2027,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "fx": "arrow",
   "kind": "weapon",
   "hero": "jun",
-  "pierce": 1,
-  "posEdge": 0.6
+  "posEdge": 0.6,
+  "wallNear": 1.2
  },
  "kiln": {
   "size": 2,
@@ -2046,7 +2057,8 @@ export const ITEMS: Record<string, ItemDef> = {
   "hero": "mo",
   "aoe": 22,
   "burn": 3,
-  "slow": 0.3
+  "slow": 0.3,
+  "perBurning": 0.06
  }
 } as unknown as Record<string, ItemDef>;
 
@@ -2097,83 +2109,31 @@ export const UPS: Record<string, UpgradeCurve> = {
 };
 
 export const ADJ: Record<string, AdjDef> = {
- "swift": {
-  "r": 0,
-  "c": "#5ad1a8"
- },
- "momentum": {
-  "r": 1,
-  "c": "#8fdc5a"
- },
- "rush": {
-  "r": 1,
-  "c": "#c4ea5d"
- },
- "sharp": {
-  "r": 0,
-  "c": "#e3e9f0"
- },
- "fervor": {
-  "r": 0,
-  "c": "#ff8a66"
- },
- "deadly": {
-  "r": 2,
-  "c": "#ff4d6a"
- },
- "precise": {
-  "r": 0,
-  "c": "#ffd166"
- },
- "echo": {
-  "r": 2,
-  "c": "#c79bff"
- },
- "twin": {
-  "r": 2,
-  "c": "#ff95dc"
- },
- "ignite": {
-  "r": 1,
-  "c": "#ffa53b"
- },
- "resonance": {
-  "r": 1,
-  "c": "#6ab7ff"
- },
- "greedy": {
-  "r": 0,
-  "c": "#f5d04a"
- },
- "hoard": {
-  "r": 0,
-  "c": "#e8b86b"
- },
- "chill": {
-  "r": 0,
-  "c": "#9fe8ff"
- },
- "sturdy": {
-  "r": 0,
-  "c": "#b3c2d2"
- },
- "heavy": {
-  "r": 1,
-  "c": "#c99a6b"
- }
+ "swift": { "r": 0, "c": "#5ad1a8" },
+ "precise": { "r": 0, "c": "#ffd166" },
+ "golden": { "r": 0, "c": "#f5d04a" },
+ "sturdy": { "r": 0, "c": "#b3c2d2" },
+ "fiery": { "r": 1, "c": "#ff7a3b", "tag": "fire" },
+ "frosty": { "r": 1, "c": "#7fe0ff", "tag": "ice" },
+ "toxic": { "r": 1, "c": "#8fe05a", "tag": "poison" },
+ "thunder": { "r": 1, "c": "#ffd84a", "tag": "volt" },
+ "ignite": { "r": 1, "c": "#ffa53b" },
+ "resonance": { "r": 1, "c": "#6ab7ff" },
+ "heavy": { "r": 1, "c": "#c99a6b" },
+ "deadly": { "r": 2, "c": "#ff4d6a" },
+ "twin": { "r": 2, "c": "#ff95dc" },
+ "echo": { "r": 2, "c": "#c79bff", "w": 0.25 }
 } as unknown as Record<string, AdjDef>;
 
+/** 旧版词缀 → 现在的词缀（读旧存档用） / old affixes → current ones (for loading old saves) */
+export const ADJ_OLD: Record<string, string> = { sharp: 'heavy', fervor: 'heavy', momentum: 'swift', rush: 'swift', greedy: 'golden', hoard: 'golden', chill: 'frosty' };
+/** 精简掉的卡 → 读旧存档时换成的卡 / trimmed cards → the card an old save gets instead */
+export const CARD_OLD: Record<string, string> = {"brand": "cinder", "paperlamp": "oilspill", "sextant": "astrolabe", "guillotine": "executioner", "stakes": "sling"};
+
+export const normAdj = (a: string | null | undefined): string | null => (a ? (ADJ_OLD[a] || a) : null);
+
 /** 不打伤害的卡只能抽到这些词缀 / cards that deal no damage can only roll these affixes */
-export const ADJ_NODMG = [
- "swift",
- "momentum",
- "rush",
- "echo",
- "twin",
- "ignite",
- "hoard",
- "sturdy"
-];
+export const ADJ_NODMG = ["swift", "golden", "sturdy", "ignite", "echo", "twin"];
 
 export const TIERS = [
  {
@@ -2284,7 +2244,6 @@ export const KINDS: Record<Kind, string[]> = {
  ],
  "lamp": [
   "firefly",
-  "paperlamp",
   "dragonlantern",
   "lamplight",
   "beacon",

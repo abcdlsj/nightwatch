@@ -1,5 +1,5 @@
 /* 整屏页面：标题、选人、起手三选一、结局 / full-screen pages: title, hero select, opening choice, ending */
-import { ITEMS, ADJ, TIERS } from '../data/cards';
+import { ITEMS, ADJ, TIERS, normAdj } from '../data/cards';
 import { HEROES, KITS } from '../data/heroes';
 import { ACH, OMENS } from '../data/meta';
 import type { KitDef } from '../data/types';
@@ -130,7 +130,7 @@ export function heroSelect() {
   const sc = $('#screen');
   const T = L.ui.heroes;
   setScene('title');
-  sc.innerHTML = `<div class="scr"><h1 style="font-size:32px">${T.title}</h1><div class="heroes">${heroList()
+  sc.innerHTML = `<div class="scr"><button class="btn alt sm hs-back" id="hsBack">‹ ${T.back}</button><h1 style="font-size:32px">${T.title}</h1><div class="heroes">${heroList()
     .map((k) => {
       const H = HEROES[k];
       if (!heroUnlocked(k))
@@ -144,6 +144,11 @@ export function heroSelect() {
     })
     .join('')}</div><p class="mastline">${T.mastLine}${(L.meta.mastShort as string[]).map((p, i) => t('heroes.mastLv', { n: i + 1, p })).join(' · ')}</p><button class="btn alt sm" id="cdxBtn2">${T.codex}</button></div>`;
   sc.hidden = false;
+  $('#hsBack').onclick = () => {
+    SFX.ensure();
+    SFX.play('ui');
+    titleScreen();
+  };
   $('#cdxBtn2').onclick = () => {
     SFX.ensure();
     openCodex(heroList()[0]);
@@ -292,7 +297,7 @@ export function endScreen(win: boolean) {
   ${row(T.relicsTalents, t('end.relicsTalentsV', { r: G.relics.length, t: G.skills.length }))}
   ${row(T.bestChain, '×' + (G.bestChain || 1))}
   ${row(T.kills, R.kills + ' / ' + R.maxCombo)}
-  ${best ? row(T.ace, `${best.adj ? t('sheet.adjOf', { a: ADJ[best.adj].n }) : ''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}`) : ''}</div>
+  ${best ? row(T.ace, `${best.adj && ADJ[normAdj(best.adj)!] ? t('sheet.adjOf', { a: ADJ[normAdj(best.adj)!].n }) : ''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}`) : ''}</div>
   ${endNote}${win ? '' : loseNote(B)}
   ${mastNote}
   ${R.newHeat ? `<div class="newheat">${t('end.newHeat', { h: R.newHeat, d: (L.meta.heats as string[])[R.newHeat] })}</div>` : ''}

@@ -88,4 +88,9 @@ export interface Battle {
   /** 本场元素反应、流派连招次数 / this battle's elemental reaction and archetype combo counts */
   rxN?: number;
   stkN?: number;
+  /** 地面效果（火油坑、毒池、冰雾……） / ground effects (oil pits, poison pools, frost mist…) */
+  zones?: GroundZone[];
 }
+
+/** 地面效果：每 0.5 秒对范围内的敌人打一下并施加状态 / ground effect: every 0.5 s hits enemies inside and applies statuses */
+export interface GroundZone { x: number; y: number; r: number; t: number; next: number; dmg: number; src: Card; burn?: number; poison?: number; slow?: number; col: string }

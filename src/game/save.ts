@@ -1,5 +1,5 @@
 /* 单局存档：每次进入备战时自动存。格式沿用旧版（chain-demo-save-v4），老存档能接着玩 / Per-run save: written automatically each time prep begins. The format follows the old version (chain-demo-save-v4), so old saves keep working */
-import { ITEMS } from '../data/cards';
+import { ITEMS, CARD_OLD } from '../data/cards';
 import { HEROES } from '../data/heroes';
 import { TALENTS } from '../data/talents';
 import { EN } from '../data/enemies';
@@ -49,12 +49,13 @@ export function restoreSave(s: SaveData | null): boolean {
     hero: s.hero, round: s.round, gold: s.gold, wall: s.wall, wallMax: s.wallMax, foeSet: s.foeSet || 'dark', relics: s.relics || [],
     skills: (s.skills || []).filter((k) => TALENTS[k]), bestChain: s.bestChain || 0, heat: s.heat || 0, run: s.run || freshRun(),
     boss9: EN[s.boss9 || s.boss8 || ''] ? s.boss9 || s.boss8 : 'eye', boss12: EN[s.boss12 || ''] ? s.boss12 : 'brood', full: !!s.full, gems: s.gems || {}, arc: s.arc || 0, kitPath: s.kitPath || '',
-    endless: !!s.endless, maxRound: s.endless ? 999 : s.full ? FULL_NIGHTS : NIGHTS, lock: s.lock || null, fightWave: null, cards: [],
+    endless: !!s.endless, maxRound: s.endless ? 999 : s.full ? FULL_NIGHTS : NIGHTS, lock: s.lock && ITEMS[s.lock.card?.key] ? s.lock : null, fightWave: null, cards: [],
     secret: s.secret || {}, seed: s.seed ?? 0, wind: (s.wind || '') as GameState['wind'], windRelic: !!s.windRelic,
     wind2: (s.wind2 || '') as GameState['wind'], omen: OMENS[s.omen || ''] ? s.omen : '', rot: s.rot || null,
   });
   if (s.rng != null) rng.state = s.rng;
   for (const d of s.cards || []) {
+    d.key = CARD_OLD[d.key] || d.key;
     if (!ITEMS[d.key]) continue;
     const c = newCard(d.key, d.tier, d.adj);
     c.loc = d.loc;

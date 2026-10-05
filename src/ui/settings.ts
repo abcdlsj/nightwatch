@@ -11,7 +11,8 @@ import { exportCode, importCode } from '../platform/backup';
 
 const VERSION = __APP_VERSION__;
 
-export function openSettings(onReset?: () => void) {
+/** onQuit：对局中打开时传入，多出「放弃这局」 / onQuit: passed when opened mid-run, adds an "abandon this run" button */
+export function openSettings(onReset?: () => void, onQuit?: () => void) {
   SFX.play('ui');
   const T = L.ui.settings;
   const rows: (keyof Settings)[] = ['music', 'sfx', 'haptics', 'shake', 'nums', 'tips'];
@@ -22,6 +23,7 @@ export function openSettings(onReset?: () => void) {
     <p class="set-bk"><b>${T.backup}</b>${T.backupD}</p>
     <div class="sh-btns"><button class="btn" id="setExport">${T.exportBtn}</button><button class="btn" id="setImport">${T.importBtn}</button></div>
     <div class="sh-btns"><button class="btn" id="setTips">${T.resetTips}</button><button class="btn red" id="setWipe">${T.wipe}</button></div>
+    ${onQuit ? `<div class="sh-btns"><button class="btn red" id="setQuit">${T.quit}</button></div>` : ''}
     <p class="muted2">${t('settings.version', { v: VERSION })}</p>
     <div class="sh-btns"><button class="btn" id="setClose">${L.ui.sheet.close}</button></div></div>`);
   sh.querySelectorAll<HTMLElement>('.set-row').forEach(
@@ -50,6 +52,17 @@ export function openSettings(onReset?: () => void) {
     toast(T.wiped);
     setTimeout(() => (onReset ? onReset() : location.reload()), 600);
   };
+  let quitArmed = false;
+  if (onQuit)
+    $('#setQuit').onclick = () => {
+      if (!quitArmed) {
+        quitArmed = true;
+        $('#setQuit').textContent = T.quitSure;
+        return;
+      }
+      closeSheet();
+      onQuit();
+    };
   $('#setClose').onclick = closeSheet;
   $('#setExport').onclick = () => openExport(onReset);
   $('#setImport').onclick = () => openImport(onReset);

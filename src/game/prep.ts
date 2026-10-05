@@ -46,6 +46,12 @@ const EVENT_NEED: Record<string, () => boolean> = {
   swap: () => G.cards.some((c) => c.tier < 3),
   tutor: () => G.gold >= 5 && G.cards.some((c) => ITEMS[c.key].dmg > 0),
   drill: () => G.cards.some((c) => c.loc === 'board' && ITEMS[c.key].dmg > 0),
+  inscribe: () => G.cards.length > 0,
+  quench: () => G.cards.some((c) => c.tier < 3 && c.adj),
+  scrap: () => G.cards.length >= 3,
+  graft: () => G.cards.some((c) => c.adj) && G.cards.length >= 2,
+  mirror: () => G.wallMax > 12 && G.cards.length > 0 && !!firstFit(1),
+  oracle: () => Object.keys(RELICS).some((k) => RELICS[k].rule && !G.relics.includes(k)),
   /* 隐藏事件不进随机池，只由下面的 SECRET_DOORS 塞进来 / hidden events stay out of the random pool and are only inserted by SECRET_DOORS below */
   s_letter: () => false,
   s_karl: () => false,

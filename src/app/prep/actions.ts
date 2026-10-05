@@ -1,6 +1,6 @@
 /* 备战的操作：进一站、拿卡、卖卡、拿遗物、学天赋、夜谈、离开。改完状态顺手刷新界面 / Prep actions: enter a stop, take a card, sell a card, take a relic, learn a talent, night talk, leave. Refresh the UI right after changing state. */
 import type { Tag } from '../../data/types';
-import { ITEMS, ADJ, TIERS, UPS } from '../../data/cards';
+import { ITEMS, ADJ, ADJ_NODMG, TIERS, UPS } from '../../data/cards';
 import { EVENTS } from '../../data/events';
 import { RELICS } from '../../data/relics';
 import { TALENTS } from '../../data/talents';
@@ -8,9 +8,9 @@ import { L, t } from '../../i18n';
 import { rand, pick, shuffled } from '../../core/rng';
 import { clamp } from '../../core/util';
 import { G, type Card, type Offer, type PrepStop } from '../../game/state';
-import { stats, sellValue, basePrice, setCarry } from '../../game/cards';
+import { stats, sellValue, basePrice, setCarry, firstFit, newCard } from '../../game/cards';
 import { unlock, foundSecret, mastLv } from '../../game/meta';
-import { rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, rollItem, rollRule } from '../../game/loot';
+import { rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, rollItem, rollRule, wpick } from '../../game/loot';
 import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, trainCap, type Dest } from '../../game/prep';
 import { heat } from '../../game/state';
 import { SFX } from '../../audio/sfx';
@@ -260,6 +260,83 @@ function enterMore(id: string, cur: PrepStop) {
         renderPrep();
       } },
     ]);
+  else if (id === 'inscribe') {
+    /* 铭文坊：先挑词缀，再挑卡 / Inscription Hall: pick the affix first, then the card */
+    const hasDmg = G.cards.some((c) => ITEMS[c.key].dmg > 0);
+    const affs = shuffled(Object.keys(ADJ).filter((a) => ADJ[a].r < 2 && (hasDmg || ADJ_NODMG.includes(a)))).slice(0, 3);
+    if (rand() < 0.35) affs[2] = wpick(Object.keys(ADJ).filter((a) => ADJ[a].r === 2 && !affs.includes(a)));
+    choice(T.inscribeHint, affs.map((a) => ({ ico: 'wand', label: `【${ADJ[a].n}】`, sub: ADJ[a].d, act: () => {
+      const ok = G.cards.filter((c) => c.adj !== a && (ITEMS[c.key].dmg > 0 || ADJ_NODMG.includes(a)));
+      choice(t('prep.inscribeOn', { a: ADJ[a].n }), ok.map((c) => ({ card: Object.assign({}, c, { adj: a }), label: ITEMS[c.key].n, sub: c.adj ? t('prep.replaceAdj', { a: ADJ[c.adj].n }) : '', act: () => {
+        c.adj = a;
+        repaint(c);
+        renderOwned();
+        SFX.play('merge');
+        FX.burstAt(elOf(c), ADJ[a].c, 20);
+        restart(elOf(c), 'merge');
+        finishStep();
+      } })));
+      renderPrep();
+    } })));
+  } else if (id === 'quench')
+    choice(T.quenchHint, shuffled(G.cards.filter((c) => c.tier < 3 && c.adj)).slice(0, 3).map((c) => ({ card: c, label: `${ITEMS[c.key].n}：${TIERS[c.tier].n} → ${TIERS[c.tier + 1].n}`, sub: t('prep.loseAdj', { a: ADJ[c.adj!].n }), act: () => {
+      c.tier++;
+      c.adj = null;
+      repaint(c);
+      afterMerge();
+      renderOwned();
+      SFX.play('merge');
+      FX.burstAt(elOf(c), TIERS[c.tier].c, 24);
+      finishStep();
+    } })));
+  else if (id === 'scrap')
+    choice(T.scrapHint, shuffled(G.cards).slice(0, 4).map((c) => {
+      const g = basePrice(c.key, c.adj, c.tier);
+      return { card: c, label: t('prep.scrapIt', { n: ITEMS[c.key].n }), sub: t('prep.scrapSub', { g }), act: () => {
+        FX.burstAt(elOf(c), '#ffd166', 20);
+        removeCard(c);
+        gainGold(g);
+        renderOwned();
+        finishStep();
+      } };
+    }));
+  else if (id === 'graft')
+    choice(T.graftHint, G.cards.filter((c) => c.adj).map((src) => ({ card: src, label: `${ITEMS[src.key].n} ·【${ADJ[src.adj!].n}】`, sub: ADJ[src.adj!].d, act: () => {
+      const a = src.adj!;
+      const ok = G.cards.filter((c) => c !== src && c.adj !== a && (ITEMS[c.key].dmg > 0 || ADJ_NODMG.includes(a)));
+      choice(t('prep.graftTo', { a: ADJ[a].n }), ok.map((c) => ({ card: Object.assign({}, c, { adj: a }), label: ITEMS[c.key].n, sub: c.adj ? t('prep.replaceAdj', { a: ADJ[c.adj].n }) : '', act: () => {
+        c.adj = a;
+        src.adj = null;
+        repaint(c);
+        repaint(src);
+        renderOwned();
+        SFX.play('merge');
+        FX.burstAt(elOf(c), ADJ[a].c, 20);
+        finishStep();
+      } })));
+      renderPrep();
+    } })));
+  else if (id === 'mirror')
+    choice(T.mirrorHint, shuffled(G.cards).slice(0, 3).map((c) => ({ card: Object.assign({}, c, { adj: null }), label: ITEMS[c.key].n + ' · ' + TIERS[c.tier].n, sub: t('prep.wallDown', { n: 4 }), act: () => {
+      const spot = firstFit(c.size);
+      if (!spot) {
+        toast(T.noRoom);
+        SFX.play('bad');
+        return;
+      }
+      const n = newCard(c.key, c.tier, null);
+      n.loc = spot.z;
+      n.idx = spot.i;
+      G.cards.push(n);
+      G.wallMax = Math.max(5, G.wallMax - 4);
+      G.wall = Math.min(G.wall, G.wallMax);
+      afterMerge();
+      renderOwned();
+      updateHUD();
+      SFX.play('merge');
+      finishStep();
+    } })));
+  else if (id === 'oracle') relicChoice(cur, L.ui.prep.ruleHint, rollRule(3));
   else if (id === 'drill')
     choice(T.drillHint, dmgCards().filter((c) => c.loc === 'board').slice(0, 3).map((c) => ({ card: c, label: t('prep.makeCarry', { n: ITEMS[c.key].n }), sub: T.carrySub, act: () => {
       setCarry(c);
@@ -273,8 +350,9 @@ function enterMore(id: string, cur: PrepStop) {
 
 /** 给一张卡挑一个稀有词缀（不打伤害的卡只给辅助词缀） / give a card a rare affix (cards that deal no damage only get support affixes) */
 function rollRareAdj(c: Card) {
-  const pool = Object.keys(ADJ).filter((k) => ADJ[k].r === 2 && k !== c.adj);
-  return pick(pool);
+  let pool = Object.keys(ADJ).filter((k) => ADJ[k].r === 2 && k !== c.adj);
+  if (!ITEMS[c.key].dmg) pool = pool.filter((k) => ADJ_NODMG.includes(k));
+  return wpick(pool);
 }
 
 /* ---------------- 宝石（完整游戏线） ---------------- / ---------------- Gems (full game line) ---------------- */

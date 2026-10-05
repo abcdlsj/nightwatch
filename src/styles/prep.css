@@ -68,3 +68,8 @@
 .sh .flav{margin:0;padding:0 2px}
 #goBtn.bump{animation:bump .4s}
 @keyframes doorIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+/* 事件稀有度：图标描边和名字后的小签 / event rarity: icon outline and a small tag after the name */
+.door{--rc:transparent}.door.rar1{--rc:#5aa9ff}.door.rar2{--rc:#b77cff}.door.rar3{--rc:#ff5a5a}
+.door.rar1 img,.door.rar2 img,.door.rar3 img{box-shadow:0 0 0 2px var(--rc),0 0 10px var(--rc)}
+.door .rarl{font-style:normal;font-family:var(--body);font-size:11px;color:#fff;background:var(--rc);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.nextstop i.rar1 img{box-shadow:0 0 0 1px #5aa9ff}.nextstop i.rar2 img{box-shadow:0 0 0 1px #b77cff}.nextstop i.rar3 img{box-shadow:0 0 0 1px #ff5a5a}

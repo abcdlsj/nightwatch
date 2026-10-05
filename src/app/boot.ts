@@ -4,6 +4,7 @@ import { loadMods } from '../mod/load';
 import { on } from '../core/events';
 import { clamp } from '../core/util';
 import { G } from '../game/state';
+import { clearSave } from '../game/save';
 import { META, mastLv } from '../game/meta';
 import { boardCards, newCard, stats } from '../game/cards';
 import { TALENTS } from '../data/talents';
@@ -140,8 +141,15 @@ $('#speedBtn').onclick = () => {
 };
 $('#muteBtn').onclick = () => {
   SFX.ensure();
-  openSettings();
+  openSettings(undefined, G.phase === 'title' || G.phase === 'over' ? undefined : quitRun);
 };
+/** 放弃这局：删掉存档，停掉战斗，回到首页 / abandon the run: delete the save, stop the battle, back to the title */
+function quitRun() {
+  if (B) B.over = true;
+  clearSave();
+  G.phase = 'title';
+  titleScreen();
+}
 
 /* ---------- 主循环：模拟按 1/60 秒定步长推进，画面每帧画一次 ---------- / ---------- Main loop: the sim advances in fixed 1/60s steps, rendering once per frame ---------- */
 let lastT = performance.now();

@@ -25,18 +25,21 @@ export function playStory(pages: Page[], mode: Mode, done?: () => void) {
     if (p.who === 'eye') return { n: S.eye, img: spr('eye').url, c: '#ff6b5b' };
     return voiceOf(p.who || 'narr');
   };
-  const skipBtn = `<div class="st-tap">${S.tap}</div><button class="btn sm st-skip" id="stSkip">${S.skip}</button>`;
+  /* 背景整屏画一次，翻页只换前景 / the full-screen backdrop is drawn once; paging only swaps the foreground */
+  ov.hidden = false;
+  ov.className = 'st-' + mode;
+  ov.innerHTML = `<canvas class="st-bg"></canvas><div class="st-vig"></div><div class="st-fg"></div><button class="btn sm st-skip" id="stSkip">${S.skip}</button>`;
+  drawScene(ov.querySelector('canvas')!, mode);
+  const fg = ov.querySelector<HTMLElement>('.st-fg')!;
+  $('#stSkip').onclick = (e) => {
+    e.stopPropagation();
+    end();
+  };
   const show = () => {
     const p = pages[i];
-    ov.hidden = false;
     if (p.title) {
-      ov.innerHTML = `<canvas class="st-scene" width="120" height="68"></canvas><div class="st-title"><small>${p.act || ''}</small><h2>${p.title}</h2></div>${skipBtn}`;
-      drawScene(ov.querySelector('canvas')!, mode);
+      fg.innerHTML = `<div class="st-title"><small>${p.act || ''}</small><h2>${p.title}</h2></div><div class="st-tap">${S.tap}</div>`;
       typing = null;
-      $('#stSkip').onclick = (e) => {
-        e.stopPropagation();
-        end();
-      };
       SFX.play('bell');
       return;
     }
@@ -45,12 +48,7 @@ export function playStory(pages: Page[], mode: Mode, done?: () => void) {
     if (tx === '@intro') tx = HEROES[G.hero].intro;
     if (typeof tx === 'object') tx = tx[G.hero];
     full = tx;
-    ov.innerHTML = `<canvas class="st-scene" width="120" height="68"></canvas><div class="st-box" style="--sc:${w.c}"><img class="st-por" src="${w.img}" alt=""><div class="st-body"><b>${w.n}</b><p id="stText"></p></div></div>${skipBtn}`;
-    drawScene(ov.querySelector('canvas')!, mode);
-    $('#stSkip').onclick = (e) => {
-      e.stopPropagation();
-      end();
-    };
+    fg.innerHTML = `<div class="st-box" style="--sc:${w.c}"><img class="st-por" src="${w.img}" alt=""><div class="st-body"><b>${w.n}</b><p id="stText"></p></div><i class="st-next" aria-label="${S.tap}">▼</i></div>`;
     let k = 0;
     const el = $('#stText');
     if (typing) clearInterval(typing);
@@ -68,6 +66,7 @@ export function playStory(pages: Page[], mode: Mode, done?: () => void) {
     if (typing) clearInterval(typing);
     ov.hidden = true;
     ov.onclick = null;
+    ov.innerHTML = '';
     done && done();
   };
   ov.onclick = () => {
@@ -117,83 +116,196 @@ export function playWin(done: () => void) {
   playStory(pages, 'dawn', done);
 }
 
-/** 剧情页背景：小镇剪影 + 天空（夜里是那只眼睛，黎明是太阳） / story page background: town silhouette + sky (the eye at night, the sun at dawn) */
+/** 剧情页背景：竖屏整幅像素画。上面是天（夜里那只眼睛，黎明是太阳，城破是火光），中间远山和晨钟城，下面是城墙和火把
+ * story backdrop: one full portrait pixel painting. Sky on top (the eye at night, the sun at dawn, firelight on a breach), distant hills and the bell city in the middle, the wall and torches below */
 function drawScene(cv: HTMLCanvasElement, mode: Mode) {
+  const W = 96;
+  const H = Math.max(150, Math.min(230, Math.round((W * innerHeight) / Math.max(1, innerWidth))));
+  cv.width = W;
+  cv.height = H;
   const x = cv.getContext('2d')!;
-  const W = cv.width,
-    H = cv.height;
   let s = G.round * 977 + 3;
   const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
-  const sky = x.createLinearGradient(0, 0, 0, H);
-  if (mode === 'dawn') {
-    sky.addColorStop(0, '#2b2a5a');
-    sky.addColorStop(0.6, '#e0785a');
-    sky.addColorStop(1, '#ffd08a');
-  } else if (mode === 'fall') {
-    sky.addColorStop(0, '#1a0508');
-    sky.addColorStop(1, '#6e1b2a');
-  } else {
-    sky.addColorStop(0, '#05060f');
-    sky.addColorStop(1, '#1d1633');
+  const px = (c: string, X: number, Y: number, w = 1, h = 1) => {
+    x.fillStyle = c;
+    x.fillRect(Math.round(X), Math.round(Y), w, h);
+  };
+  const dawn = mode === 'dawn',
+    fall = mode === 'fall';
+  const hor = Math.round(H * 0.5); // 远山脚 / foot of the far hills
+  const town = Math.round(H * 0.6); // 城里屋脚 / base of the town houses
+  const wallTop = Math.round(H * 0.66); // 城墙垛口 / top of the battlements
+
+  /* 天：分段的像素色带，不用平滑渐变 / sky: stepped pixel colour bands, no smooth gradient */
+  const bands = dawn
+    ? ['#1d1b3a', '#2b2a5a', '#4a2f63', '#7a3a63', '#b5505a', '#e0785a', '#f4a35e', '#ffd08a']
+    : fall
+      ? ['#0d0306', '#1a0508', '#2a0a10', '#3d0f18', '#521422', '#6e1b2a', '#8a2a24', '#b0401e']
+      : ['#04050c', '#05060f', '#080a18', '#0c0d20', '#110f28', '#171330', '#1d1633', '#251a3d'];
+  for (let y = 0; y < town; y++) {
+    const t = y / town;
+    const k = Math.min(bands.length - 1, Math.floor(t * bands.length + (((y * 7) % 3) - 1) * 0.15));
+    px(bands[k], 0, y, W, 1);
   }
-  x.fillStyle = sky;
-  x.fillRect(0, 0, W, H);
-  if (mode !== 'dawn')
-    for (let i = 0; i < 50; i++) {
-      x.fillStyle = r() < 0.3 ? '#c79bff' : '#f4f4f4';
-      x.globalAlpha = 0.3 + r() * 0.7;
-      x.fillRect(Math.floor(r() * W), Math.floor(r() * H * 0.6), 1, 1);
-    }
+  /* 星星：夜里满天，黎明只剩几颗 / stars: all over at night, only a few at dawn */
+  const nStar = dawn ? 10 : fall ? 25 : 90;
+  for (let i = 0; i < nStar; i++) {
+    const sx = r() * W,
+      sy = r() * hor * (dawn ? 0.35 : 0.9);
+    x.globalAlpha = 0.3 + r() * 0.7;
+    const big = r() < 0.08;
+    const c = r() < 0.25 ? '#c79bff' : r() < 0.2 ? '#9fd8ff' : '#f4f4f4';
+    if (big && !dawn) {
+      px(c, sx, sy);
+      x.globalAlpha *= 0.5;
+      px(c, sx - 1, sy);
+      px(c, sx + 1, sy);
+      px(c, sx, sy - 1);
+      px(c, sx, sy + 1);
+    } else px(c, sx, sy);
+  }
   x.globalAlpha = 1;
-  if (mode === 'dawn') {
-    x.fillStyle = '#fff1b0';
-    for (let a = 0; a < 14; a++) for (let b = 0; b < 14; b++) if ((a - 7) ** 2 + (b - 7) ** 2 < 40) x.fillRect(53 + a, 40 + b, 1, 1);
+
+  if (dawn) {
+    /* 太阳从远山后面露出来，带几圈光晕 / the sun peeks over the far hills with a few halo rings */
+    const cx = W * 0.5,
+      cy = hor + 2;
+    for (let R = 30; R > 9; R -= 5) {
+      x.globalAlpha = 0.07;
+      for (let a = -R; a <= R; a++) for (let b = -R; b <= 0; b++) if (a * a + b * b <= R * R) px('#fff1b0', cx + a, cy + b);
+    }
+    x.globalAlpha = 1;
+    for (let a = -9; a <= 9; a++) for (let b = -9; b <= 9; b++) if (a * a + b * b <= 81) px(a * a + b * b > 60 ? '#ffd08a' : '#fff1b0', cx + a, cy + b);
   } else {
-    const R0 = 3 + G.round * 1.4;
-    const cx = 90,
-      cy = 16;
+    /* 那只眼睛：越到后面越大；外面一圈暗红的光和血丝 / the eye: grows night by night, with a dark red glow and veins around it */
+    const R0 = Math.min(16, 6 + G.round * 0.8);
+    const cx = W * 0.66,
+      cy = H * 0.17;
+    for (let g = 3; g >= 1; g--) {
+      x.globalAlpha = 0.08 * g;
+      const R = R0 * (1 + g * 0.45);
+      for (let a = -R; a <= R; a++) for (let b = -R * 0.6; b <= R * 0.6; b++) if ((a * a) / (R * R) + (b * b) / (R * R * 0.36) <= 1) px(fall ? '#ff5a2a' : '#6e1b2a', cx + a, cy + b);
+    }
+    x.globalAlpha = 0.5;
+    for (let k = 0; k < 7; k++) {
+      let vx = cx,
+        vy = cy;
+      const ang = r() * Math.PI * 2;
+      for (let st = 0; st < R0 * 1.6; st++) {
+        vx += Math.cos(ang) + (r() - 0.5);
+        vy += Math.sin(ang) * 0.6 + (r() - 0.5) * 0.6;
+        px('#a32a3a', vx, vy);
+      }
+    }
+    x.globalAlpha = 1;
     for (let a = -R0; a <= R0; a++)
       for (let b = -R0 * 0.6; b <= R0 * 0.6; b++) {
         const d = (a * a) / (R0 * R0) + (b * b) / (R0 * R0 * 0.36);
         if (d > 1) continue;
-        x.fillStyle = d > 0.75 ? '#6e1b2a' : d > 0.35 ? '#e43b44' : Math.abs(a) < R0 * 0.18 ? '#1a1c2c' : '#fee761';
-        x.fillRect(Math.round(cx + a), Math.round(cy + b), 1, 1);
+        px(d > 0.75 ? '#6e1b2a' : d > 0.4 ? '#e43b44' : Math.abs(a) < R0 * 0.16 ? '#1a1c2c' : d > 0.2 ? '#f4a35e' : '#fee761', cx + a, cy + b);
       }
-    x.globalAlpha = 0.25;
-    x.fillStyle = '#e43b44';
-    for (let k = 0; k < 30; k++) x.fillRect(Math.round(cx + (r() - 0.5) * R0 * 4), Math.round(cy + (r() - 0.5) * R0 * 2), 1, 1);
-    x.globalAlpha = 1;
+    px('#fff8d0', cx - R0 * 0.35, cy - R0 * 0.2, 2, 1);
   }
-  x.fillStyle = mode === 'dawn' ? '#3a2a3a' : '#0b0a14';
+
+  /* 远山两层 / two layers of distant hills */
+  const ridge = (base: number, amp: number, col: string, step: number) => {
+    let y = base - r() * amp;
+    for (let X = 0; X < W; X++) {
+      if (X % step === 0) y = Math.max(base - amp, Math.min(base, y + (r() - 0.5) * amp * 0.9));
+      px(col, X, Math.round(y), 1, town - Math.round(y) + 1);
+    }
+  };
+  ridge(hor - 4, 14, dawn ? '#5a3a5e' : fall ? '#2a0a14' : '#141228', 3);
+  ridge(hor + 3, 9, dawn ? '#3f2a48' : fall ? '#1f0710' : '#0e0d1e', 2);
+
+  /* 晨钟城：屋顶剪影 + 亮着的窗 + 正中的钟楼 / the bell city: rooftop silhouettes, lit windows, and the bell tower in the middle */
+  const house = dawn ? '#2e2236' : '#0b0a14';
+  const win = fall ? '#ff5a2a' : '#ffcd75';
+  const tw = Math.round(W * 0.5);
   let hx = 0;
   while (hx < W) {
-    const w = 4 + Math.floor(r() * 8),
-      h = 10 + Math.floor(r() * 16);
-    x.fillRect(hx, H - 16 - h, w, h + 16);
-    if (r() < 0.3) x.fillRect(hx + Math.floor(w / 2) - 1, H - 16 - h - 5, 2, 5);
-    for (let wy = H - 14 - h; wy < H - 18; wy += 3)
-      for (let wx = hx + 1; wx < hx + w - 1; wx += 2)
-        if (r() < 0.25) {
-          x.fillStyle = mode === 'fall' ? '#ff5a2a' : '#ffcd75';
-          x.fillRect(wx, wy, 1, 1);
-          x.fillStyle = mode === 'dawn' ? '#3a2a3a' : '#0b0a14';
-        }
+    const w = 4 + Math.floor(r() * 7),
+      h = 8 + Math.floor(r() * 14);
+    if (Math.abs(hx + w / 2 - tw) < 8) {
+      hx += w;
+      continue;
+    }
+    const top = town + 6 - h;
+    px(house, hx, top, w, wallTop - top + 2);
+    if (r() < 0.45) for (let k = 0; k < Math.ceil(w / 2); k++) px(house, hx + k, top - k, w - 2 * k, 1); // 尖顶 / pitched roof
+    if (r() < 0.25) px(house, hx + Math.floor(w / 2), top - 6, 1, 4); // 烟囱 / chimney
+    for (let wy = top + 2; wy < wallTop - 1; wy += 3)
+      for (let wx = hx + 1; wx < hx + w - 1; wx += 2) if (r() < (dawn ? 0.08 : 0.28)) px(win, wx, wy);
     hx += w;
   }
-  x.fillStyle = mode === 'dawn' ? '#5a4050' : '#2a2130';
-  x.fillRect(0, H - 12, W, 12);
-  for (let bx = 0; bx < W; bx += 6) x.fillRect(bx, H - 15, 4, 3);
-  x.fillStyle = mode === 'dawn' ? '#7a5a60' : '#4a3a40';
-  for (let bx = 0; bx < W; bx += 8) x.fillRect(bx + 1, H - 9, 6, 2);
-  for (let tt = 10; tt < W; tt += 28) {
-    x.fillStyle = '#ffcd75';
-    x.fillRect(tt, H - 18, 1, 2);
-    x.fillStyle = '#ef7d57';
-    x.fillRect(tt, H - 19, 1, 1);
-  }
-  if (mode === 'fall')
-    for (let i = 0; i < 40; i++) {
-      x.fillStyle = r() < 0.5 ? '#ef7d57' : '#ffcd75';
-      x.fillRect(Math.floor(r() * W), H - 20 - Math.floor(r() * 30), 1, 1);
+  /* 钟楼 / bell tower */
+  const tTop = Math.round(H * 0.3);
+  px(house, tw - 4, tTop + 8, 9, wallTop - tTop);
+  for (let k = 0; k < 6; k++) px(house, tw - 5 + k, tTop + 8 - k, 11 - 2 * k, 1);
+  px(house, tw, tTop - 2, 1, 4);
+  px(dawn ? '#ffe79a' : '#ffcd75', tw - 2, tTop + 11, 5, 4);
+  px('#3a2a20', tw - 1, tTop + 12, 3, 3);
+  px(dawn ? '#ffe79a' : '#ffcd75', tw, tTop + 15, 1, 1);
+  for (let wy = tTop + 19; wy < wallTop - 2; wy += 4) if (r() < 0.6) px(win, tw - 1 + (wy % 3), wy);
+  if (fall) {
+    /* 城里起火：火苗和往上飘的火星 / fires in the town: flames and rising embers */
+    for (let k = 0; k < 6; k++) {
+      const fx = r() * W,
+        fy = town + 2 - r() * 8;
+      for (let j = 0; j < 6; j++) px(j < 2 ? '#fee761' : j < 4 ? '#ef7d57' : '#b13e53', fx + (r() - 0.5) * 3, fy - j);
     }
+    for (let i = 0; i < 60; i++) {
+      x.globalAlpha = 0.4 + r() * 0.6;
+      px(r() < 0.5 ? '#ef7d57' : '#ffcd75', r() * W, town - r() * H * 0.45);
+    }
+    x.globalAlpha = 1;
+  }
+
+  /* 城墙：垛口、砖缝、火把，一直铺到屏幕底 / the wall: battlements, mortar lines, torches, all the way to the bottom of the screen */
+  const stone = dawn ? '#6a4c58' : fall ? '#3a1e26' : '#2a2130';
+  const stoneHi = dawn ? '#8a6470' : fall ? '#4e2a30' : '#3a2e40';
+  const stoneLo = dawn ? '#4a3440' : fall ? '#22101a' : '#1a1420';
+  px(stone, 0, wallTop + 4, W, H - wallTop);
+  for (let bx = 0; bx < W; bx += 8) {
+    px(stone, bx, wallTop, 5, 4);
+    px(stoneHi, bx, wallTop, 5, 1);
+  }
+  px(stoneHi, 0, wallTop + 4, W, 1);
+  for (let y = wallTop + 8, row = 0; y < H; y += 5, row++) {
+    px(stoneLo, 0, y, W, 1);
+    for (let bx = row % 2 ? 0 : 5; bx < W; bx += 10) px(stoneLo, bx, y - 4, 1, 4);
+    for (let k = 0; k < 4; k++) if (r() < 0.6) px(stoneHi, r() * W, y - 3);
+  }
+  /* 火把：只在垛口间亮一小团暖光（棋盘格抖动，不糊成一片） / torches: a small dithered warm glow between the merlons, not a smudge */
+  for (let tx = 12; tx < W; tx += 24) {
+    const ty = wallTop + 9;
+    for (let a = -5; a <= 5; a++)
+      for (let b = -5; b <= 4; b++) {
+        const d = a * a + b * b;
+        if (d <= 25 && (a + b) % 2 === 0) px(d < 9 ? '#8a5a40' : stoneHi, tx + a, ty + b);
+      }
+    px('#3a2418', tx, ty, 1, 5);
+    px('#5a3a28', tx - 1, ty, 3, 1);
+    px('#b13e53', tx, ty - 3, 1, 1);
+    px('#ef7d57', tx - 1, ty - 2, 3, 1);
+    px('#fee761', tx, ty - 2, 1, 2);
+  }
+  /* 墙头一个守夜人的剪影，提着灯 / a watchman silhouette on the wall, holding a lantern */
+  const mx = Math.round(W * 0.26),
+    my = wallTop;
+  const fig = dawn ? '#1d1424' : '#020205';
+  px(fig, mx, my - 12, 3, 3); // 头 / head
+  px(fig, mx - 1, my - 13, 5, 1); // 帽檐 / hat brim
+  px(fig, mx, my - 14, 3, 1);
+  px(fig, mx - 1, my - 9, 5, 6); // 身子和斗篷 / body and cloak
+  px(fig, mx - 2, my - 5, 7, 2);
+  px(fig, mx, my - 3, 1, 3); // 腿 / legs
+  px(fig, mx + 2, my - 3, 1, 3);
+  px(fig, mx + 4, my - 8, 1, 3); // 手臂 / arm
+  px(fig, mx + 5, my - 6, 1, 1);
+  px('#ffcd75', mx + 5, my - 5, 1, 2); // 灯 / lantern
+  px('#fee761', mx + 5, my - 4, 1, 1);
+  x.globalAlpha = 0.35;
+  for (const [a, b] of [[-1, 0], [1, 0], [0, -1], [0, 2], [2, 0], [-2, 0]]) px('#ffcd75', mx + 5 + a, my - 5 + b);
+  x.globalAlpha = 1;
 }

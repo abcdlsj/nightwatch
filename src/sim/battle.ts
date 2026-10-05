@@ -16,7 +16,7 @@ import { world, RANGE0, ex, ey } from './world';
 import { TUNE } from '../game/tuning';
 import { view } from './view';
 import { CARD_HOOKS, RELIC_HOOKS, TALENT_HOOKS, passiveSrc } from './hooks';
-import { trigger, stepProj, canFire } from './combat';
+import { trigger, stepProj, canFire, hurt } from './combat';
 import { spawn, enemyStep, stepERocks, surge } from './enemies';
 import type { Battle, Enemy } from './types';
 
@@ -105,7 +105,7 @@ export function startBattle(o: StartOpts): Battle {
     lowSaid: false, wager: o.wager, ambush: o.ambush, maxCombo: 0, combo: 0, maxHit: 0, slowT: 0,
   };
   for (const c of G.cards) {
-    Object.assign(c, { charge: 0, mom: 0, bDmg: 0, bTrig: 0, bSrc: {}, bCh: 0, bHs: 0, bRl: 0, bBf: 0, bTr: 0, frozen: 0, echoLog: [], evLog: {}, hasteT: 0, stk: 0, lastT: -9, lastFire: -9, rage: 0, cnt: 0 });
+    Object.assign(c, { charge: 0, mom: 0, bDmg: 0, bTrig: 0, bSrc: {}, bCh: 0, bHs: 0, bRl: 0, bBf: 0, bTr: 0, frozen: 0, echoLog: [], evLog: {}, hasteT: 0, stk: 0, sw: 0, chN: 0, alt: 0, lastT: -9, lastFire: -9, rage: 0, cnt: 0 });
     c.ammo = maxAmmo(c);
     view.cardFlag(c, 'frozen', false);
     view.cardFlag(c, 'haste', false);
@@ -125,6 +125,7 @@ export function startBattle(o: StartOpts): Battle {
       view.cardFlag(c, 'frozen', true);
     }
   B.shield = mv('shieldStart');
+  B.flags.lime = boardCards().reduce((s, c) => s + (ITEMS[c.key].limeBurn || 0), 0);
   world.range = clamp(RANGE0 + mv('range'), 0.05, 0.35);
   for (const c of boardCards()) c.ox = world.originX(c);
   if (B.wager) later(0.6, () => view.banner(L.ui.battle.wager + WAGERS[B!.wager!].n, '#ff8a5b'));
@@ -192,6 +193,8 @@ export function simStep(dt: number) {
       }
     }
   }
+  stepZones(dt);
+  if (b.over) return;
   enemyStep(dt);
   if (b.over) return;
   b.en = b.en.filter((e) => !e.dead);
@@ -203,7 +206,31 @@ export function simStep(dt: number) {
   if (b.endT && b.t >= b.endT) finish('win');
 }
 
+/** 地面效果逐帧推进 / advance ground effects each frame */
+function stepZones(dt: number) {
+  const b = B!;
+  if (!b.zones || !b.zones.length) return;
+  for (const z of b.zones) {
+    z.t -= dt;
+    z.next -= dt;
+    if (z.next > 0) continue;
+    z.next = 0.5;
+    view.ring(z.x, z.y, z.r * 0.6, z.r, z.col, 0.35);
+    for (const e of b.en)
+      if (!e.dead && Math.hypot(ex(e) - z.x, ey(e) - z.y) <= z.r) {
+        hurt(e, z.dmg, z.src, false, { splash: 1, burn: z.burn, poison: z.poison, slow: z.slow });
+        if (b.over) return;
+      }
+  }
+  b.zones = b.zones.filter((z) => z.t > 0);
+}
+
 /* ---------------- 目标 ---------------- / ---------------- Targeting ---------------- */
+/** 射程内能被打到的敌人 / enemies in range that can be hit */
+export function targets() {
+  const rg = world.range + (B!.flags.veilT > B!.t ? TUNE.veil : 0);
+  return B!.en.filter((e) => !e.dead && e.y >= rg && !phased(e) && !rising(e));
+}
 export const phased = (e: { d: { phase?: number }; ph: number }) => !!e.d.phase && (B!.t + e.ph) % 3.2 > 2.0;
 export const rising = (e: { emerge?: boolean; bornT: number }) => !!e.emerge && B!.t - e.bornT < 0.5;
 /** 卡牌的目标：最靠近城墙、能被打到的敌人。
@@ -249,7 +276,7 @@ export function settleWin() {
   }
   if (!b.ambush) {
     if (b.kills >= 150) unlock('kills150');
-    for (const c of G.cards) if (c.adj === 'hoard') c.hoard++;
+    for (const c of G.cards) if (c.adj === 'golden') c.hoard++;
     for (const c of boardCards()) CARD_HOOKS[c.key]?.onWin?.(c);
   }
   const quests = b.ambush ? [] : finishQuests();

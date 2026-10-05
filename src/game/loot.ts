@@ -23,7 +23,15 @@ export function rollAdj(key: string, force?: boolean, exclude?: string | null, m
   if (ITEMS[key].dmg === 0) pool = pool.filter((k) => ADJ_NODMG.includes(k));
   if (exclude) pool = pool.filter((k) => k !== exclude);
   if (!pool.length) pool = ADJ_NODMG.filter((k) => k !== exclude);
-  return pick(pool);
+  return wpick(pool);
+}
+
+/** 按词缀权重抽（回响更难出） / pick weighted by affix weight (echo is rarer) */
+export function wpick(pool: string[]) {
+  const tot = pool.reduce((s, k) => s + (ADJ[k].w ?? 1), 0);
+  let r = rand() * tot;
+  for (const k of pool) if ((r -= ADJ[k].w ?? 1) < 0) return k;
+  return pool[pool.length - 1];
 }
 
 export type ItemFilter = (it: (typeof ITEMS)[string]) => boolean;

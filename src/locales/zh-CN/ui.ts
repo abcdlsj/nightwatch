@@ -53,6 +53,8 @@ export default {
     carry: 'C位',
     asCarry: '当C位',
     pos: '站位',
+    swing: '摆幅',
+    wound: '上弦',
   },
 
   battle: {
@@ -255,6 +257,17 @@ export default {
     swapSub: '换成同尺寸、高一档的随机卡',
     swapped: '换来了 {n}（{t}）',
     tutorHint: '教哪一张？',
+    inscribeHint: '刻哪个词缀？',
+    inscribeOn: '把【{a}】刻在哪一张上？',
+    replaceAdj: '会替换掉原来的【{a}】',
+    quenchHint: '淬哪一张？',
+    loseAdj: '升一品质，洗掉【{a}】',
+    scrapHint: '拆哪一张？',
+    scrapIt: '拆掉{n}',
+    scrapSub: '按原价折成 {g} 金',
+    graftHint: '挪哪一张的词缀？',
+    graftTo: '把【{a}】挪到哪一张上？',
+    mirrorHint: '照哪一张？',
     cost: '（花 {n} 金）',
     campRest: '烤火歇一会儿',
     wallHeal: '补墙 {n} 点',
@@ -422,6 +435,8 @@ export default {
     tipsD: '第一次碰到某件事时弹出的小提示',
     resetTips: '重新显示提示',
     tipsDone: '小提示会重新出现',
+    quit: '放弃这局，回到首页',
+    quitSure: '再点一次确认放弃（这局不保留）',
     wipe: '清除所有进度',
     wipeSure: '再点一次确认清除',
     wiped: '进度已清除',
@@ -478,6 +493,7 @@ export default {
 
   heroes: {
     title: '选择守夜人',
+    back: '返回首页',
     heat: '长夜 {h}',
     heatDown: '降低难度',
     heatUp: '提高难度',

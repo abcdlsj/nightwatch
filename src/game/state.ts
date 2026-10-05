@@ -35,6 +35,10 @@ export interface Card {
   frostNext?: number;
   ammo: number | null;
   stk: number;
+  /** 钟摆摆了几次、本场被别的卡充能几次、交替出手的计数 / swings so far, times charged by other cards this battle, alternating-shot counter */
+  sw?: number;
+  chN?: number;
+  alt?: number;
   rage: number;
   cnt: number;
   lastT: number;

@@ -1,5 +1,5 @@
 /* 卡牌规则：格子、相邻、伤害公式、价格。全是纯计算，不碰界面 / Card rules: slots, adjacency, damage formula, price. All pure computation, no UI */
-import { ITEMS, UPS, ADJ } from '../data/cards';
+import { ITEMS, UPS, ADJ, normAdj } from '../data/cards';
 import type { Kind, Tag } from '../data/types';
 import { L } from '../i18n';
 import { vr } from '../core/rng';
@@ -11,7 +11,7 @@ let UID = 1;
 
 export function newCard(key: string, tier?: number | null, adj?: string | null): Card {
   return {
-    id: UID++, key, tier: tier == null ? ITEMS[key].t : tier, adj: adj || null, size: ITEMS[key].size, loc: null, idx: -1,
+    id: UID++, key, tier: tier == null ? ITEMS[key].t : tier, adj: normAdj(adj), size: ITEMS[key].size, loc: null, idx: -1,
     hoard: 0, grow: 0, qp: 0, dl: (vr() * -3.4).toFixed(2),
     charge: 0, mom: 0, frozen: 0, hasteT: 0, anvil: 0, ammo: null, stk: 0, rage: 0, cnt: 0, lastT: -9, lastFire: -9, ox: 0,
     nb: null, right: null, echoLog: [], evLog: {},
@@ -171,10 +171,12 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
     U = UPS[it.up];
   const T = L.ui.stats;
   const base = Math.round((it.dmg * U.d[s] + (it.dmg > 0 ? (c.grow || 0) + (c.stk || 0) : 0)) * 10) / 10;
-  const flat = a === 'sharp' && it.dmg > 0 ? 4 * it.size * (c.tier + 1) : 0;
+  const flat = 0;
   const pct: [string, number][] = [];
-  if (a === 'fervor') pct.push([ADJ.fervor.n, 0.3]);
   if (a === 'heavy') pct.push([ADJ.heavy.n, 0.5]);
+  /* 钟摆越摆越狠；主发条越被上弦越狠 / the pendulum hits harder each swing; the mainspring hits harder the more it is wound */
+  if (it.swing && (c as Card).sw) pct.push([L.ui.stats.swing + '×' + (c as Card).sw, it.swing[0] * (c as Card).sw!]);
+  if (it.perCharged && (c as Card).chN) pct.push([L.ui.stats.wound + '×' + Math.min(20, (c as Card).chN!), it.perCharged * Math.min(20, (c as Card).chN!)]);
   if (a === 'resonance') {
     const nb = c.nb || neighbors(c as Card);
     const n = nb.filter((x) => ITEMS[x.key].tag === it.tag).length;
@@ -244,10 +246,10 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
   let cd = it.cd * U.c[s];
   if (a === 'twin') cd *= 1.6;
   if (a === 'heavy') cd *= 1.3;
+  if (it.swing && (c as Card).sw) cd *= 1 + it.swing[1] * (c as Card).sw!;
   let spd = 1;
-  if (a === 'swift') spd += 0.25;
-  if (a === 'momentum' && c.mom) spd += 0.05 * c.mom;
-  if (a === 'rush' && t != null && t < 5) spd += 1;
+  /* 疾速：冷却 -15%，开战 5 秒内再快一倍 / Swift: cooldown -15%, and twice as fast in the first 5 s of battle */
+  if (a === 'swift') spd += 0.18 + (t != null && t < 5 ? 1 : 0);
   if (it.kind === 'potion' && c.loc === 'board') {
     const j = boardCards().filter((o) => ITEMS[o.key].kindHaste).length;
     if (j) spd += 0.06 * j * countKind('potion');

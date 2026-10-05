@@ -138,6 +138,53 @@ export const CARD_HOOKS: Record<string, CardHook> = {
     },
   },
   pocketwatch: { on: { start: (c) => { for (const o of boardCards()) if (o !== c && o.size === 1) haste(o, 3, c); } } },
+  /* 凤凰羽：燃烧的敌人倒下，本卡充能 / Phoenix Feather: when a burning enemy dies, charge this card */
+  phoenix: { on: { kill: (c, x) => { if (x.burning) chargeCard(c, 0.08 + 0.02 * stepOf(c)); } } },
+  /* 瘟疫烧瓶：中毒的敌人倒下，把一半的毒传给身边最多 3 个 / Plague Flask: when a poisoned enemy dies, pass half its poison to up to 3 nearby */
+  plague: {
+    on: {
+      kill: (c, x) => {
+        if (!x.poisoned) return;
+        const e = x.e;
+        const ns = near(e, 20 * K()).slice(0, 3);
+        if (!ns.length) return;
+        view.ring(ex(e), ey(e) - 5, 2, 20 * K(), '#7ddc5f', 0.25);
+        for (const o of ns) {
+          o.poisonT = Math.max(o.poisonT, 3);
+          o.poisonD += e.poisonD * (0.5 + 0.1 * stepOf(c));
+          if (!o.poisonSrc) o.poisonSrc = c;
+        }
+      },
+    },
+  },
+  /* 猎头弩：亲手击杀精英或首领时装满弹药 / Headhunter Crossbow: refill all ammo on personally killing an elite or boss */
+  headxbow: { on: { kill: (c, x) => { if (x.src === c && x.elite) reload(c, 9, c); } } },
+  /* 爆竹：亲手击杀时，相邻的火器充能 15% / Firecracker: on personally killing, charge adjacent firearms 15% */
+  firecracker: { on: { kill: (c, x) => { if (x.src === c) for (const n of c.nb || []) if (kindOf(n) === 'firearm') chargeCard(n, 0.15 + 0.05 * stepOf(c), c); } } },
+  /* 星种：当 C 位时每击杀 10 个敌人，基础伤害永久 +1 / Star Seed: as the carry, +1 permanent base damage per 10 kills */
+  starseed: {
+    on: {
+      kill: (c, x) => {
+        if (x.src !== c || !c.carry) return;
+        c.cnt = (c.cnt || 0) + 1;
+        if (c.cnt % 10 === 0) grow(c, 1);
+      },
+    },
+  },
+  /* 霜枪：亲手击杀被冻结的敌人时碎冰，伤到周围 / Rime Lance: personally killing a frozen enemy shatters it, hurting those around */
+  rimelance: {
+    on: {
+      kill: (c, x) => {
+        if (x.src !== c || !x.frozen) return;
+        const X = ex(x.e),
+          Y = ey(x.e) - 4,
+          R = 18 * K();
+        const amt = stats(c, bt().t).total * 0.5;
+        view.ring(X, Y, 2, R, '#c2f4ff', 0.3);
+        later(0.03, () => around(X, Y, R, (o) => hurt(o, amt, c, false, { splash: 1 })));
+      },
+    },
+  },
   /* 月晷：C 位暴击时，其他卡都充能一点 / Moondial: when the carry crits, charge all other cards a little */
   moondial: {
     on: {
