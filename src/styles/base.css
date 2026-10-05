@@ -31,13 +31,6 @@ body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(
   user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 button{font-family:inherit}
 em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 / italic pixel fonts blur, so never italicize */
-/* iOS 26 起主屏模式会在状态栏下方盖一条约 40pt 的毛玻璃；顶边有带底色的 fixed 元素时 WebKit 改用纯色、不再模糊。这条底色被 background-clip:text 裁掉，看不见 / since iOS 26, home-screen mode lays a ~40pt frosted strip under the status bar; WebKit skips it when a fixed element with a background covers the top edge. background-clip:text clips that background away so the strip stays invisible */
-#edge{display:none}
-@supports (-webkit-touch-callout:none){
-  @media (display-mode:standalone){
-    #edge{display:block;position:fixed;top:0;left:0;right:0;height:11px;z-index:99;background:var(--bg);-webkit-background-clip:text;background-clip:text;pointer-events:none}
-  }
-}
 #bg{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated;z-index:0}
 #crt{position:fixed;inset:0;pointer-events:none;z-index:95;
   background:repeating-linear-gradient(to bottom,rgba(0,0,0,.13) 0 1px,transparent 1px 3px),
