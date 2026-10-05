@@ -2,5 +2,6 @@
  * 结构见 src/game/story.ts；没写的部分用 ../story.ts 里的公共剧情兜底。 */
 import ayla from './ayla';
 import mo from './mo';
+import ying from './ying';
 
-export default { ayla, mo } as Record<string, any>;
+export default { ayla, mo, ying } as Record<string, any>;
