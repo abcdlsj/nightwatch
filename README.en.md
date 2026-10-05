@@ -15,6 +15,7 @@ The same build ships as a web game (Vercel) or inside a Capacitor native shell f
 - Three random event stops each night; nights 4, 8 and 9 bring elites and bosses, with five rotating final bosses.
 - Five heroes (Ayla / Mo / Ying / Jun / Li), each with three archetypes and their own story.
 - Endless nights, mastery, 8 difficulty tiers, a codex, and 31 achievements.
+- Once a hero has reached dawn with all three archetypes and unlocked difficulty 5, two opt-in variants open up: omens (a run-wide rule picked from three) and archetype rotation (one home archetype drops out, a guest archetype from another hero joins).
 - Reproducible rule RNG — same seed and inputs give the same result; combat simulation is UI-independent.
 - Full localization packs, offline PWA, and a Capacitor native shell.
 

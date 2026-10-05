@@ -6,7 +6,8 @@ import { FIT_CHANCE } from '../data/meta';
 import { rand, pick } from '../core/rng';
 import { G, heat, type Offer } from './state';
 import { basePrice, hasKind, hasTag, hasGrow, hasAmmo, hasBig } from './cards';
-import { cardOpen, heroUnlocked } from './unlocks';
+import { cardOpen, heroUnlocked, pathOf } from './unlocks';
+import { OMENS } from '../data/meta';
 import type { Tag } from '../data/types';
 import { mv } from './mods';
 
@@ -32,7 +33,24 @@ export type ItemFilter = (it: (typeof ITEMS)[string]) => boolean;
 export const isForeign = (k: string) => !!ITEMS[k].hero && ITEMS[k].hero !== G.hero;
 const FOREIGN_SHARE = 0.1;
 export const FOREIGN_TAX = 2;
-const foreignOk = (k: string) => !ITEMS[k].local && heroUnlocked(ITEMS[k].hero!);
+const foreignOk = (k: string) => {
+  if (ITEMS[k].local) return false;
+  /* 流派轮换：外乡卡只来客串的那个流派（不看那个人物的熟练） / archetype rotation: foreign cards only come from the guest archetype (regardless of that hero's mastery) */
+  if (G.rot) {
+    const p = pathOf(k);
+    return !!p && p[0] === G.rot.gh && p[1].id === G.rot.gp;
+  }
+  return heroUnlocked(ITEMS[k].hero!) && cardOpen(k);
+};
+/** 本家的卡这局卖不卖：流派轮换时少一个流派 / whether a home card is sold this run: rotation drops one archetype */
+export const homeOk = (k: string) => {
+  if (!cardOpen(k)) return false;
+  const p = G.rot && ITEMS[k].hero === G.hero ? pathOf(k) : null;
+  return !p || p[1].id !== G.rot!.off;
+};
+/** 外乡卡占比和加价：流派轮换时客串流派占三成；异象「外乡人」占四成；这两种都不加价 / foreign share and surcharge: rotation's guest archetype takes 30%; the 'Stranger' omen 40%; neither adds a surcharge */
+const foreignShare = () => (G.omen && OMENS[G.omen].foreign) || (G.rot ? 0.3 : FOREIGN_SHARE);
+export const foreignTax = () => (G.rot || (G.omen && OMENS[G.omen].foreign) ? 0 : FOREIGN_TAX);
 /** 风向的卡权重翻倍 / the wind's cards get double weight */
 const WIND_W = 2;
 
@@ -42,10 +60,10 @@ export function rollItem(filter?: ItemFilter | null) {
   for (const k in ITEMS) {
     const it = ITEMS[k];
     const fg = isForeign(k);
-    if (it.noPool || (fg && !foreignOk(k)) || !cardOpen(k)) continue;
+    if (it.noPool || (fg ? !foreignOk(k) : !homeOk(k))) continue;
     if (filter && !filter(it)) continue;
     if (it.t === 2 && R < 2) continue;
-    const w = (it.size === 1 ? 4 : it.size === 2 ? 3 : R >= 4 ? 2.5 : 1.3) * (fg ? 1 : it.hero ? 1.4 : 1) * (G.wind === it.tag ? WIND_W : 1);
+    const w = (it.size === 1 ? 4 : it.size === 2 ? 3 : R >= 4 ? 2.5 : 1.3) * (fg ? 1 : it.hero ? 1.4 : 1) * (G.wind === it.tag || G.wind2 === it.tag ? WIND_W : 1);
     pool.push([k, w]);
   }
   /* 外乡卡整体缩到总权重的一成 / scale foreign cards down to a tenth of the total weight */
@@ -53,7 +71,8 @@ export function rollItem(filter?: ItemFilter | null) {
     far = 0;
   for (const [k, w] of pool) isForeign(k) ? (far += w) : (own += w);
   if (far && own) {
-    const f = (own * FOREIGN_SHARE) / (1 - FOREIGN_SHARE) / far;
+    const sh = foreignShare();
+    const f = (own * sh) / (1 - sh) / far;
     for (const p of pool) if (isForeign(p[0])) p[1] *= f;
   }
   if (!pool.length) return pick(Object.keys(ITEMS).filter((k) => !ITEMS[k].noPool && !ITEMS[k].hero));
@@ -73,7 +92,7 @@ export function makeOffer(filter?: ItemFilter | null, opt: { black?: number | bo
   let price = basePrice(key, adj, tier);
   if (opt.black) price = Math.round(price * 1.5);
   if (opt.free) price = 0;
-  else price += (heat(3) ? 1 : 0) + mv('tax') + (isForeign(key) ? FOREIGN_TAX : 0);
+  else price += (heat(3) ? 1 : 0) + mv('tax') + (isForeign(key) ? foreignTax() : 0);
   return { card: { key, tier, adj, size: ITEMS[key].size, dl: 0, hoard: 0 }, price, sold: false };
 }
 
@@ -87,14 +106,14 @@ export function lockedOffers(offers: Offer[]) {
 
 /* ---------------- 风向 ---------------- / ---------------- Wind ---------------- */
 /** 开局定风向：只在这个人物能买到至少 4 张的元素里挑 / pick the run's wind at start: only among elements this hero can buy at least 4 cards of */
-export function rollWind(): Tag | '' {
+export function rollWind(not: Tag | '' = ''): Tag | '' {
   const n: Partial<Record<Tag, number>> = {};
   for (const k in ITEMS) {
     const it = ITEMS[k];
-    if (it.noPool || (it.hero && it.hero !== G.hero) || !cardOpen(k)) continue;
+    if (it.noPool || (it.hero && it.hero !== G.hero) || !homeOk(k)) continue;
     n[it.tag] = (n[it.tag] || 0) + 1;
   }
-  const ts = (Object.keys(n) as Tag[]).filter((t) => n[t]! >= 4).sort();
+  const ts = (Object.keys(n) as Tag[]).filter((t) => n[t]! >= 4 && t !== not).sort();
   return ts.length ? pick(ts) : '';
 }
 /** 这件遗物顺不顺风：加这个元素的伤害、攻速，或者加它的招牌状态 / whether a relic suits the wind: boosts this element's damage or speed, or its signature status */

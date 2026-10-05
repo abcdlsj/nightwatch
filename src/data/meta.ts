@@ -164,6 +164,22 @@ export const ACH: { id: string; w?: number; n: string; d: string }[] = [
 /** 长夜难度档数（0 是正常难度） / Long Night difficulty tiers (0 is normal) */
 export const HEAT_MAX = 8;
 
+/** 异象：开局三选一、整局都算的规则（某个人物三个流派都守到黎明、长夜难度解锁到 5 以后，可以在起手页勾选开启）。
+ * m 并进修正项；wind 是风向元素的独立乘区；gold 开局多给的金币；foreign 外乡卡占比、不加价；twin 再来一个风向
+ * omens: a run-wide rule picked from three at run start (opt-in on the opening page once a hero has held dawn with all three archetypes and unlocked Long Night 5). m merges into the modifiers; wind is an independent multiplier for the wind element; gold is extra starting gold; foreign is the foreign-card share with no surcharge; twin adds a second wind */
+export const OMENS: Record<string, { m?: Record<string, number>; wind?: number; gold?: number; foreign?: number; twin?: number; n: string; d: string }> = {
+ lonely: { m: { lonely: 0.7 } },
+ crowd: { m: { full: 0.3, s1: 0.2, s3: -0.2 } },
+ giant: { m: { s3: 0.5, s2: 0.2, s1: -0.3 } },
+ mono: { wind: 0.4, m: { dmg: -0.1 } },
+ blood: { m: { enemySpd: 0.12, killGold: 0.04, interest: 2 } },
+ quick: { m: { spd: 0.2, enemySpd: 0.08 } },
+ edge: { m: { crit: 0.15, critDmg: 0.6, dmg: -0.1 } },
+ rich: { gold: 10, m: { tax: 1 } },
+ stranger: { foreign: 0.4 },
+ twin: { twin: 1 },
+} as never;
+
 /** 加码：给今晚加难度换奖励 / modifiers: add difficulty tonight for a reward */
 export const WAGERS: Record<string, { gold?: number; relic?: number; up?: number; heal?: number; n: string; d: string; r: string }> = {
  "horde": {

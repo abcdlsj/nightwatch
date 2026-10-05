@@ -4,7 +4,8 @@ import { EN } from '../../data/enemies';
 import { EVENTS } from '../../data/events';
 import { RELICS } from '../../data/relics';
 import { TALENTS, TCAT } from '../../data/talents';
-import { WAGERS, SYN, SYN2 } from '../../data/meta';
+import { WAGERS, SYN, SYN2, OMENS } from '../../data/meta';
+import { pathsOf } from '../../game/unlocks';
 import { THREATS } from '../../data/threats';
 import { nextSeg } from '../../game/threats';
 import { L, t } from '../../i18n';
@@ -54,7 +55,15 @@ export function renderPreview() {
   const thLine =
     (th.length ? `<b>${t('prep.threats', { s: th.map((k, i) => (i ? THREATS[k].n : `${THREATS[k].n}（${THREATS[k].d}）`)).join(' · ') })}</b><br>` : '') +
     (nx ? `<b class="next">${t('prep.threatsNext', { a: nx.from, b: nx.to, s: nx.ids.map((k) => THREATS[k].n).join(' · ') })}</b><br>` : '');
-  $('#pvNote').innerHTML = thLine + (boss ? boss.intents!.map((it) => `【${it.n}】${it.d}`).join('<br>') : tough ? `${tough.n}${L.ui.common.colon}${tough.tip}` : '');
+  /* 异象和流派轮换一直挂在今晚情报里 / the omen and archetype rotation stay listed in tonight's intel */
+  const pathN = (h: string, id: string) => pathsOf(h).find((p) => p.id === id)?.n || id;
+  const R = G.rot;
+  const varLine =
+    (G.omen ? `<b class="omen">${t('prep.omenLine', { n: OMENS[G.omen].n, d: OMENS[G.omen].d })}</b><br>` : '') +
+    (R && R.off
+      ? `<b class="omen">${R.gh ? t('prep.rotLine', { off: pathN(G.hero, R.off), h: HEROES[R.gh].n, p: pathN(R.gh, R.gp) }) : t('prep.rotLineSolo', { off: pathN(G.hero, R.off) })}</b><br>`
+      : '');
+  $('#pvNote').innerHTML = varLine + thLine + (boss ? boss.intents!.map((it) => `【${it.n}】${it.d}`).join('<br>') : tough ? `${tough.n}${L.ui.common.colon}${tough.tip}` : '');
 }
 
 /* ---------------- 羁绊条：凑到新的一层时提示 ---------------- / ---------------- Synergy bar: announce each new tier reached ---------------- */
@@ -88,7 +97,9 @@ export function renderSyn() {
   if (!el) return;
   const ts = (Object.keys(n) as Tag[]).sort((a, b) => n[b]! - n[a]!);
   /* 风向一直挂着，提醒这局往哪边凑 / the wind chip stays up as a reminder of which way this run leans */
-  const wind = G.wind ? `<span class="sy-l">${L.ui.prep.wind}</span><span class="sy on wind" style="--tagc:${TAGC[G.wind]}">${L.terms.tags[G.wind]}</span>` : '';
+  const wind = G.wind
+    ? `<span class="sy-l">${L.ui.prep.wind}</span>` + [G.wind, G.wind2].filter((w): w is Tag => !!w).map((w) => `<span class="sy on wind" style="--tagc:${TAGC[w]}">${L.terms.tags[w]}</span>`).join('')
+    : '';
   el.innerHTML = wind + (ts.length
     ? `<span class="sy-l">${L.ui.prep.syn}</span>` +
       ts

@@ -84,3 +84,27 @@ describe('敌情', () => {
     G.full = false;
   });
 });
+
+describe('流派轮换', () => {
+  it('不卖去掉的本家流派，外乡卡只来客串的流派，不加价', async () => {
+    const { pathOf } = await import('../../src/game/unlocks');
+    setup('mo', HERO_ORDER);
+    META.mast = { mo: 99, ayla: 99 };
+    Object.assign(G, { rot: { off: 'storm', gh: 'ayla', gp: 'oil' }, omen: '' });
+    let guest = 0;
+    for (let i = 0; i < 600; i++) {
+      const k = rollItem();
+      const p = pathOf(k);
+      if (ITEMS[k].hero === 'mo') expect(p?.[1].id).not.toBe('storm');
+      if (isForeign(k)) {
+        expect(p?.[0]).toBe('ayla');
+        expect(p?.[1].id).toBe('oil');
+        guest++;
+      }
+    }
+    expect(guest).toBeGreaterThan(80);
+    const of = makeOffer((it) => it.hero === 'ayla');
+    expect(of.price).toBe(basePrice(of.card.key, of.card.adj, of.card.tier));
+    Object.assign(G, { rot: null });
+  });
+});

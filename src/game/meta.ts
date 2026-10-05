@@ -47,6 +47,9 @@ export interface Meta {
   pathWins?: Record<string, Record<string, number>>;
   /** 选人页上「完整游戏线」勾没勾 / whether the full game line checkbox is ticked on hero select */
   fullSel?: Record<string, number>;
+  /** 起手页上「异象」「流派轮换」勾没勾 / whether the omen and rotation boxes are ticked on the opening page */
+  omenSel?: Record<string, number>;
+  rotSel?: Record<string, number>;
   /** 每个人物打倒过的隐藏首领 / 走到第十五夜的次数 / hidden bosses each hero has beaten / times they reached night 15 */
   fullDone?: Record<string, { hidden?: number; quiet?: number }>;
 }

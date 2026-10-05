@@ -170,6 +170,9 @@ export default {
     where: '去哪儿？',
     stop: '第 {n} / {m} 站',
     nextStop: '下一站',
+    omenLine: '异象：{n}（{d}）',
+    rotLine: '轮换：这局不卖「{off}」，{h}的「{p}」来客串',
+    rotLineSolo: '轮换：这局不卖「{off}」',
     pickOne: '挑一张',
     refresh: '刷新 <small>(剩{n}次)</small>',
     leave: '离开',
@@ -492,6 +495,13 @@ export default {
     gold: '　开局金币 {g}',
     full: '完整游戏线',
     fullD: '守十五夜。第九夜之后天不会亮，路上有三颗宝石；三颗都拿到，第十五夜会遇见只属于你的那一位。',
+    omen: '异象',
+    omenD: '开局从三条规则里挑一条，整局都算。',
+    rot: '流派轮换',
+    rotD: '这局只卖两个本家流派，另外请一个外乡流派来客串，不加价。',
+    variantLock: '长夜 {h} 解锁后可以开启',
+    omenTitle: '今夜的异象',
+    omenSub: '挑一条，整局都算',
   },
 
   end: {

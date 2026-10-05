@@ -38,6 +38,8 @@ export function heatWon(h: string, played: number) {
 export const pathsOf = (h: string): PathDef[] => PATHS[h] || [];
 export const pathOpen = (h: string, p: PathDef) => mastLv(h) >= p.mast;
 const PATH_OF: Record<string, [string, PathDef]> = {};
+/** 这张专属卡属于哪个人物的哪个流派 / which hero and archetype an exclusive card belongs to */
+export const pathOf = (k: string) => PATH_OF[k];
 for (const h in PATHS) for (const p of PATHS[h]) for (const k of p.cards) PATH_OF[k] = [h, p];
 
 /** 这张卡进不进店：通用卡都进；专属卡要它的流派解锁了 / whether a card can appear in shops: all generic cards can; an exclusive card needs its archetype unlocked */
@@ -75,6 +77,17 @@ export function markPathWin(h: string, path: string) {
 }
 /** 选人页的勾选状态（每个人物各记各的） / the checkbox state on hero select (tracked per hero) */
 export const fullSelected = (h: string) => fullOpen(h) && !!META.fullSel?.[h];
+/* ---------------- 异象和流派轮换：三个流派都守到黎明、长夜难度解锁到 5 以后才能开 ---------------- / ---------------- Omens and archetype rotation: available once all three archetypes have held dawn and Long Night 5 is unlocked ---------------- */
+export const VARIANT_HEAT = 5;
+/** 这个人物三套流派完成了没有、长夜解锁到几档 / whether this hero finished all three archetypes, and how far Long Night is unlocked */
+export const variantOpen = (h: string) => fullOpen(h) && heatOf(h).max >= VARIANT_HEAT;
+export const omenSelected = (h: string) => variantOpen(h) && !!META.omenSel?.[h];
+export const rotSelected = (h: string) => variantOpen(h) && !!META.rotSel?.[h];
+export function setVariant(kind: 'omen' | 'rot', h: string, on: boolean) {
+  const k = kind === 'omen' ? 'omenSel' : 'rotSel';
+  (META[k] ||= {})[h] = on ? 1 : 0;
+  saveMeta();
+}
 export function setFullSelected(h: string, on: boolean) {
   (META.fullSel ||= {})[h] = on ? 1 : 0;
   saveMeta();

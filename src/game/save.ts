@@ -3,6 +3,7 @@ import { ITEMS } from '../data/cards';
 import { HEROES } from '../data/heroes';
 import { TALENTS } from '../data/talents';
 import { EN } from '../data/enemies';
+import { OMENS } from '../data/meta';
 import { rng } from '../core/rng';
 import { store, KEYS } from '../platform/storage';
 import { G, freshRun, type GameState, type Offer, type RunStats } from './state';
@@ -19,6 +20,7 @@ export interface SaveData {
   cards: { key: string; tier: number; adj: string | null; loc: any; idx: number; hoard: number; grow: number; qp: number; carry?: boolean; star?: number }[];
   secret?: Record<string, number>;
   wind?: string; windRelic?: boolean;
+  wind2?: string; omen?: string; rot?: { off: string; gh: string; gp: string } | null;
   /** 新版加的：种子和随机数状态（旧存档没有，读的时候另起一个） / added in the new version: seed and RNG state (missing in old saves; start a fresh one on load) */
   seed?: number;
   rng?: number;
@@ -32,6 +34,7 @@ export function saveGame(rngState = rng.state) {
     endless: !!G.endless, lock: G.lock || null,
     cards: G.cards.map((c) => ({ key: c.key, tier: c.tier, adj: c.adj, loc: c.loc, idx: c.idx, hoard: c.hoard, grow: c.grow || 0, qp: c.qp || 0, carry: c.carry || undefined, star: c.star || undefined })),
     secret: G.secret, seed: G.seed, rng: rngState, wind: G.wind, windRelic: G.windRelic,
+    wind2: G.wind2 || '', omen: G.omen || '', rot: G.rot || null,
   };
   store.setJson(KEYS.save, s);
 }
@@ -48,6 +51,7 @@ export function restoreSave(s: SaveData | null): boolean {
     boss9: EN[s.boss9 || s.boss8 || ''] ? s.boss9 || s.boss8 : 'eye', boss12: EN[s.boss12 || ''] ? s.boss12 : 'brood', full: !!s.full, gems: s.gems || {}, arc: s.arc || 0, kitPath: s.kitPath || '',
     endless: !!s.endless, maxRound: s.endless ? 999 : s.full ? FULL_NIGHTS : NIGHTS, lock: s.lock || null, fightWave: null, cards: [],
     secret: s.secret || {}, seed: s.seed ?? 0, wind: (s.wind || '') as GameState['wind'], windRelic: !!s.windRelic,
+    wind2: (s.wind2 || '') as GameState['wind'], omen: OMENS[s.omen || ''] ? s.omen : '', rot: s.rot || null,
   });
   if (s.rng != null) rng.state = s.rng;
   for (const d of s.cards || []) {

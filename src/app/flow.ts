@@ -3,14 +3,15 @@ import { ITEMS, TIERS } from '../data/cards';
 import { EN, FOESETS } from '../data/enemies';
 import { HEROES } from '../data/heroes';
 import { RELICS } from '../data/relics';
-import { WAGERS } from '../data/meta';
+import { WAGERS, OMENS } from '../data/meta';
+import type { KitDef } from '../data/types';
 import { L, t } from '../i18n';
-import { pick, reseed, newSeed, rng } from '../core/rng';
+import { pick, shuffled, reseed, newSeed, rng } from '../core/rng';
 import { G, freshRun, type PrepStop } from '../game/state';
 import { recalcMods } from '../game/mods';
 import { boardCards } from '../game/cards';
 import { codexSweep, runWon, mastStart, nextBoss, markBoss, fullDone, nextArc } from '../game/meta';
-import { markPathWin } from '../game/unlocks';
+import { markPathWin, pathsOf, heroList, heroUnlocked } from '../game/unlocks';
 import { NIGHTS, FULL_NIGHTS, GEM_NIGHTS, nightKind, lastNight, finalBosses } from '../game/plan';
 import { rollDoors, hordeWave, ambushWave, ambushGold, placeKit } from '../game/prep';
 import { rollGear, withFit, rollWind, RULE_NIGHTS } from '../game/loot';
@@ -37,7 +38,7 @@ import { renderPreview, renderPrep } from './prep/view';
 import { relicChoice, gainRelic } from './prep/actions';
 import { cancelDrag } from './prep/drag';
 import { setDrawer, UI_drawer } from './prep/drawer';
-import { pickKit, endScreen, heroSelect } from './screens';
+import { pickKit, pickOmen, endScreen, heroSelect, type KitOpts } from './screens';
 
 /** 网址里带 ?seed=123 时用固定种子（测试和复现问题用） / with ?seed=123 in the URL, use a fixed seed (for tests and reproducing bugs) */
 function seedFromUrl() {
@@ -56,6 +57,7 @@ export function newGame(hero: string) {
   Object.assign(G, {
     heat: 0, run: freshRun(), round: 1, maxRound: NIGHTS, endless: false, lock: null, fightWave: null, gold: H.gold, wall: H.wall, wallMax: H.wall,
     cards: [], relics: [], skills: [], bestChain: 0, secret: {}, foeSet: pick(Object.keys(FOESETS)), full: false, gems: {}, arc: 0,
+    omen: '', rot: null, wind2: '',
   });
   G.boss9 = nextBoss(G.hero);
   G.arc = nextArc(G.hero);
@@ -64,23 +66,47 @@ export function newGame(hero: string) {
   G.windRelic = false;
   recalcMods();
   renderRelics();
-  pickKit((kit, hh, full) => {
-    /* 长夜难度在起手页里选：第 4 档起城墙上限 -15% / Long Night difficulty is chosen on the opening page: from tier 4 the wall cap is -15% */
-    G.heat = hh;
-    G.kitPath = kit.path;
-    G.full = full;
-    G.maxRound = lastNight();
-    G.wall = G.wallMax = Math.round(H.wall * (hh >= 4 ? 0.85 : 1));
-    placeKit(kit.cards);
-    if (kit.gold) G.gold = Math.max(0, G.gold + kit.gold);
-    mastStart();
-    renderRelics(G.relics.length);
-    resetGoldBump();
-    renderOwned();
-    updateHUD();
-    G.firstPrep = true;
-    playPrologue(() => toPrep());
+  pickKit((kit, o) => {
+    /* 流派轮换：起手的流派保留，另外两个本家流派去掉一个；风向按剩下的卡池重抽 / archetype rotation: keep the opening's archetype, drop one of the other two home archetypes, and re-roll the wind from what remains */
+    if (o.rot) {
+      const others = pathsOf(G.hero).filter((p) => p.id !== kit.path);
+      const guests = heroList().filter((h) => h !== G.hero && heroUnlocked(h) && pathsOf(h).length);
+      const gh = guests.length ? pick(guests) : '';
+      G.rot = { off: others.length ? pick(others).id : '', gh, gp: gh ? pick(pathsOf(gh)).id : '' };
+      G.wind = rollWind();
+    }
+    if (!o.omen) return startRun(kit, o);
+    /* 异象三选一：没有风向就不出「一色」「双风」 / omen pick of three: without a wind, 'Monochrome' and 'Twin Winds' are left out */
+    const ids = shuffled(Object.keys(OMENS).filter((k) => G.wind || !(OMENS[k].wind || OMENS[k].twin))).slice(0, 3);
+    pickOmen(ids, (k) => {
+      G.omen = k;
+      if (OMENS[k].twin) G.wind2 = rollWind(G.wind);
+      if (OMENS[k].gold) G.gold += OMENS[k].gold!;
+      recalcMods();
+      startRun(kit, o);
+    });
   });
+}
+
+function startRun(kit: KitDef, o: KitOpts) {
+  const H = HEROES[G.hero];
+  const hh = o.heat,
+    full = o.full;
+  /* 长夜难度在起手页里选：第 4 档起城墙上限 -15% / Long Night difficulty is chosen on the opening page: from tier 4 the wall cap is -15% */
+  G.heat = hh;
+  G.kitPath = kit.path;
+  G.full = full;
+  G.maxRound = lastNight();
+  G.wall = G.wallMax = Math.round(H.wall * (hh >= 4 ? 0.85 : 1));
+  placeKit(kit.cards);
+  if (kit.gold) G.gold = Math.max(0, G.gold + kit.gold);
+  mastStart();
+  renderRelics(G.relics.length);
+  resetGoldBump();
+  renderOwned();
+  updateHUD();
+  G.firstPrep = true;
+  playPrologue(() => toPrep());
 }
 
 /** 接着上回的存档 / continue from the last save */

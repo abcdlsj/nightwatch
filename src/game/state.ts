@@ -171,6 +171,12 @@ export interface GameState {
   secret: Record<string, number>;
   /** 本局风向：这个元素的卡、专卖店、遗物更常见（空串表示没有） / this run's wind: cards, specialty shops and relics of this element show up more ('' for none) */
   wind: Tag | '';
+  /** 第二个风向（异象「双风」） / a second wind (the 'Twin Winds' omen) */
+  wind2?: Tag | '';
+  /** 本局异象（没开就是空串） / this run's omen ('' when off) */
+  omen?: string;
+  /** 流派轮换：这局不卖的本家流派、客串的外乡人物和流派（没开就是 null） / archetype rotation: this run's missing home archetype, plus the guest hero and archetype (null when off) */
+  rot?: { off: string; gh: string; gp: string } | null;
   /** 风向的保底遗物已经给过 / the wind's guaranteed relic has been offered */
   windRelic: boolean;
   /** 本局种子：开局时定好，和 rng 的状态一起存档 / this run's seed: set at run start and saved alongside the rng state */

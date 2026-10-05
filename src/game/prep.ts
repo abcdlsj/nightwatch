@@ -10,8 +10,7 @@ import { clamp } from '../core/util';
 import { G, type Card, type Offer, type Wave, type Zone } from './state';
 import { recalcMods } from './mods';
 import { newCard, firstFit, countSame, zoneN, occ } from './cards';
-import { talentOk, type ItemFilter } from './loot';
-import { cardOpen } from './unlocks';
+import { talentOk, homeOk, type ItemFilter } from './loot';
 import { foeKey } from './foes';
 
 /* ---------------- 备战事件的条件 ---------------- / ---------------- Prep event conditions ---------------- */
@@ -25,7 +24,7 @@ export const EVENT_FILTER: Record<string, ItemFilter> = {
   apothecary: (it) => it.kind === 'potion' || it.kind === 'lamp',
 };
 /** 这个人物能买到的卡里，满足条件的有几张（专属卡要流派解锁） / how many of the cards this hero can buy meet the condition (exclusive cards need their archetype unlocked) */
-const poolN = (f: ItemFilter) => Object.keys(ITEMS).filter((k) => !ITEMS[k].noPool && (!ITEMS[k].hero || ITEMS[k].hero === G.hero) && cardOpen(k) && f(ITEMS[k])).length;
+const poolN = (f: ItemFilter) => Object.keys(ITEMS).filter((k) => !ITEMS[k].noPool && (!ITEMS[k].hero || ITEMS[k].hero === G.hero) && homeOk(k) && f(ITEMS[k])).length;
 /** 专卖店（铁匠铺、炼火工坊……）：这个人物能买的同类卡不到 4 张就不开 / specialty shop (smithy, fire forge…): does not open unless this hero has at least 4 buyable cards of that kind */
 /** 训练场能升到的最高档：第 4 夜前最多到银，之后最多到金 / highest tier the training ground can reach: silver before night 4, gold from then on */
 export const trainCap = () => (G.round < 4 ? 1 : 2);
@@ -61,7 +60,7 @@ const SECRET_DOORS: [string, () => boolean][] = [
 
 /** 风向对应的专卖店，抽中的权重翻倍 / the specialty shop matching the wind gets double draw weight */
 const WIND_SHOP: Partial<Record<string, string>> = { blade: 'smith', mech: 'smith', fire: 'forge', volt: 'storm', ice: 'frostshop' };
-const doorW = (i: string) => EVENTS[i].w * (G.wind && WIND_SHOP[G.wind] === i ? 2 : 1);
+const doorW = (i: string) => EVENTS[i].w * ((G.wind && WIND_SHOP[G.wind] === i) || (G.wind2 && WIND_SHOP[G.wind2] === i) ? 2 : 1);
 
 /** 这扇门现在能不能出 / whether this door can appear right now */
 const doorOk = (id: string) => {

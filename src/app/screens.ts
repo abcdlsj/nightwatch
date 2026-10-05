@@ -1,7 +1,7 @@
 /* 整屏页面：标题、选人、起手三选一、结局 / full-screen pages: title, hero select, opening choice, ending */
 import { ITEMS, ADJ, TIERS } from '../data/cards';
 import { HEROES, KITS } from '../data/heroes';
-import { ACH } from '../data/meta';
+import { ACH, OMENS } from '../data/meta';
 import type { KitDef } from '../data/types';
 import { L, t } from '../i18n';
 import { shuffled } from '../core/rng';
@@ -9,7 +9,7 @@ import { clamp } from '../core/util';
 import { G, freshRun } from '../game/state';
 import { META, ACHM, saveMeta, achCount, mastLv, mastNext, mastGain, recordRun, endlessLost, endFrom } from '../game/meta';
 import { lastNight, nightKind } from '../game/plan';
-import { heroList, heroUnlocked, heroNeeds, heatOf, pathsOf, pathOpen, kitOpen, fullOpen, fullSelected, setFullSelected } from '../game/unlocks';
+import { heroList, heroUnlocked, heroNeeds, heatOf, pathsOf, pathOpen, kitOpen, fullOpen, fullSelected, setFullSelected, variantOpen, omenSelected, rotSelected, setVariant, VARIANT_HEAT } from '../game/unlocks';
 import { loadSave, clearSave } from '../game/save';
 import { B } from '../sim/battle';
 import { setScene } from '../render/background';
@@ -176,7 +176,52 @@ function bindFull(hero: string) {
   };
 }
 
-export function pickKit(done: (k: KitDef, heat: number, full: boolean) => void) {
+/** 异象、流派轮换的勾选框：三个流派都守到黎明后出现；长夜难度没到 5 档时灰着，写解锁条件
+ * omen and rotation checkboxes: appear once all three archetypes have held dawn; greyed out with the unlock condition until Long Night 5 */
+function variantBoxes(hero: string) {
+  if (!fullOpen(hero)) return '';
+  const T = L.ui.kits;
+  if (!variantOpen(hero)) return `<div class="fullbox locked"><span><b>${T.omen} · ${T.rot}</b><small>${t('kits.variantLock', { h: VARIANT_HEAT })}</small></span></div>`;
+  const box = (id: string, on: boolean, n: string, d: string) =>
+    `<label class="fullbox${on ? ' on' : ''}"><input type="checkbox" id="${id}"${on ? ' checked' : ''}><span><b>${n}</b><small>${d}</small></span></label>`;
+  return box('omenChk', omenSelected(hero), T.omen, T.omenD) + box('rotChk', rotSelected(hero), T.rot, T.rotD);
+}
+function bindVariants(hero: string) {
+  for (const [id, kind] of [['omenChk', 'omen'], ['rotChk', 'rot']] as const) {
+    const c = document.getElementById(id) as HTMLInputElement | null;
+    if (!c) continue;
+    c.onchange = () => {
+      setVariant(kind, hero, c.checked);
+      c.parentElement!.classList.toggle('on', c.checked);
+      SFX.play(c.checked ? 'intent' : 'ui');
+    };
+  }
+}
+
+/** 异象三选一 / pick one omen of three */
+export function pickOmen(ids: string[], done: (k: string) => void) {
+  const sc = $('#screen');
+  const T = L.ui.kits;
+  sc.innerHTML = `<div class="scr"><h1 style="font-size:28px">${T.omenTitle}</h1><div class="logo-sub">${T.omenSub}</div>
+  <div class="kits">${ids.map((k, i) => `<button class="kit omen" data-i="${i}"><div><b>${OMENS[k].n}</b><span>${OMENS[k].d}</span></div></button>`).join('')}</div></div>`;
+  sc.hidden = false;
+  sc.querySelectorAll<HTMLElement>('.kit').forEach(
+    (b) =>
+      (b.onclick = () => {
+        SFX.play('merge');
+        sc.hidden = true;
+        done(ids[+b.dataset.i!]);
+      }),
+  );
+}
+
+export interface KitOpts {
+  heat: number;
+  full: boolean;
+  omen: boolean;
+  rot: boolean;
+}
+export function pickKit(done: (k: KitDef, o: KitOpts) => void) {
   const H = HEROES[G.hero];
   const all = KITS[G.hero] || [{ n: '', d: '', path: '', cards: H.start.map((s) => [s[0], s[1]] as [string, number]) }];
   const open = all.filter((k) => kitOpen(G.hero, k));
@@ -187,7 +232,7 @@ export function pickKit(done: (k: KitDef, heat: number, full: boolean) => void) 
   const sc = $('#screen');
   const T = L.ui.kits;
   setScene('title');
-  sc.innerHTML = `<div class="scr">${fullBox(G.hero)}<img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="font-size:28px">${T.title}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
+  sc.innerHTML = `<div class="scr">${fullBox(G.hero)}${variantBoxes(G.hero)}<img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="font-size:28px">${T.title}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
   ${heatBar(G.hero)}
   <div class="kits">${list
     .map((k, i) => {
@@ -200,13 +245,14 @@ export function pickKit(done: (k: KitDef, heat: number, full: boolean) => void) 
   sc.hidden = false;
   bindHeat(G.hero);
   bindFull(G.hero);
+  bindVariants(G.hero);
   sc.querySelectorAll<HTMLElement>('.kit').forEach(
     (b) =>
       (b.onclick = () => {
         SFX.ensure();
         SFX.play('merge');
         sc.hidden = true;
-        done(list[+b.dataset.i!], heatOf(G.hero).sel, fullSelected(G.hero));
+        done(list[+b.dataset.i!], { heat: heatOf(G.hero).sel, full: fullSelected(G.hero), omen: omenSelected(G.hero), rot: rotSelected(G.hero) });
       }),
   );
 }

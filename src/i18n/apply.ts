@@ -5,7 +5,7 @@ import { TALENTS, TCAT } from '../data/talents';
 import { EN, FOESETS } from '../data/enemies';
 import { EVENTS } from '../data/events';
 import { HEROES, KITS, PATHS } from '../data/heroes';
-import { ACH, WAGERS } from '../data/meta';
+import { ACH, WAGERS, OMENS } from '../data/meta';
 import { VOICES } from '../data/voices';
 import { THREATS } from '../data/threats';
 import type { LocalePack } from './index';
@@ -21,6 +21,7 @@ export function applyLocale(P: LocalePack) {
   fill(EVENTS, P.events);
   fill(ADJ, P.terms.adj);
   fill(WAGERS, P.meta.wagers);
+  fill(OMENS, P.meta.omens);
   fill(THREATS, P.terms.threats);
   for (const k in EN) {
     const tx = (P.enemies as any)[k] || {};
