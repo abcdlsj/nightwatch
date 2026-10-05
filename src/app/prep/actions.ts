@@ -20,6 +20,9 @@ import { elOf, renderOwned, repaint } from '../../ui/card-view';
 import { updateHUD, renderRelics, toast, tipOnce } from '../../ui/hud';
 import { renderPrep } from './view';
 import { prepStops } from './jumps';
+import { gemScene } from '../../game/story';
+import { GEMS, gemCount, type Gem } from '../../game/plan';
+import { pickLine } from '../../game/text';
 
 /* ---------------- 进一站 ---------------- */
 export function enterEvent(id: string) {
@@ -271,6 +274,52 @@ function enterMore(id: string, cur: PrepStop) {
 function rollRareAdj(c: Card) {
   const pool = Object.keys(ADJ).filter((k) => ADJ[k].r === 2 && k !== c.adj);
   return pick(pool);
+}
+
+/* ---------------- 宝石（完整游戏线） ---------------- */
+export function startGem() {
+  const g = G.prep.gem as Gem;
+  const sc = gemScene(g);
+  G.prep.cur = { id: 'gem', mode: 'gem', gem: g, who: sc.who, title: sc.title, sc, li: 1, intro: sc.lines };
+}
+/** 拿或不拿：拿了得宝石（带代价），不拿换一样别的；这一颗以后都不会再有 */
+export function answerGem(cur: PrepStop, take: boolean) {
+  const g = cur.gem as Gem;
+  const T = L.ui.prep;
+  const opt = take ? cur.sc.take : cur.sc.refuse;
+  cur.ans = pickLine(opt.t);
+  cur.re = opt.re;
+  G.gems[g] = take ? 1 : -1;
+  if (take) {
+    gainRelicState('gem_' + g);
+    renderRelics('gem_' + g);
+    cur.gain = t('prep.gemTaken', { n: RELICS['gem_' + g].n });
+    if (gemCount() === GEMS.length) unlock('gems3');
+  } else if (g === 'red') {
+    gainGold(10);
+    cur.gain = t('prep.gemGold', { n: 10 });
+  } else if (g === 'blue') {
+    const r = rollGear(1, 3, 2)[0];
+    if (r) {
+      gainRelicState(r);
+      renderRelics(r);
+    }
+    cur.gain = r ? t('prep.talkRelic', { n: RELICS[r].n }) : T.gemNothing;
+  } else {
+    G.wallMax += 8;
+    G.wall += 8;
+    cur.gain = t('prep.talkWall', { n: 8 });
+  }
+  cur.mode = 'gemDone';
+  renderOwned();
+  updateHUD();
+  SFX.play(take ? 'merge' : 'ui');
+  renderPrep();
+}
+export function endGem() {
+  G.prep.gemDone = true;
+  G.prep.cur = null;
+  renderPrep();
 }
 
 /* ---------------- 夜谈 / 学天赋 ---------------- */

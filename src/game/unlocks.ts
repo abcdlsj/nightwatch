@@ -51,3 +51,31 @@ export function kitOpen(h: string, k: KitDef) {
   const p = pathsOf(h).find((x) => x.id === k.path);
   return !p || pathOpen(h, p);
 }
+
+/* ---------------- 完整游戏线：三个流派的起手各守到一次黎明 ---------------- */
+const pathWins = (h: string) => META.pathWins?.[h] || {};
+/** 解锁进度：守过黎明的流派数 / 这个人物一共几个流派 */
+export function fullProgress(h: string) {
+  const ps = pathsOf(h);
+  const w = pathWins(h);
+  return { n: ps.filter((p) => w[p.id]).length, of: Math.max(1, ps.length) };
+}
+export const fullOpen = (h: string) => {
+  const p = fullProgress(h);
+  return p.n >= p.of;
+};
+/** 用某个流派的起手守到黎明：记一笔，返回进度和这次是不是刚好解锁 */
+export function markPathWin(h: string, path: string) {
+  if (!path || !pathsOf(h).some((p) => p.id === path)) return null;
+  const was = fullOpen(h);
+  ((META.pathWins ||= {})[h] ||= {})[path] = 1;
+  saveMeta();
+  const p = fullProgress(h);
+  return { ...p, opened: !was && fullOpen(h) };
+}
+/** 选人页的勾选状态（每个人物各记各的） */
+export const fullSelected = (h: string) => fullOpen(h) && !!META.fullSel?.[h];
+export function setFullSelected(h: string, on: boolean) {
+  (META.fullSel ||= {})[h] = on ? 1 : 0;
+  saveMeta();
+}

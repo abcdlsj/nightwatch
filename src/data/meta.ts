@@ -134,6 +134,30 @@ export const ACH: { id: string; w?: number; n: string; d: string }[] = [
  },
  {
   "id": "bell701"
+ },
+ {
+  "id": "gems3"
+ },
+ {
+  "id": "full15"
+ },
+ {
+  "id": "truth"
+ },
+ {
+  "id": "hid_ayla"
+ },
+ {
+  "id": "hid_mo"
+ },
+ {
+  "id": "hid_ying"
+ },
+ {
+  "id": "hid_jun"
+ },
+ {
+  "id": "hid_li"
  }
 ] as never;
 

@@ -24,6 +24,8 @@ export interface Enemy {
   sprK: string | null;
   revealed: boolean;
   dashT: number; hardT: number;
+  /** 上弦：快一半的剩余秒数 */
+  rushT?: number;
   /** 当前意图序号和倒计时 */
   ii: number; it: number;
   dead: boolean;

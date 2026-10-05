@@ -96,6 +96,10 @@ export interface RunStats {
   newHeat?: number;
   /** 这局解锁的新人物 */
   newHero?: string;
+  /** 这局守到黎明后，这个人物守过黎明的流派（完整游戏线解锁进度） */
+  pathWin?: [number, number];
+  /** 这局解锁了完整游戏线 */
+  newFull?: boolean;
   hid?: number;
 }
 
@@ -111,6 +115,9 @@ export interface Prep {
   doors: string[];
   talk?: boolean;
   talkDone?: boolean;
+  /** 完整线：这夜之前有一颗宝石的剧情 */
+  gem?: string;
+  gemDone?: boolean;
   rare?: number;
   fought?: boolean;
   wagers?: string[];
@@ -150,6 +157,8 @@ export interface GameState {
   gems: Record<string, number>;
   /** 这局走的是人物的第几套剧情 */
   arc: number;
+  /** 起手套属于哪个流派（用三个流派各守到一次黎明，解锁完整游戏线） */
+  kitPath: string;
   endless: boolean;
   lock: Offer | null;
   seenFoes: Record<string, number>;
@@ -183,6 +192,7 @@ export const G: GameState = {
   full: false,
   gems: {},
   arc: 0,
+  kitPath: '',
   endless: false,
   lock: null,
   seenFoes: {},

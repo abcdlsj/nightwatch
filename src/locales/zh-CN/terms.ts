@@ -164,6 +164,7 @@ export default {
   "rx_toxic": "毒爆效果",
   "rx_super": "超导效果",
   "xdmg": "全部伤害",
+  "tax": "店里每样东西贵",
   "xtag_blade": "【刃】卡伤害",
   "xtag_fire": "【火】卡伤害",
   "xtag_ice": "【冰】卡伤害",

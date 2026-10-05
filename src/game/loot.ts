@@ -7,6 +7,7 @@ import { rand, pick } from '../core/rng';
 import { G, heat, type Offer } from './state';
 import { basePrice, hasKind, hasTag, hasGrow, hasAmmo, hasBig } from './cards';
 import { cardOpen } from './unlocks';
+import { mv } from './mods';
 
 /* ---------------- 卡牌 ---------------- */
 export function rollAdj(key: string, force?: boolean, exclude?: string | null, maxTier?: number) {
@@ -53,7 +54,7 @@ export function makeOffer(filter?: ItemFilter | null, opt: { black?: number | bo
   let price = basePrice(key, adj, tier);
   if (opt.black) price = Math.round(price * 1.5);
   if (opt.free) price = 0;
-  else if (heat(3)) price += 1;
+  else price += (heat(3) ? 1 : 0) + mv('tax');
   return { card: { key, tier, adj, size: ITEMS[key].size, dl: 0, hoard: 0 }, price, sold: false };
 }
 
@@ -83,13 +84,13 @@ export function rollGear(n: number, bonus?: number, maxTier?: number) {
       }
     }
     const pool = Object.keys(RELICS).filter(
-      (k) => RELICS[k].t === tier && !RELICS[k].fit && (!RELICS[k].hero || RELICS[k].hero === G.hero) && !out.includes(k) && !(RELICS[k].u && G.relics.includes(k)),
+      (k) => RELICS[k].t === tier && !RELICS[k].fit && !RELICS[k].gem && (!RELICS[k].hero || RELICS[k].hero === G.hero) && !out.includes(k) && !(RELICS[k].u && G.relics.includes(k)),
     );
     if (pool.length) out.push(pick(pool));
   }
   return out;
 }
-export const gearPrice = (k: string) => [5, 9, 14, 20][RELICS[k].t] + Math.floor(G.round / 2);
+export const gearPrice = (k: string) => [5, 9, 14, 20][RELICS[k].t] + Math.floor(G.round / 2) + mv('tax');
 
 /* ---------------- 天赋 ---------------- */
 export function talentOk(id: string) {

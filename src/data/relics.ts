@@ -755,5 +755,37 @@ export const RELICS: Record<string, RelicDef> = {
   "m": {
    "xcarry": 0.3
   }
+ },
+ "gem_red": {
+  "t": 3,
+  "ico": "gem:R",
+  "u": 1,
+  "gem": "red",
+  "m": {
+   "xdmg": 0.12,
+   "wall": -6
+  }
+ },
+ "gem_blue": {
+  "t": 3,
+  "ico": "gem:c",
+  "u": 1,
+  "gem": "blue",
+  "m": {
+   "startCharge": 0.3,
+   "chain": 1,
+   "tax": 1
+  }
+ },
+ "gem_green": {
+  "t": 3,
+  "ico": "gem:G",
+  "u": 1,
+  "gem": "green",
+  "m": {
+   "regen": 3,
+   "shieldStart": 4,
+   "enemySpd": 0.05
+  }
  }
 } as unknown as Record<string, RelicDef>;

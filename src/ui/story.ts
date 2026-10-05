@@ -9,7 +9,8 @@ import { spr } from '../render/sprites';
 import { SFX } from '../audio/sfx';
 import { $ } from './dom';
 
-type Page = { who?: string; t?: any; title?: string; act?: string };
+import { fullPages, noDawnPages, type Page } from '../game/story';
+import { voiceOf } from './voice';
 type Mode = 'dawn' | 'fall' | 'night';
 
 export function playStory(pages: Page[], mode: Mode, done?: () => void) {
@@ -20,13 +21,9 @@ export function playStory(pages: Page[], mode: Mode, done?: () => void) {
   const S = L.ui.story;
   const who = (p: Page) => {
     if (p.who === 'narr') return { n: S.narr, img: spr('lantern').url, c: '#9fb3ba' };
-    if (p.who === 'hero') {
-      const H = HEROES[G.hero];
-      return { n: H.n, img: spr(H.portrait).url, c: H.col };
-    }
     if (p.who === 'knight') return { n: S.knight, img: spr('knight').url, c: '#c79bff' };
     if (p.who === 'eye') return { n: S.eye, img: spr('eye').url, c: '#ff6b5b' };
-    return { n: '', img: '', c: '#fff' };
+    return voiceOf(p.who || 'narr');
   };
   const skipBtn = `<div class="st-tap">${S.tap}</div><button class="btn sm st-skip" id="stSkip">${S.skip}</button>`;
   const show = () => {
@@ -89,6 +86,12 @@ export function playStory(pages: Page[], mode: Mode, done?: () => void) {
 }
 
 export const playPrologue = (done: () => void) => playStory(L.story.prologue as Page[], 'night', done);
+/** 完整线：第 9 夜首领倒下，天没亮 */
+export const playNoDawn = (done: () => void) => playStory(noDawnPages(G.boss9), 'night', done);
+/** 完整线：第 15 夜宝石不全，安静地天亮 */
+export const playQuiet = (done: () => void) => playStory(fullPages('quiet'), 'dawn', done);
+/** 完整线：打倒隐藏首领，真正的天亮 */
+export const playTrueWin = (done: () => void) => playStory(fullPages('trueWin'), 'dawn', done);
 export const playLose = (done: () => void) => playStory(L.story.lose as Page[], 'fall', done);
 
 /** 黎明：首领不同第一句不同；满足条件时多出隐藏剧情（借来的星、第七百零一下） */

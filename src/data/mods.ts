@@ -117,6 +117,10 @@ export const MODL: Record<string, [number, number?]> = {
   1,
   1
  ],
+ "tax": [
+  0,
+  1
+ ],
  "shellChain": [
   2
  ],

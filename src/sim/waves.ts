@@ -84,7 +84,7 @@ export function makeWave(r: number): Wave {
       pack({ bat: 5, bomber: 2 }, 3, 2, 28); pack({ berserker: 2, drummer: 1 }, 2, 10, 26); pack({ skel: 4, shieldb: 2 }, 1, 24, 24);
       break;
     case 11:
-      pack({ siege: 1 }, 3, 2, 26); pack({ catapult: 2 }, 2, 2, 14); pack({ golem: 1, shieldb: 1, drummer: 1 }, 3, 4, 28); pack({ skel: 3, necro: 1 }, 2, 0, 24);
+      pack({ siege: 1 }, 2, 4, 24); pack({ catapult: 2 }, 1, 2, 2); pack({ golem: 1, shieldb: 1, drummer: 1 }, 2, 4, 28); pack({ skel: 3, necro: 1 }, 2, 0, 24);
       pack({ bug: 3, mimic: 1 }, 2, 6, 22); pack({ bat: 5, bomber: 2 }, 3, 4, 30); pack({ berserker: 3, drummer: 1 }, 1, 26, 26);
       break;
     case 12:
@@ -97,8 +97,8 @@ export function makeWave(r: number): Wave {
       break;
     /* 第 14 夜：最长的一夜，所有东西一起来 */
     case 14:
-      boss(pick(ELITES), 4); boss(pick(ELITES), 24); pack({ siege: 1 }, 2, 6, 30); pack({ catapult: 2 }, 2, 2, 20); pack({ skel: 3, necro: 1 }, 3, 0, 32); pack({ golem: 1, shaman: 1, shieldb: 1 }, 3, 4, 34);
-      pack({ berserker: 2, drummer: 1 }, 3, 2, 34); pack({ ghost: 3 }, 3, 8, 32); pack({ bat: 5, bomber: 2 }, 4, 2, 36); pack({ bug: 3, slime: 4 }, 3, 0, 30); pack({ skel: 4, berserker: 2, shieldb: 1 }, 1, 36, 36);
+      boss(pick(ELITES), 4); boss(pick(ELITES), 24); pack({ siege: 1 }, 1, 10, 10); pack({ catapult: 2 }, 1, 2, 2); pack({ skel: 3, necro: 1 }, 3, 0, 32); pack({ golem: 1, shaman: 1, shieldb: 1 }, 2, 4, 34);
+      pack({ berserker: 2, drummer: 1 }, 3, 2, 34); pack({ ghost: 3 }, 3, 8, 32); pack({ bat: 5, bomber: 2 }, 3, 2, 36); pack({ bug: 3, slime: 4 }, 3, 0, 30); pack({ skel: 4, berserker: 2, shieldb: 1 }, 1, 36, 36);
       break;
     case 15:
       if (bk) boss(bk, 1);

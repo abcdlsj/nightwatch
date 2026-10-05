@@ -9,7 +9,7 @@ import { KITS, HEROES } from '../../src/data/heroes';
 import { makeWave } from '../../src/sim/waves';
 import { B, startBattle, simStep, settleWin, setOnEnd } from '../../src/sim/battle';
 import { nightInfo } from '../../src/game/nights';
-import { finalBosses } from '../../src/game/plan';
+import { finalBosses, hiddenBoss, nightKind } from '../../src/game/plan';
 import { EN } from '../../src/data/enemies';
 import { INTENTS } from '../../src/sim/enemies';
 
@@ -83,6 +83,35 @@ describe('战斗模拟', () => {
       expect(r.result).toBe('lose');
       expect(r.spawned).toBeGreaterThan(50);
     }
+  });
+
+  it('完整线：每个人物都有隐藏首领，三颗宝石齐了第十五夜才出现', () => {
+    for (const hero of Object.keys(HEROES)) {
+      const k = hiddenBoss(hero)!;
+      expect(k, hero).toBeTruthy();
+      for (const it of EN[k].intents || []) expect(INTENTS[it.a], `${k} 的招式 ${it.a}`).toBeTruthy();
+      newRun(hero, 0, 99);
+      G.full = true;
+      G.gems = { red: 1, blue: 1, green: -1 };
+      expect(nightKind(15)).toBe('quiet');
+      G.gems.green = 1;
+      expect(nightKind(15)).toBe('hidden');
+      const r = night(15);
+      expect(r.result).toBe('lose');
+      G.full = false;
+    }
+  });
+
+  it('完整线第十到十四夜都能打起来，第十二夜有首领', () => {
+    newRun('li', 0, 4);
+    G.full = true;
+    G.boss12 = 'mistmother';
+    for (const r of [10, 11, 12, 13, 14]) {
+      const w = makeWave(r);
+      expect(w.length, `第${r}夜`).toBeGreaterThan(40);
+      if (r === 12) expect(w.some((s) => s.type === 'mistmother')).toBe(true);
+    }
+    G.full = false;
   });
 
   it('第八夜（首领前夜）带一个精英', () => {

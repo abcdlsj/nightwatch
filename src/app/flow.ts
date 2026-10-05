@@ -9,8 +9,9 @@ import { pick, reseed, newSeed, rng } from '../core/rng';
 import { G, freshRun, type PrepStop } from '../game/state';
 import { recalcMods } from '../game/mods';
 import { boardCards } from '../game/cards';
-import { codexSweep, runWon, mastStart, nextBoss, markBoss } from '../game/meta';
-import { NIGHTS, nightKind, lastNight, finalBosses } from '../game/plan';
+import { codexSweep, runWon, mastStart, nextBoss, markBoss, fullDone } from '../game/meta';
+import { markPathWin } from '../game/unlocks';
+import { NIGHTS, GEM_NIGHTS, nightKind, lastNight, finalBosses } from '../game/plan';
 import { rollDoors, hordeWave, ambushWave, ambushGold, placeKit } from '../game/prep';
 import { rollGear, withFit } from '../game/loot';
 import { nightInfo } from '../game/nights';
@@ -29,7 +30,7 @@ import { elOf, renderOwned, repaint, clearCardEls, clearCharges } from '../ui/ca
 import { updateHUD, renderRelics, toast, banner, resetGoldBump } from '../ui/hud';
 import { say, clearVO } from '../ui/voice';
 import { closeSheet } from '../ui/sheets';
-import { playPrologue, playWin, playLose } from '../ui/story';
+import { playPrologue, playWin, playLose, playNoDawn, playQuiet, playTrueWin } from '../ui/story';
 import { showReport, type Row } from '../ui/report';
 import { prepBossbar } from '../ui/battle-view';
 import { renderPreview, renderPrep } from './prep/view';
@@ -60,9 +61,12 @@ export function newGame(hero: string) {
   G.boss12 = pick(finalBosses().filter((k) => k !== G.boss9));
   recalcMods();
   renderRelics();
-  pickKit((kit, hh) => {
+  pickKit((kit, hh, full) => {
     /* 长夜难度在起手页里选：第 4 档起城墙上限 -15% */
     G.heat = hh;
+    G.kitPath = kit.path;
+    G.full = full;
+    G.maxRound = lastNight();
     G.wall = G.wallMax = Math.round(H.wall * (hh >= 4 ? 0.85 : 1));
     placeKit(kit.cards);
     if (kit.gold) G.gold = Math.max(0, G.gold + kit.gold);
@@ -103,7 +107,9 @@ export function toPrep() {
   $('#report').hidden = true;
   $('#bossbar').hidden = true;
   F.cv.style.display = 'none';
-  G.prep = { step: 0, cur: null, doors: [], talk: G.round % 2 === 1 };
+  const gem = G.full && !G.endless ? GEM_NIGHTS[G.round] : undefined;
+  /* 宝石夜不再另有夜谈（宝石的剧情就是这夜的夜谈） */
+  G.prep = { step: 0, cur: null, doors: [], talk: G.round % 2 === 1 && !gem, gem: gem && G.gems[gem] == null ? gem : undefined };
   G.nextWave = makeWave(G.round);
   clearCharges();
   for (const c of G.cards) {
@@ -117,6 +123,15 @@ export function toPrep() {
   renderOwned();
   updateHUD();
   if (G.firstPrep && !G.prep.talk) G.firstPrep = false;
+  /* 完整线第 15 夜宝石不全：北边什么都没出来，听完一段话天就亮了 */
+  if (nightKind(G.round) === 'quiet') {
+    $('#prep').hidden = true;
+    setTimeout(() => {
+      fullDone('quiet');
+      runWon();
+      playQuiet(() => endScreen(true));
+    }, 300);
+  }
 }
 
 /* ---------------- 开战 ---------------- */
@@ -194,12 +209,25 @@ function winBattle(b: Battle) {
   const was = G.round;
   if (was >= G.maxRound) {
     if (b.wager && G.run) G.run.wagers++;
+    const hidden = nightKind(was) === 'hidden';
+    if (hidden) fullDone('hidden');
     runWon();
     banner(L.ui.flow.dawn, '#ffe79a');
     setScene('shop');
-    setTimeout(() => playWin(() => endScreen(true)), 1400);
+    setTimeout(() => (hidden ? playTrueWin : playWin)(() => endScreen(true)), 1400);
     return;
   }
+  /* 完整线：第 9 夜的首领倒下，天却没亮。这时已经算用这个流派守过一次，记进完整线的解锁进度 */
+  if (G.full && was === NIGHTS && !G.endless) {
+    markPathWin(G.hero, G.kitPath);
+    banner(L.ui.flow.noDawn, '#c9d6ff');
+    setTimeout(() => playNoDawn(() => reportWin(b, was)), 1400);
+    return;
+  }
+  reportWin(b, was);
+}
+
+function reportWin(b: Battle, was: number) {
   updateHUD();
   const T = L.ui.flow;
   const rows: Row[] = nightRewards(was, b.wallLost).map(([k, v]) => [T[k], v]);

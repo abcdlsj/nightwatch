@@ -24,7 +24,7 @@ import { updateHUD, toast, tipOnce } from '../../ui/hud';
 import { voiceOf } from '../../ui/voice';
 import { talentText } from '../../ui/sheets';
 import { startDragOffer } from './drag';
-import { enterEvent, finishStep, startTalk, answerTalk, endTalk, learnTalent, gainGold, buyGear } from './actions';
+import { enterEvent, finishStep, startTalk, answerTalk, endTalk, learnTalent, gainGold, buyGear, startGem, answerGem, endGem } from './actions';
 import { startAmbush } from '../flow';
 import { startJump, prepStops } from './jumps';
 
@@ -135,9 +135,15 @@ export function renderPrep() {
     updateHUD();
     return;
   }
+  if (!P.cur && P.gem && !P.gemDone && P.step === 0) startGem();
   if (!P.cur && P.talk && !P.talkDone && P.step < 3) startTalk();
   const cur = P.cur;
-  $('#prep').classList.toggle('talking', !!cur && (cur.mode === 'talk' || cur.mode === 'talent'));
+  $('#prep').classList.toggle('talking', !!cur && ['talk', 'talent', 'gem', 'gemDone'].includes(cur.mode));
+  if (cur && (cur.mode === 'gem' || cur.mode === 'gemDone')) {
+    renderGem(cur, body);
+    updateHUD();
+    return;
+  }
   if (!cur) {
     body.insertAdjacentHTML('beforeend', `<div class="ptitle">${T.where}<span>${t('prep.stop', { n: P.step + 1, m: stops })}</span></div>`);
     const list = document.createElement('div');
@@ -434,6 +440,48 @@ function renderTalk(cur: PrepStop, body: HTMLElement) {
       ),
     );
   }
+}
+
+/* ---------------- 宝石（完整游戏线）：先听完几句，再决定拿不拿 ---------------- */
+function renderGem(cur: PrepStop, body: HTMLElement) {
+  const T = L.ui.prep;
+  const color = { red: '#ff6b5b', blue: '#73c8ff', green: '#7ee8a2' }[cur.gem as string];
+  body.insertAdjacentHTML('beforeend', `<div class="ptitle gemt" style="--gemc:${color}">${cur.title}<span>${T.gemTag}</span></div>`);
+  const log = document.createElement('div');
+  log.className = 'tlog';
+  const lines = cur.mode === 'gem' ? cur.intro.slice(0, cur.li) : cur.intro;
+  log.innerHTML =
+    lines.map(([w, tx]: [string, any]) => tline(w, tx)).join('') +
+    (cur.mode === 'gemDone' ? tline('hero', cur.ans) + cur.re.map(([w, tx]: [string, any]) => tline(w, tx)).join('') + `<div class="ev-hint gain">${cur.gain}</div>` : '');
+  body.appendChild(log);
+  if (cur.mode === 'gemDone') {
+    body.appendChild(btnRow([[T.next, 'green', endGem]]));
+    return;
+  }
+  if (cur.li < cur.intro.length) {
+    body.appendChild(btnRow([[T.listen, 'blue', () => {
+      cur.li++;
+      SFX.play('ui');
+      renderPrep();
+    }]]));
+    return;
+  }
+  body.insertAdjacentHTML('beforeend', `<div class="ev-hint">${cur.sc.q}</div>`);
+  const list = document.createElement('div');
+  list.className = 'opts';
+  const R0 = RELICS['gem_' + cur.gem];
+  ([[true, cur.sc.take.t, `<span>${modText(R0.m)}</span>`], [false, cur.sc.refuse.t, `<span>${(T.gemRefuse as Record<string, string>)[cur.gem]}</span>`]] as [boolean, any, string][]).forEach(([take, tx, sub], i) => {
+    const b = document.createElement('button');
+    b.className = 'opt say';
+    b.style.animationDelay = i * 0.06 + 's';
+    b.innerHTML = `<div><b>“${pickLine(tx)}”</b>${sub}</div>`;
+    b.onclick = () => {
+      SFX.ensure();
+      answerGem(cur, take);
+    };
+    list.appendChild(b);
+  });
+  body.appendChild(list);
 }
 
 /* ---------------- 准备好了：今晚情报 + 加码 ---------------- */

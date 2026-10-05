@@ -1,7 +1,7 @@
 /* 局外进度：成就、长夜难度、熟练、图鉴、过往守夜、隐藏事件计数。
  * 都存在 chain-meta-v1 里，跟单局存档分开，删档不丢。 */
 import { ACH, MAST_LV, HIST_MAX } from '../data/meta';
-import { heatWon, unlockNextHero } from './unlocks';
+import { heatWon, unlockNextHero, markPathWin } from './unlocks';
 import { ITEMS } from '../data/cards';
 import { emitEv } from '../core/events';
 import { store, KEYS } from '../platform/storage';
@@ -38,6 +38,12 @@ export interface Meta {
   heat?: Record<string, { max: number; sel: number }>;
   /** 第 9 夜首领轮换：每个人物这一轮已经打过的首领 */
   bossCycle?: Record<string, string[]>;
+  /** 每个人物用哪些流派的起手守到过黎明 */
+  pathWins?: Record<string, Record<string, number>>;
+  /** 选人页上「完整游戏线」勾没勾 */
+  fullSel?: Record<string, number>;
+  /** 每个人物打倒过的隐藏首领 / 走到第十五夜的次数 */
+  fullDone?: Record<string, { hidden?: number; quiet?: number }>;
 }
 
 function loadMeta(): Meta {
@@ -112,8 +118,25 @@ export function runWon() {
     META.heatMax = Math.max(META.heatMax, nh);
   }
   R.newHero = unlockNextHero(G.hero) || undefined;
+  const pw = markPathWin(G.hero, G.kitPath);
+  if (pw) {
+    R.pathWin = [pw.n, pw.of];
+    R.newFull = pw.opened;
+  }
   saveMeta();
   for (const a of ACH) if (a.w && (!ACH_OK[a.id] || ACH_OK[a.id](R))) unlock(a.id);
+}
+
+/* ---------------- 完整游戏线：走到第十五夜（打倒隐藏首领 / 宝石不全，安静地天亮） ---------------- */
+export function fullDone(kind: 'hidden' | 'quiet') {
+  const D = ((META.fullDone ||= {})[G.hero] ||= {});
+  D[kind] = (D[kind] || 0) + 1;
+  saveMeta();
+  unlock('full15');
+  if (kind === 'hidden') {
+    unlock('truth');
+    unlock('hid_' + G.hero);
+  }
 }
 
 /* ---------------- 第 9 夜首领轮换：这个人物还没打过的先来，五个都打过一轮再重新开始 ---------------- */

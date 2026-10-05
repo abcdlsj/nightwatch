@@ -167,7 +167,8 @@ export function boardFor(arch: string, r: number): [string, number, string?][] {
     used += it.size;
     /* 晚拿到的卡品质低一档；最后两夜第一张主力是钻 */
     let tier = Math.max(it.t, TIER[r - 1] - (r - from >= 2 ? 0 : 1));
-    if (mult && r >= 7 && out.length === 0) tier = 3;
+    /* 凑乘区：第 7 夜起第一张主力是钻；完整线第 10 夜起每两夜再多一张钻（多出来的夜晚够合成） */
+    if (mult && r >= 7 && out.length < 1 + Math.max(0, Math.floor((r - 8) / 2))) tier = 3;
     out.push([key, Math.min(mult ? 3 : 2, tier), it.dmg > 0 || !adj ? adj : undefined]);
   });
   return out;
@@ -182,6 +183,8 @@ export function relicsFor(arch: string, r: number) {
   const ok = (k: string) => RELICS[k] && (!RELICS[k].hero || RELICS[k].hero === ARCHS[arch].hero) && RELICS[k].t < 3 && k !== 'glass';
   const list = ARCHS[arch].relics.filter(ok).slice(0, n);
   if (MODE === 'mult' && r >= 6) list.push(LEGEND[arch]);
+  /* 完整线后半程：再多一件传说（玻璃大炮这类通用的） */
+  if (MODE === 'mult' && r >= 12) list.push(LEGEND[arch] === 'shard' ? 'oath' : 'shard');
   return list;
 }
 export const talentsFor = (arch: string, r: number) => ARCHS[arch].talents.slice(0, Math.ceil(r / 2));

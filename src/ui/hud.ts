@@ -1,6 +1,6 @@
 /* 顶栏、底栏按钮、提示条、横幅、一次性新手提示 */
 import { L, t } from '../i18n';
-import { nightKind, lastNight } from '../game/plan';
+import { nightKind, lastNight, gemCount } from '../game/plan';
 import { store, KEYS } from '../platform/storage';
 import { G } from '../game/state';
 import { mv } from '../game/mods';
@@ -144,7 +144,12 @@ export function bindHudTips() {
     SFX.ensure();
     SFX.play('ui');
     const R = Math.min(G.round, G.maxRound);
-    showTip(L.ui.hud.tipNight, t('hud.tipNightBody', { r: R, max: G.maxRound, title: nightTitle(R) }) + (G.heat ? t('hud.tipNightHeat', { h: G.heat }) : ''), 4200, true);
+    showTip(
+      L.ui.hud.tipNight,
+      t('hud.tipNightBody', { r: R, max: G.maxRound, title: nightTitle(R) }) + (G.full ? t('hud.tipNightFull', { g: gemCount() }) : '') + (G.heat ? t('hud.tipNightHeat', { h: G.heat }) : ''),
+      4200,
+      true,
+    );
   };
   $('#goldChip').onclick = () => {
     SFX.ensure();

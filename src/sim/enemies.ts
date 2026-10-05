@@ -1,5 +1,6 @@
 /* 敌人：出场、移动、光环、意图（首领招式）、撞墙、远程、复活 */
 import { EN } from '../data/enemies';
+import { ITEMS } from '../data/cards';
 import { L, t } from '../i18n';
 import { rand, rnd, pick, vr, vrnd } from '../core/rng';
 import { clamp, fmt } from '../core/util';
@@ -140,6 +141,10 @@ export function enemyStep(dt: number) {
     if (e.dashT > 0) {
       e.dashT -= dt;
       sp *= 3;
+    }
+    if (e.rushT) {
+      e.rushT = Math.max(0, e.rushT - dt);
+      if (e.rushT > 0) sp *= 1.5;
     }
     if (e.d.rage) sp *= 1 + e.d.rage * (1 - e.hp / e.maxHp);
     if (e.d.dive && e.y > 0.45) sp *= e.d.dive;
@@ -370,6 +375,82 @@ export const INTENTS: Record<string, IntentFn> = {
   ram: (e, v) => {
     e.dashT = v ?? 2.5;
     view.shake(5);
+  },
+  /* ---- 隐藏首领 ---- */
+  /** 决斗：你伤害最高的那张卡被挑住，v 秒动不了 */
+  duel: (_e, v) => {
+    const c = boardCards()
+      .filter((x) => ITEMS[x.key].dmg > 0 && x.frozen <= 0)
+      .sort((a, b) => b.bDmg - a.bDmg)[0];
+    if (!c) return;
+    c.frozen = v ?? 4;
+    view.cardFlag(c, 'frozen', true);
+    view.toast(t('battle.dueled', { n: ITEMS[c.key].n }));
+  },
+  /** 点兵：v 个倒下的守夜人（盾卫带骷髅）站起来 */
+  muster: (e, v) => {
+    summonAt(e, 'shieldb', v ?? 3, 0.2, 0.03);
+    summonAt(e, 'skel', (v ?? 3) * 2, 0.26, 0.02);
+  },
+  /** 倒转：你棋盘上最多的那种元素，v 秒内伤害 -40% */
+  invert: (_e, v) => {
+    const b = bt();
+    const n: Record<string, number> = {};
+    for (const c of boardCards()) if (ITEMS[c.key].dmg > 0) n[ITEMS[c.key].tag] = (n[ITEMS[c.key].tag] || 0) + 1;
+    const tag = Object.keys(n).sort((a, z) => n[z] - n[a])[0];
+    if (!tag) return;
+    b.flags.invTag = tag;
+    b.flags.invT = b.t + (v ?? 5);
+    view.toast(t('battle.inverted', { t: (L.terms.tags as Record<string, string>)[tag] }));
+  },
+  /** 掐灯：你所有卡的充能清零 */
+  snuff: () => {
+    for (const c of boardCards()) {
+      c.charge = 0;
+      c.hasteT = 0;
+      view.cardFlag(c, 'haste', false);
+      view.cardFx(c, 'shake');
+    }
+    view.toast(L.ui.battle.snuffed);
+  },
+  /** 上弦：所有小怪 v 秒内快一半 */
+  wind: (e, v) => {
+    for (const o of bt().en) if (!o.dead && o !== e) o.rushT = Math.max(o.rushT || 0, v ?? 4);
+  },
+  /** 补墙：回 v 的最大血量 */
+  rebuild: (e, v) => {
+    const h = e.maxHp * (v ?? 0.06);
+    e.hp = Math.min(e.maxHp, e.hp + h);
+    view.num(ex(e), ey(e) - 16, '+' + fmt(h), '#7ee8a2', 2);
+  },
+  /** 星蚀：v 秒内你打不出暴击，C 位冻住 2 秒 */
+  eclipse: (_e, v) => {
+    const b = bt();
+    b.flags.eclipseT = b.t + (v ?? 5);
+    const c = boardCards().find((x) => x.carry);
+    if (c) {
+      c.frozen = Math.max(c.frozen, 2);
+      view.cardFlag(c, 'frozen', true);
+    }
+    view.toast(L.ui.battle.eclipsed);
+  },
+  /** 坠星：v 颗星砸在墙上，每颗冻住你一张卡 2 秒、城墙 -1 */
+  starfall: (e, v) => {
+    const cs = randomCards(v ?? 3);
+    cs.forEach((c, i) =>
+      later(0.25 * i, () => {
+        if (bt().over) return;
+        view.bolt([[ex(e), ey(e)], [c.ox, world.H]], '#fff1b0', 0.25, true);
+        c.frozen = Math.max(c.frozen, 2);
+        view.cardFlag(c, 'frozen', true);
+        damageWall(1, c.ox);
+      }),
+    );
+  },
+  /** 引力：所有敌人往城墙挪 v（0~1 的路程） */
+  gravity: (e, v) => {
+    for (const o of bt().en) if (!o.dead && o !== e && !o.d.boss) o.y = Math.min(0.95, o.y + (v ?? 0.06));
+    view.ring(ex(e), ey(e), 4, 120 * K(), '#fff1b0', 0.3);
   },
 };
 

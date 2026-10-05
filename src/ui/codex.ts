@@ -52,7 +52,7 @@ export function openHistory() {
             const He = HEROES[h.h] || { n: '?', col: '#888', portrait: '' };
             return `<button class="trow relrow hs-row${h.w ? ' win' : ''}" data-i="${i}" style="--gc:${h.w ? '#ffd166' : '#ff8a80'}">
         <img class="ricon" src="${HEROES[h.h] ? spr(He.portrait).url : ''}" alt=""><div><b>${hResult(h)}<small class="gt">${He.n}</small></b>
-        <span class="hs-sub">${hDate(h.t)} · ${setName(h.set)}${h.heat ? ' · ' + t('heroes.heat', { h: h.heat }) : ''} · ${t('codex.kills', { n: h.k })}</span>
+        <span class="hs-sub">${hDate(h.t)}${h.full ? ' · ' + T.fullTag : ''} · ${setName(h.set)}${h.heat ? ' · ' + t('heroes.heat', { h: h.heat }) : ''} · ${t('codex.kills', { n: h.k })}</span>
         <span class="hs-cards">${h.bd.map((c) => (ITEMS[c[0]] ? `<img src="${spr(c[0]).url}" alt="" style="--tc:${TIERS[c[1]].c}">` : '')).join('')}</span></div></button>`;
           }).join('')
         : `<p class="muted2">${T.noHistory}</p>`

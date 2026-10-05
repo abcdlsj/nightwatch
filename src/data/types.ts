@@ -78,6 +78,8 @@ export interface RelicDef {
   hero?: string;
   /** 只作为「对路」选项出现，不进随机池 */
   fit?: number;
+  /** 完整游戏线的宝石（red / blue / green），只在剧情里给 */
+  gem?: string;
   n: string; f: string;
 }
 

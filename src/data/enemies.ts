@@ -694,6 +694,156 @@ export const EN: Record<string, EnemyDef> = {
     "v": 2.5
    }
   ]
+ },
+ "firstoath": {
+  "hidden": "ayla",
+  "hp": 15000,
+  "spd": 0.011,
+  "armor": 4,
+  "wall": 99,
+  "spr": "b_oath",
+  "sc": 1,
+  "boss": 1,
+  "fixed": 1,
+  "col": "#d8c9a0",
+  "faction": "dead",
+  "intents": [
+   {
+    "t": 6,
+    "a": "shield",
+    "v": 0.18
+   },
+   {
+    "t": 8,
+    "a": "duel",
+    "v": 4
+   },
+   {
+    "t": 9,
+    "a": "muster",
+    "v": 3
+   }
+  ]
+ },
+ "greyrobe": {
+  "hidden": "mo",
+  "hp": 14000,
+  "spd": 0.012,
+  "armor": 2,
+  "wall": 99,
+  "spr": "b_grey",
+  "sc": 1,
+  "boss": 1,
+  "fixed": 1,
+  "col": "#b8b0c8",
+  "faction": "cult",
+  "intents": [
+   {
+    "t": 7,
+    "a": "invert",
+    "v": 5
+   },
+   {
+    "t": 8,
+    "a": "skels",
+    "v": 4
+   },
+   {
+    "t": 9,
+    "a": "shield",
+    "v": 0.15
+   }
+  ]
+ },
+ "snuffer": {
+  "hidden": "ying",
+  "hp": 14000,
+  "spd": 0.012,
+  "armor": 3,
+  "wall": 99,
+  "spr": "b_snuff",
+  "sc": 1,
+  "boss": 1,
+  "fixed": 1,
+  "col": "#ffcd75",
+  "faction": "war",
+  "intents": [
+   {
+    "t": 8,
+    "a": "snuff"
+   },
+   {
+    "t": 7,
+    "a": "wind",
+    "v": 4
+   },
+   {
+    "t": 9,
+    "a": "summon",
+    "v": 4,
+    "k": "bomber"
+   }
+  ]
+ },
+ "blackwall": {
+  "hidden": "jun",
+  "hp": 19000,
+  "spd": 0.008,
+  "armor": 6,
+  "wall": 99,
+  "spr": "b_wall",
+  "sc": 1,
+  "boss": 1,
+  "fixed": 1,
+  "col": "#56656b",
+  "faction": "war",
+  "intents": [
+   {
+    "t": 8,
+    "a": "rebuild",
+    "v": 0.06
+   },
+   {
+    "t": 9,
+    "a": "barrage",
+    "v": 5
+   },
+   {
+    "t": 7,
+    "a": "deploy",
+    "v": 4
+   }
+  ]
+ },
+ "fallenstar": {
+  "hidden": "li",
+  "hp": 14500,
+  "spd": 0.012,
+  "armor": 2,
+  "wall": 99,
+  "spr": "b_star",
+  "sc": 1,
+  "boss": 1,
+  "fixed": 1,
+  "col": "#fff1b0",
+  "faction": "abyss",
+  "intents": [
+   {
+    "t": 7,
+    "a": "eclipse",
+    "v": 5
+   },
+   {
+    "t": 8,
+    "a": "starfall",
+    "v": 3
+   },
+   {
+    "t": 9,
+    "a": "gravity",
+    "v": 0.06
+   }
+  ]
  }
 } as unknown as Record<string, EnemyDef>;
 

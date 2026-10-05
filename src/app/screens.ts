@@ -8,8 +8,8 @@ import { shuffled } from '../core/rng';
 import { clamp } from '../core/util';
 import { G, freshRun } from '../game/state';
 import { META, ACHM, saveMeta, achCount, mastLv, mastNext, mastGain, recordRun, endlessLost, endFrom } from '../game/meta';
-import { lastNight } from '../game/plan';
-import { heroList, heroUnlocked, heroNeeds, heatOf, pathsOf, pathOpen, kitOpen } from '../game/unlocks';
+import { lastNight, nightKind } from '../game/plan';
+import { heroList, heroUnlocked, heroNeeds, heatOf, pathsOf, pathOpen, kitOpen, fullOpen, fullSelected, setFullSelected } from '../game/unlocks';
 import { loadSave, clearSave } from '../game/save';
 import { B } from '../sim/battle';
 import { setScene } from '../render/background';
@@ -155,7 +155,23 @@ export function heroSelect() {
 }
 
 /* ---------------- 起手三选一（第一套固定出现；没解锁流派的起手套不出现，在下面列出解锁条件） ---------------- */
-export function pickKit(done: (k: KitDef, heat: number) => void) {
+/** 完整游戏线的勾选框：三个流派的起手各守到一次黎明后出现在起手页顶上 */
+function fullBox(hero: string) {
+  if (!fullOpen(hero)) return '';
+  const T = L.ui.kits;
+  return `<label class="fullbox${fullSelected(hero) ? ' on' : ''}"><input type="checkbox" id="fullChk"${fullSelected(hero) ? ' checked' : ''}><span><b>${T.full}</b><small>${T.fullD}</small></span></label>`;
+}
+function bindFull(hero: string) {
+  const c = document.getElementById('fullChk') as HTMLInputElement | null;
+  if (!c) return;
+  c.onchange = () => {
+    setFullSelected(hero, c.checked);
+    c.parentElement!.classList.toggle('on', c.checked);
+    SFX.play(c.checked ? 'intent' : 'ui');
+  };
+}
+
+export function pickKit(done: (k: KitDef, heat: number, full: boolean) => void) {
   const H = HEROES[G.hero];
   const all = KITS[G.hero] || [{ n: '', d: '', path: '', cards: H.start.map((s) => [s[0], s[1]] as [string, number]) }];
   const open = all.filter((k) => kitOpen(G.hero, k));
@@ -163,7 +179,7 @@ export function pickKit(done: (k: KitDef, heat: number) => void) {
   const sc = $('#screen');
   const T = L.ui.kits;
   setScene('title');
-  sc.innerHTML = `<div class="scr"><img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="font-size:28px">${T.title}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
+  sc.innerHTML = `<div class="scr">${fullBox(G.hero)}<img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="font-size:28px">${T.title}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
   ${heatBar(G.hero)}
   <div class="kits">${list
     .map((k, i) => {
@@ -175,18 +191,25 @@ export function pickKit(done: (k: KitDef, heat: number) => void) {
   ${pathsHtml(G.hero)}</div>`;
   sc.hidden = false;
   bindHeat(G.hero);
+  bindFull(G.hero);
   sc.querySelectorAll<HTMLElement>('.kit').forEach(
     (b) =>
       (b.onclick = () => {
         SFX.ensure();
         SFX.play('merge');
         sc.hidden = true;
-        done(list[+b.dataset.i!], heatOf(G.hero).sel);
+        done(list[+b.dataset.i!], heatOf(G.hero).sel, fullSelected(G.hero));
       }),
   );
 }
 
 /* ---------------- 结局 ---------------- */
+/** 守到黎明的标题：完整线打倒隐藏首领是「真正的黎明」，宝石不全是「还缺一块」 */
+function dawnTitle() {
+  const T = L.ui.end;
+  if (!G.full) return T.dawn;
+  return nightKind(G.maxRound) === 'hidden' ? T.dawnTrue : T.dawnQuiet;
+}
 export function endScreen(win: boolean) {
   const sc = $('#screen');
   const T = L.ui.end;
@@ -209,7 +232,7 @@ export function endScreen(win: boolean) {
   const mastNote = mg
     ? `<div class="newheat">${t('end.mast', { h: H.n, n: mg.add })}${mg.up ? t('end.mastUp', { lv: mg.lv, p: (L.meta.mastPerk as string[])[mg.lv - 1] }) : t('end.mastLv', { lv: mg.lv })}</div>`
     : '';
-  sc.innerHTML = `<div class="scr"><img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="color:${win || endl ? '#ffe79a' : '#ff8a80'}">${win ? T.dawn : endl ? T.endless : T.lost}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
+  sc.innerHTML = `<div class="scr"><img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="color:${win || endl ? '#ffe79a' : '#ff8a80'}">${win ? dawnTitle() : endl ? T.endless : T.lost}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
   <div class="rules res">${row(T.reached, endl ? t('end.reachedEndless', { r: G.round }) : t('end.reachedR', { r: Math.min(G.round, lastNight()), m: lastNight() }))}
   ${G.heat ? row(T.heat, t('heroes.heat', { h: G.heat })) : ''}
   ${row(T.relicsTalents, t('end.relicsTalentsV', { r: G.relics.length, t: G.skills.length }))}
@@ -221,6 +244,7 @@ export function endScreen(win: boolean) {
   ${R.newHeat ? `<div class="newheat">${t('end.newHeat', { h: R.newHeat, d: (L.meta.heats as string[])[R.newHeat] })}</div>` : ''}
   ${newPaths.map((p) => `<div class="newheat">${t('end.newPath', { h: H.n, p: p.n })}</div>`).join('')}
   ${R.newHero ? `<div class="newheat">${t('end.newHero', { h: HEROES[R.newHero].n, t: HEROES[R.newHero].title })}</div>` : ''}
+  ${R.newFull ? `<div class="newheat full">${t('end.newFull', { h: H.n })}</div>` : R.pathWin && R.pathWin[0] < R.pathWin[1] ? `<div class="newheat">${t('end.pathWin', { n: R.pathWin[0], m: R.pathWin[1] })}</div>` : ''}
   ${got.length ? `<div class="rules res achgot"><div><span>${T.gotAch}</span></div>${got.map((a) => `<div><i>★</i><span><b>${a.n}</b> ${a.d}</span></div>`).join('')}</div>` : ''}
   ${win ? `<button class="btn gold big" id="endlessBtn">${T.goOn}</button>` : ''}<button class="btn red big" id="againBtn">${T.again}</button><button class="btn alt sm" id="hisBtn2">${T.history}</button></div>`;
   clearSave();
