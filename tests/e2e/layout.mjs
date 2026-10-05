@@ -103,7 +103,7 @@ await g(() => __game.closeSheet());
 await pg.click('#relicBtn');
 await shot('relics');
 await g(() => __game.closeSheet());
-await g(() => { const G = __game.G; G.round = 8; G.nextWave = __game.makeWave(8); });
+await g(() => { const G = __game.G; G.round = 9; G.nextWave = __game.makeWave(9); });
 await pg.click('#goBtn');
 await pg.waitForTimeout(4000);
 await shot('battle-boss');
