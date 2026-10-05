@@ -119,6 +119,9 @@ export interface Prep {
   /** 完整线：这夜之前有一颗宝石的剧情 / full line: a gem scene precedes this night */
   gem?: string;
   gemDone?: boolean;
+  /** 这夜备战开头有规则遗物三选一 / this prep opens with a rule-relic pick */
+  rule?: boolean;
+  ruleDone?: boolean;
   rare?: number;
   fought?: boolean;
   wagers?: string[];

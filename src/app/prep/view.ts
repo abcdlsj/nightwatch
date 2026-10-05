@@ -26,7 +26,7 @@ import { updateHUD, toast, tipOnce } from '../../ui/hud';
 import { voiceOf } from '../../ui/voice';
 import { talentText } from '../../ui/sheets';
 import { startDragOffer } from './drag';
-import { enterEvent, finishStep, startTalk, answerTalk, endTalk, learnTalent, gainGold, buyGear, startGem, answerGem, endGem } from './actions';
+import { startRule, enterEvent, finishStep, startTalk, answerTalk, endTalk, learnTalent, gainGold, buyGear, startGem, answerGem, endGem } from './actions';
 import { startAmbush } from '../flow';
 import { startJump, prepStops } from './jumps';
 
@@ -145,6 +145,7 @@ export function renderPrep() {
     return;
   }
   if (!P.cur && P.gem && !P.gemDone && P.step === 0) startGem();
+  if (!P.cur && P.rule && !P.ruleDone && P.step === 0) startRule();
   if (!P.cur && P.talk && !P.talkDone && P.step < 3) startTalk();
   const cur = P.cur;
   $('#prep').classList.toggle('talking', !!cur && ['talk', 'talent', 'gem', 'gemDone'].includes(cur.mode));

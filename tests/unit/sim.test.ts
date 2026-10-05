@@ -12,6 +12,10 @@ import { nightInfo } from '../../src/game/nights';
 import { finalBosses, hiddenBoss, nightKind } from '../../src/game/plan';
 import { EN } from '../../src/data/enemies';
 import { INTENTS } from '../../src/sim/enemies';
+import { RELICS } from '../../src/data/relics';
+import { newCard, neighbors } from '../../src/game/cards';
+import { rollGear } from '../../src/game/loot';
+import { ARCHS, boardFor, relicsFor, talentsFor } from '../balance/builds';
 
 beforeAll(() => {
   initLocale();
@@ -118,5 +122,61 @@ describe('战斗模拟', () => {
     newRun('ayla', 0, 5);
     G.round = 8;
     expect(makeWave(8).some((s) => EN[s.type].elite)).toBe(true);
+  });
+});
+
+describe('规则遗物', () => {
+  const RULES = Object.keys(RELICS).filter((k) => RELICS[k].rule);
+  const play = (arch: string, r: number, relics: string[]) => {
+    reseed(77);
+    const A = ARCHS[arch];
+    Object.assign(G, { hero: A.hero, seed: 77, foeSet: 'dark', boss9: 'eye', round: r, maxRound: 9, heat: 0, run: freshRun(), cards: [], relics: [...relicsFor(arch, r), ...relics], skills: talentsFor(arch, r), gold: 0, endless: false, secret: {}, seenFoes: {}, full: false });
+    G.wall = G.wallMax = 60;
+    let x = 0;
+    for (const [k, t, a] of boardFor(arch, r)) {
+      const c = newCard(k, t, a || null);
+      c.loc = 'board';
+      c.idx = x;
+      x += c.size;
+      G.cards.push(c);
+    }
+    recalcMods();
+    G.phase = 'battle';
+    startBattle({ wave: makeWave(r), ambush: false, wager: null, beats: [] });
+    let n = 0;
+    while (!B!.over && n++ < 60 * 300) simStep(1 / 60);
+    return { stk: B!.stkN || 0, rx: B!.rxN || 0, result: B!.result };
+  };
+
+  it('一共 8 件，都不进普通遗物池', () => {
+    expect(RULES.length).toBe(8);
+    reseed(3);
+    Object.assign(G, { hero: 'mo', round: 9, relics: [], wind: '', windRelic: true });
+    for (let i = 0; i < 200; i++) expect(rollGear(3).some((k) => RELICS[k].rule)).toBe(false);
+  });
+
+  it('全带上能正常打完，连招比不带多', () => {
+    for (const arch of ['fire', 'volt', 'blade', 'line']) {
+      const a = play(arch, 6, []),
+        b = play(arch, 6, RULES);
+      expect(b.result, arch).toBeTruthy();
+      expect(b.stk, arch).toBeGreaterThan(a.stk);
+    }
+  });
+
+  it('环城：两端互为相邻', () => {
+    Object.assign(G, { hero: 'mo', relics: ['ringwall'], cards: [] });
+    for (const [k, i] of [['vial', 0], ['prism', 1], ['icicle', 2]] as const) {
+      const c = newCard(k, 0, null);
+      c.loc = 'board';
+      c.idx = i;
+      G.cards.push(c);
+    }
+    recalcMods();
+    expect(neighbors(G.cards[0])).toContain(G.cards[2]);
+    expect(neighbors(G.cards[2])).toContain(G.cards[0]);
+    G.relics = [];
+    recalcMods();
+    expect(neighbors(G.cards[0])).not.toContain(G.cards[2]);
   });
 });

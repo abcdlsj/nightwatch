@@ -48,6 +48,8 @@ const EVENT_NEED: Record<string, () => boolean> = {
   /* 隐藏事件不进随机池，只由下面的 SECRET_DOORS 塞进来 / hidden events stay out of the random pool and are only inserted by SECRET_DOORS below */
   s_letter: () => false,
   s_karl: () => false,
+  /* 规则遗物的匣子：不进随机池，由备战开头塞进来 / the rule-relic box: never in the random pool; inserted at the start of prep */
+  rule: () => false,
 };
 /** 隐藏事件：条件写死，第一局就能触发 / hidden events: hard-coded conditions, triggerable from the first run */
 const SECRET_DOORS: [string, () => boolean][] = [

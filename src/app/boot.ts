@@ -27,8 +27,8 @@ import { openTree, openBag, openSyn, closeSheet } from '../ui/sheets';
 import { UI } from '../ui/state';
 import { initFlow, startBattle, toPrep, newGame, fitField } from './flow';
 import { titleScreen, heroSelect, endScreen } from './screens';
-import { renderPreview, renderSyn } from './prep/view';
-import { enterEvent, finishStep, acquire, afterChange, gainRelic, sellCard } from './prep/actions';
+import { renderPreview, renderSyn, renderPrep } from './prep/view';
+import { enterEvent, finishStep, acquire, afterChange, gainRelic, sellCard, startRule } from './prep/actions';
 import { sheetActions } from '../ui/sheets';
 import { initDrag } from './prep/drag';
 import { setDrawer } from './prep/drawer';
@@ -184,7 +184,7 @@ requestAnimationFrame(loop);
     return B;
   },
   endScreen, codexKill, markSeen, closeSheet, titleScreen, heroSelect, setDrawer, openTree, startBattle, acquire, toPrep, newGame,
-  unlockTest: unlock, boardCards, newCard, afterChange, renderPreview, makeWave, enterEvent, finishStep, renderRelics, gainRelic, rollGear, withFit, rollTalents, stats, mastLv,
+  unlockTest: unlock, boardCards, newCard, afterChange, renderPreview, makeWave, enterEvent, finishStep, renderRelics, gainRelic, rollGear, withFit, rollTalents, stats, mastLv, startRule, renderPrep,
 };
 
 if (import.meta.env.VITE_LAYOUT_DEMO) import('./dev-demo').then((m) => m.runDemo());

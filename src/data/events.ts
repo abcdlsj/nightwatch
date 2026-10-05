@@ -192,5 +192,10 @@ export const EVENTS: Record<string, EventDef> = {
   "ico": "dummy",
   "cat": "up",
   "w": 0.7
+ },
+ "rule": {
+  "ico": "book:P",
+  "cat": "relic",
+  "w": 0
  }
 } as unknown as Record<string, EventDef>;

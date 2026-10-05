@@ -92,6 +92,10 @@ await shot('shop');
 await g(() => __game.finishStep());
 await g(() => __game.enterEvent('altar'));
 await shot('altar');
+/* 规则遗物三选一（第 3、7 夜备战开头） / rule-relic pick (start of prep for nights 3 and 7) */
+await g(() => { const g = __game, G = g.G; G.prep.saved = G.prep.cur; g.startRule(); g.renderPrep(); });
+await shot('rule');
+await g(() => { const g = __game, G = g.G; G.prep.cur = G.prep.saved; g.renderPrep(); });
 await g(() => { const g = __game, G = g.G; G.prep.cur = null; G.prep.step = 3;
   [['vial', 0, null, 0], ['prism', 1, null, 1], ['frost', 2, 'chill', 3], ['starfall', 3, 'echo', 5]].forEach(([k, t, a, i]) => { const c = g.newCard(k, t, a); c.loc = 'stash'; c.idx = 0; });
   /* 第 8 夜有三套敌情，预告最长（第 7 夜前有跃迁，不能用） / night 8 has three threats, the longest preview (night 7 has a leap stop first) */

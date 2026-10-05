@@ -787,5 +787,77 @@ export const RELICS: Record<string, RelicDef> = {
    "shieldStart": 4,
    "enemySpd": 0.05
   }
+ },
+ "resfork": {
+  "t": 2,
+  "ico": "ring:c",
+  "u": 1,
+  "rule": 1,
+  "m": {
+   "t_resfork": 1
+  }
+ },
+ "duet": {
+  "t": 2,
+  "ico": "book:P",
+  "u": 1,
+  "rule": 1,
+  "m": {
+   "t_duet": 1
+  }
+ },
+ "kiln": {
+  "t": 2,
+  "ico": "orb:o",
+  "u": 1,
+  "rule": 1,
+  "m": {
+   "t_kiln": 1
+  }
+ },
+ "reagent": {
+  "t": 2,
+  "ico": "potion:l",
+  "u": 1,
+  "rule": 1,
+  "m": {
+   "t_reagent": 1
+  }
+ },
+ "ringwall": {
+  "t": 2,
+  "ico": "badge:N",
+  "u": 1,
+  "rule": 1,
+  "m": {
+   "t_ring": 1
+  }
+ },
+ "rallyhorn": {
+  "t": 2,
+  "ico": "claw:R",
+  "u": 1,
+  "rule": 1,
+  "m": {
+   "t_rally": 1
+  }
+ },
+ "metronome": {
+  "t": 2,
+  "ico": "scroll:c",
+  "u": 1,
+  "rule": 1,
+  "m": {
+   "t_metro": 1
+  }
+ },
+ "linkage": {
+  "t": 2,
+  "ico": "ring:Y",
+  "u": 1,
+  "rule": 1,
+  "m": {
+   "t_link": 1
+  }
  }
 } as unknown as Record<string, RelicDef>;

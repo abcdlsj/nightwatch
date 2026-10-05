@@ -11,7 +11,7 @@ import { vr, vrnd, pick, vpick } from '../core/rng';
 import type { Card } from '../game/state';
 import { mv } from '../game/mods';
 import { TUNE } from '../game/tuning';
-import { boardCards, type Stats } from '../game/cards';
+import { boardCards, stats, type Stats } from '../game/cards';
 import { world, K, ex, ey } from './world';
 import { view } from './view';
 import { B, bt, later } from './battle';
@@ -56,13 +56,14 @@ export function react(e: Enemy, a: number, src: Card, crit: boolean, w: Was, bur
   const bonus = (f: number) => Math.max(1, a * f * m);
   switch (k) {
     case 'melt':
-      e.frzT = 0;
+      /* 窑心：融化、碎冰都不解冻 / Kiln Heart: neither melt nor shatter thaws */
+      if (!mv('t_kiln')) e.frzT = 0;
       view.ring(X, Y, 2, 12 * K(), col, 0.3);
       for (let i = 0; i < 10; i++) view.part(X + vrnd(-4, 4), Y, vrnd(-25, 25), -vrnd(30, 70), vrnd(0.3, 0.5), vr() < 0.5 ? '#c2f4ff' : col, 2);
-      hurt(e, bonus(0.6), src, false, { rx: 1 });
+      hurt(e, bonus(mv('t_kiln') ? 1.5 : 0.6), src, false, { rx: 1 });
       break;
     case 'shatter': {
-      e.frzT = 0;
+      if (!mv('t_kiln')) e.frzT = 0;
       view.ring(X, Y, 2, 16 * K(), col, 0.35);
       view.shake(2);
       for (let i = 0; i < 14; i++) {
@@ -115,6 +116,26 @@ export function react(e: Enemy, a: number, src: Card, crit: boolean, w: Was, bur
       }
       break;
   }
+  afterReact(src);
+}
+
+/** 规则遗物：反应之后 / rule relics: after a reaction */
+const forkT = new WeakMap<Card, number>();
+function afterReact(src: Card) {
+  const b = bt();
+  /* 共振叉：打出反应那张卡的邻居充能（每张卡 0.3 秒最多一次） / Resonance Fork: charge the reacting card's neighbors (at most once per card every 0.3 s) */
+  const fork = mv('t_resfork');
+  if (fork)
+    for (const n of src.nb || []) {
+      if ((forkT.get(n) ?? -9) > b.t - 0.3) continue;
+      forkT.set(n, b.t);
+      chargeCard(n, 0.2 * fork, src);
+    }
+  /* 试剂瓶：每次反应，所有元素的连招冷却 -0.5 秒 / Reagent Vial: each reaction cuts every element's combo cooldown by 0.5 s */
+  if (mv('t_reagent')) {
+    const cd: Record<string, number> = b.flags.stkCd || (b.flags.stkCd = {});
+    for (const k in cd) cd[k] -= 0.5;
+  }
 }
 
 /* ---------------- 流派连招 ---------------- / ---------------- Archetype combos ---------------- */
@@ -129,8 +150,10 @@ export function streak(c: Card, st: Stats) {
   const cd: Record<string, number> = b.flags.stkCd || (b.flags.stkCd = {});
   const l = (log[tag] = (log[tag] || []).filter((h) => h.t > b.t - TUNE.streakWin));
   l.push({ t: b.t, c, d: ITEMS[c.key].dmg > 0 ? st.total : 0 });
-  if ((cd[tag] || -99) > b.t || l.length < TUNE.streakN || new Set(l.map((h) => h.c)).size < 2) return;
-  cd[tag] = b.t + TUNE.streakCd;
+  /* 节拍器：要 6 次出手，冷却 8 秒 / Metronome: needs 6 hits, 8 s cooldown */
+  const metro = mv('t_metro') > 0;
+  if ((cd[tag] || -99) > b.t || l.length < (metro ? 6 : TUNE.streakN) || new Set(l.map((h) => h.c)).size < 2) return;
+  cd[tag] = b.t + (metro ? 8 : TUNE.streakCd);
   const ref = Math.max(...l.map((h) => h.d));
   log[tag] = [];
   b.stkN = (b.stkN || 0) + 1;
@@ -145,6 +168,51 @@ export function streak(c: Card, st: Stats) {
     if (B!.over) return;
     STREAK[tag](c, ref);
   });
+  /* 二重唱：窗口里出过手的另一种元素也跟着放一次（六成），冷却照算 / Duet: another element that fired within the window also unleashes once (60%), using its own cooldown */
+  if (mv('t_duet')) {
+    const other = (Object.keys(log) as Tag[])
+      .filter((k) => k !== tag && (cd[k] || -99) <= b.t)
+      .map((k) => [k, log[k].filter((h) => h.t > b.t - TUNE.streakWin)] as const)
+      .filter(([, hs]) => hs.length)
+      .sort((x, y) => y[1].length - x[1].length)[0];
+    if (other) {
+      const [k, hs] = other;
+      cd[k] = b.t + TUNE.streakCd;
+      log[k] = [];
+      later(0.45, () => ultimate(k, hs[hs.length - 1].c, Math.max(ref, ...hs.map((h) => h.d)) * 0.6));
+    }
+  }
+}
+
+/** 直接放一次某个元素的大招（规则遗物用）：有横幅和音效，不看也不改冷却 / unleash an element's ultimate directly (for rule relics): with banner and sound, ignoring and leaving cooldowns */
+export function ultimate(tag: Tag, c: Card, ref: number) {
+  const b = bt();
+  if (b.over || !(ref > 0)) return;
+  b.stkN = (b.stkN || 0) + 1;
+  view.banner(L.ui.battle.streak[tag], RXC_TAG[tag]);
+  view.sfx('streak', tag);
+  STREAK[tag](c, ref);
+}
+/** 棋盘上数量最多的输出元素，和它最强一张卡的伤害 / the board's most common damage element and its strongest card's damage */
+export function mainTag(): { tag: Tag; c: Card; ref: number } | null {
+  const cs = boardCards().filter((o) => ITEMS[o.key].dmg > 0);
+  if (!cs.length) return null;
+  const n: Partial<Record<Tag, number>> = {};
+  for (const o of cs) n[ITEMS[o.key].tag] = (n[ITEMS[o.key].tag] || 0) + 1;
+  const tag = (Object.keys(n) as Tag[]).sort((a, z) => n[z]! - n[a]!)[0];
+  return refOf(tag);
+}
+/** 某元素最强一张输出卡 / an element's strongest damage card */
+export function refOf(tag: Tag): { tag: Tag; c: Card; ref: number } | null {
+  const b = bt();
+  let best: Card | null = null,
+    ref = 0;
+  for (const o of boardCards())
+    if (ITEMS[o.key].tag === tag && ITEMS[o.key].dmg > 0) {
+      const v = stats(o, b.t).total;
+      if (v > ref) [best, ref] = [o, v];
+    }
+  return best ? { tag, c: best, ref } : null;
 }
 const RXC_TAG: Record<Tag, string> = { blade: '#fff4cf', fire: '#ff8a5b', ice: '#73eff7', volt: '#fee761', mech: '#ffd166', poison: '#a7f070' };
 
@@ -230,5 +298,10 @@ export function frenzy(c: number) {
   view.sfx('streak', 'frenzy');
   view.ring(world.W / 2, world.H, 6, world.H * (0.6 + i * 0.2), '#ffb37a', 0.6);
   view.shake(2 + i);
+  /* 狂潮号角：连杀 25 起每档再放一次棋盘上最多那种元素的大招（六成） / Frenzy Horn: from the 25-streak tier on, also unleash the board's most common element's ultimate (60%) */
+  if (mv('t_rally') && i > 0) {
+    const m = mainTag();
+    if (m) later(0.3, () => ultimate(m.tag, m.c, m.ref * 0.6));
+  }
   return true;
 }

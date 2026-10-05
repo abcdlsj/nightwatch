@@ -49,6 +49,12 @@ export function neighbors(c: Card): Card[] {
     R = o[c.idx + c.size];
   if (L0) r.push(L0);
   if (R) r.push(R);
+  /* 环城：最左和最右的卡互为相邻 / Ring Wall: the leftmost and rightmost cards are neighbors */
+  if (mv('t_ring')) {
+    const bc = boardCards();
+    const far = c === bc[0] ? bc[bc.length - 1] : c === bc[bc.length - 1] ? bc[0] : null;
+    if (far && far !== c && !r.includes(far)) r.push(far);
+  }
   return r;
 }
 

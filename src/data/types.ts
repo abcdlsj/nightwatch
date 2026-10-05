@@ -90,6 +90,8 @@ export interface RelicDef {
   hero?: string;
   /** 只作为「对路」选项出现，不进随机池 / only appears as an 'on-path' option, never in the random pool */
   fit?: number;
+  /** 规则遗物：改玩法，不进普通遗物池，第 2、6 夜后三选一 / rule relic: changes how play works; not in the normal pool, offered three-choose-one after nights 2 and 6 */
+  rule?: number;
   /** 完整游戏线的宝石（red / blue / green），只在剧情里给 / full game line gems (red / blue / green), granted only through story */
   gem?: string;
   n: string; f: string;

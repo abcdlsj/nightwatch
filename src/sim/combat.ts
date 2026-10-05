@@ -11,7 +11,7 @@ import { world, K, ex, ey } from './world';
 import { view } from './view';
 import { B, bt, later, emit, front, phased, dist } from './battle';
 import { spawn, comboKill } from './enemies';
-import { react, was, streak } from './combo';
+import { react, was, streak, ultimate, refOf } from './combo';
 import type { Enemy, Projectile } from './types';
 
 /* ---------------- 触发与连锁 ---------------- / ---------------- Triggers and chains ---------------- */
@@ -53,6 +53,12 @@ function fire(c: Card, depth: number) {
   const st = stats(c, b.t);
   const nb = c.nb || [];
   streak(c, st);
+  /* 连环扣：被带动的出手直接放这张卡元素的大招（按这个元素最强的卡算），不看冷却，每 4 秒最多一次 / Linked Clasp: a triggered hit unleashes its element's ultimate directly (based on that element's strongest card), ignoring cooldown, at most once every 4 s */
+  if (depth > 0 && mv('t_link') && it.dmg > 0 && !((b.flags.linkT ?? -99) > b.t - 4)) {
+    b.flags.linkT = b.t;
+    const r = refOf(it.tag);
+    if (r) later(0.2, () => ultimate(it.tag, r.c, r.ref));
+  }
   if (it.dmg > 0) {
     attack(c, st, depth);
     for (let i = 1; i < (it.multi || 1); i++)
@@ -88,7 +94,7 @@ function fire(c: Card, depth: number) {
       later(0.1, () => {
         if (B!.over) return;
         view.link(c, n, '#ffd166', 0.25);
-        showChain(depth + 2);
+        showChain(depth + 2, c);
         if (depth + 2 > B!.maxChain) B!.maxChain = depth + 2;
         c.bTr++;
         trigger(n, depth + 1, it.n);
@@ -174,7 +180,7 @@ function fire(c: Card, depth: number) {
       if (B!.over || d > 10) return;
       view.link(c, n, ADJ.echo.c);
       if (d + 1 > B!.maxChain) B!.maxChain = d + 1;
-      showChain(d + 1);
+      showChain(d + 1, c);
       if (mv('shellChain') && (d + 1) % 5 === 0 && !(B!.flags.shellT > B!.t - 1)) {
         B!.flags.shellT = B!.t;
         B!.shield += 3;
@@ -214,12 +220,12 @@ export function reload(c: Card, n: number, from?: Card | null) {
   return true;
 }
 
-function showChain(n: number) {
+function showChain(n: number, c: Card) {
   if (n < 2) return;
   if (n === 5 || n === 9) view.say('hero', L.story.barks.chain, 1);
   if (n >= 8) unlock('chain8');
   if (n >= 11) unlock('chain11');
-  if (n % 5 === 0) emit('chain', { n });
+  if (n % 5 === 0) emit('chain', { n, c });
   view.chain(n);
 }
 
@@ -615,6 +621,8 @@ export function hurt(e: Enemy, amt: number, src: Card | null, crit: boolean, o: 
   }
   if (o.kb && !e.d.boss) e.y = Math.max(-0.03, e.y - o.kb * (e.d.elite ? 0.3 : 1));
   if (src && !tick && !o.rx && !e.dead && e.hp > 0) react(e, a, src, crit, w0, !!o.burn);
+  /* 窑心：【火】命中有 50% 冻住 0.5 秒（下一下火就能融化） / Kiln Heart: 【fire】 hits have a 50% chance to freeze for 0.5 s (so the next fire hit can melt) */
+  if (src && !tick && !o.rx && !e.dead && e.hp > 0 && ITEMS[src.key].tag === 'fire' && mv('t_kiln') && rand() < 0.5) freeze(e, 0.5, src);
   view.hit(ex(e), ey(e) - 5, o.burnTick ? 'fire' : o.poisonTick ? 'poison' : src ? ITEMS[src.key].tag : null, crit, e.hp <= 0);
   if (e.hp <= 0) kill(e, src);
 }

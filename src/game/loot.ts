@@ -132,7 +132,39 @@ export function rollGear(n: number, bonus?: number, maxTier?: number) {
   }
   return out;
 }
-const gearOk = (k: string) => !RELICS[k].fit && !RELICS[k].gem && (!RELICS[k].hero || RELICS[k].hero === G.hero) && !(RELICS[k].u && G.relics.includes(k));
+const gearOk = (k: string) => !RELICS[k].fit && !RELICS[k].gem && !RELICS[k].rule && (!RELICS[k].hero || RELICS[k].hero === G.hero) && !(RELICS[k].u && G.relics.includes(k));
+/** 规则遗物三选一：第 2、6 夜守住之后（第 3、7 夜备战开头） / rule relics, three to choose from: after holding nights 2 and 6 (at the start of prep for nights 3 and 7) */
+export const RULE_NIGHTS = [3, 7];
+/** 规则遗物对不对路：用得上的权重 ×3（不对路的也可能出，给换打法留余地） / whether a rule relic suits the board: usable ones get ×3 weight (others can still show up, leaving room to pivot) */
+const elems = () => new Set(G.cards.filter((c) => c.loc === 'board' && ITEMS[c.key].dmg > 0).map((c) => ITEMS[c.key].tag));
+const RULE_FIT: Record<string, () => boolean> = {
+  resfork: () => ['fire', 'ice', 'volt', 'poison'].filter((t) => elems().has(t as Tag)).length >= 2,
+  reagent: () => ['fire', 'ice', 'volt', 'poison'].filter((t) => elems().has(t as Tag)).length >= 2,
+  kiln: () => hasTag('fire'),
+  duet: () => elems().size >= 2,
+  linkage: () => G.cards.some((c) => c.loc === 'board' && (c.adj === 'echo' || ITEMS[c.key].horn)) || mv('chain') > 0,
+  ringwall: () => G.cards.filter((c) => c.loc === 'board').length >= 4,
+};
+export function rollRule(n: number) {
+  const out: string[] = [];
+  const pool = Object.keys(RELICS).filter((k) => RELICS[k].rule && !G.relics.includes(k));
+  const w = (k: string) => (RULE_FIT[k] ? (RULE_FIT[k]() ? 3 : 1) : 2);
+  while (out.length < n) {
+    const p = pool.filter((k) => !out.includes(k));
+    if (!p.length) break;
+    let t = rand() * p.reduce((s, k) => s + w(k), 0);
+    let got = p[p.length - 1];
+    for (const k of p) {
+      t -= w(k);
+      if (t <= 0) {
+        got = k;
+        break;
+      }
+    }
+    out.push(got);
+  }
+  return out;
+}
 export const gearPrice = (k: string) => [5, 9, 14, 20][RELICS[k].t] + Math.floor(G.round / 2) + mv('tax');
 
 /* ---------------- 天赋 ---------------- / ---------------- Talents ---------------- */

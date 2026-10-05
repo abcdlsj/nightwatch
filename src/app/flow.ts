@@ -13,7 +13,7 @@ import { codexSweep, runWon, mastStart, nextBoss, markBoss, fullDone, nextArc } 
 import { markPathWin } from '../game/unlocks';
 import { NIGHTS, FULL_NIGHTS, GEM_NIGHTS, nightKind, lastNight, finalBosses } from '../game/plan';
 import { rollDoors, hordeWave, ambushWave, ambushGold, placeKit } from '../game/prep';
-import { rollGear, withFit, rollWind } from '../game/loot';
+import { rollGear, withFit, rollWind, RULE_NIGHTS } from '../game/loot';
 import { nightInfo } from '../game/nights';
 import { nightRewards } from '../game/rewards';
 import { saveGame, loadSave, restoreSave } from '../game/save';
@@ -114,7 +114,7 @@ export function toPrep() {
   /* 宝石夜不再另有夜谈（宝石的剧情就是这夜的夜谈） / gem nights have no separate night talk (the gem scene is that night's talk) */
   /* 第 15 夜（完整线）不再夜谈：隐藏首领前那段戏，或者安静的天亮 / night 15 (full line) has no night talk: either the scene before the hidden boss or a quiet dawn */
   const last = G.full && !G.endless && G.round === FULL_NIGHTS;
-  G.prep = { step: 0, cur: null, doors: [], talk: G.round % 2 === 1 && !gem && !last, gem: gem && G.gems[gem] == null ? gem : undefined };
+  G.prep = { step: 0, cur: null, doors: [], talk: G.round % 2 === 1 && !gem && !last, gem: gem && G.gems[gem] == null ? gem : undefined, rule: !G.endless && RULE_NIGHTS.includes(G.round) };
   G.nextWave = makeWave(G.round);
   clearCharges();
   for (const c of G.cards) {

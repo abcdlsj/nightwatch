@@ -221,5 +221,13 @@ export const MODL: Record<string, [number, number?]> = {
  "xtag_volt": [3],
  "xtag_mech": [3],
  "xtag_poison": [3],
- "xcarry": [3]
+ "xcarry": [3],
+ "t_resfork": [2],
+ "t_duet": [2],
+ "t_kiln": [2],
+ "t_reagent": [2],
+ "t_ring": [2],
+ "t_rally": [2],
+ "t_metro": [2],
+ "t_link": [2]
 } as never;

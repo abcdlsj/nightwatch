@@ -193,6 +193,7 @@ export default {
     fit: '对路',
     owned: '已有{n}',
     altarHint: '同名的能叠',
+    ruleHint: '每件都会改一条规矩，和连招、反应、连锁搭着用',
     parcelHint: '包裹里装着……',
     enchantHint: '原来的词缀会被换掉',
     trainHint: '挑一张卡升一档',

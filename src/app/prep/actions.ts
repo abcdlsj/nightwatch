@@ -10,7 +10,7 @@ import { clamp } from '../../core/util';
 import { G, type Card, type Offer, type PrepStop } from '../../game/state';
 import { stats, sellValue, basePrice, setCarry } from '../../game/cards';
 import { unlock, foundSecret, mastLv } from '../../game/meta';
-import { rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, rollItem } from '../../game/loot';
+import { rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, rollItem, rollRule } from '../../game/loot';
 import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, type Dest } from '../../game/prep';
 import { heat } from '../../game/state';
 import { SFX } from '../../audio/sfx';
@@ -396,6 +396,28 @@ export function gainGold(n: number) {
   SFX.play('coin');
   const r = $('#pbody').getBoundingClientRect();
   FX.coins(r.left + r.width / 2, r.top + r.height / 2, Math.min(n, 8));
+}
+
+/** 规则遗物三选一：白给，不占三站里的一站 / rule-relic pick: free, and does not use up one of the three stops */
+export function startRule() {
+  const P = G.prep;
+  const list = rollRule(3);
+  if (!list.length) {
+    P.ruleDone = true;
+    return;
+  }
+  const cur: PrepStop = { id: 'rule', ev: EVENTS.rule, mode: '' };
+  relicChoice(cur, L.ui.prep.ruleHint, list);
+  cur.opts = list.map((r) => ({
+    relic: r,
+    act: () => {
+      gainRelic(r, true);
+      P.ruleDone = true;
+      P.cur = null;
+      renderPrep();
+    },
+  }));
+  P.cur = cur;
 }
 
 export function relicChoice(cur: PrepStop, hint: string, list: string[]) {
