@@ -22,7 +22,8 @@ export const hpScale = (r: number) => {
   const at = (n: number) => Math.pow(TUNE.hpGrowth, n - 1) * Math.pow(TUNE.lateHp, Math.max(0, n - 5));
   if (r <= 7) return at(r);
   if (r === 8) return at(7) * TUNE.hp8;
-  return at(7) * TUNE.hp9 * Math.pow(TUNE.afterHp, r - NIGHTS);
+  if (r === NIGHTS) return at(7) * TUNE.hp9;
+  return at(7) * TUNE.hpFull * Math.pow(TUNE.afterHp, r - NIGHTS);
 };
 /** 首领和固定数值的敌人：第 9 夜以前不变，之后每夜涨 / bosses and fixed-value enemies: unchanged before night 9, then grow per night */
 export const fixedScale = (r: number) => (r > NIGHTS ? Math.pow(TUNE.bossAfter, r - NIGHTS) : 1);
@@ -71,7 +72,7 @@ export function makeWave(r: number): Wave {
     case 1: pack({ slime: 5 }, 5, 0.5, 22); pack({ slime: 3 }, 3, 6, 20); pack({ slime: 6 }, 1, 15, 15); break;
     case 2: slot({ slime: 5 }, 4, 0, 22); pack({ bat: 4 }, 4, 4, 24); pack({ bomber: 2 }, 2, 10, 20); pack({ bat: 4, slime: 3 }, 1, 17, 17); break;
     case 3: slot({ slime: 5 }, 2, 0, 22); slot({ bug: 2 }, 2, 8, 20); slot({ bat: 4 }, 3, 3, 22); pack({ skel: 3, shieldb: 1 }, 2, 6, 24); pack({ ghost: 2 }, 2, 6, 20); pack({ skel: 3, bomber: 1 }, 1, 18, 18); break;
-    case 4: boss('knight', 2); pack({ skel: 2, shieldb: 1 }, 2, 4, 18); slot({ bat: 4 }, 3, 6, 24); slot({ slime: 5 }, 3, 0, 22); pack({ mimic: 1 }, 1, 12, 12); pack({ bomber: 3, ghost: 2 }, 1, 16, 16); break;
+    case 4: boss('knight', 2); pack({ skel: 2, shieldb: 1 }, 2, 4, 18); slot({ bat: 4 }, 2, 6, 24); slot({ slime: 5 }, 3, 0, 22); pack({ mimic: 1 }, 1, 12, 12); pack({ bomber: 3, ghost: 2 }, 1, 16, 16); break;
     case 5: pack({ skel: 3, necro: 1 }, 2, 0, 20); pack({ skel: 3, shaman: 1 }, 2, 4, 22); slot({ bat: 4 }, 3, 2, 24); slot({ berserker: 2, drummer: 1 }, 2, 8, 24); slot({ bug: 3 }, 2, 1, 20); pack({ ghost: 3, berserker: 1 }, 1, 17, 17); break;
     case 6: pack({ catapult: 2 }, 1, 2, 2); pack({ siege: 1 }, 1, 8, 8); pack({ golem: 1, shaman: 1, shieldb: 1 }, 2, 4, 20); slot({ skel: 3, shieldb: 1 }, 3, 0, 24); slot({ bug: 3, drummer: 1 }, 2, 2, 24); slot({ bat: 5, bomber: 2 }, 2, 4, 26); pack({ berserker: 3, drummer: 1 }, 1, 19, 19); break;
     case 7:

@@ -22,14 +22,16 @@ export const TUNE = {
   /** 敌人血量每夜成长倍率 / enemy HP growth multiplier per night */
   hpGrowth: 1.34,
   /** 第 6 夜起每夜额外的血量倍率（后期没有乘区就打不动） / extra HP multiplier per night from night 6 (late game is unwinnable without multipliers) */
-  lateHp: 1.18,
+  lateHp: 1.14,
   /** 选目标时精英和首领「往前算」多少（0~1 的路程） / how far elites and bosses count as 'further forward' when targeting (0–1 of the path) */
   eliteFocus: 0.12,
   /** 首领血量倍率 / boss HP multiplier */
   bossHp: 1.6,
   /** 第 8、9 夜普通敌人血量是第 7 夜的几倍 / how many times night 7's normal-enemy HP nights 8 and 9 have */
   hp8: 1.25,
-  hp9: 1.65,
+  hp9: 1.5,
+  /** 完整线、无尽（第 9 夜以后）普通敌人的起算倍率，和第 9 夜分开调：第 9 夜放松了，完整线不跟着变简单 / the base multiplier for normal enemies after night 9 (full line, endless), tuned apart from night 9 so easing night 9 does not make the full line easier */
+  hpFull: 1.77,
   /** 第 9 夜以后（完整线、无尽）普通敌人每夜血量倍率（取代上面两项） / normal-enemy HP multiplier per night after night 9 (full line, endless); replaces the two above */
   afterHp: 1.15,
   /** 隐藏首领的血量按早几夜的倍率算（它还会不停叫小怪挡在前面） / the hidden boss's HP uses an earlier night's multiplier (it also keeps summoning adds as shields) */

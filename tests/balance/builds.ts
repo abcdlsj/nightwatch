@@ -80,7 +80,7 @@ export const ARCHS: Record<string, Arch> = {
   },
   works: {
     hero: 'jun',
-    board: [[1, 'palisade'], [1, 'caltrop'], [1, 'watchtower'], [3, 'mortar'], [5, 'bastion']],
+    board: [[1, 'palisade'], [1, 'caltrop', undefined, 4], [1, 'watchtower'], [3, 'mortar'], [5, 'bastion']],
     relics: ['blueprint', 'plumb', 'spike', 'medal', 'mortarboard', 'citadel'],
     talents: ['jun_00', 'jun_01', 'jun_10', 'jun_02'],
     carry: ['watchtower', 'mortar'],
