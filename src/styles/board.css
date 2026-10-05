@@ -1,4 +1,4 @@
-/* ---------- 棋盘 ---------- */
+/* ---------- 棋盘 ---------- / ---------- Board ---------- */
 #stashRow{display:flex;gap:7px}
 #stashRow{max-height:calc(var(--ch) + 12px);transition:max-height .25s ease,opacity .2s,margin .25s;overflow:visible}
 #stashRow.closed{max-height:0;opacity:0;margin-top:-7px;overflow:hidden;pointer-events:none}

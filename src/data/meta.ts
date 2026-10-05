@@ -1,7 +1,7 @@
-/* 从旧版数据迁移而来，直接在这里改 */
+/* 从旧版数据迁移而来，直接在这里改 / migrated from the old data format; edit here directly */
 import type { Tag } from './types';
 
-/** 成就：w=1 表示守到黎明时结算 */
+/** 成就：w=1 表示守到黎明时结算 / achievements: w=1 means settled at dawn */
 export const ACH: { id: string; w?: number; n: string; d: string }[] = [
  {
   "id": "dawn",
@@ -161,10 +161,10 @@ export const ACH: { id: string; w?: number; n: string; d: string }[] = [
  }
 ] as never;
 
-/** 长夜难度档数（0 是正常难度） */
+/** 长夜难度档数（0 是正常难度） / Long Night difficulty tiers (0 is normal) */
 export const HEAT_MAX = 8;
 
-/** 加码：给今晚加难度换奖励 */
+/** 加码：给今晚加难度换奖励 / modifiers: add difficulty tonight for a reward */
 export const WAGERS: Record<string, { gold?: number; relic?: number; up?: number; heal?: number; n: string; d: string; r: string }> = {
  "horde": {
   "gold": 6
@@ -184,7 +184,7 @@ export const WAGERS: Record<string, { gold?: number; relic?: number; up?: number
  }
 } as never;
 
-/** 羁绊：同元素凑够张数 → 修正项 */
+/** 羁绊：同元素凑够张数 → 修正项 / synergy: enough cards of the same element → modifiers */
 export const SYN: Record<Tag, [number, Record<string, number>][]> = {
  "blade": [
   [
@@ -311,7 +311,7 @@ export const SYN: Record<Tag, [number, Record<string, number>][]> = {
  ]
 } as never;
 
-/** 联动：两种元素都凑到 2 层（各 2 张）时额外生效。键是「元素_元素」，名字在 terms.syn2 */
+/** 联动：两种元素都凑到 2 层（各 2 张）时额外生效。键是「元素_元素」，名字在 terms.syn2 / dual synergy: additionally active when two elements both reach 2 stacks (2 cards each). Keys are 'element_element'; names are in terms.syn2 */
 export const SYN2_NEED = 2;
 export const SYN2: Record<string, { a: Tag; b: Tag; m: Record<string, number> }> = {
   blade_fire: { a: 'blade', b: 'fire', m: { crit: 0.05, burn: 0.2 } },
@@ -331,7 +331,7 @@ export const SYN2: Record<string, { a: Tag; b: Tag; m: Record<string, number> }>
   mech_poison: { a: 'mech', b: 'poison', m: { poison: 0.2, startCharge: 0.1 } },
 };
 
-/** 熟练：各级所需点数 */
+/** 熟练：各级所需点数 / mastery: points required per level */
 export const MAST_LV = [
  5,
  15,

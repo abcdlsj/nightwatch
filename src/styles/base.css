@@ -1,12 +1,12 @@
-/* 字体放在自己站上（public/fonts，由 tools/fontsub.py 子集化，只收游戏里用到的字）；加载完之前先用系统字体 */
+/* 字体放在自己站上（public/fonts，由 tools/fontsub.py 子集化，只收游戏里用到的字）；加载完之前先用系统字体 / fonts are self-hosted (public/fonts, subset by tools/fontsub.py to only the glyphs the game uses); fall back to system fonts until loaded */
 @font-face{font-family:'ZCOOL QingKe HuangYou';src:url(/fonts/zcool.woff2) format('woff2');font-display:swap}
 @font-face{font-family:'Pixelify Sans';src:url(/fonts/pixelify.woff2) format('woff2');font-weight:400 700;font-display:swap}
 @font-face{font-family:'Silkscreen';src:url(/fonts/silkscreen-bold.woff2) format('woff2');font-weight:700;font-display:swap}
-/* 缝合像素 12px：小字正文用；数字统一用它（别的像素字体里 2、3、8 太像） */
+/* 缝合像素 12px：小字正文用；数字统一用它（别的像素字体里 2、3、8 太像） / Fusion Pixel 12px: used for small body text and all digits (2, 3 and 8 look too similar in the other pixel fonts) */
 @font-face{font-family:'Fusion Pixel';src:url(/fonts/fusion.woff2) format('woff2');font-display:swap}
-/* 数字：缩到八成，跟旁边的汉字一样高；声明整段字重，免得浏览器给像素字硬加粗 */
+/* 数字：缩到八成，跟旁边的汉字一样高；声明整段字重，免得浏览器给像素字硬加粗 / digits: shrunk to 80% to match the height of adjacent characters; declare the whole range's weight so browsers do not fake-bold the pixel font */
 @font-face{font-family:'PixNum';src:url(/fonts/fusion.woff2) format('woff2');unicode-range:U+0030-0039;font-weight:100 900;size-adjust:80%;font-display:swap}
-/* 箭头、音符：标题字体里没有，iOS 回退系统字体时会显示成空白，统一用缝合像素画 */
+/* 箭头、音符：标题字体里没有，iOS 回退系统字体时会显示成空白，统一用缝合像素画 / arrows and note symbols: missing from the title font and blank when iOS falls back to system fonts, so draw them with Fusion Pixel */
 @font-face{font-family:'PixSym';src:url(/fonts/fusion.woff2) format('woff2');unicode-range:U+2190-21FF,U+2660-267F;font-weight:100 900;font-display:swap}
 :root{
   --bg:#0f1c20; --panel:#1c2a30; --panel2:#25363d; --edge:#3a525c; --ink:#fbf7ee; --muted:#9fb3ba;
@@ -16,13 +16,13 @@
   --px:'PixNum','PixSym','Pixelify Sans','ZCOOL QingKe HuangYou','Noto Sans CJK SC',ui-monospace,monospace;
   --body:'Fusion Pixel','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif;
   --cw:46px; --ch:90px;
-  /* 安全区（刘海、灵动岛、底部横条）。测试时可以用 ?safe=上,下 覆盖 */
+  /* 安全区（刘海、灵动岛、底部横条）。测试时可以用 ?safe=上,下 覆盖 / safe area (notch, Dynamic Island, home bar). Override in testing with ?safe=top,bottom */
   --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
   box-sizing:border-box;
   padding-top:var(--sat);
   padding-bottom:var(--sab);
 }
-/* 游戏本身就是暗色美术，明暗两种环境使用同一套色板 */
+/* 游戏本身就是暗色美术，明暗两种环境使用同一套色板 / the game is dark art by design, so light and dark environments share one palette */
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0f1c20; --panel:#1c2a30; } }
 :root[data-theme="dark"]{ --bg:#0f1c20; --panel:#1c2a30; }
 *,*::before,*::after{box-sizing:border-box}
@@ -30,7 +30,7 @@ html{height:100%;background:var(--bg);scroll-padding-top:var(--sat)}
 body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--zh);overflow:hidden;
   user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 button{font-family:inherit}
-em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 */
+em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 / italic pixel fonts blur, so never italicize */
 #bg{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated;z-index:0}
 #crt{position:fixed;inset:0;pointer-events:none;z-index:95;
   background:repeating-linear-gradient(to bottom,rgba(0,0,0,.13) 0 1px,transparent 1px 3px),

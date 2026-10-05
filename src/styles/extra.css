@@ -1,4 +1,4 @@
-/* ---------- 起手 / 商店锁卡 / 拦路 ---------- */
+/* ---------- 起手 / 商店锁卡 / 拦路 ---------- / ---------- Opening / shop locking / roadblock ---------- */
 .cat-fight{--cc:#ff7a5c}.door.cat-fight{box-shadow:0 4px 0 rgba(0,0,0,.5),inset 5px 0 0 var(--cc),0 0 12px rgba(255,122,92,.35)}
 .offer .lockb{position:absolute;top:4px;right:4px;width:26px;height:26px;border:0;border-radius:8px;background:rgba(0,0,0,.35);color:#9fb3ba;font-size:14px;line-height:26px;padding:0;cursor:pointer}
 .offer .lockb.on{background:#ffd166;color:#1a1c2c}
@@ -11,13 +11,13 @@
 .amb img{width:64px;height:64px;image-rendering:pixelated;flex:none;background:rgba(0,0,0,.3);border-radius:10px;padding:4px}
 .amb b{font-size:18px;color:#ff9e7a}.amb p{margin:4px 0 0;font-size:12px;line-height:1.45;color:#c5d2d6}
 
-/* ---------- 隐藏事件 ---------- */
+/* ---------- 隐藏事件 ---------- / ---------- Hidden events ---------- */
 .sletter{font-size:13px;line-height:1.7;text-align:left;color:#e8dcc0;margin-bottom:10px}
 .sletter span{display:block;text-align:right}
 .nstar{position:fixed;top:calc(7% + var(--sat));right:16%;width:4px;height:4px;background:#fff7d0;box-shadow:0 0 6px 2px #ffe79a;pointer-events:none;animation:nstar 3s ease-in-out infinite}
 @keyframes nstar{50%{opacity:.5}}
 
-/* ---------- 人物解锁 / 流派 ---------- */
+/* ---------- 人物解锁 / 流派 ---------- / ---------- Hero unlocks / archetypes ---------- */
 .hero.locked{filter:grayscale(1);opacity:.55;cursor:default}
 .hero.locked .por{filter:brightness(.4)}
 .hpaths{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
@@ -26,21 +26,21 @@
 .hpaths span.on{background:rgba(255,209,102,.16);color:#ffe79a}
 .hpaths small{margin-left:4px;font-size:10px;opacity:.8}
 
-/* ---------- 设置 ---------- */
+/* ---------- 设置 ---------- / ---------- Settings ---------- */
 .set-row{width:100%;display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer}
 .set-row>div{flex:1}
 .tog{flex:none;width:42px;height:24px;border-radius:12px;background:#33424a;position:relative;transition:background .15s}
 .tog::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:9px;background:#9fb3ba;transition:left .15s,background .15s}
 .tog.on{background:#3c7a52}.tog.on::after{left:21px;background:#e8fff0}
 
-/* ---------- C 位 ---------- */
+/* ---------- C 位 ---------- / ---------- Carry ---------- */
 .card.carry .inner{box-shadow:0 0 0 2px #ffd166,0 0 10px rgba(255,209,102,.55)}
 .card .cw{position:absolute;right:-5px;top:-7px;width:17px;height:17px;border-radius:5px;background:#ffd166;color:#1a1c2c;font-size:12px;line-height:17px;text-align:center;box-shadow:0 2px 0 rgba(0,0,0,.4);z-index:3}
-/* iOS Safari：装到主屏的提示 */
+/* iOS Safari：装到主屏的提示 / iOS Safari: the add-to-home-screen hint */
 .ioshint{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:2px dashed var(--edge);border-radius:8px;background:rgba(15,28,32,.7);color:var(--muted);font-family:var(--body);font-size:12px;line-height:1.5;text-align:left}
 .ioshint span{flex:1}
 .ioshint .btn{flex:none;min-width:32px}
-/* 起手页顶上：完整游戏线 */
+/* 起手页顶上：完整游戏线 / top of the opening page: full game line */
 .fullbox{display:flex;align-items:center;gap:10px;width:100%;max-width:380px;padding:8px 12px;border-radius:12px;background:rgba(10,16,22,.75);box-shadow:inset 0 0 0 2px rgba(255,209,102,.25);text-align:left;cursor:pointer}
 .fullbox.on{box-shadow:inset 0 0 0 2px #ffd166,0 0 16px rgba(255,209,102,.25)}
 .fullbox input{appearance:none;-webkit-appearance:none;flex:none;width:22px;height:22px;margin:0;border:2px solid #ffd166;border-radius:5px;background:transparent}
@@ -49,5 +49,5 @@
 .fullbox b{font-weight:400;font-size:17px;color:#ffd166}
 .fullbox small{font-family:var(--body);font-size:12px;line-height:1.45;color:#c9bda8}
 .newheat.full{box-shadow:inset 0 0 0 2px #ffd166}
-/* 宝石剧情的标题 */
+/* 宝石剧情的标题 / the gem scene's title */
 .ptitle.gemt{color:var(--gemc);text-shadow:0 0 10px color-mix(in srgb,var(--gemc) 45%,transparent)}

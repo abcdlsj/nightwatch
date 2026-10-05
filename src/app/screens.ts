@@ -1,4 +1,4 @@
-/* 整屏页面：标题、选人、起手三选一、结局 */
+/* 整屏页面：标题、选人、起手三选一、结局 / full-screen pages: title, hero select, opening choice, ending */
 import { ITEMS, ADJ, TIERS } from '../data/cards';
 import { HEROES, KITS } from '../data/heroes';
 import { ACH } from '../data/meta';
@@ -25,7 +25,7 @@ import { openWorkshop } from '../ui/workshop';
 import { store, KEYS } from '../platform/storage';
 import { newGame, resumeSave, continueEndless } from './flow';
 
-/* ---------------- 标题 ---------------- */
+/* ---------------- 标题 ---------------- / ---------------- Title ---------------- */
 export function titleScreen() {
   const sc = $('#screen');
   const T = L.ui.title;
@@ -70,7 +70,7 @@ export function titleScreen() {
       sc.hidden = true;
       resumeSave();
     };
-  /* iOS Safari 里：提示装到主屏（全屏、离线）。点叉不再提示 */
+  /* iOS Safari 里：提示装到主屏（全屏、离线）。点叉不再提示 / on iOS Safari: hint to add to home screen (fullscreen, offline). Dismissing with the X stops the hint */
   if (canInstallIOS() && !store.get(KEYS.iosHint)) {
     sc.querySelector('.scr')!.insertAdjacentHTML('beforeend', `<div class="ioshint"><span>${T.installIOS}</span><button class="btn sm" id="iosX" aria-label="${T.installClose}">×</button></div>`);
     $('#iosX').onclick = () => {
@@ -78,12 +78,12 @@ export function titleScreen() {
       document.querySelector('.ioshint')?.remove();
     };
   }
-  /* 借来的星还回去了：挂在标题页的天上 */
+  /* 借来的星还回去了：挂在标题页的天上 / the borrowed star is returned: it hangs in the title screen's sky */
   if (META.secrets.star) sc.insertAdjacentHTML('beforeend', `<i class="nstar" title="${T.star}"></i>`);
 }
 
-/* ---------------- 选人 ---------------- */
-/** 长夜难度：每个人物各自解锁，起手页里选 */
+/* ---------------- 选人 ---------------- / ---------------- Hero select ---------------- */
+/** 长夜难度：每个人物各自解锁，起手页里选 / Long Night difficulty: unlocked per hero, chosen on the opening page */
 function heatHtml(h: number) {
   const H = L.meta.heats as string[];
   return h ? H.slice(1, h + 1).map((x, i) => `<i>${i + 1}</i> ${x}`).join('<br>') : H[0];
@@ -119,7 +119,7 @@ function mastHtml(h: string) {
     nx = mastNext(h);
   return `<span class="hmast">${L.ui.heroes.mast} <b>${lv}</b>${nx ? `<small>${t('heroes.mastNext', { n: nx })}</small>` : ''}</span>`;
 }
-/** 流派一览：解锁了的亮着，没解锁的写要几级熟练 */
+/** 流派一览：解锁了的亮着，没解锁的写要几级熟练 / archetype overview: unlocked ones lit, locked ones show the mastery level needed */
 function pathsHtml(h: string) {
   return `<div class="hpaths">${pathsOf(h)
     .map((p) => (pathOpen(h, p) ? `<span class="on">${p.n}</span>` : `<span>${p.n}<small>${t('heroes.pathLock', { n: p.mast })}</small></span>`))
@@ -159,8 +159,8 @@ export function heroSelect() {
   );
 }
 
-/* ---------------- 起手三选一（第一套固定出现；没解锁流派的起手套不出现，在下面列出解锁条件） ---------------- */
-/** 完整游戏线的勾选框：三个流派的起手各守到一次黎明后出现在起手页顶上 */
+/* ---------------- 起手三选一（第一套固定出现；没解锁流派的起手套不出现，在下面列出解锁条件） ---------------- / ---------------- Opening choice of three (the first set always appears; sets from locked archetypes are hidden, with their unlock conditions listed below) ---------------- */
+/** 完整游戏线的勾选框：三个流派的起手各守到一次黎明后出现在起手页顶上 / full game line checkbox: appears at the top of the opening page once you have held to dawn with an opening set from each of the three archetypes */
 function fullBox(hero: string) {
   if (!fullOpen(hero)) return '';
   const T = L.ui.kits;
@@ -180,7 +180,7 @@ export function pickKit(done: (k: KitDef, heat: number, full: boolean) => void) 
   const H = HEROES[G.hero];
   const all = KITS[G.hero] || [{ n: '', d: '', path: '', cards: H.start.map((s) => [s[0], s[1]] as [string, number]) }];
   const open = all.filter((k) => kitOpen(G.hero, k));
-  /* 每个解锁了的流派先出一套（第一个流派固定第一套），不够三套再从剩下的里随机补 */
+  /* 每个解锁了的流派先出一套（第一个流派固定第一套），不够三套再从剩下的里随机补 / give one set per unlocked archetype first (the first archetype always offers its first set), then fill up to three randomly from the rest */
   const byPath: KitDef[] = [];
   for (const k of [open[0], ...shuffled(open.slice(1))]) if (!byPath.some((x) => x.path === k.path)) byPath.push(k);
   const list = [...byPath, ...shuffled(open.filter((k) => !byPath.includes(k)))].slice(0, 3);
@@ -211,8 +211,8 @@ export function pickKit(done: (k: KitDef, heat: number, full: boolean) => void) 
   );
 }
 
-/* ---------------- 结局 ---------------- */
-/** 守到黎明的标题：完整线打倒隐藏首领是「真正的黎明」，宝石不全是「还缺一块」 */
+/* ---------------- 结局 ---------------- / ---------------- Ending ---------------- */
+/** 守到黎明的标题：完整线打倒隐藏首领是「真正的黎明」，宝石不全是「还缺一块」 / dawn title: beating the hidden boss on the full line is 'True Dawn'; a missing gem is 'One Piece Short' */
 function dawnTitle() {
   const T = L.ui.end;
   if (!G.full) return T.dawn;

@@ -1,4 +1,4 @@
-/* 卡牌的 DOM：卡面、棋盘/背包里的位置、卡面数字 */
+/* 卡牌的 DOM：卡面、棋盘/背包里的位置、卡面数字 / card DOM: the face, its board/bag position, the face numbers */
 import { ITEMS, ADJ, TIERS, TAGC } from '../data/cards';
 import { t } from '../i18n';
 import { pct } from '../core/util';
@@ -10,13 +10,13 @@ import { B } from '../sim/battle';
 import { spr } from '../render/sprites';
 import { $, $$ } from './dom';
 
-/** 卡宽（每格）和卡高，随屏幕算 */
+/** 卡宽（每格）和卡高，随屏幕算 / card width (per slot) and height, computed from the screen */
 export const LAYOUT = { cw: 46, ch: 90 };
 
 const els = new Map<Card, HTMLElement>();
 export const elOf = (c: Card | null | undefined) => (c ? els.get(c) : undefined);
 
-/** 卡面右下的小数字：伤害，或者辅助卡的效果 */
+/** 卡面右下的小数字：伤害，或者辅助卡的效果 / the small number at the card's bottom-right: damage, or a support card's effect */
 const NUM_TEXT: Record<string, (c: Card) => string> = {
   anvil: (c) => pct(buffAmt(c)),
   bloodrage: (c) => pct(buffAmt(c)),
@@ -82,7 +82,7 @@ export function setNum(el: HTMLElement | undefined, c: Card) {
   n.classList.toggle('txt', /[^\x00-\x7f]/.test(s));
 }
 
-/** 弹药数显示；打空了卡面变灰 */
+/** 弹药数显示；打空了卡面变灰 / ammo counter; the face greys out when empty */
 export function setAmmo(c: Card) {
   const el = elOf(c);
   if (!el) return;
@@ -94,14 +94,14 @@ export function setAmmo(c: Card) {
 }
 
 let bind: (c: Card, el: HTMLElement) => void = () => {};
-/** 由拖拽模块注册：卡牌元素按下时开始拖 */
+/** 由拖拽模块注册：卡牌元素按下时开始拖 / registered by the drag module: start dragging on pointer down */
 export const setCardBinder = (f: (c: Card, el: HTMLElement) => void) => {
   bind = f;
 };
 
 const slotX = (i: number) => 4 + i * LAYOUT.cw + 2 + 'px';
 
-/** 把 G.cards 同步到棋盘和背包 */
+/** 把 G.cards 同步到棋盘和背包 / sync G.cards to the board and bag */
 export function renderOwned() {
   recalcMods();
   for (const [c, el] of els)
@@ -134,7 +134,7 @@ export function repaint(c: Card) {
   if (el) paintCard(el, c, el.classList.contains('frozen') ? 'frozen' : '');
 }
 
-/** 换局时清掉所有卡牌元素 */
+/** 换局时清掉所有卡牌元素 / clear all card elements between runs */
 export function clearCardEls() {
   for (const el of els.values()) el.remove();
   els.clear();
@@ -166,7 +166,7 @@ export function buildCells() {
 }
 export const cells = (z: Zone) => $$('.cell', $('#' + z)).sort((a, b) => +a.dataset.i! - +b.dataset.i!);
 
-/** 战斗中卡面的冷却遮罩 */
+/** 战斗中卡面的冷却遮罩 / the cooldown overlay on card faces during battle */
 export function paintCharges() {
   for (const c of G.cards) {
     if (c.loc !== 'board') continue;

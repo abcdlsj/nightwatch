@@ -1,6 +1,8 @@
 /* 平衡报告：每个流派 × 每个人物跑若干个种子，统计守到黎明的比例和平均撑到第几夜。
  * 用法：npm run balance            （默认每格 20 局）
- *       RUNS=50 FOCUS=volt npm run balance */
+ *       RUNS=50 FOCUS=volt npm run balance
+ * Balance report: run each archetype × hero across several seeds and tally the dawn rate and the average night reached. Usage: npm run balance            (20 runs per cell by default) / RUNS=50 FOCUS=volt npm run balance
+ */
 import { it, beforeAll } from 'vitest';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { initLocale } from '../../src/i18n';
@@ -11,7 +13,7 @@ import { playRun, type Focus, type RunLog } from './bot';
 const RUNS = +(process.env.RUNS || 20);
 const FOCI = (process.env.FOCUS || 'blade,fire,ice,volt,mech,poison,any').split(',') as Focus[];
 const HEAT = +(process.env.HEAT || 0);
-/** FULL=1：跑完整游戏线（15 夜） */
+/** FULL=1：跑完整游戏线（15 夜） / FULL=1: run the full game line (15 nights) */
 const FULL = !!+(process.env.FULL || 0);
 
 beforeAll(() => {

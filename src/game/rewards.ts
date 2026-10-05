@@ -1,4 +1,4 @@
-/* 守住一夜的收入：工钱、精英、遗物/天赋加的钱、利息、墙没掉砖。补墙也在这里结算 */
+/* 守住一夜的收入：工钱、精英、遗物/天赋加的钱、利息、墙没掉砖。补墙也在这里结算 / Income for holding a night: wages, elites, gold from relics/talents, interest, and bricks the wall kept. Wall repair is settled here too */
 import { G, heat } from './state';
 import { mv } from './mods';
 

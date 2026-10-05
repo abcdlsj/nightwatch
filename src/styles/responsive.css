@@ -1,4 +1,4 @@
-/* ---------- 矮屏：整页不超过一屏 ---------- */
+/* ---------- 矮屏：整页不超过一屏 ---------- / ---------- Short screens: keep the whole page within one screen ---------- */
 @media (max-height:760px){
   .logo{font-size:64px}.rules{font-size:14px;padding:10px 12px;gap:5px}.scr{gap:9px}
   .hero em{display:none}.hero p{font-size:12px}

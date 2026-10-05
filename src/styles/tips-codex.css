@@ -1,4 +1,4 @@
-/* ---------- 提示气泡 / 今晚情报 / 图鉴 ---------- */
+/* ---------- 提示气泡 / 今晚情报 / 图鉴 ---------- / ---------- Tooltips / tonight's intel / codex ---------- */
 #roundChip,#goldChip,#hpChip{cursor:pointer}
 .chip.hp.low{animation:lowP 1s ease-in-out infinite alternate}
 @keyframes lowP{from{box-shadow:inset 0 0 0 2px rgba(255,90,90,.2)}to{box-shadow:inset 0 0 0 2px #ff5a5a,0 0 12px rgba(255,90,90,.6)}}
@@ -39,7 +39,7 @@
 .hs-rel{display:flex;flex-wrap:wrap;gap:5px}.hs-rel span{display:flex;align-items:center;gap:4px;font-size:13px;padding:3px 7px;border-radius:7px;background:rgba(0,0,0,.28);color:var(--gc);box-shadow:inset 0 0 0 1px var(--gc)}
 .hs-rel img{width:18px;height:18px;image-rendering:pixelated}
 .tbtns{flex-wrap:wrap}
-/* 工坊 */
+/* 工坊 / Workshop */
 .ws-steps{display:flex;flex-direction:column;gap:6px;margin:4px 0 8px}
 .ws-steps div{display:flex;gap:8px;align-items:flex-start;font-family:var(--body);font-size:13px;line-height:1.55;color:#d8e2e5}
 .ws-steps i{flex:none;width:20px;height:20px;border-radius:50%;background:var(--panel2);color:#ffd166;display:grid;place-items:center;font-family:var(--px);font-size:12px}

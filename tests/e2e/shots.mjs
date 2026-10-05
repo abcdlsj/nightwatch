@@ -1,5 +1,7 @@
 /* 关键界面截图：标题、选人、起手、备战、卡牌详情、战斗、图鉴。用于迁移前后对照。
- * 用法：node tests/e2e/shots.mjs --url=地址 --out=目录 */
+ * 用法：node tests/e2e/shots.mjs --url=地址 --out=目录
+ * Key-screen screenshots: title, hero select, opening, prep, card details, battle, codex. Used for before/after comparison across migrations. Usage: node tests/e2e/shots.mjs --url= --out=dir
+ */
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 const arg = (k, d) => process.argv.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3) ?? d;
@@ -8,7 +10,7 @@ const out = arg('out', 'shots');
 mkdirSync(out, { recursive: true });
 const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
 const pg = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
-/* 测试用存档：人物全部解锁 */
+/* 测试用存档：人物全部解锁 / test save: all heroes unlocked */
 await pg.addInitScript(() => {
   if (!localStorage.getItem('chain-meta-v1')) localStorage.setItem('chain-meta-v1', JSON.stringify({ heroes: { ayla: 1, mo: 1, ying: 1, jun: 1, li: 1 } }));
 });

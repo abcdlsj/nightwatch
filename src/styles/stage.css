@@ -1,4 +1,4 @@
-/* ---------- 舞台 ---------- */
+/* ---------- 舞台 ---------- / ---------- Stage ---------- */
 #stage{position:relative;flex:1;min-height:200px;border-radius:14px;overflow:hidden;background:rgba(8,14,18,.55);
   box-shadow:inset 0 0 0 3px rgba(0,0,0,.35),0 4px 0 rgba(0,0,0,.4)}
 #field{position:absolute;top:0;image-rendering:pixelated;display:block}
@@ -28,7 +28,7 @@
 .offer .oflav{display:none}
 .price.free{color:#9bf0b8;background:#173a28}
 .offer .odesc{font-family:var(--body);font-size:12px;line-height:1.35;color:#c5d2d6;text-align:center;padding:0 2px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-/* 三张货并排时逐行对齐：卡图同高、名字同一行、价格贴底；卡图不缩放，像素保持清楚 */
+/* 三张货并排时逐行对齐：卡图同高、名字同一行、价格贴底；卡图不缩放，像素保持清楚 / align rows when three items sit side by side: equal art height, names on one line, prices at the bottom; art is never scaled so pixels stay crisp */
 .offer .card.static{margin-bottom:6px}
 .offer .price{margin-top:auto}
 .price{margin-top:3px;display:inline-flex;align-items:center;gap:3px;background:#3b2a12;border-radius:7px;padding:3px 7px;font-family:var(--px);font-size:16px;color:#ffd166;box-shadow:0 2px 0 rgba(0,0,0,.5)}

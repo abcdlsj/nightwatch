@@ -1,4 +1,4 @@
-/* 敌人套：霜潮按角色替换原来那套 */
+/* 敌人套：霜潮按角色替换原来那套 / Enemy sets: Frost Tide swaps in per role */
 import { FOESETS } from '../data/enemies';
 import { G } from './state';
 

@@ -1,4 +1,4 @@
-/** 手画的像素图（不经 tools/pixelgen.py）：顶栏的金币和心，霜潮专属的三个敌人 */
+/** 手画的像素图（不经 tools/pixelgen.py）：顶栏的金币和心，霜潮专属的三个敌人 / Hand-drawn pixel art (not via tools/pixelgen.py): the top-bar coin and heart, and the three Frost Tide exclusives */
 export const HAND_SPRITES: Record<string, string[]> = {
  "coin": [
   "..kkkk..",
@@ -76,7 +76,7 @@ export const HAND_SPRITES: Record<string, string[]> = {
  ]
 };
 
-/** 4×6 像素数字（战场飘字用）：3 与 8 形状区分明显 */
+/** 4×6 像素数字（战场飘字用）：3 与 8 形状区分明显 / 4×6 pixel digits (for battlefield floating text): 3 and 8 are clearly distinct */
 export const DIG: Record<string, string> = {
  "0": "011010011001100110010110",
  "1": "001001100010001000100111",

@@ -1,15 +1,15 @@
-/* 玩家设置（存在 chain-settings）。旧版只有声音三档（chain-audio），第一次读时迁移过来 */
+/* 玩家设置（存在 chain-settings）。旧版只有声音三档（chain-audio），第一次读时迁移过来 / Player settings (stored under chain-settings). The old version only had three sound levels (chain-audio); migrate on first read */
 import { store, KEYS } from './storage';
 
 export interface Settings {
   music: boolean;
   sfx: boolean;
   haptics: boolean;
-  /** 震屏 */
+  /** 震屏 / screen shake */
   shake: boolean;
-  /** 伤害数字 */
+  /** 伤害数字 / damage numbers */
   nums: boolean;
-  /** 新手提示 */
+  /** 新手提示 / tutorial hints */
   tips: boolean;
 }
 

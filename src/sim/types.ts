@@ -17,23 +17,23 @@ export interface Enemy {
   frzT: number; frzN: number;
   vulnT: number; vulnA: number;
   flash: number;
-  /** 动画相位，也决定游魂什么时候虚化 */
+  /** 动画相位，也决定游魂什么时候虚化 / animation phase; also decides when wraiths turn ethereal */
   ph: number;
   armorB: number; hasteB: number;
   healT: number; bornT: number; raiseT: number; lobT: number;
   sprK: string | null;
   revealed: boolean;
   dashT: number; hardT: number;
-  /** 上弦：快一半的剩余秒数 */
+  /** 上弦：快一半的剩余秒数 / wind-up: roughly half the remaining seconds */
   rushT?: number;
-  /** 当前意图序号和倒计时 */
+  /** 当前意图序号和倒计时 / current intent index and countdown */
   ii: number; it: number;
   dead: boolean;
   emerge?: boolean;
   raised?: boolean;
   shellN?: number;
   lowSaid?: boolean;
-  /** 元素反应的内置冷却（到这个时刻前不再反应） */
+  /** 元素反应的内置冷却（到这个时刻前不再反应） / elemental reaction internal cooldown (no further reaction until this time) */
   rxT?: number;
 }
 
@@ -46,7 +46,7 @@ export interface Projectile {
   done: boolean;
 }
 
-export interface EnemyRock { x0: number; y0: number; x1: number; y1: number; t: number; dur: number; done?: boolean; /** 砸到城墙的伤害（不填按投石车） */ d?: number }
+export interface EnemyRock { x0: number; y0: number; x1: number; y1: number; t: number; dur: number; done?: boolean; /** 砸到城墙的伤害（不填按投石车） / damage dealt to the wall (defaults to the catapult's) */ d?: number }
 
 export interface Battle {
   t: number;
@@ -63,7 +63,7 @@ export interface Battle {
   endT: number;
   over: boolean;
   result?: 'win' | 'lose';
-  /** 界面主循环用的时间累积 */
+  /** 界面主循环用的时间累积 / time accumulator for the UI main loop */
   acc: number;
   boss: Enemy | null;
   greed: number;
@@ -81,11 +81,11 @@ export interface Battle {
   combo: number;
   lastKill?: number;
   maxHit: number;
-  /** 慢镜头剩余（真实时间） */
+  /** 慢镜头剩余（真实时间） / remaining slow-motion time (real time) */
   slowT: number;
   kt?: number[];
   wallBy?: Record<string, number>;
-  /** 本场元素反应、流派连招次数 */
+  /** 本场元素反应、流派连招次数 / this battle's elemental reaction and archetype combo counts */
   rxN?: number;
   stkN?: number;
 }

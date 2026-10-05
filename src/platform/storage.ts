@@ -1,5 +1,7 @@
 /* 键值存储。网页和 WebView 里都用 localStorage（Capacitor 的 WKWebView / Android WebView 会持久化它）；
- * 以后接 Steam 云存档或原生存储时，只换这里的实现。读写失败（隐私模式、配额满）一律静默。 */
+ * 以后接 Steam 云存档或原生存储时，只换这里的实现。读写失败（隐私模式、配额满）一律静默。
+ * Key-value storage. Both the web and WebViews use localStorage (Capacitor's WKWebView / Android WebView persist it); to add Steam cloud saves or native storage later, only swap the implementation here. Read/write failures (private mode, quota full) are always silent.
+ */
 export interface KV {
   get(k: string): string | null;
   set(k: string, v: string): void;
@@ -51,7 +53,7 @@ export const store = {
   setJson: (k: string, v: unknown) => kv.set(k, JSON.stringify(v)),
 };
 
-/* 各存档键（沿用旧版，老玩家的进度不丢） */
+/* 各存档键（沿用旧版，老玩家的进度不丢） / save keys (kept from the old version so existing players keep their progress) */
 export const KEYS = {
   meta: 'chain-meta-v1',
   save: 'chain-demo-save-v4',

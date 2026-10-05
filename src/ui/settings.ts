@@ -1,4 +1,4 @@
-/* 设置页：声音、震动、震屏、伤害数字、新手提示、清除进度 */
+/* 设置页：声音、震动、震屏、伤害数字、新手提示、清除进度 / Settings page: sound, haptics, screen shake, damage numbers, tutorial hints, clear progress */
 import { L, t } from '../i18n';
 import { SETTINGS, setSetting, type Settings } from '../platform/settings';
 import { store, KEYS } from '../platform/storage';

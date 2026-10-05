@@ -2,7 +2,9 @@
  *   1) 有没有元素跑到屏幕外（横向溢出、纵向超出且不可滚动）
  *   2) 主界面有没有在底部留下大块空白
  *   3) 固定在顶部的弹窗有没有压到刘海里
- * 用法：node tests/e2e/layout.mjs [--url=] [--out=shots/layout] [--size=420x912] [--safe=62,34] [--engine=webkit] */
+ * 用法：node tests/e2e/layout.mjs [--url=] [--out=shots/layout] [--size=420x912] [--safe=62,34] [--engine=webkit]
+ * Layout check: screenshot every screen at phone sizes (default iPhone Air 420×912 with a 62px notch / 34px home bar) and check 1) whether anything overflows the screen (horizontal overflow, or vertical beyond a non-scrollable area) 2) whether main screens leave a large blank band at the bottom 3) whether top-anchored popups intrude into the notch. Usage: node tests/e2e/layout.mjs [--url=] [--out=shots/layout] [--size=420x912] [--safe=62,34] [--engine=webkit]
+ */
 import { webkit, chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 const arg = (k, d) => process.argv.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3) ?? d;
@@ -15,7 +17,7 @@ mkdirSync(out, { recursive: true });
 const engine = arg('engine', 'webkit') === 'chromium' ? chromium : webkit;
 const b = await engine.launch();
 const pg = await b.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 2, hasTouch: true });
-/* 测试用存档：人物全部解锁 */
+/* 测试用存档：人物全部解锁 / test save: all heroes unlocked */
 await pg.addInitScript(() => {
   if (!localStorage.getItem('chain-meta-v1')) localStorage.setItem('chain-meta-v1', JSON.stringify({ heroes: { ayla: 1, mo: 1, ying: 1, jun: 1, li: 1 } }));
 });
@@ -23,7 +25,7 @@ const errs = [];
 const problems = [];
 pg.on('pageerror', (e) => errs.push(String(e)));
 
-/** 找出可见但超出屏幕的元素（在可滚动容器里的不算） */
+/** 找出可见但超出屏幕的元素（在可滚动容器里的不算） / find visible elements that overflow the screen (excluding those in scrollable containers) */
 const check = (name) =>
   pg.evaluate(
     ({ name, W, H, SAT, SAB }) => {
@@ -121,7 +123,7 @@ await g(() => __game.closeSheet());
 await pg.click('#hisBtn');
 await shot('history');
 await g(() => __game.closeSheet());
-/* 顶部弹出物：成就和提示气泡 */
+/* 顶部弹出物：成就和提示气泡 / top popups: achievements and tooltips */
 await g(() => { __game.unlockTest?.('dawn'); });
 await pg.click('#goldChip', { force: true }).catch(() => {});
 await shot('popups');

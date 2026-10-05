@@ -1,4 +1,4 @@
-/* ---------- 战报 ---------- */
+/* ---------- 战报 ---------- / ---------- Battle report ---------- */
 #report{background:rgba(10,14,20,.8);justify-content:flex-start}
 .rp-title{font-size:26px;text-align:center;text-shadow:0 3px 0 rgba(0,0,0,.5)}
 .rp-title.win{color:#9bf0b8}

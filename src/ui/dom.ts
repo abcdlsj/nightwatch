@@ -1,10 +1,10 @@
-/* DOM 小工具 */
+/* DOM 小工具 / small DOM helpers */
 import { L, lang } from '../i18n';
 
 export const $ = (s: string) => document.querySelector(s) as HTMLElement;
 export const $$ = (s: string, root: ParentNode = document) => [...root.querySelectorAll(s)] as HTMLElement[];
 
-/** 重新播放一个 CSS 动画类 */
+/** 重新播放一个 CSS 动画类 / replay a CSS animation class */
 export function restart(el: Element | null | undefined, cls: string) {
   if (!el) return;
   el.classList.remove(cls);
@@ -12,7 +12,7 @@ export function restart(el: Element | null | undefined, cls: string) {
   el.classList.add(cls);
 }
 
-/** 静态 HTML 里标了 data-i18n / data-i18n-aria 的地方换成当前语言 */
+/** 静态 HTML 里标了 data-i18n / data-i18n-aria 的地方换成当前语言 / replace spots tagged data-i18n / data-i18n-aria in static HTML with the current language */
 export function applyStaticText() {
   document.documentElement.lang = lang;
   const get = (k: string) => k.split('.').reduce((o: any, x) => (o == null ? o : o[x]), L.ui);

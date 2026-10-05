@@ -1,4 +1,4 @@
-/* 掉落与抽取：商店卡、词缀、遗物、天赋、「对路」选项 */
+/* 掉落与抽取：商店卡、词缀、遗物、天赋、「对路」选项 / Loot and rolls: shop cards, affixes, relics, talents, and 'on-path' options */
 import { ITEMS, ADJ, ADJ_NODMG } from '../data/cards';
 import { RELICS } from '../data/relics';
 import { TALENTS } from '../data/talents';
@@ -9,7 +9,7 @@ import { basePrice, hasKind, hasTag, hasGrow, hasAmmo, hasBig } from './cards';
 import { cardOpen } from './unlocks';
 import { mv } from './mods';
 
-/* ---------------- 卡牌 ---------------- */
+/* ---------------- 卡牌 ---------------- / ---------------- Cards ---------------- */
 export function rollAdj(key: string, force?: boolean, exclude?: string | null, maxTier?: number) {
   if (!force && rand() > 0.12) return null;
   const r = rand();
@@ -58,7 +58,7 @@ export function makeOffer(filter?: ItemFilter | null, opt: { black?: number | bo
   return { card: { key, tier, adj, size: ITEMS[key].size, dl: 0, hoard: 0 }, price, sold: false };
 }
 
-/** 锁住的卡原价出现在下一家店的第一格 */
+/** 锁住的卡原价出现在下一家店的第一格 / a locked card reappears at full price in the next shop's first slot */
 export function lockedOffers(offers: Offer[]) {
   if (!G.lock) return offers;
   const L0 = G.lock;
@@ -66,7 +66,7 @@ export function lockedOffers(offers: Offer[]) {
   return offers;
 }
 
-/* ---------------- 遗物 ---------------- */
+/* ---------------- 遗物 ---------------- / ---------------- Relics ---------------- */
 export function rollGear(n: number, bonus?: number, maxTier?: number) {
   const R = G.round + (bonus || 0);
   const w = [Math.max(10, 62 - 8 * R), 24 + 2 * R, R >= 2 ? 4 + 4 * R : 0, R >= 4 ? 2 * R - 4 : 0];
@@ -92,7 +92,7 @@ export function rollGear(n: number, bonus?: number, maxTier?: number) {
 }
 export const gearPrice = (k: string) => [5, 9, 14, 20][RELICS[k].t] + Math.floor(G.round / 2) + mv('tax');
 
-/* ---------------- 天赋 ---------------- */
+/* ---------------- 天赋 ---------------- / ---------------- Talents ---------------- */
 export function talentOk(id: string) {
   const T = TALENTS[id];
   return !!T && !G.skills.includes(id) && (!T.hero || T.hero === G.hero);
@@ -125,7 +125,9 @@ export function rollTalents(n: number, bias?: string) {
 }
 
 /* ---------------- 对路：手里有某类卡时，偶尔多一个针对性选项 ----------------
- * 这些遗物和天赋平时不进随机池，只在条件满足时才可能冒出来 */
+ * 这些遗物和天赋平时不进随机池，只在条件满足时才可能冒出来
+ * ---------------- On-path: holding a certain card type occasionally adds a tailored option ---------------- / these relics and talents never enter the random pool; they only appear when conditions are met
+ */
 const RELIC_FIT: Record<string, () => boolean> = {
   scabbard: () => hasKind('weapon'),
   chant: () => hasKind('weapon'),

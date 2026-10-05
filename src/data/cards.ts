@@ -1,4 +1,4 @@
-/* 从旧版数据迁移而来，直接在这里改 */
+/* 从旧版数据迁移而来，直接在这里改 / migrated from the old data format; edit here directly */
 import type { ItemDef, UpgradeCurve, AdjDef, Tag, Kind } from './types';
 
 export const ITEMS: Record<string, ItemDef> = {
@@ -2048,7 +2048,7 @@ export const ITEMS: Record<string, ItemDef> = {
  }
 } as unknown as Record<string, ItemDef>;
 
-/** 升品曲线：d 伤害倍率、c 冷却倍率，按升了几档取值 */
+/** 升品曲线：d 伤害倍率、c 冷却倍率，按升了几档取值 / tier-up curve: d damage multiplier, c cooldown multiplier, indexed by how many tiers were gained */
 export const UPS: Record<string, UpgradeCurve> = {
  "dmg": {
   "d": [
@@ -2161,7 +2161,7 @@ export const ADJ: Record<string, AdjDef> = {
  }
 } as unknown as Record<string, AdjDef>;
 
-/** 不打伤害的卡只能抽到这些词缀 */
+/** 不打伤害的卡只能抽到这些词缀 / cards that deal no damage can only roll these affixes */
 export const ADJ_NODMG = [
  "swift",
  "momentum",
@@ -2192,7 +2192,7 @@ export const TIERS = [
  }
 ] as { c: string; bg: string; n: string }[];
 
-/** 遗物品阶颜色 */
+/** 遗物品阶颜色 / relic rarity colors */
 export const GT = [
  {
   "c": "#c8d0d8"
@@ -2226,7 +2226,7 @@ export const TAGC: Record<Tag, string> = {
  "poison": "#7ddc5f"
 };
 
-/** 功能标签：和元素交叉，用于「每有一张某类卡」 */
+/** 功能标签：和元素交叉，用于「每有一张某类卡」 / function tags: cross with elements, used by 'per card of a type' */
 export const KINDS: Record<Kind, string[]> = {
  "weapon": [
   "dagger",

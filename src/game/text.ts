@@ -1,4 +1,4 @@
-/* 和规则相关的文字拼装（不碰 DOM，界面层直接用） */
+/* 和规则相关的文字拼装（不碰 DOM，界面层直接用） / Rule-related text assembly (no DOM; the UI layer uses it directly) */
 import { ITEMS } from '../data/cards';
 import { MODL } from '../data/mods';
 import { L } from '../i18n';
@@ -6,13 +6,13 @@ import type { Mods, Line } from '../data/types';
 import { vpick } from '../core/rng';
 import { G } from './state';
 
-/** 卡面显示名：钻品质用专属名 */
+/** 卡面显示名：钻品质用专属名 / card display name: diamond tier uses its own name */
 export const cardName = (c: { key: string; tier: number }) => {
   const it = ITEMS[c.key];
   return c.tier >= 3 && it.dn ? it.dn : it.n;
 };
 
-/** 修正项列表 → 带颜色的说明（好的绿、坏的红） */
+/** 修正项列表 → 带颜色的说明（好的绿、坏的红） / modifier list → colored descriptions (green for good, red for bad) */
 export function modText(m: Mods) {
   const ML = L.terms.mods as Record<string, string>;
   return Object.keys(m)
@@ -28,7 +28,7 @@ export function modText(m: Mods) {
     })
     .join('');
 }
-/** 修正项 → 纯文字（提示气泡用） */
+/** 修正项 → 纯文字（提示气泡用） / modifiers → plain text (for tooltips) */
 export function plainMods(m: Mods) {
   const ML = L.terms.mods as Record<string, string>;
   return Object.keys(m)
@@ -40,7 +40,7 @@ export function plainMods(m: Mods) {
     .join(L.ui.common.comma);
 }
 
-/** 按人物取台词：字符串、随机一句、或 {ayla:'',mo:''} */
+/** 按人物取台词：字符串、随机一句、或 {ayla:'',mo:''} / look up a line by hero: a string, a random pick, or {ayla:'',mo:''} */
 export function pickLine(t: Line): string {
   if (t == null) return '';
   if (Array.isArray(t)) return vpick(t);

@@ -1,4 +1,4 @@
-/* 界面文字（简体中文）。参数写成 {名字}，由 t() 替换；可以带少量 HTML */
+/* 界面文字（简体中文）。参数写成 {名字}，由 t() 替换；可以带少量 HTML / UI strings (Simplified Chinese). Parameters are written as {name} and replaced by t(); a little HTML is allowed */
 export default {
   docTitle: 'Night Watch',
   common: { colon: '：', comma: '，', period: '。' },
@@ -39,7 +39,7 @@ export default {
     carry: 'C 位：这局的主力，独立乘区 ×1.25',
   },
 
-  /** 伤害公式里各项加成的名字 */
+  /** 伤害公式里各项加成的名字 / names of the damage-formula terms */
   stats: {
     elem: '元素',
     alch: '炼金手册',
@@ -138,7 +138,7 @@ export default {
   night: {
     plain: '第{r}夜',
     endless: '第{r}夜 · 长夜无尽',
-    /** 首领夜的标题：第几夜用汉字 */
+    /** 首领夜的标题：第几夜用汉字 / boss-night title: the night number uses Chinese numerals */
     boss: '第{n}夜 · {s}',
     num: ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五'],
   },
@@ -325,7 +325,7 @@ export default {
 
   ach: { unlocked: '成就解锁' },
 
-  /** 跃迁事件（第 3、5、7 夜之前多一站，定 C 位） */
+  /** 跃迁事件（第 3、5、7 夜之前多一站，定 C 位） / leap events (an extra stop before nights 3, 5 and 7 that picks the carry) */
   jump: {
     got: '得到 {n}（{t}）',
     noRoom: '没地方放了，折成 5 金',

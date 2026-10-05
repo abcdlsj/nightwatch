@@ -1,4 +1,4 @@
-/* 音效：全部用 WebAudio 现场合成，不带音频文件 */
+/* 音效：全部用 WebAudio 现场合成，不带音频文件 / Sound effects: all synthesized live with WebAudio, no audio files */
 import { isIOS } from '../platform/env';
 
 let ac: AudioContext | null = null;
@@ -8,10 +8,10 @@ let unlocked = false;
 let sil: HTMLAudioElement | null = null;
 let mbI = 0;
 const last: Record<string, number> = {};
-/** 八音盒那首「师父的曲子」，每次触发放下一个音 */
+/** 八音盒那首「师父的曲子」，每次触发放下一个音 / the music-box 'Master's Song'; each trigger advances one note */
 const MB = [76, 79, 84, 79, 77, 76, 74, 72, 74, 76, 79, 76, 72, 74, 71, 72];
 
-/** 一段静音 wav：iOS 开了静音开关时，靠它把音频会话切到「播放」 */
+/** 一段静音 wav：iOS 开了静音开关时，靠它把音频会话切到「播放」 / a silent wav clip: with the iOS mute switch on, it switches the audio session to playback */
 function silentWav() {
   const n = 4000,
     b = new Uint8Array(44 + n),
@@ -27,13 +27,13 @@ function silentWav() {
   return 'data:audio/wav;base64,' + btoa(s);
 }
 
-/** 手机上要在点按里解锁：iOS 还得先切到「播放」音频会话，不然手机开了静音就全没声 */
+/** 手机上要在点按里解锁：iOS 还得先切到「播放」音频会话，不然手机开了静音就全没声 / on phones audio must be unlocked inside a tap; iOS also needs the session switched to playback, or everything is silent with the mute switch on */
 export function ensure() {
   try {
     const as = (navigator as any).audioSession;
     if (as && as.type !== 'playback') as.type = 'playback';
   } catch {
-    /* 不支持 audioSession 的浏览器 */
+    /* 不支持 audioSession 的浏览器 / browsers without audioSession support */
   }
   if (!ac) {
     try {
@@ -62,7 +62,7 @@ export function ensure() {
       s.connect(ac.destination);
       s.start(0);
     } catch {
-      /* 忽略 */
+      /* 忽略 / ignore */
     }
     if (!sil && isIOS()) {
       try {
@@ -116,7 +116,7 @@ function noise(d: number, vol: number) {
   s.start();
 }
 
-/** 卡牌出手音按元素区分音高 */
+/** 卡牌出手音按元素区分音高 / card firing SFX vary in pitch by element */
 const TP: Record<string, number> = { blade: 520, fire: 300, volt: 660, ice: 780, mech: 220, poison: 440 };
 
 export function play(k: string, p?: string | number) {

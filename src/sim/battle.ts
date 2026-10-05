@@ -1,5 +1,7 @@
 /* 一场战斗：状态、开场、逐帧推进、事件分发、收尾。
- * 模拟按固定步长（1/60 秒）推进，规则随机只走 rng，给定种子和阵容结果完全一样。 */
+ * 模拟按固定步长（1/60 秒）推进，规则随机只走 rng，给定种子和阵容结果完全一样。
+ * One battle: state, opening, per-frame advance, event dispatch, wrap-up. The sim advances in fixed steps (1/60s) and the rules RNG only goes through rng, so a given seed and lineup give identical results.
+ */
 import { ITEMS } from '../data/cards';
 import { WAGERS } from '../data/meta';
 import { TALENTS } from '../data/talents';
@@ -19,7 +21,7 @@ import { spawn, enemyStep, stepERocks, surge } from './enemies';
 import type { Battle, Enemy } from './types';
 
 export let B: Battle | null = null;
-/** 战斗结束时调用（界面层接管后续流程：战报、拦路结算、城破……） */
+/** 战斗结束时调用（界面层接管后续流程：战报、拦路结算、城破……） / called at battle end (the UI layer takes over the rest: report, roadblock result, breach…) */
 let onEnd: (b: Battle) => void = () => {};
 export const setOnEnd = (f: (b: Battle) => void) => {
   onEnd = f;
@@ -28,7 +30,7 @@ export const clearBattle = () => {
   B = null;
 };
 
-/** 战斗中的 B（调用方保证在战斗里） */
+/** 战斗中的 B（调用方保证在战斗里） / the in-battle B (callers guarantee a battle is running) */
 export const bt = () => B!;
 
 export function later(dt: number, f: () => void) {
@@ -36,7 +38,9 @@ export function later(dt: number, f: () => void) {
 }
 
 /* ---------------- 事件：卡牌 / 遗物 / 天赋声明的钩子在这里被调用 ----------------
- * 每张卡每种事件每秒最多响应 8 次，防止互相触发成死循环 */
+ * 每张卡每种事件每秒最多响应 8 次，防止互相触发成死循环
+ * ---------------- Events: hooks declared by cards / relics / talents are called here ---------------- / each card responds to each event at most 8 times per second to prevent infinite trigger loops
+ */
 function evOk(log: Record<string, number[]>, k: string, cap: number) {
   const a = (log[k] = (log[k] || []).filter((t) => t > B!.t - 1));
   if (a.length >= cap) return false;
@@ -68,7 +72,7 @@ export function emit(ev: string, x: Record<string, any> = {}) {
   }
 }
 
-/* ---------------- 开场 ---------------- */
+/* ---------------- 开场 ---------------- / ---------------- Opening ---------------- */
 export interface StartOpts {
   wave: Wave;
   ambush: boolean;
@@ -76,7 +80,7 @@ export interface StartOpts {
   beats: any[];
 }
 
-/** 开战时记下这一夜的阵容（成就用） */
+/** 开战时记下这一夜的阵容（成就用） / record this night's lineup at battle start (for achievements) */
 function noteLineup() {
   const R = G.run;
   if (!R) return;
@@ -128,7 +132,7 @@ export function startBattle(o: StartOpts): Battle {
   return B;
 }
 
-/* ---------------- 逐帧 ---------------- */
+/* ---------------- 逐帧 ---------------- / ---------------- Per frame ---------------- */
 export function simStep(dt: number) {
   const b = B!;
   b.t += dt;
@@ -178,7 +182,7 @@ export function simStep(dt: number) {
       c.charge += (dt / st.cd) * (c.hasteT > 0 ? 2 : 1);
     }
     if (c.charge >= 1) {
-      /* 离上次触发不到一个普朗克时间：先攒着，下一帧再说 */
+      /* 离上次触发不到一个普朗克时间：先攒着，下一帧再说 / less than one Planck time since the last trigger: queue it for the next frame */
       if (ITEMS[c.key].dmg > 0 && !hasTarget()) c.charge = 1;
       else if (!canFire(c)) c.charge = Math.min(c.charge, 1.5);
       else {
@@ -199,15 +203,17 @@ export function simStep(dt: number) {
   if (b.endT && b.t >= b.endT) finish('win');
 }
 
-/* ---------------- 目标 ---------------- */
+/* ---------------- 目标 ---------------- / ---------------- Targeting ---------------- */
 export const phased = (e: { d: { phase?: number }; ph: number }) => !!e.d.phase && (B!.t + e.ph) % 3.2 > 2.0;
 export const rising = (e: { emerge?: boolean; bornT: number }) => !!e.emerge && B!.t - e.bornT < 0.5;
 /** 卡牌的目标：最靠近城墙、能被打到的敌人。
- * 精英和首领算「更靠前」一截（TUNE.eliteFocus），不然它们跟在小怪后面，单体输出的卡永远打不到，直到撞墙 */
+ * 精英和首领算「更靠前」一截（TUNE.eliteFocus），不然它们跟在小怪后面，单体输出的卡永远打不到，直到撞墙
+ * a card's target: the closest hittable enemy to the wall. Elites and bosses count as 'further forward' (TUNE.eliteFocus), or single-target cards could never reach them while they trail behind adds until they hit the wall
+ */
 export function front() {
   let b: Enemy | null = null,
     bv = -1;
-  /* 雾母的雾幕：射程线往下压 */
+  /* 雾母的雾幕：射程线往下压 / the Fog Mother's mist: lower the range line */
   const rg = world.range + (B!.flags.veilT > B!.t ? TUNE.veil : 0);
   for (const e of B!.en) {
     if (e.dead || e.y < rg || phased(e) || rising(e)) continue;
@@ -223,7 +229,7 @@ export const hasTarget = () => !!front();
 export const dist = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(ex(a) - ex(b), ey(a) - ey(b));
 export const near = (e: { x: number; y: number }, R: number) => B!.en.filter((o) => !o.dead && o !== e && Math.hypot(ex(o) - ex(e), ey(o) - ey(e)) <= R);
 
-/* ---------------- 收尾 ---------------- */
+/* ---------------- 收尾 ---------------- / ---------------- Wrap-up ---------------- */
 export function finish(result: 'win' | 'lose') {
   const b = B!;
   b.over = true;
@@ -232,7 +238,7 @@ export function finish(result: 'win' | 'lose') {
   onEnd(b);
 }
 
-/** 守住一夜后的结算（不含界面）：统计、珍藏、成长、任务、卡牌状态复位 */
+/** 守住一夜后的结算（不含界面）：统计、珍藏、成长、任务、卡牌状态复位 / settlement after holding a night (no UI): stats, collection, growth, quests, and resetting card state */
 export function settleWin() {
   const b = B!;
   G.bestChain = Math.max(G.bestChain, b.maxChain);
@@ -251,7 +257,7 @@ export function settleWin() {
   return quests;
 }
 
-/** 战斗结束后卡牌回到备战状态 */
+/** 战斗结束后卡牌回到备战状态 / cards return to their prep state after battle */
 export function resetCards() {
   for (const c of G.cards) {
     c.charge = 0;

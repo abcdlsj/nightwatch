@@ -1,4 +1,4 @@
-/* 从旧版数据迁移而来，直接在这里改 */
+/* 从旧版数据迁移而来，直接在这里改 / migrated from the old data format; edit here directly */
 import type { HeroDef, KitDef } from './types';
 
 export const HEROES: Record<string, HeroDef> = {
@@ -94,7 +94,7 @@ export const HEROES: Record<string, HeroDef> = {
  }
 } as unknown as Record<string, HeroDef>;
 
-/** 起手三选一：每人四套，第一套固定出现 */
+/** 起手三选一：每人四套，第一套固定出现 / opening choice of three: four sets per hero; the first always appears */
 export const KITS: Record<string, KitDef[]> = {
  "ayla": [
   {
@@ -406,10 +406,10 @@ export const KITS: Record<string, KitDef[]> = {
  ]
 } as unknown as Record<string, KitDef[]>;
 
-/** 人物解锁顺序：用前一个人物守到黎明一次，解锁下一个 */
+/** 人物解锁顺序：用前一个人物守到黎明一次，解锁下一个 / hero unlock order: reach dawn once with the previous hero to unlock the next */
 export const HERO_ORDER = ['ayla', 'mo', 'ying', 'jun', 'li'];
 
-/** 专属卡分流派：第一个一开始就有，后面的按这个人物的熟练等级解锁（mast 是需要的等级） */
+/** 专属卡分流派：第一个一开始就有，后面的按这个人物的熟练等级解锁（mast 是需要的等级） / exclusive cards split by archetype: the first is available from the start, the rest unlock by this hero's mastery level (mast is the required level) */
 export interface PathDef {
   id: string;
   mast: number;

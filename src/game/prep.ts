@@ -1,4 +1,4 @@
-/* 备战规则：选门、加码、拿卡/卖卡/合成、拿遗物/学天赋。只改状态，界面由 app/ 刷新 */
+/* 备战规则：选门、加码、拿卡/卖卡/合成、拿遗物/学天赋。只改状态，界面由 app/ 刷新 / Prep rules: choose doors, modifiers, take/sell/merge cards, take relics/learn talents. Changes state only; app/ refreshes the UI */
 import { ADJ, ITEMS } from '../data/cards';
 import { EVENTS } from '../data/events';
 import { EN, ELITES } from '../data/enemies';
@@ -14,7 +14,7 @@ import { talentOk, type ItemFilter } from './loot';
 import { cardOpen } from './unlocks';
 import { foeKey } from './foes';
 
-/* ---------------- 备战事件的条件 ---------------- */
+/* ---------------- 备战事件的条件 ---------------- / ---------------- Prep event conditions ---------------- */
 export const EVENT_FILTER: Record<string, ItemFilter> = {
   smith: (it) => it.tag === 'blade' || it.tag === 'mech',
   forge: (it) => it.tag === 'fire',
@@ -24,9 +24,9 @@ export const EVENT_FILTER: Record<string, ItemFilter> = {
   armory: (it) => it.kind === 'weapon' || it.kind === 'firearm',
   apothecary: (it) => it.kind === 'potion' || it.kind === 'lamp',
 };
-/** 这个人物能买到的卡里，满足条件的有几张（专属卡要流派解锁） */
+/** 这个人物能买到的卡里，满足条件的有几张（专属卡要流派解锁） / how many of the cards this hero can buy meet the condition (exclusive cards need their archetype unlocked) */
 const poolN = (f: ItemFilter) => Object.keys(ITEMS).filter((k) => !ITEMS[k].noPool && (!ITEMS[k].hero || ITEMS[k].hero === G.hero) && cardOpen(k) && f(ITEMS[k])).length;
-/** 专卖店（铁匠铺、炼火工坊……）：这个人物能买的同类卡不到 4 张就不开 */
+/** 专卖店（铁匠铺、炼火工坊……）：这个人物能买的同类卡不到 4 张就不开 / specialty shop (smithy, fire forge…): does not open unless this hero has at least 4 buyable cards of that kind */
 const shopOk = (id: string) => () => poolN(EVENT_FILTER[id]) >= 4;
 const EVENT_NEED: Record<string, () => boolean> = {
   ...Object.fromEntries(Object.keys(EVENT_FILTER).map((id) => [id, shopOk(id)])),
@@ -45,11 +45,11 @@ const EVENT_NEED: Record<string, () => boolean> = {
   swap: () => G.cards.some((c) => c.tier < 3),
   tutor: () => G.gold >= 5 && G.cards.some((c) => ITEMS[c.key].dmg > 0),
   drill: () => G.cards.some((c) => c.loc === 'board' && ITEMS[c.key].dmg > 0),
-  /* 隐藏事件不进随机池，只由下面的 SECRET_DOORS 塞进来 */
+  /* 隐藏事件不进随机池，只由下面的 SECRET_DOORS 塞进来 / hidden events stay out of the random pool and are only inserted by SECRET_DOORS below */
   s_letter: () => false,
   s_karl: () => false,
 };
-/** 隐藏事件：条件写死，第一局就能触发 */
+/** 隐藏事件：条件写死，第一局就能触发 / hidden events: hard-coded conditions, triggerable from the first run */
 const SECRET_DOORS: [string, () => boolean][] = [
   ['s_letter', () => G.hero === 'ying' && G.round >= 3 && !G.secret.letter && G.cards.some((c) => c.key === 'musicbox')],
   ['s_karl', () => G.hero === 'ayla' && !!G.secret.karlKill && !G.secret.karl],
@@ -82,7 +82,7 @@ export function rollDoors() {
   if (!out.some((i) => EVENTS[i].cat === 'shop' || EVENTS[i].cat === 'free')) out[out.findIndex((i) => !isRare(i))] = 'shop';
   if (out.some(isRare)) P.rare = 1;
   P.doors = out.sort(() => rand() - 0.5);
-  /* 隐藏事件：换掉一扇门，但保证至少还剩一家店或一份白给 */
+  /* 隐藏事件：换掉一扇门，但保证至少还剩一家店或一份白给 / hidden events: replace a door but guarantee at least one shop or one freebie remains */
   if (P.step !== 0 || G.endless) return;
   const hit = SECRET_DOORS.find(([id, ok]) => ok() && !P.doors.includes(id));
   if (!hit) return;
@@ -93,10 +93,10 @@ export function rollDoors() {
   P.doors[at] = hit[0];
 }
 
-/* ---------------- 加码 ---------------- */
+/* ---------------- 加码 ---------------- / ---------------- Modifiers ---------------- */
 export const rollWagers = () => shuffled(Object.keys(WAGERS)).slice(0, 2);
 
-/** 蜂拥：敌人多三成 */
+/** 蜂拥：敌人多三成 / Swarm: 30% more enemies */
 export function hordeWave(w: Wave): Wave {
   const add = w
     .filter((s) => !EN[s.type].boss && !EN[s.type].elite && !noScale(s.type) && rand() < 0.3)
@@ -105,10 +105,10 @@ export function hordeWave(w: Wave): Wave {
   out.surges = w.surges;
   return out;
 }
-/** 这些敌人不随夜数加量 */
+/** 这些敌人不随夜数加量 / these enemies do not scale in number with the night */
 export const noScale = (t: string) => ['eye', 'knight', 'golem', 'siege', 'catapult', 'mimic', 'necro'].includes(t);
 
-/* ---------------- 拦路 ---------------- */
+/* ---------------- 拦路 ---------------- / ---------------- Roadblock ---------------- */
 export const ambushFoe = () => foeKey(pick(ELITES));
 export const ambushGold = () => 3 + Math.floor(G.round / 2);
 export function ambushWave(k: string): Wave {
@@ -124,7 +124,7 @@ export function ambushWave(k: string): Wave {
   return S;
 }
 
-/* ---------------- 拿东西 ---------------- */
+/* ---------------- 拿东西 ---------------- / ---------------- Taking things ---------------- */
 export function gainRelicState(r: string) {
   G.relics.push(r);
   const w = RELICS[r].m.wall;
@@ -153,7 +153,7 @@ export const removeCard = (c: Card) => {
 
 export type Dest = { z: Zone; i: number } | 'merge' | null;
 
-/** 买下 / 拿走一张卡。dest 不给就自动找空位（或合成）。返回失败原因或新卡 */
+/** 买下 / 拿走一张卡。dest 不给就自动找空位（或合成）。返回失败原因或新卡 / buy / take a card. Without dest, find a free slot automatically (or merge). Returns the failure reason or the new card */
 export function acquireState(of: Offer, dest: Dest): { ok: true; card: Card } | { ok: false; why: 'gone' | 'full' | 'gold' } {
   if (of.sold || G.phase !== 'prep') return { ok: false, why: 'gone' };
   const canMerge = of.card.tier < 3 && countSame(of.card.key, of.card.tier) >= 1;
@@ -186,7 +186,7 @@ export function acquireState(of: Offer, dest: Dest): { ok: true; card: Card } | 
   return { ok: true, card: c };
 }
 
-/** 两张同名同品质合成下一档（背包里的也算）。返回每次合成留下的那张卡（按发生顺序） */
+/** 两张同名同品质合成下一档（背包里的也算）。返回每次合成留下的那张卡（按发生顺序） / merge two same-name, same-tier cards into the next tier (bag included). Returns the card left by each merge, in order */
 export function checkMerges(): Card[] {
   const merged: Card[] = [];
   for (let guard = 0; guard < 8; guard++) {
@@ -232,8 +232,8 @@ export function checkMerges(): Card[] {
   return merged;
 }
 
-/* ---------------- 拖拽排列 ---------------- */
-/** 插入排列：目标位置被占时，把两边的卡往外挤，腾出位置；挤不下才算失败 */
+/* ---------------- 拖拽排列 ---------------- / ---------------- Drag arrangement ---------------- */
+/** 插入排列：目标位置被占时，把两边的卡往外挤，腾出位置；挤不下才算失败 / insertion: when the target slot is occupied, push the cards on both sides outward to make room; only fail if there is no room */
 export function insertPlan(z: Zone, i: number, size: number, ignore: Card | null) {
   const n = zoneN(z);
   const others = G.cards.filter((o) => o.loc === z && o !== ignore).sort((a, b) => a.idx - b.idx);
@@ -257,7 +257,7 @@ export function insertPlan(z: Zone, i: number, size: number, ignore: Card | null
   return { i: me.p, moves: items.filter((t) => t.o && t.p !== t.o.idx).map((t) => [t.o, t.p] as [Card, number]) };
 }
 
-/** 新开一局时放下起手卡 */
+/** 新开一局时放下起手卡 / place the opening cards when a run starts */
 export function placeKit(cards: [string, number][]) {
   let i = 3;
   for (const [key, t] of cards) {

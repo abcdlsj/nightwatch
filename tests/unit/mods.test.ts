@@ -1,4 +1,4 @@
-/* 模组：示例模组能通过检查、合并进各张表，人物能正常打一夜，首领进第九夜轮换；写错的条目会被跳过并报出来 */
+/* 模组：示例模组能通过检查、合并进各张表，人物能正常打一夜，首领进第九夜轮换；写错的条目会被跳过并报出来 / Mods: the sample mod passes validation and merges into the tables, its hero can play a night, its boss joins the night-9 rotation, and invalid entries are skipped and reported */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { initLocale, L } from '../../src/i18n';
 import { reseed } from '../../src/core/rng';

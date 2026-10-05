@@ -1,5 +1,7 @@
 /* 墨的剧情。
- * 三套夜晚：学院（灰袍和冷库）、苏砚（学院里的师姐）、染坊（他娘）。 */
+ * 三套夜晚：学院（灰袍和冷库）、苏砚（学院里的师姐）、染坊（他娘）。
+ * Mo's story. Three night sets: the Academy (the grey robe and the cold vault), Su Yan (his senior at the academy), the Dye Works (his mother).
+ */
 export default {
   arcs: [
     {

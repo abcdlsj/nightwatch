@@ -1,4 +1,4 @@
-/* ---------- 遗物/备战 ---------- */
+/* ---------- 遗物/备战 ---------- / ---------- Relics / prep ---------- */
 #relics{flex:1;display:flex;justify-content:flex-end;min-width:0}
 .bagchip{border:0;color:#fff;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 0 0 2px rgba(208,166,255,.35)}
 .bagchip b{color:#e0c8ff}
@@ -45,7 +45,7 @@
 .opt .oc .card.static{pointer-events:none;height:78px}
 .opt b{font-weight:400;font-size:17px}
 .opt span{font-family:var(--body);font-size:12px;color:#c5d2d6;line-height:1.4}
-/* 图标都是 16 格，显示尺寸取整倍（32 / 48），不糊 */
+/* 图标都是 16 格，显示尺寸取整倍（32 / 48），不糊 / icons are all 16 cells; display sizes are integer multiples (32 / 48) to stay crisp */
 .ricon{width:44px;height:44px;image-rendering:pixelated;background:rgba(0,0,0,.3);border-radius:10px;padding:6px;flex:none;box-shadow:inset 0 0 0 2px var(--gc,transparent)}
 .mg,.mb{display:block;font-style:normal;font-family:var(--body);font-size:12px;line-height:1.45}
 .mg{color:#8ff0b0}.mb{color:#ff8a80}

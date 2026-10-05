@@ -1,4 +1,4 @@
-/* 单局存档：每次进入备战时自动存。格式沿用旧版（chain-demo-save-v4），老存档能接着玩 */
+/* 单局存档：每次进入备战时自动存。格式沿用旧版（chain-demo-save-v4），老存档能接着玩 / Per-run save: written automatically each time prep begins. The format follows the old version (chain-demo-save-v4), so old saves keep working */
 import { ITEMS } from '../data/cards';
 import { HEROES } from '../data/heroes';
 import { TALENTS } from '../data/talents';
@@ -13,17 +13,17 @@ import { NIGHTS, FULL_NIGHTS } from './plan';
 export interface SaveData {
   hero: string; round: number; gold: number; wall: number; wallMax: number; relics: string[]; skills: string[]; foeSet: string;
   bestChain: number; heat: number; run: RunStats | null; boss9?: string; boss12?: string; full?: boolean; gems?: Record<string, number>; arc?: number; kitPath?: string;
-  /** 旧版（8 夜）存档里的首领 */
+  /** 旧版（8 夜）存档里的首领 / the boss in old-version (8-night) saves */
   boss8?: string;
   endless: boolean; lock: Offer | null;
   cards: { key: string; tier: number; adj: string | null; loc: any; idx: number; hoard: number; grow: number; qp: number; carry?: boolean; star?: number }[];
   secret?: Record<string, number>;
-  /** 新版加的：种子和随机数状态（旧存档没有，读的时候另起一个） */
+  /** 新版加的：种子和随机数状态（旧存档没有，读的时候另起一个） / added in the new version: seed and RNG state (missing in old saves; start a fresh one on load) */
   seed?: number;
   rng?: number;
 }
 
-/** rngState：进入备战之前的随机数状态（读档后今晚的出怪和三站不变） */
+/** rngState：进入备战之前的随机数状态（读档后今晚的出怪和三站不变） / rngState: the RNG state from before prep (loading gives the same spawns and three stops) */
 export function saveGame(rngState = rng.state) {
   const s: SaveData = {
     hero: G.hero, round: G.round, gold: G.gold, wall: G.wall, wallMax: G.wallMax, relics: G.relics, skills: G.skills, foeSet: G.foeSet,
@@ -38,7 +38,7 @@ export function saveGame(rngState = rng.state) {
 export const loadSave = () => store.json<SaveData | null>(KEYS.save, null);
 export const clearSave = () => store.del(KEYS.save);
 
-/** 把存档读回 G。返回 false 表示存档坏了或人物不存在 */
+/** 把存档读回 G。返回 false 表示存档坏了或人物不存在 / load the save back into G. Returns false if the save is corrupt or the hero does not exist */
 export function restoreSave(s: SaveData | null): boolean {
   if (!s || !HEROES[s.hero]) return false;
   Object.assign(G, {

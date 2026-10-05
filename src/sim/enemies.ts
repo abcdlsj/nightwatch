@@ -1,4 +1,4 @@
-/* 敌人：出场、移动、光环、意图（首领招式）、撞墙、远程、复活 */
+/* 敌人：出场、移动、光环、意图（首领招式）、撞墙、远程、复活 / Enemies: spawning, movement, auras, intents (boss moves), wall hits, ranged attacks, revival */
 import { EN } from '../data/enemies';
 import { ITEMS } from '../data/cards';
 import { L, t } from '../i18n';
@@ -41,7 +41,7 @@ export function spawn(type: string, x?: number | null, y?: number | null): Enemy
   }
   if (!d.fixed && e.y < 0) for (let i = 0; i < 4; i++) view.part(ex(e) + vrnd(-4, 4), world.top + vrnd(0, 3), vrnd(-8, 8), vrnd(5, 20), 0.5, vr() < 0.5 ? '#a64ca6' : '#5d275d', 1);
   if (!d.fixed && e.y > 0.1) {
-    /* 从半路的雾里冒出来 */
+    /* 从半路的雾里冒出来 / emerge from the fog midway */
     e.emerge = !d.mimic;
     const c = d.col || '#94b0c2';
     view.ring(ex(e), ey(e) - 2, 2, 10 * K(), c, 0.45);
@@ -65,7 +65,7 @@ export function spawn(type: string, x?: number | null, y?: number | null): Enemy
   return e;
 }
 
-/** 光环（护甲 / 加速 / 治疗）和每个敌人的移动、状态、招式 */
+/** 光环（护甲 / 加速 / 治疗）和每个敌人的移动、状态、招式 / auras (armor / speed / healing) and each enemy's movement, state and moves */
 export function enemyStep(dt: number) {
   const b = bt();
   for (const e of b.en) {
@@ -185,7 +185,7 @@ export function enemyStep(dt: number) {
 }
 
 
-/* ---------------- 撞墙 ---------------- */
+/* ---------------- 撞墙 ---------------- / ---------------- Wall hits ---------------- */
 function wallHit(e: Enemy) {
   const b = bt();
   e.dead = true;
@@ -196,7 +196,7 @@ function wallHit(e: Enemy) {
   if (b.ambush && e.d.elite) b.fled = 1;
 }
 
-/** 霜潮的大家伙撞墙：冻住你一张卡 */
+/** 霜潮的大家伙撞墙：冻住你一张卡 / Frost Tide big-hitters on the wall: freeze one of your cards */
 function chillCard(t: number) {
   const bc = boardCards().filter((c) => c.frozen <= 0);
   if (!bc.length) return;
@@ -243,9 +243,11 @@ export function damageWall(d: number, xx: number, kind?: 'boom' | null) {
 
 /* ---------------- 意图（首领、精英的招式） ----------------
  * 招式表：每招一个函数，收到放招的敌人和招式参数 v（数量 / 秒数 / 比例，不填用默认）、k（招来的小怪）。
- * 数据里的首领（含模组加的）只能从这张表里挑招式组合。 */
+ * 数据里的首领（含模组加的）只能从这张表里挑招式组合。
+ * ---------------- Intents (boss and elite moves) ---------------- / Move table: one function per move, receiving the casting enemy and move params v (count / seconds / ratio, defaulting when omitted) and k (which add to summon). / Bosses in the data (including mod-added ones) can only compose moves from this table.
+ */
 type IntentFn = (e: Enemy, v: number | undefined, k: string | undefined) => void;
-/** 在首领身边招一批小怪 */
+/** 在首领身边招一批小怪 / summon a batch of adds beside the boss */
 function summonAt(e: Enemy, k: string, n: number, spread: number, dy = 0) {
   for (let i = 0; i < n; i++) {
     const s = spawn(foeKey(k), clamp(e.x + (n === 1 ? 0 : (i / (n - 1) - 0.5) * 2 * spread) + rnd(-0.03, 0.03), 0.05, 0.95), Math.max(-0.02, e.y + dy));
@@ -259,21 +261,21 @@ const randomCards = (n: number) => {
   return out;
 };
 export const INTENTS: Record<string, IntentFn> = {
-  /** 护盾：最大血量的 v（默认 15%） */
+  /** 护盾：最大血量的 v（默认 15%） / shield: v of max HP (default 15%) */
   shield: (e, v) => {
     e.shield += e.maxHp * (v ?? 0.15);
   },
-  /** 冲锋：v 秒内三倍速 */
+  /** 冲锋：v 秒内三倍速 / charge: triple speed for v seconds */
   dash: (e, v) => {
     e.dashT = v ?? 2;
   },
-  /** 硬化：v 秒内护甲 +10 */
+  /** 硬化：v 秒内护甲 +10 / harden: +10 armor for v seconds */
   harden: (e, v) => {
     e.hardT = v ?? 4;
   },
-  /** 召唤蝙蝠（k 可换） */
+  /** 召唤蝙蝠（k 可换） / summon bats (k can override) */
   summon: (e, v, k) => summonAt(e, k || 'bat', v ?? 6, 0.25, -0.02),
-  /** 凝视：随机冻住你 v 张卡 3 秒 */
+  /** 凝视：随机冻住你 v 张卡 3 秒 / gaze: randomly freeze v of your cards for 3 seconds */
   gaze: (_e, v) => {
     for (const c of randomCards(v ?? 2)) {
       c.frozen = 3;
@@ -282,13 +284,13 @@ export const INTENTS: Record<string, IntentFn> = {
     view.toast(L.ui.battle.gazed);
     view.say('hero', L.story.barks.freeze, 2);
   },
-  /** 怒吼：身边的敌人一起冲锋 3 秒 */
+  /** 怒吼：身边的敌人一起冲锋 3 秒 / roar: nearby enemies charge together for 3 seconds */
   roar: (e) => {
     const R = 40 * K();
     for (const o of bt().en) if (!o.dead && o !== e && Math.hypot(ex(o) - ex(e), ey(o) - ey(e)) <= R) o.dashT = Math.max(o.dashT || 0, 3);
     view.ring(ex(e), ey(e) - 6, 4, R, '#e43b44', 0.5);
   },
-  /** 震地：冻住你一张卡 2 秒 */
+  /** 震地：冻住你一张卡 2 秒 / quake: freeze one of your cards for 2 seconds */
   quake: () => {
     for (const c of randomCards(1)) {
       c.frozen = 2;
@@ -296,11 +298,11 @@ export const INTENTS: Record<string, IntentFn> = {
     }
     view.shake(6);
   },
-  /** 招骷髅（k 可换） */
+  /** 招骷髅（k 可换） / summon skeletons (k can override) */
   skels: (e, v, k) => summonAt(e, k || 'skel', v ?? 3, 0.08, -0.03),
-  /** 产卵：招虫子 */
+  /** 产卵：招虫子 / spawn: summon bugs */
   brood: (e, v, k) => summonAt(e, k || 'bug', v ?? 4, 0.22, 0.02),
-  /** 吸走你所有卡的充能（剩 1-v） */
+  /** 吸走你所有卡的充能（剩 1-v） / drain the charge of all your cards (leaving 1-v) */
   drain: (_e, v) => {
     for (const c of boardCards()) {
       c.charge *= 1 - (v ?? 0.5);
@@ -308,12 +310,12 @@ export const INTENTS: Record<string, IntentFn> = {
     }
     view.toast(L.ui.battle.drained);
   },
-  /** 蜕壳：护盾 v */
+  /** 蜕壳：护盾 v / molt: shield v */
   molt: (e, v) => {
     e.shield += e.maxHp * (v ?? 0.12);
   },
-  /* ---- 哑钟 ---- */
-  /** 敲丧钟：最近倒下的 v 个敌人变成游魂站起来；坟不够就在钟边上冒出来 */
+  /* ---- 哑钟 ---- / ---- Dumb Bell ---- */
+  /** 敲丧钟：最近倒下的 v 个敌人变成游魂站起来；坟不够就在钟边上冒出来 / toll the knell: the last v fallen enemies rise as wraiths; if graves run short they emerge beside the bell */
   toll: (e, v) => {
     const b = bt();
     const n = v ?? 4;
@@ -327,29 +329,29 @@ export const INTENTS: Record<string, IntentFn> = {
     if (gs.length < n) summonAt(e, 'ghost', n - gs.length, 0.18, 0.03);
     view.ring(ex(e), ey(e), 4, 80 * K(), '#c9b37a', 0.4);
   },
-  /** 噤声：v 秒内卡牌之间不再互相带动（回响、齐鸣、遗物带出的出手都不算） */
+  /** 噤声：v 秒内卡牌之间不再互相带动（回响、齐鸣、遗物带出的出手都不算） / silence: for v seconds cards no longer trigger each other (echo, chorus and relic-driven hits do not count) */
   hush: (_e, v) => {
     const b = bt();
     b.flags.hushT = b.t + (v ?? 4);
     view.toast(L.ui.battle.hushed);
   },
-  /** 余音：场上每个敌人得到最大血量 v 的护盾 */
+  /** 余音：场上每个敌人得到最大血量 v 的护盾 / aftersound: every enemy on the field gains a shield of v max HP */
   knell: (e, v) => {
     for (const o of bt().en) if (!o.dead && o !== e) o.shield += o.maxHp * (v ?? 0.15);
     view.ring(ex(e), ey(e), 4, 120 * K(), '#fff1b0', 0.35);
   },
-  /* ---- 雾母 ---- */
-  /** 雾幕：v 秒内射程线往下压，敌人要走得更近才打得到 */
+  /* ---- 雾母 ---- / ---- Fog Mother ---- */
+  /** 雾幕：v 秒内射程线往下压，敌人要走得更近才打得到 / fog curtain: for v seconds the range line lowers, so enemies must come closer to be hit */
   veil: (_e, v) => {
     const b = bt();
     b.flags.veilT = b.t + (v ?? 5);
     view.toast(L.ui.battle.veiled);
   },
-  /** 引魂：所有小怪冲锋 v 秒 */
+  /** 引魂：所有小怪冲锋 v 秒 / soul draw: all adds charge for v seconds */
   lure: (e, v) => {
     for (const o of bt().en) if (!o.dead && o !== e && !o.d.boss) o.dashT = Math.max(o.dashT || 0, v ?? 2);
   },
-  /** 摸金：偷走 v 金（打倒她连本带利还回来） */
+  /** 摸金：偷走 v 金（打倒她连本带利还回来） / pickpocket: steal v gold (beat her and it returns with interest) */
   pilfer: (e, v) => {
     const b = bt();
     const n = Math.min(G.gold, v ?? 2);
@@ -360,24 +362,24 @@ export const INTENTS: Record<string, IntentFn> = {
     view.hud();
     view.toast(t('battle.pilfered', { n }));
   },
-  /* ---- 攻城王 ---- */
-  /** 放兵：v 个骷髅加一个盾卫 */
+  /* ---- 攻城王 ---- / ---- Siege King ---- */
+  /** 放兵：v 个骷髅加一个盾卫 / deploy: v skeletons plus one shield guard */
   deploy: (e, v, k) => {
     summonAt(e, k || 'skel', v ?? 4, 0.14, 0.04);
     summonAt(e, 'shieldb', 1, 0, 0.05);
   },
-  /** 齐射：2 秒内往城墙上砸 v 块石头 */
+  /** 齐射：2 秒内往城墙上砸 v 块石头 / volley: hurl v rocks at the wall over 2 seconds */
   barrage: (e, v) => {
     const n = v ?? 4;
     for (let i = 0; i < n; i++) later(0.45 * i, () => !bt().over && !e.dead && lobRock(e, 1.5));
   },
-  /** 撞城：v 秒三倍速往前冲 */
+  /** 撞城：v 秒三倍速往前冲 / ram: charge forward at triple speed for v seconds */
   ram: (e, v) => {
     e.dashT = v ?? 2.5;
     view.shake(5);
   },
-  /* ---- 隐藏首领 ---- */
-  /** 决斗：你伤害最高的那张卡被挑住，v 秒动不了 */
+  /* ---- 隐藏首领 ---- / ---- Hidden bosses ---- */
+  /** 决斗：你伤害最高的那张卡被挑住，v 秒动不了 / duel: your highest-damage card is pinned and cannot act for v seconds */
   duel: (_e, v) => {
     const c = boardCards()
       .filter((x) => ITEMS[x.key].dmg > 0 && x.frozen <= 0)
@@ -387,12 +389,12 @@ export const INTENTS: Record<string, IntentFn> = {
     view.cardFlag(c, 'frozen', true);
     view.toast(t('battle.dueled', { n: ITEMS[c.key].n }));
   },
-  /** 点兵：v 个倒下的守夜人（盾卫带骷髅）站起来 */
+  /** 点兵：v 个倒下的守夜人（盾卫带骷髅）站起来 / muster: v fallen watchers (a shield guard leading skeletons) rise */
   muster: (e, v) => {
     summonAt(e, 'shieldb', v ?? 3, 0.2, 0.03);
     summonAt(e, 'skel', (v ?? 3) * 2, 0.26, 0.02);
   },
-  /** 倒转：你棋盘上最多的那种元素，v 秒内伤害 -30% */
+  /** 倒转：你棋盘上最多的那种元素，v 秒内伤害 -30% / invert: the most common element on your board deals -30% damage for v seconds */
   invert: (_e, v) => {
     const b = bt();
     const n: Record<string, number> = {};
@@ -403,7 +405,7 @@ export const INTENTS: Record<string, IntentFn> = {
     b.flags.invT = b.t + (v ?? 5);
     view.toast(t('battle.inverted', { t: (L.terms.tags as Record<string, string>)[tag] }));
   },
-  /** 掐灯：你所有卡的充能清零 */
+  /** 掐灯：你所有卡的充能清零 / snuff: zero the charge of all your cards */
   snuff: () => {
     for (const c of boardCards()) {
       c.charge = 0;
@@ -413,17 +415,17 @@ export const INTENTS: Record<string, IntentFn> = {
     }
     view.toast(L.ui.battle.snuffed);
   },
-  /** 上弦：所有小怪 v 秒内快一半 */
+  /** 上弦：所有小怪 v 秒内快一半 / wind: all adds are half again as fast for v seconds */
   wind: (e, v) => {
     for (const o of bt().en) if (!o.dead && o !== e) o.rushT = Math.max(o.rushT || 0, v ?? 4);
   },
-  /** 补墙：回 v 的最大血量 */
+  /** 补墙：回 v 的最大血量 / mend: heal v of max HP */
   rebuild: (e, v) => {
     const h = e.maxHp * (v ?? 0.06);
     e.hp = Math.min(e.maxHp, e.hp + h);
     view.num(ex(e), ey(e) - 16, '+' + fmt(h), '#7ee8a2', 2);
   },
-  /** 星蚀：v 秒内你打不出暴击，C 位冻住 2 秒 */
+  /** 星蚀：v 秒内你打不出暴击，C 位冻住 2 秒 / eclipse: for v seconds you cannot crit, and the carry is frozen for 2 seconds */
   eclipse: (_e, v) => {
     const b = bt();
     b.flags.eclipseT = b.t + (v ?? 5);
@@ -434,7 +436,7 @@ export const INTENTS: Record<string, IntentFn> = {
     }
     view.toast(L.ui.battle.eclipsed);
   },
-  /** 坠星：v 颗星砸在墙上，每颗冻住你一张卡 2 秒、城墙 -1 */
+  /** 坠星：v 颗星砸在墙上，每颗冻住你一张卡 2 秒、城墙 -1 / falling stars: v stars strike the wall, each freezing one of your cards for 2 seconds and dealing -1 wall */
   starfall: (e, v) => {
     const cs = randomCards(v ?? 3);
     cs.forEach((c, i) =>
@@ -447,7 +449,7 @@ export const INTENTS: Record<string, IntentFn> = {
       }),
     );
   },
-  /** 引力：所有敌人往城墙挪 v（0~1 的路程） */
+  /** 引力：所有敌人往城墙挪 v（0~1 的路程） / gravity: all enemies advance v toward the wall (0–1 of the path) */
   gravity: (e, v) => {
     for (const o of bt().en) if (!o.dead && o !== e && !o.d.boss) o.y = Math.min(0.95, o.y + (v ?? 0.06));
     view.ring(ex(e), ey(e), 4, 120 * K(), '#fff1b0', 0.3);
@@ -467,7 +469,7 @@ function doIntent(e: Enemy) {
   e.it = e.d.intents![e.ii].t;
 }
 
-/* ---------------- 远程：投石车 / 冰晶法师 ---------------- */
+/* ---------------- 远程：投石车 / 冰晶法师 ---------------- / ---------------- Ranged: catapult / Ice Crystal Mage ---------------- */
 function lobRock(e: Enemy, d?: number) {
   bt().epr.push({ x0: ex(e), y0: ey(e) - 6, x1: ex(e) + vrnd(-8, 8), y1: WALLY() - 1, t: 0, dur: 1.1, d });
   view.sfx('fire', 'mech');
@@ -486,7 +488,7 @@ export function stepERocks(dt: number) {
   b.epr = b.epr.filter((r) => !r.done);
 }
 
-/** 冰晶法师：每隔几秒冻住你一张卡 */
+/** 冰晶法师：每隔几秒冻住你一张卡 / Ice Crystal Mage: freeze one of your cards every few seconds */
 function frostBolt(e: Enemy) {
   const bc = boardCards().filter((c) => c.frozen <= 0);
   if (!bc.length) return;
@@ -497,7 +499,7 @@ function frostBolt(e: Enemy) {
   view.cardFlag(c, 'frozen', true);
 }
 
-/* ---------------- 死灵法师：让附近倒下的敌人站起来 ---------------- */
+/* ---------------- 死灵法师：让附近倒下的敌人站起来 ---------------- / ---------------- Necromancer: raise nearby fallen enemies ---------------- */
 function raiseDead(e: Enemy) {
   const b = bt();
   const R = 50 * K();
@@ -516,7 +518,7 @@ function raiseDead(e: Enemy) {
   }
 }
 
-/** 大军压境 */
+/** 大军压境 / the big onslaught */
 export function surge() {
   view.banner(L.ui.battle.surge, '#ff8a5b');
   view.sfx('intent');
@@ -526,7 +528,7 @@ export function surge() {
   view.say('hero', L.story.barks.surge, 2);
 }
 
-/* ---------------- 连杀：1 秒内接着杀就续上，每 25 连杀掉 1 金 ---------------- */
+/* ---------------- 连杀：1 秒内接着杀就续上，每 25 连杀掉 1 金 ---------------- / ---------------- Kill streak: keep killing within 1 second to continue; every 25 kills drops 1 gold ---------------- */
 export function comboKill(e: Enemy) {
   const b = bt();
   const c = (b.combo = b.t - (b.lastKill == null ? -9 : b.lastKill) < 1 ? (b.combo || 0) + 1 : 1);

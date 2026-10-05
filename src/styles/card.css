@@ -1,4 +1,4 @@
-/* ---------- 卡牌 ---------- */
+/* ---------- 卡牌 ---------- / ---------- Cards ---------- */
 .card{position:absolute;top:4px;width:calc(var(--cw) * var(--sz) - 4px);height:var(--ch);cursor:grab;touch-action:none;
   transition:left .2s cubic-bezier(.3,1.4,.5,1)}
 .card .inner{position:absolute;inset:0;animation:bob 3.4s ease-in-out infinite;animation-delay:var(--dl,0s)}
@@ -12,7 +12,7 @@
 .card .spr{display:block;width:32px;height:32px;margin:3px auto 0;image-rendering:pixelated}
 .card.s3 .spr{width:48px;height:48px;margin-top:0}
 .card .num{position:absolute;left:0;right:0;bottom:3px;text-align:center;font-family:'PixNum','Silkscreen','Pixelify Sans',ui-monospace,monospace;font-weight:700;font-size:15px;color:var(--cink);line-height:1;letter-spacing:.5px}
-.card .num.txt{font-family:var(--zh);font-weight:400;font-size:13px;bottom:4px}/* 「装填」「齐奏」这类字，跟卡名一个字体 */
+.card .num.txt{font-family:var(--zh);font-weight:400;font-size:13px;bottom:4px}/* 「装填」「齐奏」这类字，跟卡名一个字体 / words like 'Reload' and 'Chorus' use the same font as card names */
 .card .cdv{position:absolute;left:0;right:0;top:8px;bottom:0;background:rgba(24,14,40,.5);transform-origin:top;transform:scaleY(var(--s,0))}
 .card .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 .card .holo{position:absolute;inset:0;pointer-events:none}

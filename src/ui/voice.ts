@@ -1,5 +1,7 @@
 /* 战斗内叙事：台词气泡 / 战报字幕 / 新敌人卡片。
- * 纯表现层：不读写战斗数值，不暂停模拟，不接收点击（pointer-events:none） */
+ * 纯表现层：不读写战斗数值，不暂停模拟，不接收点击（pointer-events:none）
+ * In-battle narrative: bark bubbles / report subtitles / new-enemy cards. Presentation only: reads or writes no combat values, never pauses the sim, receives no clicks (pointer-events:none)
+ */
 import { EN } from '../data/enemies';
 import { HEROES } from '../data/heroes';
 import { VOICES } from '../data/voices';
@@ -28,7 +30,7 @@ export function voiceOf(who: string) {
   return { n: '', img: spr('lantern').url, c: '#fff' };
 }
 
-/** pri：3=剧情/首领（必播，可插队）2=新敌人/重要事件 1=随机反应（空闲时才播） */
+/** pri：3=剧情/首领（必播，可插队）2=新敌人/重要事件 1=随机反应（空闲时才播） / pri: 3 = story/boss (always plays, can cut in), 2 = new enemy/important event, 1 = random reaction (only when idle) */
 export function say(who: string, text: Line, pri?: number) {
   const t = pickLine(text);
   if (!t) return;
@@ -75,7 +77,7 @@ export function clearVO() {
   $('#bark').className = 'bark';
 }
 
-/** 本局第一次遇到某种敌人：右上角弹出介绍卡 */
+/** 本局第一次遇到某种敌人：右上角弹出介绍卡 / first time meeting an enemy this run: pop up an intro card in the top-right */
 export function foeCard(type: string, firstEver: boolean) {
   const d = EN[type];
   const el = $('#foeCard');

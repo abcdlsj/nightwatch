@@ -1,5 +1,7 @@
 /* 把模组包检查一遍，再合并进游戏的各张表（卡牌、遗物、天赋、敌人、人物、说话人、像素图、剧情、触发钩子）。
- * 有问题的条目跳过，不影响别的；问题记在报告里，工坊页能看到，控制台也会打出来。 */
+ * 有问题的条目跳过，不影响别的；问题记在报告里，工坊页能看到，控制台也会打出来。
+ * Validate a mod pack, then merge it into the game's tables (cards, relics, talents, enemies, heroes, speakers, sprites, story, trigger hooks). Invalid entries are skipped without affecting the rest; problems are recorded in a report shown on the Workshop page and printed to the console.
+ */
 import { ITEMS, UPS, TAGS } from '../data/cards';
 import { RELICS } from '../data/relics';
 import { TALENTS, TCAT } from '../data/talents';
@@ -17,10 +19,10 @@ import type { ModPack, ModReport } from './types';
 const FX = ['knife', 'spark', 'ice', 'bolt', 'rock', 'none', 'arrow', 'axe', 'shell', 'quake', 'flame', 'bell', 'blizzard', 'sting', 'gas', 'meteor', 'slash', 'fslash', 'firefly', 'sweep', 'avalanche', 'discharge'];
 const KINDS = ['weapon', 'firearm', 'potion', 'gadget', 'lamp', 'sky'];
 const SHAPE = /^[a-z]+:[A-Za-z]$/;
-/** 跃迁事件可以借用的玩法（见 src/app/prep/jumps.ts） */
+/** 跃迁事件可以借用的玩法（见 src/app/prep/jumps.ts） / leap gameplay a mod may borrow (see src/app/prep/jumps.ts) */
 const JUMP_STYLES = ['ayla', 'mo', 'ying', 'jun', 'li'];
 
-/** 深合并（剧情这种嵌套对象用） */
+/** 深合并（剧情这种嵌套对象用） / deep merge (for nested objects like story) */
 function deepMerge(into: any, from: any) {
   for (const k in from) {
     if (from[k] && typeof from[k] === 'object' && !Array.isArray(from[k]) && into[k] && typeof into[k] === 'object' && !Array.isArray(into[k])) deepMerge(into[k], from[k]);
@@ -33,7 +35,7 @@ export function applyMod(pack: ModPack): ModReport {
   const err = (s: string) => R.errors.push(s);
   const count = (k: string) => (R.added[k] = (R.added[k] || 0) + 1);
   if (!pack.id || !/^[a-z0-9-]+$/.test(pack.id)) err('模组的 id 只能用小写英文、数字和短横线');
-  /** 重名检查：原版或别的模组已经有了，又没写 override */
+  /** 重名检查：原版或别的模组已经有了，又没写 override / name-collision check: already present in the base game or another mod and override was not set */
   const clash = (reg: Record<string, unknown>, k: string, what: string) => {
     if (reg[k] && !pack.override) {
       err(`${what}「${k}」和已有的重名了（要覆盖原版，在模组里写 override: true）`);
@@ -43,7 +45,7 @@ export function applyMod(pack: ModPack): ModReport {
   };
   const sprOk = (k: string) => hasSpr(k) || !!pack.sprites?.[k] || SHAPE.test(k);
 
-  /* ---- 像素图：先加，后面的检查要用 ---- */
+  /* ---- 像素图：先加，后面的检查要用 ---- / ---- Sprites: add first, later checks need them ---- */
   const goodSpr: Record<string, string[]> = {};
   for (const [k, rows] of Object.entries(pack.sprites || {})) {
     if (!Array.isArray(rows) || !rows.length) {
@@ -62,7 +64,7 @@ export function applyMod(pack: ModPack): ModReport {
   }
   addSprites(goodSpr);
 
-  /* ---- 卡牌 ---- */
+  /* ---- 卡牌 ---- / ---- Cards ---- */
   for (const [k, c] of Object.entries(pack.cards || {})) {
     if (clash(ITEMS, k, '卡牌')) continue;
     const bad: string[] = [];
@@ -84,7 +86,7 @@ export function applyMod(pack: ModPack): ModReport {
     count('cards');
   }
 
-  /* ---- 遗物 ---- */
+  /* ---- 遗物 ---- / ---- Relics ---- */
   for (const [k, r] of Object.entries(pack.relics || {})) {
     if (clash(RELICS, k, '遗物')) continue;
     const badM = Object.keys(r.m || {}).filter((m) => !MODL[m]);
@@ -96,7 +98,7 @@ export function applyMod(pack: ModPack): ModReport {
     count('relics');
   }
 
-  /* ---- 天赋 ---- */
+  /* ---- 天赋 ---- / ---- Talents ---- */
   for (const [k, tl] of Object.entries(pack.talents || {})) {
     if (clash(TALENTS, k, '天赋')) continue;
     const badM = Object.keys(tl.m || {}).filter((m) => !MODL[m]);
@@ -108,7 +110,7 @@ export function applyMod(pack: ModPack): ModReport {
     count('talents');
   }
 
-  /* ---- 敌人、首领 ---- */
+  /* ---- 敌人、首领 ---- / ---- Enemies, bosses ---- */
   for (const [k, e] of Object.entries(pack.enemies || {})) {
     if (clash(EN, k, '敌人')) continue;
     const bad: string[] = [];
@@ -125,7 +127,7 @@ export function applyMod(pack: ModPack): ModReport {
     count(e.boss ? 'bosses' : 'enemies');
   }
 
-  /* ---- 说话人 ---- */
+  /* ---- 说话人 ---- / ---- Speakers ---- */
   for (const [k, v] of Object.entries(pack.voices || {})) {
     if (clash(VOICES, k, '说话人')) continue;
     if (!v.n || !sprOk(v.img)) {
@@ -136,7 +138,7 @@ export function applyMod(pack: ModPack): ModReport {
     count('voices');
   }
 
-  /* ---- 人物 ---- */
+  /* ---- 人物 ---- / ---- Heroes ---- */
   for (const [k, h] of Object.entries(pack.heroes || {})) {
     if (clash(HEROES, k, '人物')) continue;
     const d = h.def;
@@ -159,10 +161,10 @@ export function applyMod(pack: ModPack): ModReport {
     count('heroes');
   }
 
-  /* ---- 公共剧情的补充 ---- */
+  /* ---- 公共剧情的补充 ---- / ---- Additions to the shared story ---- */
   if (pack.story) deepMerge(L.story, pack.story);
 
-  /* ---- 触发钩子（写代码的效果） ---- */
+  /* ---- 触发钩子（写代码的效果） ---- / ---- Trigger hooks (code-based effects) ---- */
   Object.assign(CARD_HOOKS, pack.hooks?.cards || {});
   Object.assign(RELIC_HOOKS, pack.hooks?.relics || {});
   Object.assign(TALENT_HOOKS, pack.hooks?.talents || {});

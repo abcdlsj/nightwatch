@@ -1,6 +1,8 @@
 /* 艾拉的剧情。
  * 三套夜晚：门（卡尔）、小满、老褚。一局走一套，按顺序轮。
- * 战斗台词 [秒, 说话人, 台词]；夜谈 { title, who, lines, q, ans }；剧情页 { who, t }。 */
+ * 战斗台词 [秒, 说话人, 台词]；夜谈 { title, who, lines, q, ans }；剧情页 { who, t }。
+ * Ayla's story. Three night sets: the Gate (Karl), Xiaoman, Old Chu. One set per run, cycling in order. Battle lines are [seconds, speaker, line]; night talks are { title, who, lines, q, ans }; story pages are { who, t }.
+ */
 export default {
   arcs: [
     {
@@ -231,7 +233,7 @@ export default {
       },
     },
   ],
-  /* 不分套的夜谈 */
+  /* 不分套的夜谈 / night talks not tied to a set */
   talks: {
     9: {
       title: '最后一夜', who: 'bellman',
@@ -250,7 +252,7 @@ export default {
       ],
     },
   },
-  /* 第九夜：每个首领各一段 */
+  /* 第九夜：每个首领各一段 / night 9: one scene per boss */
   bosses: {
     eye: {
       beats: [[4, 'hero', '来吧。我在这道墙上等了你二十年。'], [30, 'hero', '卡尔，你要是在里头，就往外推一把。']],
@@ -295,7 +297,7 @@ export default {
       ],
     },
   },
-  /* 完整游戏线 */
+  /* 完整游戏线 / the full game line */
   full: {
     noDawn: [
       { who: 'narr', t: '光没有来。' },

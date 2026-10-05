@@ -1,4 +1,4 @@
-/* 备战的操作：进一站、拿卡、卖卡、拿遗物、学天赋、夜谈、离开。改完状态顺手刷新界面 */
+/* 备战的操作：进一站、拿卡、卖卡、拿遗物、学天赋、夜谈、离开。改完状态顺手刷新界面 / Prep actions: enter a stop, take a card, sell a card, take a relic, learn a talent, night talk, leave. Refresh the UI right after changing state. */
 import { ITEMS, ADJ, TIERS, UPS } from '../../data/cards';
 import { EVENTS } from '../../data/events';
 import { RELICS } from '../../data/relics';
@@ -24,14 +24,14 @@ import { gemScene, talkScene } from '../../game/story';
 import { GEMS, gemCount, type Gem } from '../../game/plan';
 import { pickLine } from '../../game/text';
 
-/* ---------------- 进一站 ---------------- */
+/* ---------------- 进一站 ---------------- / ---------------- Entering a stop ---------------- */
 export function enterEvent(id: string) {
   const T = L.ui.prep;
   if (EVENTS[id].cat === 'shop') tipOnce('shop', L.ui.tips.shop, 500);
   const ev = EVENTS[id];
   const cur: PrepStop = { id, ev, mode: '' };
   const P = G.prep;
-  /* 隐藏事件：师父的信 / 卡尔的剑 */
+  /* 隐藏事件：师父的信 / 卡尔的剑 / hidden events: the master's letter / Karl's sword */
   if (id === 's_letter') {
     Object.assign(cur, {
       mode: 'reward',
@@ -154,7 +154,7 @@ export function enterEvent(id: string) {
   else if (id === 'bank') {
     const g = clamp(Math.round(G.gold * 0.3), 2, 10);
     Object.assign(cur, { mode: 'reward', text: t('prep.bankText', { n: g }), apply: () => gainGold(g) });
-    /* 隐藏事件：兜里正好 7 金时进钱庄，账房先生会抬头 */
+    /* 隐藏事件：兜里正好 7 金时进钱庄，账房先生会抬头 / hidden event: with exactly 7 gold in hand, enter the bank and the clerk looks up */
     if (G.gold === 7) {
       foundSecret('bank');
       cur.text = `<div class="sletter">${L.story.secretBank}</div>` + cur.text;
@@ -165,7 +165,7 @@ export function enterEvent(id: string) {
   renderPrep();
 }
 
-/** 第二批备战事件：选择都有实际代价和收获 */
+/** 第二批备战事件：选择都有实际代价和收获 / second batch of prep events: every choice has a real cost and payoff */
 function enterMore(id: string, cur: PrepStop) {
   const T = L.ui.prep;
   const dmgCards = () => G.cards.filter((c) => ITEMS[c.key].dmg > 0).sort((a, b) => stats(b, null).total - stats(a, null).total);
@@ -270,19 +270,19 @@ function enterMore(id: string, cur: PrepStop) {
     } })));
 }
 
-/** 给一张卡挑一个稀有词缀（不打伤害的卡只给辅助词缀） */
+/** 给一张卡挑一个稀有词缀（不打伤害的卡只给辅助词缀） / give a card a rare affix (cards that deal no damage only get support affixes) */
 function rollRareAdj(c: Card) {
   const pool = Object.keys(ADJ).filter((k) => ADJ[k].r === 2 && k !== c.adj);
   return pick(pool);
 }
 
-/* ---------------- 宝石（完整游戏线） ---------------- */
+/* ---------------- 宝石（完整游戏线） ---------------- / ---------------- Gems (full game line) ---------------- */
 export function startGem() {
   const g = G.prep.gem as Gem;
   const sc = gemScene(g);
   G.prep.cur = { id: 'gem', mode: 'gem', gem: g, who: sc.who, title: sc.title, sc, li: 1, intro: sc.lines };
 }
-/** 拿或不拿：拿了得宝石（带代价），不拿换一样别的；这一颗以后都不会再有 */
+/** 拿或不拿：拿了得宝石（带代价），不拿换一样别的；这一颗以后都不会再有 / take it or not: taking grants the gem (with a cost); declining trades it for something else; that gem never returns */
 export function answerGem(cur: PrepStop, take: boolean) {
   const g = cur.gem as Gem;
   const T = L.ui.prep;
@@ -322,12 +322,12 @@ export function endGem() {
   renderPrep();
 }
 
-/* ---------------- 夜谈 / 学天赋 ---------------- */
+/* ---------------- 夜谈 / 学天赋 ---------------- / ---------------- Night talk / learning talents ---------------- */
 export function startTalk() {
   const sc = talkScene(G.round);
   G.prep.cur = { id: 'talk', talk: 1, mode: 'talk', who: sc.who, title: sc.title, sc, li: 1, intro: sc.lines };
 }
-/** 夜谈选了一个回答：按回答的倾向抽天赋 */
+/** 夜谈选了一个回答：按回答的倾向抽天赋 / a night-talk answer was chosen: draw a talent toward that inclination */
 export function answerTalk(cur: PrepStop, ans: string, re: string, cat: string) {
   cur.ans = ans;
   cur.re = re;
@@ -336,7 +336,7 @@ export function answerTalk(cur: PrepStop, ans: string, re: string, cat: string) 
   cur.picks = rollTalents((heat(8) ? 2 : 3) + (mastLv() >= 2 ? 1 : 0), cat);
   renderPrep();
 }
-/** 夜谈的回答当场给东西：攻 → 一张卡，守 → 城墙，术 → 遗物，财 → 金币 */
+/** 夜谈的回答当场给东西：攻 → 一张卡，守 → 城墙，术 → 遗物，财 → 金币 / a night-talk answer pays out on the spot: attack → a card, defense → wall, arcane → a relic, fortune → gold */
 function talkReward(cat: string): string {
   const T = L.ui.prep;
   if (cat === 'atk') {
@@ -388,7 +388,7 @@ export function learnTalent(id: string) {
   toast(t('prep.learned', { n: TALENTS[id].n }));
 }
 
-/* ---------------- 金币 / 遗物 ---------------- */
+/* ---------------- 金币 / 遗物 ---------------- / ---------------- Gold / relics ---------------- */
 export function gainGold(n: number) {
   G.gold += n;
   SFX.play('coin');
@@ -412,7 +412,7 @@ export function gainRelic(r: string, stay?: boolean) {
   if (!stay) finishStep();
 }
 
-/** 杂货铺买一件 */
+/** 杂货铺买一件 / buy one item at the general store */
 export function buyGear(g: { k: string; price: number; sold: boolean }) {
   if (G.gold < g.price) {
     toast(L.ui.prep.noGold);
@@ -436,7 +436,7 @@ export function finishStep() {
   if (P.step >= prepStops()) restart($('#goBtn'), 'bump');
 }
 
-/* ---------------- 拿卡 / 卖卡 / 合成 ---------------- */
+/* ---------------- 拿卡 / 卖卡 / 合成 ---------------- / ---------------- Taking / selling / merging cards ---------------- */
 export function acquire(of: Offer, dest: Dest): boolean {
   const r = acquireState(of, dest);
   if (!r.ok) {
@@ -455,7 +455,7 @@ export function acquire(of: Offer, dest: Dest): boolean {
   afterChange(r.card);
   return true;
 }
-/** 钱够不够（拖到棋盘上买之前先看一眼） */
+/** 钱够不够（拖到棋盘上买之前先看一眼） / whether you can afford it (a quick check before dragging onto the board to buy) */
 export function canAfford(of: Offer) {
   if (G.gold < of.price) {
     toast(L.ui.prep.noGold);
@@ -475,7 +475,7 @@ export function sellCard(c: Card) {
   toast(t('prep.sold', { n: v }));
 }
 
-/** 合成后的表现：音效、震动、提示、钻卡成就 */
+/** 合成后的表现：音效、震动、提示、钻卡成就 / merge feedback: SFX, haptics, toast, and the diamond-card achievement */
 export function afterMerge() {
   const merged = checkMerges();
   if (!merged.length) return;

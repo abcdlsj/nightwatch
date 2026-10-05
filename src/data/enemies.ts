@@ -1,4 +1,4 @@
-/* 从旧版数据迁移而来，直接在这里改 */
+/* 从旧版数据迁移而来，直接在这里改 / migrated from the old data format; edit here directly */
 import type { EnemyDef } from './types';
 
 export const EN: Record<string, EnemyDef> = {
@@ -857,7 +857,7 @@ export const FACTIONS = [
  "frost"
 ] as const;
 
-/** 两套敌人：霜潮按角色一一替换原来那套 */
+/** 两套敌人：霜潮按角色一一替换原来那套 / two enemy sets: Frost Tide replaces the original set role for role */
 export const FOESETS: Record<string, { map: Record<string, string>; n: string }> = {
  "dark": {
   "map": {}
@@ -886,7 +886,7 @@ export const FOESETS: Record<string, { map: Record<string, string>; n: string }>
  }
 } as never;
 
-/** 拦路和无尽夜用的精英 */
+/** 拦路和无尽夜用的精英 / elites used for roadblocks and endless nights */
 export const ELITES = [
  "a_brute",
  "a_golem",

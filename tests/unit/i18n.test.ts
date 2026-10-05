@@ -1,4 +1,4 @@
-/* 语言包完整性：代码里用到的界面文字键都要在 zh-CN 里；数据表的每一项都要有文案 */
+/* 语言包完整性：代码里用到的界面文字键都要在 zh-CN 里；数据表的每一项都要有文案 / Locale completeness: every UI string key used in code must exist in zh-CN, and every data-table entry must have text */
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';

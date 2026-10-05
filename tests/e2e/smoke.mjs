@@ -1,6 +1,8 @@
 /* 冒烟测试：机器人自动玩一整局，报告每夜城墙剩余、同屏最多敌人数和页面报错。
  * 用法：node tests/e2e/smoke.mjs [人物序号0/1/2] [--url=地址] [--shots] [--seed=数字]
- * 不给 --url 时自己起一个 vite preview（需要先 npm run build）。 */
+ * 不给 --url 时自己起一个 vite preview（需要先 npm run build）。
+ * Smoke test: the bot plays a full run and reports each night's remaining wall, the most enemies on screen at once, and page errors. Usage: node tests/e2e/smoke.mjs [heroIndex 0/1/2] [--url=] [--shots] [--seed=] / without --url it starts its own vite preview (requires a prior npm run build).
+ */
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
@@ -54,7 +56,7 @@ async function skip(pg) {
 
 const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
 const pg = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
-/* 测试用存档：人物全部解锁 */
+/* 测试用存档：人物全部解锁 / test save: all heroes unlocked */
 await pg.addInitScript(() => {
   if (!localStorage.getItem('chain-meta-v1')) localStorage.setItem('chain-meta-v1', JSON.stringify({ heroes: { ayla: 1, mo: 1, ying: 1, jun: 1, li: 1 } }));
 });

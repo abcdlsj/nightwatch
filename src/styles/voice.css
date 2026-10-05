@@ -1,4 +1,4 @@
-/* ---------- 战斗内台词 / 新敌人卡片（纯表现，不接收点击） ---------- */
+/* ---------- 战斗内台词 / 新敌人卡片（纯表现，不接收点击） ---------- / ---------- In-battle barks / new-enemy cards (presentation only, no clicks) ---------- */
 .bark{position:absolute;left:8px;right:8px;bottom:52px;display:flex;align-items:center;gap:8px;pointer-events:none;z-index:7;opacity:0;
   background:rgba(12,10,20,.86);border-radius:10px;padding:6px 10px 6px 6px;box-shadow:0 3px 0 rgba(0,0,0,.5),inset 3px 0 0 var(--vc,#fff);max-width:92%;width:max-content}
 .bark img{width:32px;height:32px;image-rendering:pixelated;flex:none;background:rgba(255,255,255,.06);border-radius:7px}

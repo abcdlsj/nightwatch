@@ -1,4 +1,4 @@
-/* 从旧版数据迁移而来，直接在这里改 */
+/* 从旧版数据迁移而来，直接在这里改 / migrated from the old data format; edit here directly */
 export default {
  "campLine": "火堆边上，一个老兵往里添了根柴：“守夜的门道，我就知道这么几样。挑一个？”",
  "secretKarl": {

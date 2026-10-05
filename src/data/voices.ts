@@ -1,5 +1,5 @@
-/* 从旧版数据迁移而来，直接在这里改 */
-/** 配角说话人：头像和颜色，名字在文案里 */
+/* 从旧版数据迁移而来，直接在这里改 / migrated from the old data format; edit here directly */
+/** 配角说话人：头像和颜色，名字在文案里 / side-character speakers: portrait and color; names live in the text */
 export const VOICES: Record<string, { img: string; c: string; n: string }> = {
  "narr": {
   "img": "lantern",

@@ -1,4 +1,4 @@
-/* 剧情页：开场、黎明、城破。逐字打出，点一下继续，可以跳过 */
+/* 剧情页：开场、黎明、城破。逐字打出，点一下继续，可以跳过 / Story pages: opening, dawn, breach. Types out character by character; tap to continue, can skip */
 import { HEROES } from '../data/heroes';
 import { L } from '../i18n';
 import { G } from '../game/state';
@@ -86,21 +86,21 @@ export function playStory(pages: Page[], mode: Mode, done?: () => void) {
 }
 
 export const playPrologue = (done: () => void) => playStory(prologuePages(), 'night', done);
-/** 完整线第 15 夜：隐藏首领出来之前（人物写了才有） */
+/** 完整线第 15 夜：隐藏首领出来之前（人物写了才有） / full line, night 15: before the hidden boss appears (only if the hero has one) */
 export function playHiddenPre(done: () => void) {
   const p = hiddenPrePages();
   if (p) playStory(p, 'night', done);
   else done();
 }
-/** 完整线：第 9 夜首领倒下，天没亮 */
+/** 完整线：第 9 夜首领倒下，天没亮 / full line: the night-9 boss falls but dawn does not come */
 export const playNoDawn = (done: () => void) => playStory(noDawnPages(G.boss9), 'night', done);
-/** 完整线：第 15 夜宝石不全，安静地天亮 */
+/** 完整线：第 15 夜宝石不全，安静地天亮 / full line: night 15 with a missing gem, dawn comes quietly */
 export const playQuiet = (done: () => void) => playStory(fullPages('quiet'), 'dawn', done);
-/** 完整线：打倒隐藏首领，真正的天亮 */
+/** 完整线：打倒隐藏首领，真正的天亮 / full line: beat the hidden boss and true dawn arrives */
 export const playTrueWin = (done: () => void) => playStory(fullPages('trueWin'), 'dawn', done);
 export const playLose = (done: () => void) => playStory(L.story.lose as Page[], 'fall', done);
 
-/** 黎明：首领不同第一句不同；满足条件时多出隐藏剧情（借来的星、第七百零一下） */
+/** 黎明：首领不同第一句不同；满足条件时多出隐藏剧情（借来的星、第七百零一下） / dawn: the first line varies by boss; extra hidden scenes appear when conditions are met (the borrowed star, the seven-hundred-and-first strike) */
 export function playWin(done: () => void) {
   const S = L.story as any;
   const pages: Page[] = winPages(G.boss9);
@@ -117,7 +117,7 @@ export function playWin(done: () => void) {
   playStory(pages, 'dawn', done);
 }
 
-/** 剧情页背景：小镇剪影 + 天空（夜里是那只眼睛，黎明是太阳） */
+/** 剧情页背景：小镇剪影 + 天空（夜里是那只眼睛，黎明是太阳） / story page background: town silhouette + sky (the eye at night, the sun at dawn) */
 function drawScene(cv: HTMLCanvasElement, mode: Mode) {
   const x = cv.getContext('2d')!;
   const W = cv.width,

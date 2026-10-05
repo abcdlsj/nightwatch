@@ -1,6 +1,8 @@
 /* 背景音乐：WebAudio 现场合成，跟着场景换曲。
  * 曲谱格式：prog 每小节一个和弦 [根音, m小/M大]，每小节 16 步；
- * bass/arp 每字符一步：x 根音、5 五度、o 高八度、数字=和弦第几个音；lead 空格分隔：数字起音、- 延长、. 休止 */
+ * bass/arp 每字符一步：x 根音、5 五度、o 高八度、数字=和弦第几个音；lead 空格分隔：数字起音、- 延长、. 休止
+ * Background music: synthesized live with WebAudio and switched per scene. Score format: prog is one chord per bar [root, m minor/M major], 16 steps per bar; each character in bass/arp is one step: x root, 5 fifth, o octave up, a digit = which chord tone; lead is space-separated: a digit starts a note, - sustains, . rests
+ */
 import { SFX } from './sfx';
 
 interface Song {
@@ -12,7 +14,7 @@ interface Song {
 const RAW: Record<string, any> = {
   title: { bpm: 64, prog: [[45, 'm'], [41, 'M'], [48, 'M'], [43, 'M']], bass: 'x.......5.......', bv: 0.035, bt: 'triangle', arp: '0...1...2...1...', av: 0.016, at: 'triangle', ao: 24,
     lead: ['76 - - - - - - - 72 - - - - - - -', '. . . . 69 - - - 72 - - - . . . .', '. . . . 67 - - - 72 - - - 76 - - -', '74 - - - - - - - . . . . . . . .'], lv: 0.02, lt: 'sine' },
-  /* 备战：八音盒里那首「师父的曲子」 */
+  /* 备战：八音盒里那首「师父的曲子」 / prep: the music-box tune 'The Master's Song' */
   shop: { bpm: 96, prog: [[48, 'M'], [45, 'm'], [41, 'M'], [43, 'M']], bass: 'x...5...x...5...', bv: 0.03, bt: 'triangle', arp: '0.2.1.2.0.2.1.2.', av: 0.009, at: 'sine', ao: 12,
     lead: ['76 . 79 . 84 . 79 . 77 . 76 . 74 - . .', '72 . 74 . 76 . 79 . 76 - . . 72 - . .', '77 . 76 . 74 . 72 . 69 . 72 . 77 - . .', '79 . 77 . 76 . 74 . 71 - . . 74 - . .'], lv: 0.03, lt: 'sine', box: 1 },
   battle: { bpm: 132, prog: [[45, 'm'], [41, 'M'], [43, 'M'], [40, 'm']], bass: 'x.x.o.x.x.x.o.x.', bv: 0.02, bt: 'square', arp: '0.1.2.1.0.1.2.1.', av: 0.006, at: 'square', ao: 24,

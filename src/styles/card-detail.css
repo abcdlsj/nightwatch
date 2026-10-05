@@ -1,4 +1,4 @@
-/* ---------- 卡牌精细化：纸面纹理、内框、品质装饰、传闻 ---------- */
+/* ---------- 卡牌精细化：纸面纹理、内框、品质装饰、传闻 ---------- / ---------- Card polish: paper texture, inner frame, tier ornaments, flavor text ---------- */
 .card .face{background-image:repeating-linear-gradient(135deg,rgba(60,40,20,.035) 0 2px,transparent 2px 5px),linear-gradient(var(--tbg,var(--card)),var(--tbg,var(--card)))}
 .card .face::before{content:'';position:absolute;left:2px;right:2px;top:10px;bottom:2px;border:1px solid rgba(40,28,20,.14);border-radius:4px;pointer-events:none}
 .card.t1 .face::before{border-color:rgba(120,140,165,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.5)}

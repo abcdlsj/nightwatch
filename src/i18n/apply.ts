@@ -1,4 +1,4 @@
-/* 把语言包里的内容文字填进数据表。数据表里只有机制字段，文字字段由这里补齐 */
+/* 把语言包里的内容文字填进数据表。数据表里只有机制字段，文字字段由这里补齐 / Fill locale content into the data tables. The tables hold mechanics only; text fields are filled here */
 import { ITEMS, ADJ, TIERS, GT, UPS } from '../data/cards';
 import { RELICS } from '../data/relics';
 import { TALENTS, TCAT } from '../data/talents';

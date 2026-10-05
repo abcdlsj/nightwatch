@@ -1,4 +1,4 @@
-/* 备战界面：今晚预告、三站选门、各站内容、夜谈、准备好了、加码 */
+/* 备战界面：今晚预告、三站选门、各站内容、夜谈、准备好了、加码 / Prep screen: tonight's forecast, three door stops, each stop's content, night talks, ready, and modifiers */
 import { ITEMS, ADJ, TIERS, GT, TAGC } from '../../data/cards';
 import { EN } from '../../data/enemies';
 import { EVENTS } from '../../data/events';
@@ -30,7 +30,7 @@ import { startJump, prepStops } from './jumps';
 
 const fitTag = () => `<small class="gt fit">${L.ui.prep.fit}</small>`;
 
-/* ---------------- 今晚预告 ---------------- */
+/* ---------------- 今晚预告 ---------------- / ---------------- Tonight's forecast ---------------- */
 export function renderPreview() {
   const w = G.nextWave!;
   const cnt: Record<string, number> = {};
@@ -48,7 +48,7 @@ export function renderPreview() {
   $('#pvNote').innerHTML = boss ? boss.intents!.map((it) => `【${it.n}】${it.d}`).join('<br>') : tough ? `${tough.n}${L.ui.common.colon}${tough.tip}` : '';
 }
 
-/* ---------------- 羁绊条：凑到新的一层时提示 ---------------- */
+/* ---------------- 羁绊条：凑到新的一层时提示 ---------------- / ---------------- Synergy bar: announce each new tier reached ---------------- */
 let synPrev: ReturnType<typeof synCount> | null = null;
 const pairName = (k: string) => L.terms.syn2[k as keyof typeof L.terms.syn2];
 export function renderSyn() {
@@ -91,7 +91,7 @@ export function renderSyn() {
     : '';
 }
 
-/* ---------------- 各站 ---------------- */
+/* ---------------- 各站 ---------------- / ---------------- The stops ---------------- */
 function evHead(e: (typeof EVENTS)[string]) {
   return `<div class="ev-head cat-${e.cat}"><img src="${icon(e.ico).url}" alt=""><div><b>${e.n}</b><em>${e.f}</em></div></div>`;
 }
@@ -127,7 +127,7 @@ export function renderPrep() {
   const stops = prepStops();
   $('#stepPips').innerHTML = [...Array(stops).keys()].map((i) => `<i class="${i < P.step ? 'done' : i === P.step ? 'now' : ''}"></i>`).join('');
   body.innerHTML = '';
-  /* 跃迁夜：三站走完后多一站，定 C 位 */
+  /* 跃迁夜：三站走完后多一站，定 C 位 / leap night: one extra stop after the usual three, which picks the carry */
   if (P.step === 3 && stops === 4 && !P.cur) P.cur = startJump();
   if (P.step >= stops) {
     body.innerHTML = readyHtml() + wagerHtml();
@@ -310,7 +310,7 @@ export function renderPrep() {
   updateHUD();
 }
 
-/** 赌桌：一半一半 */
+/** 赌桌：一半一半 / gamble table: fifty-fifty */
 const gambleRoll = () => rand() < 0.5;
 
 function offerEl(of: Offer) {
@@ -333,7 +333,7 @@ function offerEl(of: Offer) {
   return o;
 }
 
-/** 商店锁卡：锁住的卡原价出现在下一家店，一次只锁一张 */
+/** 商店锁卡：锁住的卡原价出现在下一家店，一次只锁一张 / shop card locking: a locked card reappears at the next shop at full price; only one lock at a time */
 function lockBtn(o: HTMLElement, of: Offer, cur: PrepStop | null) {
   if (!cur || cur.mode !== 'shop' || of.sold) return;
   const T = L.ui.prep;
@@ -366,7 +366,7 @@ function ambushHtml(cur: PrepStop) {
   <div class="ev-hint">${t('prep.ambushHint', { n: ambushGold() })}</div>`;
 }
 
-/* ---------------- 夜谈 ---------------- */
+/* ---------------- 夜谈 ---------------- / ---------------- Night talk ---------------- */
 function tline(who: string, tx: any) {
   const v = voiceOf(who);
   return `<div class="tl${who === 'hero' ? ' me' : ''}" style="--vc:${v.c}"><img src="${v.img}" alt=""><p><b>${v.n}</b>${pickLine(tx)}</p></div>`;
@@ -442,7 +442,7 @@ function renderTalk(cur: PrepStop, body: HTMLElement) {
   }
 }
 
-/* ---------------- 宝石（完整游戏线）：先听完几句，再决定拿不拿 ---------------- */
+/* ---------------- 宝石（完整游戏线）：先听完几句，再决定拿不拿 ---------------- / ---------------- Gems (full game line): hear a few lines first, then decide whether to take it ---------------- */
 function renderGem(cur: PrepStop, body: HTMLElement) {
   const T = L.ui.prep;
   const color = { red: '#ff6b5b', blue: '#73c8ff', green: '#7ee8a2' }[cur.gem as string];
@@ -484,7 +484,7 @@ function renderGem(cur: PrepStop, body: HTMLElement) {
   body.appendChild(list);
 }
 
-/* ---------------- 准备好了：今晚情报 + 加码 ---------------- */
+/* ---------------- 准备好了：今晚情报 + 加码 ---------------- / ---------------- Ready: tonight's intel + modifiers ---------------- */
 function readyHtml() {
   const P = G.prep;
   const T = L.ui.prep;

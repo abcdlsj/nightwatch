@@ -1,5 +1,7 @@
 /* 跃迁事件：第 3、5、7 夜之前（敌人明显变强的几夜）备战多出一站，每个人物不同，
- * 用来定 C 位（这局的主力，独立乘区 ×1.25）和流派方向。选了就有实打实的收获，不是随便问问。 */
+ * 用来定 C 位（这局的主力，独立乘区 ×1.25）和流派方向。选了就有实打实的收获，不是随便问问。
+ * Leap events: an extra prep stop before nights 3, 5 and 7 (the nights enemies clearly spike). Each hero has their own; it sets the carry (this run's main damage card, an independent ×1.25 multiplier) and archetype direction. Choosing always pays off concretely — it is not just flavor.
+ */
 import { ITEMS, TIERS } from '../../data/cards';
 import { L, t } from '../../i18n';
 import { shuffled } from '../../core/rng';
@@ -32,7 +34,7 @@ function crown(c: Card) {
   restart(elOf(c), 'merge');
   FX.burstAt(elOf(c), '#ffd166', 30);
 }
-/** 送一张卡；没地方放就折成金币 */
+/** 送一张卡；没地方放就折成金币 / grant a card; if there is no room, convert it to gold */
 function gift(filter: (it: (typeof ITEMS)[string]) => boolean, up: number) {
   const of = makeOffer(filter, { free: 1 });
   of.card.tier = Math.min(2, of.card.tier + up);
@@ -47,9 +49,9 @@ function gift(filter: (it: (typeof ITEMS)[string]) => boolean, up: number) {
   return null;
 }
 
-/** 每个人物的跃迁事件：标题、开场白、提示、选项 */
+/** 每个人物的跃迁事件：标题、开场白、提示、选项 / each hero's leap event: title, opening line, hint, options */
 export const JUMPS: Record<string, () => { opts: Opt[] }> = {
-  /* 艾拉「点将」：立一张输出卡为 C 位并加成长；或者要一张流派卡 */
+  /* 艾拉「点将」：立一张输出卡为 C 位并加成长；或者要一张流派卡 / Ayla's 'Call the Roll': make one damage card the carry and give it growth; or take an archetype card */
   ayla: () => {
     const n = 4 + G.round;
     const opts: Opt[] = byDmg(board())
@@ -66,7 +68,7 @@ export const JUMPS: Record<string, () => { opts: Opt[] }> = {
       } });
     return { opts };
   },
-  /* 墨「课题」：专攻一个元素——送一张这个元素的卡（高一档），棋盘上这个元素最强的卡立为 C 位 */
+  /* 墨「课题」：专攻一个元素——送一张这个元素的卡（高一档），棋盘上这个元素最强的卡立为 C 位 / Mo's 'Thesis': specialize in one element — grant a card of that element (one tier higher) and make the strongest card of that element on the board the carry */
   mo: () => {
     const tags: Tag[] = ['fire', 'ice', 'volt', 'poison'];
     const have = board().map((c) => ITEMS[c.key].tag);
@@ -80,7 +82,7 @@ export const JUMPS: Record<string, () => { opts: Opt[] }> = {
       } })),
     };
   },
-  /* 萤「图纸」：改装一张小卡——升一档（最多到钻），再照着它做一张同流派的小卡。萤靠的是数量，不立 C 位 */
+  /* 萤「图纸」：改装一张小卡——升一档（最多到钻），再照着它做一张同流派的小卡。萤靠的是数量，不立 C 位 / Ying's 'Blueprints': refit a small card — upgrade it one tier (up to diamond), then make a copy of it in the same archetype. Ying relies on quantity, so she sets no carry */
   ying: () => {
     let cs = board().filter((c) => c.size === 1);
     if (!cs.length) cs = board();
@@ -98,9 +100,9 @@ export const JUMPS: Record<string, () => { opts: Opt[] }> = {
   },
 };
 
-/** 这一夜备战一共几站：平时 3 站，跃迁夜多一站 */
+/** 这一夜备战一共几站：平时 3 站，跃迁夜多一站 / how many prep stops this night: 3 normally, one more on leap nights */
 export const prepStops = () => (hasJump() ? 4 : 3);
-/* 钧「布防图」：定一处主炮位（C 位 + 城墙上限）；或者领一张流派卡 */
+/* 钧「布防图」：定一处主炮位（C 位 + 城墙上限）；或者领一张流派卡 / Jun's 'Defense Map': stake out a main gun position (carry + wall cap); or take an archetype card */
 JUMPS.jun = () => {
   const n = 2 + G.round;
   const opts: Opt[] = byDmg(board())
@@ -116,7 +118,7 @@ JUMPS.jun = () => {
     } });
   return { opts };
 };
-/* 璃「星象」：已经有 C 位就再为它点一颗星（倍率一路往上叠）；也可以换一颗星 */
+/* 璃「星象」：已经有 C 位就再为它点一颗星（倍率一路往上叠）；也可以换一颗星 / Li's 'Astrology': if a carry already exists, light another star for it (the multiplier keeps stacking); or move the star */
 JUMPS.li = () => {
   const cur = board().find((c) => c.carry);
   const opts: Opt[] = [];
@@ -133,14 +135,14 @@ JUMPS.li = () => {
   return { opts };
 };
 
-/** 这个人物用哪一套跃迁（模组人物可以借用五个人物的玩法） */
+/** 这个人物用哪一套跃迁（模组人物可以借用五个人物的玩法） / which leap set this hero uses (mod heroes may borrow one of the five) */
 const jumpOf = () => HEROES[G.hero]?.jump || G.hero;
 export const hasJump = () => jumpNights().includes(G.round) && !G.endless && !!JUMPS[jumpOf()];
 
 export function startJump(): PrepStop {
   const J = (L.ui.jump as any)[jumpOf()];
   const { opts } = JUMPS[jumpOf()]();
-  /* 选完算走完这一站 */
+  /* 选完算走完这一站 / choosing completes this stop */
   for (const o of opts) {
     const f = o.act;
     o.act = () => {

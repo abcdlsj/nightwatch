@@ -1,4 +1,4 @@
-/* 图鉴（卡牌 / 遗物 / 天赋 / 敌人）和过往守夜 */
+/* 图鉴（卡牌 / 遗物 / 天赋 / 敌人）和过往守夜 / codex (cards / relics / talents / enemies) and past nights */
 import { ITEMS, ADJ, TIERS, GT } from '../data/cards';
 import { RELICS } from '../data/relics';
 import { TALENTS, TCAT } from '../data/talents';
@@ -28,7 +28,7 @@ function miniCard(el: HTMLElement, k: string, tier: number, adj?: string | 0 | n
   return ce;
 }
 
-/* ---------------- 过往守夜 ---------------- */
+/* ---------------- 过往守夜 ---------------- / ---------------- Past nights ---------------- */
 export function openHistory() {
   SFX.play('ui');
   const H = META.hist;
@@ -99,7 +99,7 @@ function openRunDetail(i: number) {
   $('#hsClose').onclick = closeSheet;
 }
 
-/* ---------------- 图鉴 ---------------- */
+/* ---------------- 图鉴 ---------------- / ---------------- Codex ---------------- */
 const TABS = ['card', 'relic', 'talent', 'foe'] as const;
 function cxHead(tab: string, got: number, all: number) {
   const N = L.meta.codexTabs as Record<string, string>;
@@ -113,7 +113,7 @@ function cxBind(sh: HTMLElement) {
 const cxLock = () => `<b class="cx-q">${L.ui.codex.unknown3}</b>`;
 const closeRow = () => `<div class="sh-btns"><button class="btn" id="cdxClose">${L.ui.sheet.close}</button></div>`;
 
-/** openCodex() 卡牌通用页；openCodex(人物 key) 卡牌专属页；openCodex('relic'|'talent'|'foe') 其他页 */
+/** openCodex() 卡牌通用页；openCodex(人物 key) 卡牌专属页；openCodex('relic'|'talent'|'foe') 其他页 / openCodex() opens the generic cards page; openCodex(heroKey) the hero's own cards; openCodex('relic'|'talent'|'foe') the other pages */
 export function openCodex(tab?: string, sub?: string) {
   if (tab && (HEROES[tab] || tab === 'all')) {
     sub = tab;

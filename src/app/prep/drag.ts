@@ -1,6 +1,8 @@
 /* 拖拽：把卡拖上棋盘（买）、在棋盘和背包之间挪、拖去卖、拖到同名卡上合成。
  * 同一时间只允许一次拖拽；抬手、取消、切后台、失焦都会收尾，保证幽灵卡一定被清掉。
- * 按下不动直接抬手 = 点击，打开详情。 */
+ * 按下不动直接抬手 = 点击，打开详情。
+ * Dragging: drag a card onto the board to buy it, move it between board and bag, drag it out to sell, or drop it on a same-name card to merge. Only one drag at a time; pointer up, cancel, backgrounding or blur all finish it so the ghost card is always cleaned up. Press and release without moving = a tap, which opens details.
+ */
 import { ITEMS } from '../../data/cards';
 import { L, t } from '../../i18n';
 import { clamp } from '../../core/util';
@@ -49,7 +51,7 @@ function onDown(e: PointerEvent, src: Drag['src']) {
   try {
     src.el.setPointerCapture(e.pointerId);
   } catch {
-    /* 有的浏览器在合成事件上不给捕获 */
+    /* 有的浏览器在合成事件上不给捕获 / some browsers do not give capture on composed events */
   }
 }
 export const startDragOffer = (e: PointerEvent, offer: Offer, el: HTMLElement) => onDown(e, { kind: 'shop', offer, el });
@@ -210,7 +212,7 @@ function showTgt(tg: Target | null) {
   for (let i = t2.i; i < t2.i + D!.c!.size; i++) if (cs[i]) cs[i].classList.add(t2.ok ? 'ok' : 'bad');
 }
 
-/** 拖起来时，棋盘上放下去有协同的格子发光 */
+/** 拖起来时，棋盘上放下去有协同的格子发光 / while dragging, glow the board slots that would gain synergy if dropped there */
 function synergyAt(c: CardSpec, i: number, ignore: Card | null) {
   const o = occ('board').map((x) => (x === ignore ? null : x));
   const L0 = o[i - 1],

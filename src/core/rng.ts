@@ -1,8 +1,10 @@
 /* 可复现的随机数。
  * 规则相关的随机（出怪、掉落、暴击、商店……）都走 rng，给定种子就能完整复现一局；
- * 纯表现的随机（粒子、飘字、台词挑哪句）用 vr，不影响结算，也不打乱 rng 的序列。 */
+ * 纯表现的随机（粒子、飘字、台词挑哪句）用 vr，不影响结算，也不打乱 rng 的序列。
+ * Reproducible RNG. Rule-relevant rolls (spawns, loot, crits, shop…) all go through rng, so a run replays exactly from a seed; cosmetic rolls (particles, floating text, which bark to pick) use vr and neither affect results nor disturb rng's sequence.
+ */
 
-/** mulberry32：32 位状态，够快，分布够用 */
+/** mulberry32：32 位状态，够快，分布够用 / mulberry32: 32-bit state, fast enough with a good-enough distribution */
 export class Rng {
   private s: number;
   constructor(seed: number) {
@@ -24,7 +26,7 @@ export class Rng {
 
 export const newSeed = () => (Math.random() * 4294967296) >>> 0;
 
-/** 规则随机。新开一局时 reseed */
+/** 规则随机。新开一局时 reseed / the rules RNG; reseeded when a new run starts */
 export const rng = new Rng(newSeed());
 export const reseed = (seed: number) => {
   rng.state = seed;
@@ -33,10 +35,10 @@ export const reseed = (seed: number) => {
 export const rand = () => rng.next();
 export const rnd = (a: number, b: number) => a + rng.next() * (b - a);
 export const pick = <T>(a: readonly T[]): T => a[Math.floor(rng.next() * a.length)];
-/** 打乱顺序（沿用旧版的 sort 写法，保证同种子结果一致） */
+/** 打乱顺序（沿用旧版的 sort 写法，保证同种子结果一致） / shuffle (keeping the old sort trick so the same seed gives the same result) */
 export const shuffled = <T>(a: readonly T[]): T[] => a.slice().sort(() => rng.next() - 0.5);
 
-/** 表现随机：不影响结算 */
+/** 表现随机：不影响结算 / the cosmetic RNG: never affects results */
 export const vr = () => Math.random();
 export const vrnd = (a: number, b: number) => a + Math.random() * (b - a);
 export const vpick = <T>(a: readonly T[]): T => a[Math.floor(Math.random() * a.length)];

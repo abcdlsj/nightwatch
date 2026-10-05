@@ -1,6 +1,8 @@
 /* 成型阵容逐夜测：每个流派一套「认真玩的玩家到第 N 夜大概有的棋盘」，每夜单独打若干种子，
  * 看守不守得住、墙掉多少、主力是谁。测的是卡牌强度和怪物成长曲线，不受机器人水平影响。
- * 用法：npm run bench            RUNS=12 ARCH=volt,fire npm run bench */
+ * 用法：npm run bench            RUNS=12 ARCH=volt,fire npm run bench
+ * Tested night by night with assembled lineups: each archetype gets a 'board a serious player would roughly have by night N', and each night runs several seeds to see whether it holds, how much wall is lost, and who the carry is. This measures card strength and the enemy growth curve, independent of bot skill. Usage: npm run bench            RUNS=12 ARCH=volt,fire npm run bench
+ */
 import { it, beforeAll } from 'vitest';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { initLocale } from '../../src/i18n';
@@ -21,7 +23,7 @@ import { finalBosses } from '../../src/game/plan';
 const RUNS = +(process.env.RUNS || 8);
 const PICK = (process.env.ARCH || Object.keys(ARCHS).join(',')).split(',');
 const HEAT = +(process.env.HEAT || 0);
-/** FULL=1：测完整游戏线 15 夜 */
+/** FULL=1：测完整游戏线 15 夜 / FULL=1: test the 15-night full game line */
 const FULL = !!+(process.env.FULL || 0);
 const LAST = FULL ? 15 : 9;
 if (process.env.TUNE) Object.assign(TUNE, JSON.parse(process.env.TUNE));

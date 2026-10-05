@@ -1,5 +1,7 @@
 /* 平衡模拟用的机器人：按流派偏好买卡、合成、摆棋盘、拿遗物、学天赋，然后无界面打完一整局。
- * 只调规则层和模拟层，不碰界面。策略不求最优，求「一个认真玩某流派的普通玩家」。 */
+ * 只调规则层和模拟层，不碰界面。策略不求最优，求「一个认真玩某流派的普通玩家」。
+ * The bot used for balance simulation: it buys cards by archetype preference, merges, arranges the board, takes relics and learns talents, then plays a full headless run. It only drives the rules and sim layers, never the UI. The strategy need not be optimal, just 'a regular player who takes one archetype seriously'.
+ */
 import { ITEMS } from '../../src/data/cards';
 import { RELICS } from '../../src/data/relics';
 import { EVENTS } from '../../src/data/events';
@@ -20,13 +22,13 @@ import { finalBosses, lastNight, jumpNights, nightKind } from '../../src/game/pl
 
 export type Focus = Tag | 'any';
 
-/** 一张卡大概值多少：输出卡看每秒伤害，辅助卡给个固定分 */
+/** 一张卡大概值多少：输出卡看每秒伤害，辅助卡给个固定分 / roughly what a card is worth: damage cards by DPS, support cards a flat score */
 export function cardScore(c: Card, focus: Focus) {
   const it = ITEMS[c.key];
   let v: number;
   if (it.dmg > 0) {
     const st = stats(c, null);
-    /* 第 3 夜起有护甲怪（骷髅 2 + 盾卫光环 3），单发小的卡打不动 */
+    /* 第 3 夜起有护甲怪（骷髅 2 + 盾卫光环 3），单发小的卡打不动 / from night 3 there are armored enemies (skeleton 2 + shield-guard aura 3), so weak single hits bounce off */
     const armor = G.round >= 3 ? 4 + (it.pen || 0) * -1 : 0;
     const per = it.burn || it.poison ? st.total : Math.max(1, st.total - Math.max(0, armor));
     v = (per * (it.multi || 1)) / st.cd;
@@ -41,7 +43,7 @@ export function cardScore(c: Card, focus: Focus) {
   return v / c.size;
 }
 
-/** 把最值钱的卡排上棋盘（按单格价值从高到低塞满 8 格），其余进背包，背包放不下就卖 */
+/** 把最值钱的卡排上棋盘（按单格价值从高到低塞满 8 格），其余进背包，背包放不下就卖 / arrange the most valuable cards on the board (fill all 8 slots by per-slot value, highest first); the rest go to the bag, and sell when the bag is full */
 function arrange(focus: Focus) {
   const all = G.cards.slice().sort((a, b) => cardScore(b, focus) * b.size - cardScore(a, focus) * a.size);
   for (const c of all) {
@@ -55,7 +57,7 @@ function arrange(focus: Focus) {
       chosen.push(c);
       used += c.size;
     }
-  /* 输出卡按分数排，辅助卡（充能、增伤、齐鸣、回响）插在最强的输出卡两边 */
+  /* 输出卡按分数排，辅助卡（充能、增伤、齐鸣、回响）插在最强的输出卡两边 / order damage cards by score and slot support cards (charge, damage amp, chorus, echo) on both sides of the strongest one */
   const isSup = (c: Card) => ITEMS[c.key].dmg === 0 || c.adj === 'echo';
   const dmgCards = chosen.filter((c) => !isSup(c));
   const sups = chosen.filter(isSup);
@@ -93,7 +95,7 @@ function offerWorth(of: Offer, focus: Focus) {
   return cardScore(tmp, focus) * of.card.size * (dup ? 1.8 : 1);
 }
 
-/** 买得起、值得买就买：能合成的、棋盘还有空位的、比最弱那张好的 */
+/** 买得起、值得买就买：能合成的、棋盘还有空位的、比最弱那张好的 / buy when affordable and worthwhile: mergeable, with a free board slot, or better than the weakest card */
 function buyFrom(offers: Offer[], focus: Focus, free: boolean) {
   for (let guard = 0; guard < 4; guard++) {
     const board = G.cards.filter((c) => c.loc === 'board');
@@ -103,7 +105,7 @@ function buyFrom(offers: Offer[], focus: Focus, free: boolean) {
       .filter((o) => !o.sold && o.price <= G.gold)
       .filter((o) => {
         const dup = G.cards.some((c) => c.key === o.card.key && c.tier === o.card.tier);
-        /* 钱多（14 以上）时，差不多好的也买：留在背包等合成 */
+        /* 钱多（14 以上）时，差不多好的也买：留在背包等合成 / with plenty of gold (14+), buy near-good cards too and keep them in the bag to merge */
         const bar = G.gold >= 14 ? weakest * 0.7 : weakest;
         return free || dup || used + o.card.size <= 8 || offerWorth(o, focus) > bar;
       })
@@ -148,7 +150,7 @@ const SHOP_FOR: Record<string, string[]> = {
   blade: ['smith', 'armory'], mech: ['smith'], fire: ['forge'], volt: ['storm'], ice: ['frostshop'], poison: ['apothecary'], any: [],
 };
 
-/* 跃迁事件（第 3、5、7 夜之前多一站）：照 src/app/prep/jumps.ts 的效果，挑每个人物最直接的那项 */
+/* 跃迁事件（第 3、5、7 夜之前多一站）：照 src/app/prep/jumps.ts 的效果，挑每个人物最直接的那项 / leap events (an extra stop before nights 3, 5 and 7): mirror src/app/prep/jumps.ts and pick each hero's most direct option */
 
 const bestDmg = (focus: Focus, f: (c: Card) => boolean = () => true) =>
   G.cards.filter((c) => c.loc === 'board' && ITEMS[c.key].dmg > 0 && f(c)).sort((a, b) => cardScore(b, focus) * b.size - cardScore(a, focus) * a.size)[0];
@@ -167,7 +169,7 @@ function jump(focus: Focus) {
     return;
   }
   if (h === 'ying') {
-    /* 萤的图纸：升一张小卡，再送一张同流派的小卡（不立 C 位） */
+    /* 萤的图纸：升一张小卡，再送一张同流派的小卡（不立 C 位） / Ying's Blueprints: upgrade one small card and grant another small card of the same archetype (no carry) */
     const c = bestDmg(focus, (x) => x.size === 1) || bestDmg(focus);
     if (c && c.tier < 3) c.tier++;
     const of = makeOffer((it) => it.size === 1 && it.hero === 'ying', { free: 1 });
@@ -199,10 +201,10 @@ function prep(focus: Focus) {
     G.prep.step = step;
     rollDoors();
     const rich = G.gold >= 14;
-    /* 墙掉了四成以上先去补 */
+    /* 墙掉了四成以上先去补 / if the wall has lost 40% or more, repair first */
     const hurt = G.wall < G.wallMax * 0.6 ? ['spring', 'camp'] : [];
     const pref = [...hurt, ...SHOP_FOR[focus], ...(rich ? ['black', 'grocer'] : []), 'shop', 'giant', 'altar', 'field', 'manual', 'train', 'grocer', 'chest', 'parcel', 'black', 'armory', 'forge', 'storm', 'smith', 'frostshop', 'apothecary', 'job', 'bank'];
-    /* 不在偏好表里的门（机器人不会处理）排最后 */
+    /* 不在偏好表里的门（机器人不会处理）排最后 / doors not in the preference table (which the bot cannot handle) come last */
     const rank = (id: string) => (pref.includes(id) ? pref.indexOf(id) : 999);
     const d = G.prep.doors.slice().sort((a, b) => rank(a) - rank(b))[0];
     const ev = EVENTS[d];
@@ -301,7 +303,7 @@ export function playRun(hero: string, focus: Focus, seed: number, opts: { heat?:
   G.maxRound = lastNight();
   void rng;
   const kits = KITS[hero];
-  /* 起手：挑和流派最搭的一套 */
+  /* 起手：挑和流派最搭的一套 / opening: pick the set that fits the archetype best */
   const kit = kits.slice().sort((a, b) => kitFit(b.cards, focus) - kitFit(a.cards, focus))[0];
   placeKit(kit.cards);
   if (kit.gold) G.gold = Math.max(0, G.gold + kit.gold);

@@ -1,4 +1,4 @@
-/* 卡牌规则：格子、相邻、伤害公式、价格。全是纯计算，不碰界面 */
+/* 卡牌规则：格子、相邻、伤害公式、价格。全是纯计算，不碰界面 / Card rules: slots, adjacency, damage formula, price. All pure computation, no UI */
 import { ITEMS, UPS, ADJ } from '../data/cards';
 import type { Kind, Tag } from '../data/types';
 import { L } from '../i18n';
@@ -19,7 +19,7 @@ export function newCard(key: string, tier?: number | null, adj?: string | null):
   };
 }
 
-/* ---------------- 格子 ---------------- */
+/* ---------------- 格子 ---------------- / ---------------- Slots ---------------- */
 export const zoneN = (z: Zone) => (z === 'board' ? 8 : 4);
 
 export function occ(z: Zone): (Card | null)[] {
@@ -58,14 +58,14 @@ export function rightOf(c: Card) {
 }
 
 export const boardCards = () => G.cards.filter((c) => c.loc === 'board').sort((a, b) => a.idx - b.idx);
-/** 棋盘最左和最右的卡 */
+/** 棋盘最左和最右的卡 / the cards at the board's far left and far right */
 export const ends = (): [Card | undefined, Card | undefined] => {
   const b = boardCards();
   return [b[0], b[b.length - 1]];
 };
 export const countSame = (key: string, tier: number) => G.cards.filter((c) => c.key === key && c.tier === tier).length;
 
-/* ---------------- 品质与数值 ---------------- */
+/* ---------------- 品质与数值 ---------------- / ---------------- Tier and values ---------------- */
 export const stepOf = (c: CardSpec | Card) => Math.max(0, c.tier - ITEMS[c.key].t);
 export const dmgMul = (c: Card) => UPS[ITEMS[c.key].up].d[stepOf(c)];
 export const chainOf = (c: Card) => (ITEMS[c.key].chain || 0) + stepOf(c) + mv('chain');
@@ -87,8 +87,8 @@ export function buffAmt(c: Card) {
   return a;
 }
 
-/* ---------------- 成长与任务 ---------------- */
-/** 带【成长】关键词的卡 */
+/* ---------------- 成长与任务 ---------------- / ---------------- Growth and quests ---------------- */
+/** 带【成长】关键词的卡 / cards with the 【growth】 keyword */
 export const isGrow = (c: { key: string }) => !!ITEMS[c.key].grow;
 
 export function growCard(c: Card, v: number) {
@@ -103,7 +103,7 @@ export function questAdd(c: Card, v?: number) {
   if (ITEMS[c.key].quest) c.qp = (c.qp || 0) + (v || 1);
 }
 
-/** 夜晚结束时结算任务，返回完成了的卡和原来的名字 */
+/** 夜晚结束时结算任务，返回完成了的卡和原来的名字 / settle quests when the night ends; returns completed cards and their original names */
 export function finishQuests(): { c: Card; from: string }[] {
   const done: { c: Card; from: string }[] = [];
   for (const c of G.cards) {
@@ -118,7 +118,7 @@ export function finishQuests(): { c: Card; from: string }[] {
   return done;
 }
 
-/* ---------------- 对路：按卡型加攻速 ---------------- */
+/* ---------------- 对路：按卡型加攻速 ---------------- / ---------------- On-path: attack speed by card type ---------------- */
 export const hasKind = (k: Kind) => G.cards.some((c) => ITEMS[c.key].kind === k);
 export const hasTag = (t: Tag) => G.cards.some((c) => ITEMS[c.key].tag === t);
 export const hasGrow = () => G.cards.some(isGrow);
@@ -139,15 +139,17 @@ export function fitSpd(c: Card) {
 
 /* ---------------- 伤害公式 ----------------
  * (基础 + 固定) × (1 + Σ加成) × Π独立乘区 × 暴击 × 连锁倍率 × 目标易伤
- * 独立乘区：致命、钻品质、传说遗物、6 层羁绊……每一项单独相乘，后期主要靠它们 */
-/** 连锁倍率：被回响、齐鸣、遗物带出来的出手，每深一层加一截（系数见 tuning.ts） */
+ * 独立乘区：致命、钻品质、传说遗物、6 层羁绊……每一项单独相乘，后期主要靠它们
+ * ---------------- Damage formula ---------------- / (base + flat) × (1 + Σbonus) × Πindependent multipliers × crit × chain multiplier × target vulnerability / Independent multipliers: Deadly, diamond tier, legendary relics, 6-stack synergy… each multiplies separately; late game leans on them
+ */
+/** 连锁倍率：被回响、齐鸣、遗物带出来的出手，每深一层加一截（系数见 tuning.ts） / chain multiplier: hits triggered by echoes, choruses or relics add a step per extra depth (coefficient in tuning.ts) */
 export const comboMul = (depth: number) => 1 + TUNE.combo * Math.min(TUNE.comboMax, Math.max(0, depth));
 export interface Stats {
   base: number;
   flat: number;
   pct: [string, number][];
   psum: number;
-  /** 独立乘区：每一项单独相乘 [名字, 倍率] */
+  /** 独立乘区：每一项单独相乘 [名字, 倍率] / independent multipliers: each multiplies separately [name, multiplier] */
   xs: [string, number][];
   mult: number;
   total: number;
@@ -197,7 +199,7 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
     if (bc[bc.length - 1] === c) mp('right', T.right);
     if (mv('lonely') && !(c.nb || neighbors(c as Card)).length) mp('lonely', T.lonely);
     if (mv('full') && occ('board').every(Boolean)) mp('full', T.full);
-    /* 【站位】：相邻同类卡、旁边的军旗这类加成 */
+    /* 【站位】：相邻同类卡、旁边的军旗这类加成 / 【position】: bonuses from adjacent same-type cards, a nearby banner, and the like */
     const nb = c.nb || neighbors(c as Card);
     if (it.lineKind) {
       const n = nb.filter((x) => ITEMS[x.key].kind === it.lineKind!.kind).length;
@@ -215,11 +217,11 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
   if (c.tier >= 3) xs.push([T.diamond, TUNE.diamond]);
   if (c.carry) xs.push([T.carry, TUNE.carry * (1 + TUNE.star * ((c as Card).star || 0)) * (1 + mv('xcarry'))]);
   if (c.carry && it.asCarry) xs.push([T.asCarry, 1 + it.asCarry]);
-  /* 【站位】 */
+  /* 【站位】 / 【position】 */
   if (c.loc === 'board') {
     const nb = c.nb || neighbors(c as Card);
     const bc = boardCards();
-    /* 中军帐：占着正中时，所有站位乘区再加一截 */
+    /* 中军帐：占着正中时，所有站位乘区再加一截 / Command Tent: while on the center slot, all position multipliers gain another step */
     const pb = bc.filter((o) => ITEMS[o.key].posBoost && isMid(o)).reduce((s2, o) => s2 + ITEMS[o.key].posBoost! * (1 + 0.25 * stepOf(o)), 0);
     if (it.posMid && isMid(c as Card)) xs.push([T.pos, 1 + it.posMid + pb]);
     if (it.posEdge && (bc[0] === c || bc[bc.length - 1] === c)) xs.push([T.pos, 1 + it.posEdge + pb]);
@@ -246,28 +248,28 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
   }
   if (mv('t_last') && G.wall < G.wallMax * 0.35) spd += 0.25;
   spd = Math.max(0.3, spd + mv('spd') + fitSpd(c as Card));
-  /* 军旗手：相邻的兵器卡暴击率加一截 */
+  /* 军旗手：相邻的兵器卡暴击率加一截 / Standard-Bearer: adjacent weapon cards gain crit chance */
   let critNb = 0;
   if (it.kind === 'weapon' && c.loc === 'board') for (const n of c.nb || neighbors(c as Card)) critNb += (ITEMS[n.key].critNb || 0) * (1 + 0.5 * stepOf(n));
   return { base, flat, pct, psum, xs, mult, total, cd: Math.max(0.25, cd / spd), cdRaw: it.cd, crit: 0.05 + (a === 'precise' ? 0.2 : 0) + mv('crit') + critNb };
 }
 
-/** 占着棋盘正中（第 4、5 格） */
+/** 占着棋盘正中（第 4、5 格） / occupies the board center (slots 4 and 5) */
 export const isMid = (c: Card) => c.loc === 'board' && c.idx <= 4 && c.idx + c.size > 3;
-/** C 位；还没立 C 位时，「为 C 位服务」的卡就服务棋盘上伤害最高的那张 */
+/** C 位；还没立 C 位时，「为 C 位服务」的卡就服务棋盘上伤害最高的那张 / carry; until one is set, cards that 'serve the carry' serve the highest-damage card on the board */
 export const carryCard = () =>
   G.cards.find((c) => c.carry && c.loc === 'board') ||
   boardCards()
     .filter((c) => ITEMS[c.key].dmg > 0)
     .sort((a, b) => stats(b, null).total / stats(b, null).cd - stats(a, null).total / stats(a, null).cd)[0] ||
   null;
-/** 立 C 位：同一时间只有一张 */
+/** 立 C 位：同一时间只有一张 / set the carry: only one at a time */
 export function setCarry(c: Card) {
   for (const o of G.cards) if (o !== c) o.carry = false;
   c.carry = true;
 }
 
-/* ---------------- 价格 ---------------- */
+/* ---------------- 价格 ---------------- / ---------------- Price ---------------- */
 export const basePrice = (k: string, adj: string | null, tier: number) =>
   [3, 6, 10, 16][tier] + (ITEMS[k].size - 1) + (adj ? [1, 2, 3][ADJ[adj].r] : 0);
 export const sellValue = (c: Card) => Math.max(1, Math.floor(basePrice(c.key, c.adj, c.tier) / 2)) + c.hoard;

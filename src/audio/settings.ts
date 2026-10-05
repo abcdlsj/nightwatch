@@ -1,4 +1,4 @@
-/* 声音和震动跟着玩家设置走 */
+/* 声音和震动跟着玩家设置走 / Sound and haptics follow the player's settings */
 import { vibrate } from '../platform/haptics';
 import { SETTINGS, onSettings } from '../platform/settings';
 import { SFX } from './sfx';
@@ -10,7 +10,7 @@ export function applyAudio() {
 }
 onSettings(applyAudio);
 
-/** 震动：设置里关了就不震 */
+/** 震动：设置里关了就不震 / haptics: no vibration when disabled in settings */
 export function buzz(p: number | number[]) {
   if (SETTINGS.haptics) vibrate(p);
 }

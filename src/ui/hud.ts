@@ -1,4 +1,4 @@
-/* 顶栏、底栏按钮、提示条、横幅、一次性新手提示 */
+/* 顶栏、底栏按钮、提示条、横幅、一次性新手提示 / top bar, bottom-bar buttons, toasts, banners, one-off tutorial hints */
 import { L, t } from '../i18n';
 import { nightKind, lastNight, gemCount } from '../game/plan';
 import { store, KEYS } from '../platform/storage';
@@ -17,7 +17,7 @@ export const resetGoldBump = () => {
   shownGold = null;
 };
 
-/** 这一夜备战几站（跃迁夜 4 站），由备战流程注册 */
+/** 这一夜备战几站（跃迁夜 4 站），由备战流程注册 / how many prep stops this night (4 on leap nights); registered by the prep flow */
 let prepTotal = () => 3;
 export const setPrepTotal = (f: () => number) => {
   prepTotal = f;
@@ -84,12 +84,12 @@ export function banner(msg: string, col?: string) {
   restart(b, 'show');
 }
 
-/* ---------- 提示气泡：一次性的新手提示 + 点顶栏看说明 ---------- */
+/* ---------- 提示气泡：一次性的新手提示 + 点顶栏看说明 ---------- / ---------- Tooltips: one-off tutorial hints + tap the top bar for help ---------- */
 const TIPQ: [string, string, number][] = [];
 let tipEl: HTMLElement | null = null,
   tipT: ReturnType<typeof setTimeout> | null = null;
 let tipSeen: Record<string, number> = store.json(KEYS.tips, {});
-/** 设置里「重新显示新手提示」 */
+/** 设置里「重新显示新手提示」 / 'Show tutorial hints again' in settings */
 export function resetTips() {
   tipSeen = {};
   store.setJson(KEYS.tips, tipSeen);
@@ -121,7 +121,7 @@ function nextTip(first?: boolean) {
   const [l, h, ms] = TIPQ[0];
   tipEl!.innerHTML = `<small>${l}</small><p>${h}</p>`;
   tipEl!.className = '';
-  /* 首领血条和「下一招」在顶上时，气泡挪到它下面，别挡住 */
+  /* 首领血条和「下一招」在顶上时，气泡挪到它下面，别挡住 / when the boss bar and 'next move' sit up top, move tooltips below them so they are not covered */
   const bar = $('#bossbar');
   tipEl!.style.top = bar.hidden ? '' : `${bar.getBoundingClientRect().bottom + 6}px`;
   void tipEl!.offsetWidth;
@@ -138,7 +138,7 @@ export function tipOnce(key: string, html: string, delay?: number) {
   }, delay || 0);
 }
 
-/** 顶栏三个数字点一下有说明 */
+/** 顶栏三个数字点一下有说明 / each of the three top-bar numbers shows help when tapped */
 export function bindHudTips() {
   $('#roundChip').onclick = () => {
     SFX.ensure();

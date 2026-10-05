@@ -1,4 +1,4 @@
-/* 人物剧情的结构：说话人都认识，夜谈的回答类别对，宝石两种选择都有，首领夜和完整线都写到了 */
+/* 人物剧情的结构：说话人都认识，夜谈的回答类别对，宝石两种选择都有，首领夜和完整线都写到了 / Hero story structure: every speaker is known, night-talk answer categories are valid, both gem choices exist, and boss nights plus the full line are covered */
 import { describe, it, expect } from 'vitest';
 import zh from '../../src/locales/zh-CN';
 import { VOICES } from '../../src/data/voices';

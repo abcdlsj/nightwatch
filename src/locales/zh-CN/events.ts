@@ -1,4 +1,4 @@
-/* 从旧版数据迁移而来，直接在这里改 */
+/* 从旧版数据迁移而来，直接在这里改 / migrated from the old data format; edit here directly */
 export default {
  "shop": {
   "n": "流浪商人",

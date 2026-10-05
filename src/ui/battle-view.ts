@@ -1,4 +1,4 @@
-/* 战斗表现：把模拟层的「喊一声」落到画面上（SimView 的实现），以及首领血条、连锁、连杀 */
+/* 战斗表现：把模拟层的「喊一声」落到画面上（SimView 的实现），以及首领血条、连锁、连杀 / Battle presentation: turn the sim layer's 'shout' events into visuals (the SimView implementation), plus boss health bar, chains and kill streaks */
 import { L, t } from '../i18n';
 import { fmt } from '../core/util';
 import { G, type Card } from '../game/state';
@@ -78,7 +78,7 @@ export const domView: SimView = {
   buzz,
 };
 
-/** 开战前把首领血条摆好（它的高度决定战场顶部留多少） */
+/** 开战前把首领血条摆好（它的高度决定战场顶部留多少） / lay out the boss health bar before battle (its height decides how much space the battlefield top reserves) */
 export function prepBossbar(bd: { n: string; intents?: { n: string; d: string }[] } | undefined) {
   const bb = $('#bossbar');
   if (!bd) return 0;
@@ -93,7 +93,7 @@ export function prepBossbar(bd: { n: string; intents?: { n: string; d: string }[
   return bb.offsetHeight + 14;
 }
 
-/** 每帧刷新首领血条和意图倒计时 */
+/** 每帧刷新首领血条和意图倒计时 / refresh the boss health bar and intent countdown every frame */
 export function paintBossbar() {
   if (!B || !B.boss) return;
   const e: Enemy = B.boss;

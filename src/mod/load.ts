@@ -1,11 +1,13 @@
 /* 读 mods/ 目录：每个子目录的 index.ts 默认导出一个模组包，构建时打进游戏。
- * 下划线开头的目录（比如 mods/_example）不加载，只当示例看。 */
+ * 下划线开头的目录（比如 mods/_example）不加载，只当示例看。
+ * Read the mods/ directory: each subdirectory's index.ts default-exports a mod pack, bundled at build time. Directories starting with an underscore (like mods/_example) are not loaded and serve as examples only.
+ */
 import type { ModPack, ModReport } from './types';
 import { applyMod } from './apply';
 
 const found = import.meta.glob<{ default: ModPack }>(['../../mods/*/index.ts', '!../../mods/_*/index.ts'], { eager: true });
 
-/** 加载结果（工坊页显示） */
+/** 加载结果（工坊页显示） / load result (shown on the Workshop page) */
 export const MOD_REPORTS: ModReport[] = [];
 
 export function loadMods() {

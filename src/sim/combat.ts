@@ -1,4 +1,4 @@
-/* 出手、连锁、攻击方式、伤害结算、击杀 */
+/* 出手、连锁、攻击方式、伤害结算、击杀 / Firing, chaining, attack modes, damage resolution, kills */
 import { ITEMS, ADJ } from '../data/cards';
 import { L } from '../i18n';
 import { rand, rnd, vr, vrnd } from '../core/rng';
@@ -14,14 +14,14 @@ import { spawn, comboKill } from './enemies';
 import { react, was, streak } from './combo';
 import type { Enemy, Projectile } from './types';
 
-/* ---------------- 触发与连锁 ---------------- */
-/** 这张卡现在能不能再触发（离上次触发够不够一个普朗克时间） */
+/* ---------------- 触发与连锁 ---------------- / ---------------- Triggers and chains ---------------- */
+/** 这张卡现在能不能再触发（离上次触发够不够一个普朗克时间） / whether this card can trigger again now (whether one Planck time has passed) */
 export const canFire = (c: Card) => bt().t - c.lastFire >= TUNE.planck - 1e-9;
 
 export function trigger(c: Card, depth: number, src?: string) {
   const b = bt();
   if (depth > 10 || b.over || c.ammo === 0 || !canFire(c)) return;
-  /* 哑钟的噤声：卡牌之间不再互相带动 */
+  /* 哑钟的噤声：卡牌之间不再互相带动 / the Dumb Bell's silence: cards no longer trigger each other */
   if (depth > 0 && b.flags.hushT > b.t) return;
   c.lastFire = b.t;
   if (c.bSrc) {
@@ -135,7 +135,7 @@ function fire(c: Card, depth: number) {
       c.bBf++;
       view.link(c, n, '#73eff7', 0.25);
     }
-  /* 为 C 位服务的辅助卡 */
+  /* 为 C 位服务的辅助卡 / support cards that serve the carry */
   const cc = it.chargeCarry || it.buffCarry || it.hasteCarry || it.critCarry || it.freezeCarry || it.stackCarry ? carryCard() : null;
   if (cc && cc !== c) {
     if (it.stackCarry) {
@@ -202,7 +202,7 @@ export function haste(c: Card, t: number, from?: Card | null) {
   if (from) view.link(from, c, '#8ff0c8', 0.2);
 }
 
-/** 装填：给弹药卡补 n 发。返回 false 表示这张不是弹药卡 */
+/** 装填：给弹药卡补 n 发。返回 false 表示这张不是弹药卡 / reload: refill n rounds for an ammo card. Returns false if this is not an ammo card */
 export function reload(c: Card, n: number, from?: Card | null) {
   const m = maxAmmo(c);
   if (m == null) return false;
@@ -223,7 +223,7 @@ function showChain(n: number) {
   view.chain(n);
 }
 
-/* ---------------- 攻击方式 ---------------- */
+/* ---------------- 攻击方式 ---------------- / ---------------- Attack modes ---------------- */
 type HitMods = { rx?: number; slow?: number; kb?: number; freeze?: number; vuln?: [number, number] | null; exec?: number; burnDur?: number; poisonDur?: number; burn?: number; poison?: number; pen?: number; splash?: number; burnTick?: number; poisonTick?: number };
 
 
@@ -232,18 +232,18 @@ function attack(c: Card, st: Stats, depth = 0) {
   const it = ITEMS[c.key];
   const t = front();
   if (!t) return;
-  /* 失星的星蚀：打不出暴击 */
+  /* 失星的星蚀：打不出暴击 / the Lost Star's eclipse: no crits */
   const crit = (rand() < st.crit || !!c.sure) && !(b.flags.eclipseT > b.t);
   c.sure = false;
   const sh = it.shieldDmg ? Math.min(b.shield, TUNE.shieldDmgCap) * it.shieldDmg * dmgMul(c) * (st.total / Math.max(1, st.base + st.flat)) : 0;
   let dmg = (st.total + sh) * (crit ? 2 + mv('critDmg') : 1) * comboMul(depth);
-  /* 灰袍的倒转：最多的那种元素伤害 -30% */
+  /* 灰袍的倒转：最多的那种元素伤害 -30% / the Grey Robe's inversion: the most common element deals -30% damage */
   if (b.flags.invT > b.t && it.tag === b.flags.invTag) dmg *= 0.7;
   if (c.anvil) {
     dmg *= 1 + c.anvil;
     c.anvil = 0;
   }
-  /* 被别的卡带动出手（艾拉的军令） */
+  /* 被别的卡带动出手（艾拉的军令） / fired by another card (Ayla's command) */
   if (depth > 0 && it.onChain) dmg *= 1 + it.onChain;
   const mods: HitMods = { slow: c.adj === 'chill' ? 0.3 : 0, kb: c.adj === 'heavy' ? 0.035 : 0, freeze: Math.max(it.freeze || 0, c.frostNext || 0), vuln: it.vuln || null, exec: it.exec || 0, burnDur: it.burnDur || 0, poisonDur: it.poisonDur || 0, pen: it.pen || 0 };
   c.frostNext = 0;
@@ -259,7 +259,7 @@ function attack(c: Card, st: Stats, depth = 0) {
   const inR = (x: number, y: number, R: number, fn: (e: Enemy) => void) => {
     for (const en of b.en) if (!en.dead && Math.hypot(ex(en) - x, ey(en) - y) <= R) fn(en);
   };
-  /** 斩击：目标和它身旁最近的一个 */
+  /** 斩击：目标和它身旁最近的一个 / slash: the target and the nearest enemy beside it */
   const second = (x0: number, y0: number) => {
     let n2: Enemy | null = null,
       bd = 22 * K();
@@ -409,7 +409,7 @@ function attack(c: Card, st: Stats, depth = 0) {
       list.forEach((e) => pts.push([ex(e), ey(e) - 5]));
       view.bolt(pts, it.tag === 'volt' ? '#fee761' : '#fff', 0.16);
       list.forEach((e, i) => {
-        /* 第一跳 60%，之后每跳递减：叠再多弹跳次数，总收益也有上限 */
+        /* 第一跳 60%，之后每跳递减：叠再多弹跳次数，总收益也有上限 / first hop 60%, decaying per hop after: stacking more bounces has a capped total payoff */
         H_(e, i ? TUNE.bounceFirst * Math.pow(TUNE.bounceDecay, i - 1) : 1);
         if (i) emit('bounce', { e, src: c });
       });
@@ -522,7 +522,7 @@ export function stepProj(p: Projectile, dt: number) {
   p.y += p.vy * s;
 }
 
-/* ---------------- 伤害结算 ---------------- */
+/* ---------------- 伤害结算 ---------------- / ---------------- Damage resolution ---------------- */
 export function hurt(e: Enemy, amt: number, src: Card | null, crit: boolean, o: HitMods = {}) {
   const b = bt();
   if (!e || e.dead) return;
@@ -530,7 +530,7 @@ export function hurt(e: Enemy, amt: number, src: Card | null, crit: boolean, o: 
     if (!o.burnTick && !o.poisonTick && vr() < 0.3) view.num(ex(e), ey(e) - 10, '0', '#73eff7', 1);
     return;
   }
-  /* 冰壳蟹：前几下打在壳上（灼烧和中毒不吃壳） */
+  /* 冰壳蟹：前几下打在壳上（灼烧和中毒不吃壳） / Ice-Shell Crab: the first few hits land on the shell (burn and poison ignore it) */
   if (e.d.shell && (e.shellN || 0) < e.d.shell && !o.burnTick && !o.poisonTick) {
     e.shellN = (e.shellN || 0) + 1;
     e.flash = 0.05;
@@ -548,7 +548,7 @@ export function hurt(e: Enemy, amt: number, src: Card | null, crit: boolean, o: 
     view.sfx('intent');
     view.ring(ex(e), ey(e) - 5, 2, 14 * K(), '#ffcd75', 0.3);
   }
-  /* 元素反应的追加伤害按已经结算过的那一下算，不再吃易伤和护甲 */
+  /* 元素反应的追加伤害按已经结算过的那一下算，不再吃易伤和护甲 / reaction bonus damage is based on the already-resolved hit and no longer takes vulnerability or armor into account */
   if (!o.rx) {
     if (e.slowT > 0 && mv('slowVuln')) amt *= 1 + mv('slowVuln');
     if (e.vulnT > 0) amt *= 1 + e.vulnA;
@@ -636,11 +636,11 @@ export function vuln(e: Enemy, t: number, a: number) {
   e.vulnA = Math.max(e.vulnA, a);
 }
 
-/* ---------------- 击杀 ---------------- */
+/* ---------------- 击杀 ---------------- / ---------------- Kills ---------------- */
 export function kill(e: Enemy, src: Card | null) {
   const b = bt();
   const FOEB = L.story.foe as Record<string, any>;
-  /* 隐藏剧情：艾拉用誓约长剑打出击倒卡尔的最后一下 */
+  /* 隐藏剧情：艾拉用誓约长剑打出击倒卡尔的最后一下 / hidden scene: Ayla lands the final blow on Karl with the Oath Longsword */
   const karl = e.type === 'knight' && !e.dead && G.hero === 'ayla' && src && src.key === 'oathsword' && !b.ambush;
   if (karl) G.secret.karlKill = 1;
   e.dead = true;
@@ -709,7 +709,7 @@ export function kill(e: Enemy, src: Card | null) {
     view.coins(ex(e), ey(e), 1);
     view.hud();
   }
-  /* 雾母偷走的钱：打倒她连本带利还回来 */
+  /* 雾母偷走的钱：打倒她连本带利还回来 / gold the Fog Mother stole: beat her and it comes back with interest */
   if (e.d.boss && b.flags.stolen) {
     const back = b.flags.stolen + 3;
     b.flags.stolen = 0;

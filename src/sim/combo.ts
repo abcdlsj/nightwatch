@@ -1,7 +1,9 @@
 /* 爽感三件套：元素反应、流派连招、连杀分级。
  *   元素反应：这一下的元素碰上敌人身上已有的状态（冻结 / 灼烧 / 中毒 / 减速），打出额外效果；同一个敌人有内置冷却
  *   流派连招：同元素的卡在短时间内连着出手，放一次这个元素的大招；每个元素各自冷却
- *   连杀分级：连杀到一定数量，全队加速几秒 */
+ *   连杀分级：连杀到一定数量，全队加速几秒
+ * The three feel-good systems: elemental reactions, archetype combos, kill-streak tiers. Elemental reactions: the hit's element meets a status already on the enemy (freeze / burn / poison / slow) to add an extra effect, with an internal cooldown per enemy. Archetype combos: cards of the same element firing in quick succession unleash that element's ultimate, each with its own cooldown. Kill-streak tiers: at certain streak counts the whole team speeds up for a few seconds.
+ */
 import { ITEMS } from '../data/cards';
 import type { Tag } from '../data/types';
 import { L } from '../i18n';
@@ -16,20 +18,20 @@ import { B, bt, later } from './battle';
 import { hurt, freeze, vuln, chargeCard, haste } from './combat';
 import type { Enemy } from './types';
 
-/* ---------------- 元素反应 ---------------- */
+/* ---------------- 元素反应 ---------------- / ---------------- Elemental reactions ---------------- */
 export type Rx = 'melt' | 'shatter' | 'overload' | 'toxic' | 'super';
 export const RXC: Record<Rx, string> = { melt: '#ff9a5a', shatter: '#c2f4ff', overload: '#fee761', toxic: '#b8f060', super: '#9ad8ff' };
-/** 命中前敌人身上的状态 */
+/** 命中前敌人身上的状态 / statuses on the enemy before the hit */
 export interface Was { frz: boolean; burn: boolean; poi: boolean; slow: boolean }
 export const was = (e: Enemy): Was => ({ frz: e.frzT > 0, burn: e.burnT > 0, poi: e.poisonT > 0, slow: e.slowT > 0 });
 
 const around = (e: Enemy, R: number, fn: (o: Enemy) => void) => {
   for (const o of bt().en) if (!o.dead && o !== e && Math.hypot(ex(o) - ex(e), ey(o) - ey(e)) <= R) fn(o);
 };
-/** 反应强度：基础 × 全局系数 × (1 + 通用加成 + 这种反应的加成) */
+/** 反应强度：基础 × 全局系数 × (1 + 通用加成 + 这种反应的加成) / reaction strength: base × global coefficient × (1 + general bonus + this reaction's bonus) */
 const rxK = (k: Rx) => TUNE.rx * (1 + mv('rx') + mv('rx_' + k));
 
-/** 命中结算完以后看要不要反应。a 是这一下实际打掉的血（已扣护甲） */
+/** 命中结算完以后看要不要反应。a 是这一下实际打掉的血（已扣护甲） / after the hit resolves, check whether to react. a is the HP actually removed by this hit (armor already applied) */
 export function react(e: Enemy, a: number, src: Card, crit: boolean, w: Was, burnHit: boolean) {
   const b = bt();
   if (e.rxT && e.rxT > b.t) return;
@@ -91,7 +93,7 @@ export function react(e: Enemy, a: number, src: Card, crit: boolean, w: Was, bur
           s = vrnd(15, 45);
         view.part(X, Y, Math.cos(ang) * s, Math.sin(ang) * s - 10, vrnd(0.4, 0.7), vr() < 0.6 ? '#7ddc5f' : '#ef7d57', 2);
       }
-      /* 毒往外传只拉平到源头的一部分，不叠加：互相传来传去也不会越滚越大 */
+      /* 毒往外传只拉平到源头的一部分，不叠加：互相传来传去也不会越滚越大 / poison spread only levels out toward a fraction of the source and does not stack, so back-and-forth spreading never snowballs */
       const d = bonus(0.3),
         pd = e.poisonD * Math.min(1, 0.5 * m);
       hurt(e, d, src, false, { rx: 1 });
@@ -115,11 +117,11 @@ export function react(e: Enemy, a: number, src: Card, crit: boolean, w: Was, bur
   }
 }
 
-/* ---------------- 流派连招 ---------------- */
+/* ---------------- 流派连招 ---------------- / ---------------- Archetype combos ---------------- */
 type Hit = { t: number; c: Card; d: number };
 const inRange = () => bt().en.filter((e) => !e.dead && e.y >= world.range - 0.05);
 
-/** 每次出手记一笔；同元素在窗口内凑够次数（至少两张卡）就放大招 */
+/** 每次出手记一笔；同元素在窗口内凑够次数（至少两张卡）就放大招 / record every hit; when the same element reaches enough hits within the window (at least two cards), unleash the ultimate */
 export function streak(c: Card, st: Stats) {
   const b = bt();
   const tag = ITEMS[c.key].tag;
@@ -136,7 +138,7 @@ export function streak(c: Card, st: Stats) {
   view.banner(L.ui.battle.streak[tag], RXC_TAG[tag]);
   view.sfx('streak', tag);
   view.buzz(30);
-  /* 卡与卡之间亮一圈：连招是这几张一起打出来的 */
+  /* 卡与卡之间亮一圈：连招是这几张一起打出来的 / draw a ring between the cards: the combo came from these together */
   const cs = [...new Set(l.map((h) => h.c))];
   cs.forEach((x, i) => i && view.link(cs[i - 1], x, RXC_TAG[tag], 0.45));
   later(0.15, () => {
@@ -147,7 +149,7 @@ export function streak(c: Card, st: Stats) {
 const RXC_TAG: Record<Tag, string> = { blade: '#fff4cf', fire: '#ff8a5b', ice: '#73eff7', volt: '#fee761', mech: '#ffd166', poison: '#a7f070' };
 
 const STREAK: Record<Tag, (c: Card, ref: number) => void> = {
-  /* 千刃：射程内最多 6 个敌人各挨一刀 */
+  /* 千刃：射程内最多 6 个敌人各挨一刀 / Thousand Blades: up to 6 enemies in range each take one hit */
   blade(c, ref) {
     const ts = inRange().sort((a, z) => z.y - a.y).slice(0, 6);
     ts.forEach((e, i) =>
@@ -163,7 +165,7 @@ const STREAK: Record<Tag, (c: Card, ref: number) => void> = {
     );
     view.shake(3);
   },
-  /* 燎原：射程内全部点着 */
+  /* 燎原：射程内全部点着 / Wildfire: set everything in range alight */
   fire(c, ref) {
     const W = world.W;
     for (let i = 0; i < 30; i++) view.part(vrnd(0, W), world.top + vrnd(10, 60) * K(), vrnd(-10, 10), -vrnd(20, 60), vrnd(0.4, 0.8), vpick(['#ffcd75', '#ef7d57', '#ff5a2a']), 2);
@@ -173,7 +175,7 @@ const STREAK: Record<Tag, (c: Card, ref: number) => void> = {
     }
     view.shake(3);
   },
-  /* 冰封：射程内全部冻住 */
+  /* 冰封：射程内全部冻住 / Icebound: freeze everything in range */
   ice(c, ref) {
     view.ring(world.W / 2, world.H * 0.5, 4, world.W * 0.7, '#c2f4ff', 0.5);
     for (let i = 0; i < 30; i++) view.part(vrnd(0, world.W), vrnd(world.top, world.H * 0.8), vrnd(-20, 20), vrnd(10, 40), vrnd(0.4, 0.8), vr() < 0.5 ? '#ffffff' : '#73eff7', 1);
@@ -182,7 +184,7 @@ const STREAK: Record<Tag, (c: Card, ref: number) => void> = {
       if (!e.dead) freeze(e, 0.8, c);
     }
   },
-  /* 雷暴：天上劈下 5 道雷 */
+  /* 雷暴：天上劈下 5 道雷 / Thunderstorm: 5 bolts strike from the sky */
   volt(c, ref) {
     const ts = inRange();
     for (let i = 0; i < 5 && ts.length; i++)
@@ -198,7 +200,7 @@ const STREAK: Record<Tag, (c: Card, ref: number) => void> = {
       });
     view.shake(3);
   },
-  /* 全速：全部【机】卡充能并加速 */
+  /* 全速：全部【机】卡充能并加速 / Full Speed: charge and speed up all 【machine】 cards */
   mech(c) {
     for (const o of boardCards())
       if (ITEMS[o.key].tag === 'mech') {
@@ -206,7 +208,7 @@ const STREAK: Record<Tag, (c: Card, ref: number) => void> = {
         haste(o, 1.2, c);
       }
   },
-  /* 疫潮：射程内全部染毒 */
+  /* 疫潮：射程内全部染毒 / Plague Tide: poison everything in range */
   poison(c, ref) {
     for (let i = 0; i < 24; i++) view.part(vrnd(0, world.W), vrnd(world.top, world.H * 0.7), vrnd(-15, 15), vrnd(-15, 5), vrnd(0.5, 0.9), vr() < 0.5 ? '#7ddc5f' : '#a7f070', 2);
     for (const e of inRange()) {
@@ -216,8 +218,8 @@ const STREAK: Record<Tag, (c: Card, ref: number) => void> = {
   },
 };
 
-/* ---------------- 连杀分级 ---------------- */
-/** 连杀到这些数时全队加速（秒） */
+/* ---------------- 连杀分级 ---------------- / ---------------- Kill-streak tiers ---------------- */
+/** 连杀到这些数时全队加速（秒） / at these streak counts the team speeds up (seconds) */
 const FRENZY: [number, number][] = [[10, 0.6], [25, 1], [50, 1.5], [100, 2]];
 export function frenzy(c: number) {
   const i = FRENZY.findIndex(([n]) => n === c);

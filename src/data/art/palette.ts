@@ -1,6 +1,6 @@
 import { EXTRA_PAL } from "./generated";
 
-/** 调色板：像素图里每个字母对应一种颜色，"." 是透明 */
+/** 调色板：像素图里每个字母对应一种颜色，"." 是透明 / Palette: each letter in pixel art maps to a color; '.' is transparent */
 export const PAL: Record<string, string> = { ...{
  "f": "#f0c49c",
  "F": "#c98f6a",
@@ -28,7 +28,7 @@ export const PAL: Record<string, string> = { ...{
  "m": "#4a3326"
 }, ...EXTRA_PAL };
 
-/** 遗物图标模板换色时的阴影色：X 主色，Z 取这里的对应暗色 */
+/** 遗物图标模板换色时的阴影色：X 主色，Z 取这里的对应暗色 / shadow colors when recoloring relic icon templates: X is the primary color, Z takes the matching dark shade here */
 export const SHADE: Record<string, string> = {
  "R": "r",
  "o": "n",

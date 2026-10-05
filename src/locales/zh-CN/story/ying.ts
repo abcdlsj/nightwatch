@@ -1,5 +1,7 @@
 /* 萤的剧情。
- * 三套夜晚：师父（出城三年的秦师父）、阿禾（卖灯油的小伙子）、灯会（跟她学糊纸灯的孩子豆子）。 */
+ * 三套夜晚：师父（出城三年的秦师父）、阿禾（卖灯油的小伙子）、灯会（跟她学糊纸灯的孩子豆子）。
+ * Ying's story. Three night sets: Master (Master Qin, three years out of town), Ahe (the boy who sells lamp oil), Lantern Fair (Douzi, the kid learning to paste paper lanterns).
+ */
 export default {
   arcs: [
     {

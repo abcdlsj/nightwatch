@@ -1,4 +1,4 @@
-/* 羁绊：棋盘上同元素的卡凑到 2 / 4 / 6 张，全队拿加成，层数叠加；两种元素都凑到 2 张时再加一条联动 */
+/* 羁绊：棋盘上同元素的卡凑到 2 / 4 / 6 张，全队拿加成，层数叠加；两种元素都凑到 2 张时再加一条联动 / Synergy: 2 / 4 / 6 cards of the same element on the board give the whole team bonuses that stack; having 2 cards of two different elements also adds a link */
 import { ITEMS } from '../data/cards';
 import { SYN, SYN2, SYN2_NEED } from '../data/meta';
 import type { Mods, Tag } from '../data/types';
@@ -17,7 +17,7 @@ export function synCount(): Partial<Record<Tag, number>> {
 
 export const synLevel = (t: Tag, n: number) => SYN[t].filter((s) => n >= s[0]).length;
 
-/** 生效的联动 */
+/** 生效的联动 / active dual-synergy links */
 export const synPairs = (n = synCount()) => Object.keys(SYN2).filter((k) => (n[SYN2[k].a] || 0) >= SYN2_NEED && (n[SYN2[k].b] || 0) >= SYN2_NEED);
 
 export function synMods(): Mods {

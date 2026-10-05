@@ -1,4 +1,4 @@
-/* 从旧版数据迁移而来，直接在这里改 */
+/* 从旧版数据迁移而来，直接在这里改 / migrated from the old data format; edit here directly */
 import type { TalentDef } from './types';
 
 export const TALENTS: Record<string, TalentDef> = {
@@ -544,7 +544,7 @@ export const TALENTS: Record<string, TalentDef> = {
  }
 } as unknown as Record<string, TalentDef>;
 
-/** 天赋类别：颜色和图标 */
+/** 天赋类别：颜色和图标 / talent categories: color and icon */
 export const TCAT: Record<string, { c: string; ico: string; n: string }> = {
  "atk": {
   "c": "#ff8a5b",

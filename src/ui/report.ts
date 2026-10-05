@@ -1,4 +1,4 @@
-/* 战报：每张卡打了多少、被谁触发、帮队友干了什么；城破时谁漏过去最多 */
+/* 战报：每张卡打了多少、被谁触发、帮队友干了什么；城破时谁漏过去最多 / Battle report: damage per card, what triggered it, how it helped allies; on breach, who leaked through most */
 import { ITEMS, TAGC } from '../data/cards';
 import { EN } from '../data/enemies';
 import { L, t } from '../i18n';
@@ -13,7 +13,7 @@ import { SFX } from '../audio/sfx';
 import { $, $$ } from './dom';
 import { tipOnce } from './hud';
 
-/** 辅助卡这一场帮了多少忙 */
+/** 辅助卡这一场帮了多少忙 / how much a support card helped in this fight */
 export function supOf(c: Card) {
   const T = L.ui.report;
   const s: string[] = [];
@@ -40,7 +40,7 @@ function srcLine(c: Card) {
 
 export type Row = [string, number, number?, string?];
 
-/** 守住一夜的战报，点「收下」后回调 */
+/** 守住一夜的战报，点「收下」后回调 / the report after holding a night; the callback runs when 'Collect' is tapped */
 export function showReport(b: Battle, was: number, rows: Row[], total: number, onCash: () => void) {
   const T = L.ui.report;
   const rp = $('#report');
@@ -82,7 +82,7 @@ export function showReport(b: Battle, was: number, rows: Row[], total: number, o
   };
 }
 
-/** 输了：看看是谁漏过去的 */
+/** 输了：看看是谁漏过去的 / lost: see who leaked through */
 export function loseNote(b: Battle | null) {
   if (!b || !b.wallBy) return '';
   const wb = b.wallBy;

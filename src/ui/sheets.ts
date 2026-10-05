@@ -1,4 +1,4 @@
-/* 底部弹层：卡牌详情、遗物、天赋、羁绊、成就 */
+/* 底部弹层：卡牌详情、遗物、天赋、羁绊、成就 / Bottom sheets: card details, relics, talents, synergy, achievements */
 import { ITEMS, ADJ, TIERS, TAGC, GT, UPS } from '../data/cards';
 import { RELICS } from '../data/relics';
 import { TALENTS, TCAT } from '../data/talents';
@@ -20,7 +20,7 @@ import { supOf } from './report';
 
 export type SheetSrc = { kind: 'own'; card: Card; el?: HTMLElement } | { kind: 'shop' | 'codex'; offer: Offer; el?: HTMLElement };
 
-/** 买 / 卖按钮的动作由备战流程注册 */
+/** 买 / 卖按钮的动作由备战流程注册 / the buy / sell button actions are registered by the prep flow */
 export const sheetActions = {
   buy: (_o: Offer) => false as boolean,
   sell: (_c: Card) => {},
@@ -30,7 +30,7 @@ export function closeSheet() {
   $('#sheet').hidden = true;
 }
 
-/** 打开一个盖在上层的弹层（图鉴、成就这类从标题页打开的） */
+/** 打开一个盖在上层的弹层（图鉴、成就这类从标题页打开的） / open a sheet on top of everything (codex, achievements and the like opened from the title screen) */
 export function sheetOpen(html: string) {
   const sh = $('#sheet');
   sh.classList.add('top');
@@ -51,14 +51,14 @@ function show(html: string) {
   return sh;
 }
 
-/** 描述里出现【关键词】时附上解释 */
+/** 描述里出现【关键词】时附上解释 / when a description contains 【keyword】, append its explanation */
 export function kwBox(d: string) {
   const KW = L.terms.kw as Record<string, string>;
   const ks = Object.keys(KW).filter((k) => d.includes('【' + k));
   return ks.length ? `<div class="kwbox">${ks.map((k) => `<div><b>${k}</b><span>${KW[k]}</span></div>`).join('')}</div>` : '';
 }
 
-/* ---------------- 卡牌详情 ---------------- */
+/* ---------------- 卡牌详情 ---------------- / ---------------- Card details ---------------- */
 export function openSheet(src: SheetSrc) {
   const own = src.kind === 'own';
   const c = (own ? src.card : src.offer.card) as Card;
@@ -74,7 +74,7 @@ export function openSheet(src: SheetSrc) {
     let f = '(' + st.base + (st.flat ? ' + ' + ADJ.sharp.n + st.flat : '') + ')';
     if (st.psum) f += ' × (1 + ' + st.pct.map((p) => p[0] + ' ' + Math.round(p[1] * 100) + '%').join(' + ') + ')';
     for (const [l, v] of st.xs) f += ' × ' + l + +v.toFixed(2);
-    /* 没有加成时算式就是它自己，不单占一行 */
+    /* 没有加成时算式就是它自己，不单占一行 / with no bonuses the formula is just the value itself, so it does not get its own line */
     rows += row(S.dmg, String(Math.round(st.total))) + (st.flat || st.psum || st.xs.length ? `<div><span></span><span class="f">${f}</span></div>` : '');
     rows += row(S.crit, t('sheet.critV', { n: Math.round(st.crit * 100) }));
     if (it.chain) rows += row(S.chain, String(chainOf(c)));
@@ -128,7 +128,7 @@ export function openSheet(src: SheetSrc) {
   mk(S.close, '', closeSheet);
 }
 
-/* ---------------- 遗物 ---------------- */
+/* ---------------- 遗物 ---------------- / ---------------- Relics ---------------- */
 export function openRelicSheet(r: string) {
   const R0 = RELICS[r];
   SFX.play('ui');
@@ -164,7 +164,7 @@ export function openBag() {
   sh.querySelectorAll<HTMLElement>('.relrow').forEach((el) => (el.onclick = () => openRelicSheet(el.dataset.r!)));
 }
 
-/* ---------------- 天赋 ---------------- */
+/* ---------------- 天赋 ---------------- / ---------------- Talents ---------------- */
 export function talentText(id: string) {
   const T = TALENTS[id];
   return T.d || modText(T.m);
@@ -191,7 +191,7 @@ export function openTree() {
   $('#tClose').onclick = closeSheet;
 }
 
-/* ---------------- 羁绊 ---------------- */
+/* ---------------- 羁绊 ---------------- / ---------------- Synergy ---------------- */
 export function openSyn() {
   SFX.play('ui');
   const S = L.ui.sheet;
@@ -219,7 +219,7 @@ export function openSyn() {
   $('#yClose').onclick = closeSheet;
 }
 
-/* ---------------- 成就 ---------------- */
+/* ---------------- 成就 ---------------- / ---------------- Achievements ---------------- */
 export function openAch() {
   SFX.play('ui');
   const S = L.ui.sheet;

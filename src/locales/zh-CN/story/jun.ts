@@ -1,5 +1,7 @@
 /* 钧的剧情。
- * 三套夜晚：东墙（他爹老石和十八年前那次塌方）、图纸（十七岁画的投石车）、家（媳妇桂枝和儿子石头）。 */
+ * 三套夜晚：东墙（他爹老石和十八年前那次塌方）、图纸（十七岁画的投石车）、家（媳妇桂枝和儿子石头）。
+ * Jun's story. Three night sets: the East Wall (his father Old Shi and the collapse eighteen years ago), Blueprints (the catapult he drew at seventeen), Home (his wife Guizhi and son Shitou).
+ */
 export default {
   arcs: [
     {

@@ -1,4 +1,4 @@
-/* 界面层特效：盖在整页上的画布，画卡与卡之间的连线、合成时的迸溅、飞向顶栏的金币 */
+/* 界面层特效：盖在整页上的画布，画卡与卡之间的连线、合成时的迸溅、飞向顶栏的金币 / Overlay effects: a full-page canvas drawing links between cards, merge bursts, and gold flying to the top bar */
 import { vr, vrnd } from '../core/rng';
 import { $ } from '../ui/dom';
 import { spr } from './sprites';
@@ -51,7 +51,7 @@ export const FX = {
       items.push({ k: 'p', x: cx, y: cy, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, col: vr() < 0.3 ? '#ffffff' : col, life: vrnd(0.35, 0.7), max: 0.7 });
     }
   },
-  /** 从元素中心迸溅 */
+  /** 从元素中心迸溅 / burst from the element's center */
   burstAt(el: Element | null | undefined, col: string, n: number) {
     if (!el) return;
     const r = el.getBoundingClientRect();
@@ -89,7 +89,7 @@ export const FX = {
         x.strokeStyle = '#fff';
         x.lineWidth = 1;
         x.stroke();
-        /* 光点沿线跑到接收的卡，在前 60% 的时间里跑完，到了迸一下 */
+        /* 光点沿线跑到接收的卡，在前 60% 的时间里跑完，到了迸一下 / a spark runs along the line to the receiving card, covering the first 60% of the time, then bursts on arrival */
         const k = Math.min(1, (1 - it.life / it.max) / 0.6);
         const f = k * (it.pts.length - 1),
           i0 = Math.min(it.pts.length - 2, Math.floor(f)),

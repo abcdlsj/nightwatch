@@ -2,7 +2,9 @@
  * 战斗引擎在对应时机 emit(事件)，这里按 id 找到钩子执行：
  *   start 开战 · use 任意卡触发 · hit 命中 · crit 暴击 · burn/poison/freeze 施加状态 · bounce 闪电弹跳
  *   kill 击杀 · wall 城墙受击 · charge 某卡被充能 · chain 连锁到 5 的倍数
- * 卡牌钩子收到 (这张卡, 上下文)；遗物钩子收到 (同名遗物件数, 上下文)；天赋钩子收到 (上下文)。 */
+ * 卡牌钩子收到 (这张卡, 上下文)；遗物钩子收到 (同名遗物件数, 上下文)；天赋钩子收到 (上下文)。
+ * Triggered effects of cards / relics / talents. The battle engine emits events at the right moments and looks up hooks by id: start battle start · use any card triggers · hit on hit · crit on crit · burn/poison/freeze applying a status · bounce lightning bounce · kill on kill · wall wall hit · charge a card charged · chain chain reaches a multiple of 5. Card hooks receive (this card, context); relic hooks receive (count of same-name relics, context); talent hooks receive (context).
+ */
 import { ITEMS } from '../data/cards';
 import { RELICS } from '../data/relics';
 import { TALENTS } from '../data/talents';
@@ -19,7 +21,7 @@ import { chargeCard, haste, reload, hurt, trigger, vuln } from './combat';
 export type X = Record<string, any>;
 export type CardHook = { on?: Record<string, (c: Card, x: X) => void>; onWin?: (c: Card) => void };
 
-/** 在 (X,Y) 半径 R 内的活着的敌人上执行 */
+/** 在 (X,Y) 半径 R 内的活着的敌人上执行 / run on living enemies within radius R of (X,Y) */
 const around = (X: number, Y: number, R: number, fn: (o: any) => void) => {
   for (const o of bt().en) if (!o.dead && Math.hypot(ex(o) - X, ey(o) - Y) <= R) fn(o);
 };
@@ -137,7 +139,7 @@ export const CARD_HOOKS: Record<string, CardHook> = {
     },
   },
   pocketwatch: { on: { start: (c) => { for (const o of boardCards()) if (o !== c && o.size === 1) haste(o, 3, c); } } },
-  /* 月晷：C 位暴击时，其他卡都充能一点 */
+  /* 月晷：C 位暴击时，其他卡都充能一点 / Moondial: when the carry crits, charge all other cards a little */
   moondial: {
     on: {
       crit: (c, x) => {
@@ -309,7 +311,7 @@ export const TALENT_HOOKS: Record<string, Record<string, (x: X) => void>> = {
   },
 };
 
-/** 战报里「被谁触发」：没有冷却的卡写成「有卡点燃时」这类 */
+/** 战报里「被谁触发」：没有冷却的卡写成「有卡点燃时」这类 / 'triggered by' in the report: cards without a cooldown read like 'when a card fires' */
 export function passiveSrc(key: string) {
   const on = CARD_HOOKS[key]?.on;
   const evl = L.meta.evl as Record<string, string>;

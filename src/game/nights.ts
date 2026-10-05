@@ -1,4 +1,4 @@
-/* 每夜的标题和战斗中的剧情节拍 [秒, 说话人, 台词] */
+/* 每夜的标题和战斗中的剧情节拍 [秒, 说话人, 台词] / Each night's title and in-battle story beats [seconds, speaker, line] */
 import { L, t } from '../i18n';
 import { G } from './state';
 import { nightBoss, nightKind, NIGHTS } from './plan';
@@ -9,10 +9,10 @@ export interface NightInfo {
   beats: [number, string, any][];
 }
 
-/** 第几夜（汉字） */
+/** 第几夜（汉字） / the night number (Chinese numerals) */
 export const nightNum = (r: number) => (L.ui.night.num as string[])[r - 1] || String(r);
 
-/** 公共剧情 + 这个人物自己的几句（人物写了，就不用公共剧情里给每个人物准备的那几句） */
+/** 公共剧情 + 这个人物自己的几句（人物写了，就不用公共剧情里给每个人物准备的那几句） / shared story + this hero's own lines (if the hero has them, skip the per-hero lines the shared story provides) */
 function merge(base: NightInfo, own: [number, string, any][] | null): NightInfo {
   if (!own) return base;
   const beats = base.beats.filter((b) => b[1] !== 'hero').concat(own);

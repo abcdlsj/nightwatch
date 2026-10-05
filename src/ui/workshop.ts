@@ -1,4 +1,4 @@
-/* 工坊：说明怎么做自己的守夜人（fork → 在 mods/ 里加内容 → 部署），列出这个版本装了哪些模组、有没有出错 */
+/* 工坊：说明怎么做自己的守夜人（fork → 在 mods/ 里加内容 → 部署），列出这个版本装了哪些模组、有没有出错 / Workshop: how to build your own Night Watch (fork → add content under mods/ → deploy), and which mods this build has plus any errors */
 import { L, t } from '../i18n';
 import { SFX } from '../audio/sfx';
 import { MOD_REPORTS } from '../mod/load';
@@ -9,7 +9,7 @@ export const REPO = 'https://github.com/abcdlsj/nightwatch';
 export const DOC_URL = REPO + '/blob/main/docs/modding.md';
 export const DEPLOY_URL = 'https://vercel.com/new/clone?repository-url=' + encodeURIComponent(REPO) + '&project-name=nightwatch&repository-name=nightwatch';
 
-/** 原生壳里也用系统浏览器打开 */
+/** 原生壳里也用系统浏览器打开 / on native, open it in the system browser too */
 const go = (url: string) => window.open(url, '_blank', 'noopener');
 
 export function openWorkshop() {

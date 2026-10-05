@@ -1,18 +1,20 @@
 /* 各流派的成型阵容：到第 N 夜大概会有哪些卡、什么品质、哪些遗物和天赋。
- * 卡按棋盘顺序写（辅助卡贴着主力），[从第几夜有, 卡, 词缀?]；任务卡在完成后换成新卡。 */
+ * 卡按棋盘顺序写（辅助卡贴着主力），[从第几夜有, 卡, 词缀?]；任务卡在完成后换成新卡。
+ * Assembled lineups per archetype: roughly which cards, at what tier, with which relics and talents by night N. Cards are written in board order (supports hug the carry), [from which night, card, affix?]; quest cards become new cards on completion.
+ */
 import { ITEMS } from '../../src/data/cards';
 import { RELICS } from '../../src/data/relics';
 
-/** [从第几夜有, 卡, 词缀?, 到第几夜为止?] */
+/** [从第几夜有, 卡, 词缀?, 到第几夜为止?] / [from which night, card, affix?, until which night?] */
 type Slot = [number, string, string?, number?];
 interface Arch {
   hero: string;
   board: Slot[];
   relics: string[];
   talents: string[];
-  /** 任务卡：第几夜起变成什么 */
+  /** 任务卡：第几夜起变成什么 / quest cards: what they become from which night */
   quests?: Record<string, [number, string]>;
-  /** C 位候选（按优先级，棋盘上有哪张就立哪张；第 3 夜跃迁事件之后才有） */
+  /** C 位候选（按优先级，棋盘上有哪张就立哪张；第 3 夜跃迁事件之后才有） / carry candidates (by priority; whichever is on the board becomes the carry; only available after the night-3 leap event) */
   carry?: string[];
 }
 
@@ -147,7 +149,7 @@ export const ARCHS: Record<string, Arch> = {
   },
 };
 
-/** 第 N 夜的大致品质：前两夜铜/银，中期银，后期金，最后两夜主力一张钻 */
+/** 第 N 夜的大致品质：前两夜铜/银，中期银，后期金，最后两夜主力一张钻 / rough tiers by night N: bronze/silver in the first two, silver mid-game, gold late, and one diamond carry in the last two nights */
 const TIER = [0, 0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
 
 export function boardFor(arch: string, r: number): [string, number, string?][] {
@@ -157,7 +159,7 @@ export function boardFor(arch: string, r: number): [string, number, string?][] {
   const mult = MODE === 'mult';
   A.board.forEach(([from, key0, adj0, until], i) => {
     if (r < from || (until && r > until)) return;
-    /* 凑乘区：第 5 夜起主力旁边两张输出卡带回响 */
+    /* 凑乘区：第 5 夜起主力旁边两张输出卡带回响 / stack multipliers: from night 5, the two damage cards beside the carry have echo */
     const adj = adj0 || (mult && r >= 5 && (i === 1 || i === 2) ? 'echo' : undefined);
     let key = key0;
     const q = A.quests?.[key0];
@@ -165,16 +167,16 @@ export function boardFor(arch: string, r: number): [string, number, string?][] {
     const it = ITEMS[key];
     if (used + it.size > 8) return;
     used += it.size;
-    /* 晚拿到的卡品质低一档；最后两夜第一张主力是钻 */
+    /* 晚拿到的卡品质低一档；最后两夜第一张主力是钻 / cards obtained late are one tier lower; in the final two nights the first carry is diamond */
     let tier = Math.max(it.t, TIER[r - 1] - (r - from >= 2 ? 0 : 1));
-    /* 凑乘区：第 7 夜起第一张主力是钻；完整线第 10 夜起每两夜再多一张钻（多出来的夜晚够合成） */
+    /* 凑乘区：第 7 夜起第一张主力是钻；完整线第 10 夜起每两夜再多一张钻（多出来的夜晚够合成） / stack multipliers: from night 7 the first carry is diamond; from full-line night 10 one more diamond every two nights (the extra nights allow merging) */
     if (mult && r >= 7 && out.length < 1 + Math.max(0, Math.floor((r - 8) / 2))) tier = 3;
     out.push([key, Math.min(mult ? 3 : 2, tier), it.dmg > 0 || !adj ? adj : undefined]);
   });
   return out;
 }
 
-/** plain：只靠加法（不拿传说遗物、不用回响、最高金品质）；mult：凑出独立乘区和连锁 */
+/** plain：只靠加法（不拿传说遗物、不用回响、最高金品质）；mult：凑出独立乘区和连锁 / plain: additive only (no legendary relics, no echo, gold tier at most); mult: built for independent multipliers and chains */
 export const MODE = (process.env.BUILD || 'plain') as 'plain' | 'mult';
 const LEGEND: Record<string, string> = { volt: 'shard', fire: 'dragonheart', blade: 'venom', ice: 'oath', poison: 'shard', mech: 'box', lamp: 'lampbook', drill: 'venom', cracker: 'lampbook', turret: 'citadel', works: 'citadel', chart: 'polaris', frostar: 'polaris', meteor: 'polaris', line: 'citadel', bulwark: 'citadel', scope: 'polaris', aurora: 'polaris', nova: 'polaris' };
 
@@ -183,12 +185,12 @@ export function relicsFor(arch: string, r: number) {
   const ok = (k: string) => RELICS[k] && (!RELICS[k].hero || RELICS[k].hero === ARCHS[arch].hero) && RELICS[k].t < 3 && k !== 'glass';
   const list = ARCHS[arch].relics.filter(ok).slice(0, n);
   if (MODE === 'mult' && r >= 6) list.push(LEGEND[arch]);
-  /* 完整线后半程：再多一件传说（玻璃大炮这类通用的） */
+  /* 完整线后半程：再多一件传说（玻璃大炮这类通用的） / second half of the full line: one more legendary (a generic one like Glass Cannon) */
   if (MODE === 'mult' && r >= 12) list.push(LEGEND[arch] === 'shard' ? 'oath' : 'shard');
   return list;
 }
 export const talentsFor = (arch: string, r: number) => ARCHS[arch].talents.slice(0, Math.ceil(r / 2));
-/** C 位：第 3 夜起有（跃迁事件）；璃每经过一次跃迁再点一颗星 */
+/** C 位：第 3 夜起有（跃迁事件）；璃每经过一次跃迁再点一颗星 / carry: present from night 3 (the leap event); Li lights another star after each leap */
 export function carryFor(arch: string, r: number, keys: string[]): { key: string; star: number } | null {
   if (r < 3) return null;
   const A = ARCHS[arch];

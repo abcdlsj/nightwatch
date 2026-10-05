@@ -1,5 +1,7 @@
 /* 原生壳（Capacitor）里的平台能力：持久存储、震动、返回键、前后台切换。
- * 网页里什么都不做；插件都按需加载，不进网页首屏的包。 */
+ * 网页里什么都不做；插件都按需加载，不进网页首屏的包。
+ * platform capabilities on native (Capacitor): persistent storage, haptics, back button, foreground/background. On web it does nothing; plugins load on demand and stay out of the web first-load bundle.
+ */
 import { isNative, platform } from './env';
 import { setStorage, KEYS, type KV } from './storage';
 import { setVibrate } from './haptics';
@@ -7,7 +9,7 @@ import { setVibrate } from './haptics';
 type Hook = () => void;
 const hooks = { back: [] as (() => boolean)[], pause: [] as Hook[], resume: [] as Hook[] };
 
-/** 返回键（Android）：处理了就返回 true，都不处理时退到后台 */
+/** 返回键（Android）：处理了就返回 true，都不处理时退到后台 / Back button (Android): return true once handled; if nothing handles it, move the app to the background */
 export const onBack = (f: () => boolean) => hooks.back.push(f);
 export const onPause = (f: Hook) => hooks.pause.push(f);
 export const onResume = (f: Hook) => hooks.resume.push(f);
@@ -20,7 +22,7 @@ export async function initPlatform() {
     import('@capacitor/app'),
   ]);
 
-  /* 存档：原生存储为准，内存里留一份同步读；第一次装原生版时把 WebView 里的旧数据搬过去 */
+  /* 存档：原生存储为准，内存里留一份同步读；第一次装原生版时把 WebView 里的旧数据搬过去 / Save: native storage is the source of truth, with an in-memory copy for synchronous reads; on first native launch migrate old WebView data over */
   const cache: Record<string, string> = {};
   for (const k of Object.values(KEYS)) {
     const { value } = await Preferences.get({ key: k });

@@ -1,4 +1,4 @@
-/* 装配各层，绑定底栏按钮，跑主循环（由 src/main.ts 在平台层就绪后加载） */
+/* 装配各层，绑定底栏按钮，跑主循环（由 src/main.ts 在平台层就绪后加载） / wire up the layers, bind bottom-bar buttons and run the main loop (loaded by src/main.ts after the platform layer is ready) */
 import { initLocale, L } from '../i18n';
 import { loadMods } from '../mod/load';
 import { on } from '../core/events';
@@ -38,9 +38,9 @@ setPrepTotal(prepStops);
 import { codexKill, markSeen, unlock } from '../game/meta';
 import { onBack, onPause, onResume } from '../platform/native';
 
-/* ---------- 装配 ---------- */
+/* ---------- 装配 ---------- / ---------- Wiring ---------- */
 initLocale();
-/* 模组：在语言包填好之后合并进各张表 */
+/* 模组：在语言包填好之后合并进各张表 / mods: merged into the tables after the locale packs are filled in */
 loadMods();
 applyStaticText();
 document.title = L.ui.docTitle;
@@ -68,7 +68,7 @@ $('#pvSyn').onclick = () => {
   openSyn();
 };
 
-/* 原生壳：切后台时静音，回来再响；Android 返回键先关弹层和背包 */
+/* 原生壳：切后台时静音，回来再响；Android 返回键先关弹层和背包 / native: mute when backgrounded and resume on return; Android's back button closes sheets and the bag first */
 onPause(() => SFX.ctx()?.suspend().catch(() => {}));
 onResume(() => SFX.ctx()?.resume().catch(() => {}));
 onBack(() => {
@@ -77,7 +77,7 @@ onBack(() => {
   return false;
 });
 
-/* 成就解锁：右上角弹一下 */
+/* 成就解锁：右上角弹一下 / achievement unlocked: pop in the top-right */
 on('ach', (a: { n: string; d: string }) => {
   const n = $$('.achpop').length;
   const el = document.createElement('div');
@@ -89,11 +89,11 @@ on('ach', (a: { n: string; d: string }) => {
   setTimeout(() => el.remove(), 3200);
 });
 
-/* ---------- 布局：卡宽跟屏幕走 ---------- */
+/* ---------- 布局：卡宽跟屏幕走 ---------- / ---------- Layout: card width follows the screen ---------- */
 function layout() {
   const avail = Math.min(440, innerWidth) - 16 - 8;
   LAYOUT.cw = Math.floor(avail / 8);
-  /* 用 #app 实际可用高度（已扣掉刘海和底部横条），不用 innerHeight */
+  /* 用 #app 实际可用高度（已扣掉刘海和底部横条），不用 innerHeight / use #app's actual usable height (already excluding the notch and home bar), not innerHeight */
   const vh = $('#app').clientHeight || innerHeight;
   LAYOUT.ch = Math.round(clamp(Math.min(LAYOUT.cw * 2, (vh - 330) / 2.6), 70, 104));
   document.documentElement.style.setProperty('--cw', LAYOUT.cw + 'px');
@@ -103,7 +103,7 @@ function layout() {
   requestAnimationFrame(fitField);
 }
 addEventListener('resize', layout);
-/* iOS WebView 刚启动时安全区还是 0，稍后才生效：#app 尺寸一变就重新排 */
+/* iOS WebView 刚启动时安全区还是 0，稍后才生效：#app 尺寸一变就重新排 / the iOS WebView reports a zero safe area at startup and only later fixes it: relayout whenever #app changes size */
 let lastAppH = 0;
 new ResizeObserver(() => {
   const h = $('#app').clientHeight;
@@ -113,7 +113,7 @@ new ResizeObserver(() => {
   }
 }).observe($('#app'));
 
-/* ---------- 底栏 ---------- */
+/* ---------- 底栏 ---------- / ---------- Bottom bar ---------- */
 $('#goBtn').onclick = () => {
   SFX.ensure();
   if (G.phase === 'prep' && G.prep.step >= prepStops()) startBattle();
@@ -143,7 +143,7 @@ $('#muteBtn').onclick = () => {
   openSettings();
 };
 
-/* ---------- 主循环：模拟按 1/60 秒定步长推进，画面每帧画一次 ---------- */
+/* ---------- 主循环：模拟按 1/60 秒定步长推进，画面每帧画一次 ---------- / ---------- Main loop: the sim advances in fixed 1/60s steps, rendering once per frame ---------- */
 let lastT = performance.now();
 function loop(now: number) {
   const dtR = Math.min(0.05, (now - lastT) / 1000);
@@ -177,7 +177,7 @@ layout();
 titleScreen();
 requestAnimationFrame(loop);
 
-/* ---------- 给测试脚本用的入口 ---------- */
+/* ---------- 给测试脚本用的入口 ---------- / ---------- Hooks for test scripts ---------- */
 (window as any).__game = {
   G, META, TALENTS, MUSIC,
   get B() {

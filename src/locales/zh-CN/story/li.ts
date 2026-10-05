@@ -1,5 +1,7 @@
 /* 璃的剧情。
- * 三套夜晚：北天（少了的那颗星和往北走的爹）、婆婆（快看不见的老守星人）、信号（子时往北晃三下镜子）。 */
+ * 三套夜晚：北天（少了的那颗星和往北走的爹）、婆婆（快看不见的老守星人）、信号（子时往北晃三下镜子）。
+ * Li's story. Three night sets: North Sky (the missing star and her father heading north), Grandma (an old star-watcher going blind), Signal (flash a mirror north three times at midnight).
+ */
 export default {
   arcs: [
     {

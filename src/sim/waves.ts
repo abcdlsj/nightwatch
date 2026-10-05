@@ -1,4 +1,4 @@
-/* 出怪表：每夜一张固定的编排，数量和血量随夜数、难度涨 */
+/* 出怪表：每夜一张固定的编排，数量和血量随夜数、难度涨 / Spawn tables: a fixed arrangement each night; counts and HP scale with the night and difficulty */
 import { EN, ELITES } from '../data/enemies';
 import { rand, rnd, pick } from '../core/rng';
 import { clamp } from '../core/util';
@@ -12,20 +12,22 @@ type Pack = (comp: Record<string, number>, n: number, t0: number, t1: number) =>
 type Boss = (k: string, t: number) => void;
 
 /** 敌人血量倍率（首领和固定数值的除外）：每夜成长，第 6 夜起再加一截；
- * 第 8、9 夜按第 7 夜的倍数单独定（多出来的一夜让玩家多一轮备战，怪不必再翻一倍）；之后（完整线、无尽）每夜一个慢一点的倍率 */
+ * 第 8、9 夜按第 7 夜的倍数单独定（多出来的一夜让玩家多一轮备战，怪不必再翻一倍）；之后（完整线、无尽）每夜一个慢一点的倍率
+ * enemy HP multiplier (except bosses and fixed-value enemies): grows per night with an extra step from night 6; nights 8 and 9 have their own multipliers relative to night 7 (the extra night gives players another prep round, so enemies need not double again); after that (full line, endless) a slower per-night multiplier
+ */
 export const hpScale = (r: number) => {
   const at = (n: number) => Math.pow(TUNE.hpGrowth, n - 1) * Math.pow(TUNE.lateHp, Math.max(0, n - 5));
   if (r <= 7) return at(r);
   if (r === 8) return at(7) * TUNE.hp8;
   return at(7) * TUNE.hp9 * Math.pow(TUNE.afterHp, r - NIGHTS);
 };
-/** 首领和固定数值的敌人：第 9 夜以前不变，之后每夜涨 */
+/** 首领和固定数值的敌人：第 9 夜以前不变，之后每夜涨 / bosses and fixed-value enemies: unchanged before night 9, then grow per night */
 export const fixedScale = (r: number) => (r > NIGHTS ? Math.pow(TUNE.bossAfter, r - NIGHTS) : 1);
 
 export function makeWave(r: number): Wave {
   const S: Wave = [];
   const pack: Pack = (comp, n, t0, t1) => {
-    /* 数量随夜数涨，第 11 夜封顶（再多手机上跑不动，后面靠血量涨） */
+    /* 数量随夜数涨，第 11 夜封顶（再多手机上跑不动，后面靠血量涨） / counts grow per night and cap at night 11 (more would not run on phones; HP carries it after that) */
     const DN = (1.15 + 0.1 * Math.min(r, 11)) * (heat(5) ? 1.15 : 1);
     n = Math.round(n * DN);
     comp = Object.fromEntries(
@@ -39,7 +41,7 @@ export function makeWave(r: number): Wave {
       const sup = mem.filter((k) => EN[k].aura),
         rest = mem.filter((k) => !EN[k].aura);
       const cols = Math.min(5, Math.max(1, rest.length));
-      /* 游魂有一半时候不从北边来，直接在半路的雾里冒出来 */
+      /* 游魂有一半时候不从北边来，直接在半路的雾里冒出来 / half the time wraiths do not come from the north but emerge from the fog midway */
       const mid = comp.ghost && rand() < 0.5 ? rnd(0.3, 0.44) : null;
       rest.forEach((k, i) => {
         const row = Math.floor(i / cols),
@@ -55,7 +57,7 @@ export function makeWave(r: number): Wave {
     }
   };
   const boss: Boss = (k, t) => S.push({ type: k, t, x: 0.5, y: -0.04 });
-  /** 大军压境的时间点 */
+  /** 大军压境的时间点 / the timing of the big onslaught */
   const SG: Record<number, number[]> = { 1: [15], 2: [17], 3: [18], 4: [16], 5: [17], 6: [19], 7: [12, 26], 8: [14, 28], 9: [22], 10: [16], 11: [12, 26], 12: [24], 13: [14, 28], 14: [10, 22, 34], 15: [26] };
   const bk = nightBoss(r);
   switch (G.endless ? 0 : r) {
@@ -69,7 +71,7 @@ export function makeWave(r: number): Wave {
       pack({ siege: 1 }, 2, 4, 20); pack({ catapult: 2 }, 1, 3, 3); pack({ skel: 3, necro: 1 }, 2, 0, 22); pack({ golem: 1, shaman: 1, shieldb: 1 }, 2, 6, 24); pack({ berserker: 2, drummer: 1 }, 3, 2, 26);
       pack({ ghost: 3 }, 2, 8, 24); pack({ bat: 5, bomber: 2 }, 3, 4, 28); pack({ slime: 6, mimic: 1 }, 2, 0, 20); pack({ skel: 4, berserker: 2, shieldb: 1 }, 1, 26, 26);
       break;
-    /* 第 8 夜：首领来之前的一夜，一个精英压阵，三面一起上 */
+    /* 第 8 夜：首领来之前的一夜，一个精英压阵，三面一起上 / night 8: the night before the boss, one elite anchors the wave and all three lanes push at once */
     case 8:
       boss(pick(ELITES), 9); pack({ siege: 1 }, 1, 6, 6); pack({ catapult: 2 }, 1, 2, 2); pack({ skel: 3, necro: 1 }, 2, 0, 24); pack({ golem: 1, shaman: 1, shieldb: 1 }, 2, 4, 26);
       pack({ berserker: 2, drummer: 1 }, 2, 6, 28); pack({ ghost: 3, bomber: 1 }, 2, 10, 26); pack({ bat: 5, bomber: 2 }, 3, 2, 30); pack({ bug: 3, slime: 4 }, 2, 0, 22); pack({ skel: 4, berserker: 2, shieldb: 1 }, 1, 28, 28);
@@ -78,7 +80,7 @@ export function makeWave(r: number): Wave {
       boss(bk || 'eye', 1); pack({ siege: 1 }, 1, 10, 10); pack({ catapult: 1 }, 1, 6, 6); pack({ skel: 3, necro: 1 }, 2, 4, 30); pack({ bat: 5, drummer: 1 }, 3, 8, 36);
       pack({ ghost: 3 }, 2, 14, 32); pack({ slime: 6, shaman: 1 }, 2, 12, 30); pack({ berserker: 3, bomber: 2 }, 1, 22, 22);
       break;
-    /* ---- 完整游戏线：天没亮，接着守 ---- */
+    /* ---- 完整游戏线：天没亮，接着守 ---- / ---- Full game line: no dawn, keep watching ---- */
     case 10:
       boss(foeKey('a_lich'), 8); pack({ skel: 3, necro: 1 }, 3, 0, 26); pack({ ghost: 3 }, 3, 4, 28); pack({ golem: 1, shaman: 1, shieldb: 1 }, 2, 6, 24);
       pack({ bat: 5, bomber: 2 }, 3, 2, 28); pack({ berserker: 2, drummer: 1 }, 2, 10, 26); pack({ skel: 4, shieldb: 2 }, 1, 24, 24);
@@ -95,7 +97,7 @@ export function makeWave(r: number): Wave {
       boss(foeKey('a_brute'), 6); boss(foeKey('a_golem'), 18); pack({ berserker: 2, drummer: 1 }, 3, 0, 28); pack({ skel: 3, shieldb: 1 }, 3, 2, 26); pack({ ghost: 3 }, 2, 6, 24);
       pack({ siege: 1 }, 1, 10, 10); pack({ bat: 5, bomber: 2 }, 3, 2, 30); pack({ slime: 6, mimic: 1 }, 2, 0, 22);
       break;
-    /* 第 14 夜：最长的一夜，所有东西一起来 */
+    /* 第 14 夜：最长的一夜，所有东西一起来 / night 14: the longest night, everything at once */
     case 14:
       boss(pick(ELITES), 4); boss(pick(ELITES), 24); pack({ siege: 1 }, 1, 10, 10); pack({ catapult: 2 }, 1, 2, 2); pack({ skel: 3, necro: 1 }, 2, 0, 32); pack({ golem: 1, shaman: 1, shieldb: 1 }, 2, 4, 34);
       pack({ berserker: 2, drummer: 1 }, 3, 2, 34); pack({ ghost: 3 }, 2, 8, 32); pack({ bat: 5, bomber: 2 }, 3, 2, 36); pack({ bug: 3, slime: 4 }, 2, 0, 30); pack({ skel: 4, berserker: 2, shieldb: 1 }, 1, 36, 36);
@@ -108,7 +110,7 @@ export function makeWave(r: number): Wave {
       endlessWave(r, pack, boss);
   }
   frostExtra(r, pack);
-  /* 宝箱怪本来就躺在半路上装宝箱 */
+  /* 宝箱怪本来就躺在半路上装宝箱 / mimic chests simply lie midway pretending to be chests */
   for (const s of S) if (s.type === 'mimic') s.y = rnd(0.3, 0.4);
   for (const s of S) s.type = foeKey(s.type);
   const out = S.sort((a, b) => a.t - b.t) as Wave;
@@ -116,7 +118,7 @@ export function makeWave(r: number): Wave {
   return out;
 }
 
-/** 霜潮专属：冰鸦、冰壳蟹、冰晶法师 */
+/** 霜潮专属：冰鸦、冰壳蟹、冰晶法师 / Frost Tide exclusives: Ice Crow, Ice-Shell Crab, Ice Crystal Mage */
 function frostExtra(r: number, pack: Pack) {
   if (G.foeSet !== 'frost') return;
   if (r >= 3) pack({ f_crow: 2 }, 1, 6, 18);
@@ -124,7 +126,7 @@ function frostExtra(r: number, pack: Pack) {
   if (r >= 6) pack({ f_mage: 1 }, 1, 6, 20);
 }
 
-/** 无尽长夜：单数夜带一个精英，每四夜一个首领 */
+/** 无尽长夜：单数夜带一个精英，每四夜一个首领 / Endless nights: odd nights carry an elite, and every fourth night a boss */
 function endlessWave(r: number, pack: Pack, boss: Boss) {
   const k = r - lastNight();
   pack({ skel: 3, necro: 1 }, 2, 0, 22); pack({ golem: 1, shaman: 1, shieldb: 1 }, 2, 6, 24); pack({ berserker: 2, drummer: 1 }, 3, 2, 26);

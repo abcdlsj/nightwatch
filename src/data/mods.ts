@@ -1,5 +1,5 @@
-/* 从旧版数据迁移而来，直接在这里改 */
-/** 修正项：[显示方式, 越小越好]。显示方式 0 数值、1 百分比、2 只显示说明、3 独立乘区（键以 x 开头，多个来源相乘） */
+/* 从旧版数据迁移而来，直接在这里改 / migrated from the old data format; edit here directly */
+/** 修正项：[显示方式, 越小越好]。显示方式 0 数值、1 百分比、2 只显示说明、3 独立乘区（键以 x 开头，多个来源相乘） / modifiers: [display mode, lower is better]. Display mode 0 number, 1 percentage, 2 description only, 3 independent multiplier (keys start with x and multiply across sources) */
 export const MODL: Record<string, [number, number?]> = {
  "rx": [
   1

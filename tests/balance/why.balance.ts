@@ -1,4 +1,4 @@
-/* 单夜诊断：某流派某夜，谁撞的墙、每张卡打了多少 */
+/* 单夜诊断：某流派某夜，谁撞的墙、每张卡打了多少 / Single-night diagnosis: for one archetype on one night, who hit the wall and how much each card dealt */
 import { it, beforeAll } from 'vitest';
 import { initLocale } from '../../src/i18n';
 import { reseed } from '../../src/core/rng';

@@ -1,4 +1,4 @@
-/* 背包抽屉：拖卡时自动拉开，放下后收回 */
+/* 背包抽屉：拖卡时自动拉开，放下后收回 / Bag drawer: slides open while dragging a card and closes after the drop */
 import { L } from '../../i18n';
 import { G } from '../../game/state';
 import { resizeField } from '../../render/field';

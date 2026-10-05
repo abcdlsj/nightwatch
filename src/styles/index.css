@@ -1,4 +1,4 @@
-/* 样式入口：按界面区域分文件，顺序即层叠顺序 */
+/* 样式入口：按界面区域分文件，顺序即层叠顺序 / Style entry: split by UI area; the order is the cascade order */
 @import './base.css';
 @import './hud.css';
 @import './stage.css';

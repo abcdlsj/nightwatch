@@ -1,4 +1,4 @@
-/* 背景着色器：缓慢旋转的漩涡，按场景换色（标题 / 备战 / 战斗 / 首领 / 结局） */
+/* 背景着色器：缓慢旋转的漩涡，按场景换色（标题 / 备战 / 战斗 / 首领 / 结局） / Background shader: a slowly rotating vortex, recolored per scene (title / prep / battle / boss / ending) */
 import { RM } from '../platform/env';
 import { $ } from '../ui/dom';
 
@@ -59,7 +59,7 @@ export function initBackground() {
   g.enableVertexAttribArray(loc);
   g.vertexAttribPointer(loc, 2, g.FLOAT, false, 0, 0);
   const U = { R: g.getUniformLocation(pr, 'R'), T: g.getUniformLocation(pr, 'T'), A: g.getUniformLocation(pr, 'A'), B: g.getUniformLocation(pr, 'B'), C: g.getUniformLocation(pr, 'C') };
-  /* 画布只有屏幕的 1/5 大，CSS 拉伸；本来就是糊的漩涡，省电 */
+  /* 画布只有屏幕的 1/5 大，CSS 拉伸；本来就是糊的漩涡，省电 / the canvas is only 1/5 the screen and stretched via CSS; it is a blurry vortex anyway, and this saves battery */
   const size = () => {
     cv.width = Math.max(40, Math.ceil(innerWidth / 5));
     cv.height = Math.max(40, Math.ceil(innerHeight / 5));
@@ -87,7 +87,7 @@ export function initBackground() {
   };
 }
 
-/** 换场景：背景换色，背景音乐跟着换曲 */
+/** 换场景：背景换色，背景音乐跟着换曲 / scene change: recolor the background and switch the background music */
 export function setScene(n: Scene) {
   setPal(n);
   for (const f of listeners) f(n);

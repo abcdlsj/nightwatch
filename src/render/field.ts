@@ -1,5 +1,7 @@
 /* 战场画布：低分辨率（约 180 格宽）像素画布，CSS 放大显示。
- * 负责城墙、敌人、弹道、粒子、飘字；模拟层通过 SimView 往这里塞特效。 */
+ * 负责城墙、敌人、弹道、粒子、飘字；模拟层通过 SimView 往这里塞特效。
+ * Battlefield canvas: a low-resolution (about 180 cells wide) pixel canvas scaled up with CSS. Handles the wall, enemies, projectiles, particles and floating text; the sim feeds effects in through SimView.
+ */
 import { DIG } from '../data/art/hand';
 import { TUNE } from '../game/tuning';
 import { vr, vrnd } from '../core/rng';
@@ -21,7 +23,7 @@ interface Bolt { segs: number[][]; col: string; life: number; max: number }
 export const F = {
   cv: null as unknown as HTMLCanvasElement,
   ctx: null as CanvasRenderingContext2D | null,
-  /** CSS 放大倍数 */
+  /** CSS 放大倍数 / CSS scale factor */
   s: 2,
   shake: 0,
   wallFlash: 0,
@@ -36,7 +38,7 @@ export function initField() {
   F.cv = $('#field') as HTMLCanvasElement;
 }
 
-/** 按舞台大小重排画布：手机上约 180 格宽，像素整数倍放大 */
+/** 按舞台大小重排画布：手机上约 180 格宽，像素整数倍放大 / relayout the canvas to the stage size: about 180 cells wide on phones, scaled by an integer factor to keep pixels crisp */
 export function resizeField() {
   const st = $('#stage').getBoundingClientRect();
   const s = Math.max(2, Math.floor(st.width / 160));
@@ -60,19 +62,19 @@ export function clearFieldFx() {
   F.bolts = [];
 }
 
-/** 战场坐标 → 页面坐标（金币飞向顶栏用） */
+/** 战场坐标 → 页面坐标（金币飞向顶栏用） / battlefield coordinates → page coordinates (for gold flying to the top bar) */
 export function toClient(x: number, y: number): [number, number] {
   const fr = F.cv.getBoundingClientRect();
   return [fr.left + x * F.s, fr.top + y * F.s];
 }
-/** 页面元素中心 → 战场 x（卡牌出手位置） */
+/** 页面元素中心 → 战场 x（卡牌出手位置） / page element center → battlefield x (card firing positions) */
 export function clientToFieldX(el: Element) {
   const fr = F.cv.getBoundingClientRect();
   const r = el.getBoundingClientRect();
   return (r.left + r.width / 2 - fr.left) / F.s;
 }
 
-/** 地面：一次画好缓存，固定种子保证每次一样 */
+/** 地面：一次画好缓存，固定种子保证每次一样 / ground: draw once and cache, with a fixed seed so it looks the same every time */
 function buildGround() {
   const W = world.W,
     H = world.H;
@@ -117,7 +119,7 @@ function buildGround() {
   F.ground = c;
 }
 
-/* ---------------- 特效（给 SimView 用） ---------------- */
+/* ---------------- 特效（给 SimView 用） ---------------- / ---------------- Effects (for SimView) ---------------- */
 export function part(x: number, y: number, vx: number, vy: number, life: number, col: string, sz?: number) {
   if (F.parts.length > 600) F.parts.shift();
   F.parts.push({ x, y, vx, vy, life, max: life, col, sz: sz || 1 });
@@ -126,7 +128,7 @@ export function num(x: number, y: number, str: string, col: string, s: number) {
   if (F.nums.length > 70) F.nums.shift();
   F.nums.push({ x, y, str, col, s, life: 0.8 });
 }
-/** 伤害飘字：暴击和持续伤害都显示；同屏多了以后普通伤害只抽一部分显示 */
+/** 伤害飘字：暴击和持续伤害都显示；同屏多了以后普通伤害只抽一部分显示 / damage numbers: crits and damage-over-time always show; once many are on screen, only a sample of normal hits shows */
 export function dmgNum(e: Enemy, a: number, crit: boolean, kind: 'burn' | 'poison' | null) {
   if (!SETTINGS.nums) return;
   const big = crit || a >= 150;
@@ -163,7 +165,7 @@ export function boom(x: number, y: number, r: number, col: string) {
     part(x, y, Math.cos(a) * s, Math.sin(a) * s, vrnd(0.2, 0.5), vr() < 0.5 ? col : '#ffcd75', 2);
   }
 }
-/** 命中：按出手卡的元素出不同的迸溅；暴击加一圈亮环，击杀炸得更开 */
+/** 命中：按出手卡的元素出不同的迸溅；暴击加一圈亮环，击杀炸得更开 / hit: spark color follows the firing card's element; crits add a bright ring, kills burst wider */
 const HITC: Record<string, [string, string]> = {
   blade: ['#ffffff', '#dfe6ee'], fire: ['#ffcd75', '#ef7d57'], ice: ['#c2f4ff', '#73eff7'],
   volt: ['#fee761', '#ffffff'], mech: ['#ffd166', '#c28a4d'], poison: ['#a7f070', '#7ddc5f'],
@@ -223,7 +225,7 @@ export const wallFlash = () => {
   F.wallFlash = 0.4;
 };
 
-/* ---------------- 画 ---------------- */
+/* ---------------- 画 ---------------- / ---------------- Draw ---------------- */
 function pline(x: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number, col: string) {
   const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)) | 0;
   x.fillStyle = col;
@@ -258,7 +260,7 @@ function drawNum(x: CanvasRenderingContext2D, str: string, cx: number, cy: numbe
     }
   }
 }
-/** 非数字的飘字（「壳」「碎」「处决」）：用缝合像素字体，12px 是它的原生字号，加一圈深色描边 */
+/** 非数字的飘字（「壳」「碎」「处决」）：用缝合像素字体，12px 是它的原生字号，加一圈深色描边 / non-numeric floating text ('shell', 'shatter', 'execute'): use the Fusion Pixel font at 12px (its native size) with a dark outline */
 function drawWord(x: CanvasRenderingContext2D, str: string, cx: number, cy: number, col: string) {
   x.font = "12px 'Fusion Pixel', sans-serif";
   x.textAlign = 'center';
@@ -284,7 +286,7 @@ export function drawField(dt: number) {
   x.fillStyle = '#0a0c14';
   x.fillRect(-4, -4, W + 8, H + 8);
   if (F.ground) x.drawImage(F.ground, 0, 0);
-  /* 危险区：敌人逼近城墙时泛红 */
+  /* 危险区：敌人逼近城墙时泛红 / danger zone: tints red as enemies approach the wall */
   let danger = 0;
   if (B) for (const e of B.en) if (e.y > 0.72) danger = Math.max(danger, (e.y - 0.72) / 0.28);
   if (danger > 0)
@@ -292,7 +294,7 @@ export function drawField(dt: number) {
       x.fillStyle = `rgba(228,59,68,${(0.18 * danger * (1 - i / 12)).toFixed(3)})`;
       x.fillRect(0, WALLY() - i * 3 - 3, W, 3);
     }
-  /* 城墙 */
+  /* 城墙 / the wall */
   const wy = WALLY();
   x.fillStyle = '#2a2130';
   x.fillRect(0, wy, W, 7);
@@ -314,7 +316,7 @@ export function drawField(dt: number) {
     x.fillRect(0, wy - 3, W, 10);
     F.wallFlash -= dt;
   }
-  /* 射程线；雾母起雾时压低，线上面盖一层雾 */
+  /* 射程线；雾母起雾时压低，线上面盖一层雾 / range line; fog from the Fog Mother lowers it and covers it with mist */
   {
     const veil = B && B.flags.veilT > B.t ? TUNE.veil : 0;
     const ry = Math.round(world.top + (world.range + veil) * (WALLY() - 2 - world.top));
@@ -387,7 +389,7 @@ export function drawField(dt: number) {
 function drawBattle(x: CanvasRenderingContext2D, W: number) {
   const b = B!;
   const now = b.t;
-  /* 北边的火把 */
+  /* 北边的火把 / torches to the north */
   {
     const fy = world.top + 2,
       n = Math.floor(W / 7),
@@ -406,7 +408,7 @@ function drawBattle(x: CanvasRenderingContext2D, W: number) {
     }
   }
   const list = b.en.slice().sort((a, z) => a.y - z.y);
-  /* 光环 */
+  /* 光环 / auras */
   for (const s of list) {
     if (!s.d.aura || s.y < -0.02) continue;
     const R2 = s.d.aura * K();
@@ -444,7 +446,7 @@ function drawBattle(x: CanvasRenderingContext2D, W: number) {
       pcircle(x, px + w / 2, py + h / 2, w * 0.7, `rgba(228,59,68,${a.toFixed(3)})`);
     }
     if (rising(e)) {
-      /* 从地里一点点钻出来 */
+      /* 从地里一点点钻出来 / emerging from the ground a little at a time */
       const k = Math.max(0.1, (now - e.bornT) / 0.5),
         hh = Math.max(1, Math.round(sp.h * k));
       x.globalAlpha = 1;
@@ -498,7 +500,7 @@ function drawBattle(x: CanvasRenderingContext2D, W: number) {
       x.fillRect(px + w - 2, py + 1, 2, 2);
     }
   }
-  /* 投石 */
+  /* 投石 / rock throw */
   for (const r of b.epr) {
     const k = Math.min(1, r.t / r.dur);
     const px = Math.round(r.x0 + (r.x1 - r.x0) * k),
@@ -509,7 +511,7 @@ function drawBattle(x: CanvasRenderingContext2D, W: number) {
     x.fillRect(px - 1, py - 1, 2, 2);
     if (vr() < 0.4) part(px, py, 0, 0, 0.3, '#566c86', 1);
   }
-  /* 弹道 */
+  /* 弹道 / projectiles */
   for (const p of b.pr) {
     const px = Math.round(p.x),
       py = Math.round(p.y);

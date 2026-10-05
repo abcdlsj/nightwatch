@@ -1,11 +1,11 @@
-/* 分层约束：规则层和模拟层不碰界面，换渲染、换平台时只动上层 */
+/* 分层约束：规则层和模拟层不碰界面，换渲染、换平台时只动上层 / Layer boundaries: the rules and sim layers never touch the UI, so switching renderers or platforms only touches upper layers */
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const walk = (d: string): string[] => readdirSync(d).flatMap((f) => (statSync(join(d, f)).isDirectory() ? walk(join(d, f)) : f.endsWith('.ts') ? [join(d, f)] : []));
 const RULES: Record<string, string[]> = {
-  /* 目录: 不许 import 的目录 */
+  /* 目录: 不许 import 的目录 / directory: its forbidden import targets */
   'src/core': ['data', 'game', 'sim', 'ui', 'render', 'audio', 'app', 'platform', 'i18n'],
   'src/data': ['game', 'sim', 'ui', 'render', 'audio', 'app', 'platform', 'i18n'],
   'src/i18n': ['game', 'sim', 'ui', 'render', 'audio', 'app', 'platform'],

@@ -1,4 +1,4 @@
-/* ---------- 战斗 UI ---------- */
+/* ---------- 战斗 UI ---------- / ---------- Battle UI ---------- */
 #bossbar{position:absolute;left:8px;right:8px;top:8px;background:rgba(20,6,10,.8);border-radius:10px;padding:6px 8px;
   box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,90,90,.35);display:flex;flex-direction:column;gap:4px;z-index:3}
 #bossbar[hidden]{display:none}

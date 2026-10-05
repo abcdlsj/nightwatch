@@ -1,4 +1,4 @@
-/* 无界面跑战斗：同一种子、同一阵容，结果必须完全一样；各人物起手都能正常打完前几夜 */
+/* 无界面跑战斗：同一种子、同一阵容，结果必须完全一样；各人物起手都能正常打完前几夜 / Headless battles: the same seed and lineup must give identical results; every hero's opening can clear the first nights */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { initLocale } from '../../src/i18n';
 import { reseed } from '../../src/core/rng';
@@ -26,7 +26,7 @@ function newRun(hero: string, kit: number, seed: number, foeSet = 'dark') {
   recalcMods();
 }
 
-/** 打一夜，返回结果摘要 */
+/** 打一夜，返回结果摘要 / play one night and return a result summary */
 function night(r: number) {
   G.round = r;
   G.phase = 'battle';

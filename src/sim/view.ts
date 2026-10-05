@@ -1,30 +1,32 @@
 /* 战斗模拟对外的表现接口。模拟层只在这里「喊一声」，由界面层实现；
- * 无界面跑模拟（测试、平衡脚本）时用默认的空实现。 */
+ * 无界面跑模拟（测试、平衡脚本）时用默认的空实现。
+ * The sim's outward presentation interface. The sim only 'shouts' here, and the UI layer implements it; headless runs (tests, balance scripts) use the default no-op.
+ */
 import type { Card } from '../game/state';
 import type { Enemy } from './types';
 import type { Line } from '../data/types';
 
 export interface SimView {
-  /* 战场特效（战场坐标） */
+  /* 战场特效（战场坐标） / battlefield effects (battlefield coordinates) */
   part(x: number, y: number, vx: number, vy: number, life: number, col: string, sz?: number): void;
   num(x: number, y: number, str: string, col: string, s: number): void;
-  /** 伤害飘字：由界面决定要不要显示（同屏太多时会抽掉一部分） */
+  /** 伤害飘字：由界面决定要不要显示（同屏太多时会抽掉一部分） / damage numbers: the UI decides whether to show them (dropping some when too many are on screen) */
   dmgNum(e: Enemy, a: number, crit: boolean, kind: 'burn' | 'poison' | null): void;
   ring(x: number, y: number, r0: number, r1: number, col: string, life: number): void;
   bolt(pts: [number, number][], col: string, life: number, straight?: boolean): void;
   boom(x: number, y: number, r: number, col: string): void;
-  /** 命中迸溅：tag 是出手卡的元素（灼烧、中毒跳伤按火、毒算） */
+  /** 命中迸溅：tag 是出手卡的元素（灼烧、中毒跳伤按火、毒算） / hit sparks: tag is the firing card's element (burn and poison ticks count as fire and poison) */
   hit(x: number, y: number, tag: string | null, crit: boolean, kill: boolean): void;
   shake(n: number): void;
   wallFlash(): void;
   coins(x: number, y: number, n: number): void;
-  /* 卡牌 */
+  /* 卡牌 / cards */
   cardFx(c: Card, cls: 'pop' | 'shake'): void;
   cardFlag(c: Card, flag: 'frozen' | 'haste', on: boolean): void;
   cardAmmo(c: Card): void;
   cardNum(c: Card): void;
   link(a: Card, b: Card, col: string, life?: number): void;
-  /* 界面 */
+  /* 界面 / UI */
   sfx(k: string, p?: string | number): void;
   say(who: string, text: Line, pri?: number): void;
   toast(msg: string): void;
