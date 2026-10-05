@@ -97,8 +97,8 @@ export function makeWave(r: number): Wave {
       break;
     /* 第 14 夜：最长的一夜，所有东西一起来 */
     case 14:
-      boss(pick(ELITES), 4); boss(pick(ELITES), 24); pack({ siege: 1 }, 1, 10, 10); pack({ catapult: 2 }, 1, 2, 2); pack({ skel: 3, necro: 1 }, 3, 0, 32); pack({ golem: 1, shaman: 1, shieldb: 1 }, 2, 4, 34);
-      pack({ berserker: 2, drummer: 1 }, 3, 2, 34); pack({ ghost: 3 }, 3, 8, 32); pack({ bat: 5, bomber: 2 }, 3, 2, 36); pack({ bug: 3, slime: 4 }, 3, 0, 30); pack({ skel: 4, berserker: 2, shieldb: 1 }, 1, 36, 36);
+      boss(pick(ELITES), 4); boss(pick(ELITES), 24); pack({ siege: 1 }, 1, 10, 10); pack({ catapult: 2 }, 1, 2, 2); pack({ skel: 3, necro: 1 }, 2, 0, 32); pack({ golem: 1, shaman: 1, shieldb: 1 }, 2, 4, 34);
+      pack({ berserker: 2, drummer: 1 }, 3, 2, 34); pack({ ghost: 3 }, 2, 8, 32); pack({ bat: 5, bomber: 2 }, 3, 2, 36); pack({ bug: 3, slime: 4 }, 2, 0, 30); pack({ skel: 4, berserker: 2, shieldb: 1 }, 1, 36, 36);
       break;
     case 15:
       if (bk) boss(bk, 1);

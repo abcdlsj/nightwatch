@@ -15,13 +15,13 @@ beforeAll(() => { initLocale(); setOnEnd(() => {}); if (process.env.TUNE) Object
 it('why', () => {
   const arch = process.env.ARCH || 'ice', r = +(process.env.R || 4);
   const A = ARCHS[arch]; reseed(+(process.env.SEED || 1));
-  Object.assign(G, { hero: A.hero, heat: 0, run: freshRun(), round: r, gold: 0, wall: HEROES[A.hero].wall, wallMax: HEROES[A.hero].wall, cards: [], relics: relicsFor(arch, r), skills: talentsFor(arch, r), secret: {}, seenFoes: {}, foeSet: process.env.SET || 'dark', boss9: 'eye', phase: 'battle' });
+  Object.assign(G, { hero: A.hero, heat: 0, run: freshRun(), round: r, gold: 0, wall: HEROES[A.hero].wall, wallMax: HEROES[A.hero].wall, cards: [], relics: relicsFor(arch, r), skills: talentsFor(arch, r), secret: {}, seenFoes: {}, foeSet: process.env.SET || 'dark', boss9: process.env.BOSS || 'eye', boss12: 'brood', phase: 'battle', full: r > 9, gems: r > 9 ? { red: 1, blue: 1, green: 1 } : {}, maxRound: r > 9 ? 15 : 9, endless: false });
   let x = 0; for (const [k, t, a] of boardFor(arch, r)) { const c = newCard(k, t, a || null); c.loc = 'board'; c.idx = x; x += c.size; G.cards.push(c); }
   const cr = carryFor(arch, r, G.cards.map((c) => c.key));
   if (cr) { const c = G.cards.find((x) => x.key === cr.key)!; c.carry = true; c.star = cr.star; }
   recalcMods();
   console.log('board', G.cards.map((c) => `${c.key}@${c.tier} dmg${Math.round(stats(c, null).total)} cd${stats(c, null).cd.toFixed(2)}`).join(' | '));
   startBattle({ wave: makeWave(r), ambush: false, wager: null, beats: nightInfo(r).beats });
-  let s = 0; let kn: any = null; while (!B!.over && s < 24000) { simStep(1 / 60); s++; kn = kn || B!.en.find((e) => e.type === 'knight'); if (s % 300 === 0 && kn) console.log('t', B!.t.toFixed(0), 'knight hp', Math.round(kn.hp), '/', Math.round(kn.maxHp), 'shield', Math.round(kn.shield), 'y', kn.y.toFixed(2), 'dead', kn.dead, 'wall', G.wall.toFixed(1)); }
+  let s = 0; let kn: any = null; while (!B!.over && s < 24000) { simStep(1 / 60); s++; kn = kn || B!.en.find((e) => e.type === 'knight' || e.d.boss); if (s % 300 === 0 && kn) console.log('t', B!.t.toFixed(0), 'knight hp', Math.round(kn.hp), '/', Math.round(kn.maxHp), 'shield', Math.round(kn.shield), 'y', kn.y.toFixed(2), 'dead', kn.dead, 'wall', G.wall.toFixed(1)); }
   console.log('result', B!.result, 't', B!.t.toFixed(1), 'kills', B!.kills, 'wallBy', JSON.stringify(B!.wallBy), 'dmg', G.cards.map((c) => c.key + ':' + Math.round(c.bDmg)).join(' '));
 });

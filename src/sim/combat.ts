@@ -237,8 +237,8 @@ function attack(c: Card, st: Stats, depth = 0) {
   c.sure = false;
   const sh = it.shieldDmg ? Math.min(b.shield, TUNE.shieldDmgCap) * it.shieldDmg * dmgMul(c) * (st.total / Math.max(1, st.base + st.flat)) : 0;
   let dmg = (st.total + sh) * (crit ? 2 + mv('critDmg') : 1) * comboMul(depth);
-  /* 灰袍的倒转：最多的那种元素伤害 -40% */
-  if (b.flags.invT > b.t && it.tag === b.flags.invTag) dmg *= 0.6;
+  /* 灰袍的倒转：最多的那种元素伤害 -30% */
+  if (b.flags.invT > b.t && it.tag === b.flags.invTag) dmg *= 0.7;
   if (c.anvil) {
     dmg *= 1 + c.anvil;
     c.anvil = 0;

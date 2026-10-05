@@ -26,7 +26,7 @@ export const ARCHS: Record<string, Arch> = {
   },
   fire: {
     hero: 'mo',
-    board: [[1, 'vial'], [1, 'icicle', undefined, 4], [2, 'prism'], [3, 'dualflask'], [5, 'sunflare']],
+    board: [[1, 'vial'], [1, 'icicle', undefined, 4], [2, 'prism'], [3, 'dualflask'], [4, 'frost', undefined, 5], [6, 'sunflare']],
     relics: ['tinder', 'oil', 'wisp', 'powder', 'dragonheart', 'medal'],
     talents: ['mo_00', 'quick', 'mo_01', 'mo_02'],
   },
@@ -99,7 +99,7 @@ export const ARCHS: Record<string, Arch> = {
   },
   meteor: {
     hero: 'li',
-    board: [[1, 'stardust'], [1, 'astrolabe'], [2, 'pulsar'], [4, 'starfire']],
+    board: [[1, 'stardust'], [1, 'astrolabe'], [2, 'pulsar'], [3, 'fallstar'], [4, 'starfire']],
     relics: ['telescope', 'wire', 'starchart', 'medal', 'compass', 'polaris'],
     talents: ['li_20', 'li_21', 'li_00', 'li_22'],
     carry: ['starfire', 'pulsar'],

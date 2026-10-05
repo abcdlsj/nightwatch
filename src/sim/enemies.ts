@@ -25,7 +25,7 @@ export function spawn(type: string, x?: number | null, y?: number | null): Enemy
   const b = bt();
   const d = EN[type];
   const sc = d.fixed
-    ? fixedScale(G.round) * (d.boss ? TUNE.bossHp : 1)
+    ? fixedScale(d.hidden ? G.round - TUNE.hiddenEase : G.round) * (d.boss ? TUNE.bossHp : 1)
     : hpScale(G.round) * (G.round === 1 ? 0.5 : G.round === 2 ? 0.6 : 0.7) * (heat(1) ? 1.15 : 1) * (heat(2) && (d.boss || d.elite) ? 1.25 : 1) * (wg('iron') ? 1.3 : 1);
   const e: Enemy = {
     d, type, x: x != null ? x : rnd(0.08, 0.92), y: y != null ? y : -0.04, x0: 0, hp: d.hp * sc, maxHp: d.hp * sc, armor: d.armor, shield: 0,
@@ -392,7 +392,7 @@ export const INTENTS: Record<string, IntentFn> = {
     summonAt(e, 'shieldb', v ?? 3, 0.2, 0.03);
     summonAt(e, 'skel', (v ?? 3) * 2, 0.26, 0.02);
   },
-  /** 倒转：你棋盘上最多的那种元素，v 秒内伤害 -40% */
+  /** 倒转：你棋盘上最多的那种元素，v 秒内伤害 -30% */
   invert: (_e, v) => {
     const b = bt();
     const n: Record<string, number> = {};

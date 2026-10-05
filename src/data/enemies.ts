@@ -697,8 +697,8 @@ export const EN: Record<string, EnemyDef> = {
  },
  "firstoath": {
   "hidden": "ayla",
-  "hp": 15000,
-  "spd": 0.011,
+  "hp": 10000,
+  "spd": 0.009,
   "armor": 4,
   "wall": 99,
   "spr": "b_oath",
@@ -711,7 +711,7 @@ export const EN: Record<string, EnemyDef> = {
    {
     "t": 6,
     "a": "shield",
-    "v": 0.18
+    "v": 0.12
    },
    {
     "t": 8,
@@ -721,14 +721,14 @@ export const EN: Record<string, EnemyDef> = {
    {
     "t": 9,
     "a": "muster",
-    "v": 3
+    "v": 2
    }
   ]
  },
  "greyrobe": {
   "hidden": "mo",
-  "hp": 14000,
-  "spd": 0.012,
+  "hp": 10000,
+  "spd": 0.009,
   "armor": 2,
   "wall": 99,
   "spr": "b_grey",
@@ -741,7 +741,7 @@ export const EN: Record<string, EnemyDef> = {
    {
     "t": 7,
     "a": "invert",
-    "v": 5
+    "v": 4
    },
    {
     "t": 8,
@@ -757,8 +757,8 @@ export const EN: Record<string, EnemyDef> = {
  },
  "snuffer": {
   "hidden": "ying",
-  "hp": 14000,
-  "spd": 0.012,
+  "hp": 11500,
+  "spd": 0.009,
   "armor": 3,
   "wall": 99,
   "spr": "b_snuff",
@@ -787,9 +787,9 @@ export const EN: Record<string, EnemyDef> = {
  },
  "blackwall": {
   "hidden": "jun",
-  "hp": 19000,
+  "hp": 14000,
   "spd": 0.008,
-  "armor": 6,
+  "armor": 5,
   "wall": 99,
   "spr": "b_wall",
   "sc": 1,
@@ -801,7 +801,7 @@ export const EN: Record<string, EnemyDef> = {
    {
     "t": 8,
     "a": "rebuild",
-    "v": 0.06
+    "v": 0.04
    },
    {
     "t": 9,
@@ -817,8 +817,8 @@ export const EN: Record<string, EnemyDef> = {
  },
  "fallenstar": {
   "hidden": "li",
-  "hp": 14500,
-  "spd": 0.012,
+  "hp": 11500,
+  "spd": 0.009,
   "armor": 2,
   "wall": 99,
   "spr": "b_star",
