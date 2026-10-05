@@ -14,7 +14,7 @@ export const VOICES: Record<string, { img: string; c: string; n: string }> = {
   "c": "#ffcd75"
  },
  "greyrobe": {
-  "img": "eye",
+  "img": "b_grey",
   "c": "#b77cff"
  },
  "karl": {
