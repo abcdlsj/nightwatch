@@ -114,6 +114,8 @@ export interface Prep {
   step: number;
   cur: PrepStop | null;
   doors: string[];
+  /** 下一站的三扇门（提前抽好，备战页预告） / the next stop's three doors (rolled ahead and previewed on the prep screen) */
+  next?: string[];
   talk?: boolean;
   talkDone?: boolean;
   /** 完整线：这夜之前有一颗宝石的剧情 / full line: a gem scene precedes this night */

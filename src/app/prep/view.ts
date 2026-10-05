@@ -173,6 +173,11 @@ export function renderPrep() {
       list.appendChild(b);
     });
     body.appendChild(list);
+    if (P.next?.length)
+      body.insertAdjacentHTML(
+        'beforeend',
+        `<div class="nextstop"><span>${T.nextStop}</span>${P.next.map((id) => `<i class="cat-${EVENTS[id].cat}"><img src="${icon(EVENTS[id].ico).url}" alt="">${EVENTS[id].n}</i>`).join('')}</div>`,
+      );
     updateHUD();
     return;
   }

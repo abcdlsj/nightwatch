@@ -169,6 +169,7 @@ export default {
     syn2Up: '联动【{n}】生效：{m}',
     where: '去哪儿？',
     stop: '第 {n} / {m} 站',
+    nextStop: '下一站',
     pickOne: '挑一张',
     refresh: '刷新 <small>(剩{n}次)</small>',
     leave: '离开',

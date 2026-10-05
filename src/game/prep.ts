@@ -9,7 +9,7 @@ import { rand, rnd, pick, shuffled } from '../core/rng';
 import { clamp } from '../core/util';
 import { G, type Card, type Offer, type Wave, type Zone } from './state';
 import { recalcMods } from './mods';
-import { newCard, firstFit, countSame, zoneN } from './cards';
+import { newCard, firstFit, countSame, zoneN, occ } from './cards';
 import { talentOk, type ItemFilter } from './loot';
 import { cardOpen } from './unlocks';
 import { foeKey } from './foes';
@@ -63,40 +63,62 @@ const SECRET_DOORS: [string, () => boolean][] = [
 const WIND_SHOP: Partial<Record<string, string>> = { blade: 'smith', mech: 'smith', fire: 'forge', volt: 'storm', ice: 'frostshop' };
 const doorW = (i: string) => EVENTS[i].w * (G.wind && WIND_SHOP[G.wind] === i ? 2 : 1);
 
-export function rollDoors() {
-  const R = G.round,
-    P = G.prep;
-  const ids = Object.keys(EVENTS).filter((id) => {
-    const e = EVENTS[id];
-    return (!e.minR || R >= e.minR) && (!EVENT_NEED[id] || EVENT_NEED[id]());
-  });
-  const isRare = (i: string) => EVENTS[i].cat === 'rare';
-  const out: string[] = [];
-  if (R === 1 && P.step === 0) out.push('shop', 'field');
-  while (out.length < 3) {
-    const pool = ids.filter((i) => !out.includes(i) && !(isRare(i) && (P.rare || out.some(isRare))));
-    if (!pool.length) break;
-    let t = rand() * pool.reduce((s, i) => s + doorW(i), 0);
-    let got: string | null = null;
-    for (const i of pool) {
-      t -= doorW(i);
-      if (t <= 0) {
-        got = i;
-        break;
-      }
-    }
-    out.push(got || pool[pool.length - 1]);
+/** 这扇门现在能不能出 / whether this door can appear right now */
+const doorOk = (id: string) => {
+  const e = EVENTS[id];
+  return (!e.minR || G.round >= e.minR) && (!EVENT_NEED[id] || EVENT_NEED[id]());
+};
+const isRare = (i: string) => EVENTS[i].cat === 'rare';
+const keepCat = (i: string) => EVENTS[i].cat === 'shop' || EVENTS[i].cat === 'free';
+
+/** 按权重补一扇门，不和已有的重样 / draw one more door by weight, not repeating the ones already there */
+function drawDoor(out: string[]): string | null {
+  const P = G.prep;
+  const pool = Object.keys(EVENTS).filter((i) => doorOk(i) && !out.includes(i) && !(isRare(i) && (P.rare || out.some(isRare))));
+  if (!pool.length) return null;
+  let t = rand() * pool.reduce((s, i) => s + doorW(i), 0);
+  for (const i of pool) {
+    t -= doorW(i);
+    if (t <= 0) return i;
   }
-  if (!out.some((i) => EVENTS[i].cat === 'shop' || EVENTS[i].cat === 'free')) out[out.findIndex((i) => !isRare(i))] = 'shop';
+  return pool[pool.length - 1];
+}
+
+/** 抽一站的三扇门（第一夜第一站固定有商店和战场） / roll one stop's three doors (night 1's first stop always has a shop and a battlefield) */
+function rollSet(step: number): string[] {
+  const P = G.prep;
+  const out: string[] = [];
+  if (G.round === 1 && step === 0) out.push('shop', 'field');
+  while (out.length < 3) {
+    const got = drawDoor(out);
+    if (!got) break;
+    out.push(got);
+  }
+  if (!out.some(keepCat)) out[out.findIndex((i) => !isRare(i))] = 'shop';
   if (out.some(isRare)) P.rare = 1;
-  P.doors = out.sort(() => rand() - 0.5);
+  return out.sort(() => rand() - 0.5);
+}
+
+/** 进到新的一站：用上一站预告过的门（条件变了的那扇换掉），再预告下一站 / arrive at a new stop: use the doors previewed at the last stop (swapping any whose condition changed), then preview the next stop */
+export function rollDoors() {
+  const P = G.prep;
+  if (P.next?.length) {
+    const out = P.next.filter(doorOk);
+    while (out.length < P.next.length) {
+      const got = drawDoor(out);
+      if (!got) break;
+      out.push(got);
+    }
+    if (!out.some(keepCat)) out[Math.max(0, out.findIndex((i) => !isRare(i)))] = 'shop';
+    P.doors = out;
+  } else P.doors = rollSet(P.step);
+  P.next = P.step + 1 < 3 ? rollSet(P.step + 1) : undefined;
   /* 隐藏事件：换掉一扇门，但保证至少还剩一家店或一份白给 / hidden events: replace a door but guarantee at least one shop or one freebie remains */
   if (P.step !== 0 || G.endless) return;
   const hit = SECRET_DOORS.find(([id, ok]) => ok() && !P.doors.includes(id));
   if (!hit) return;
-  const keep = (i: string) => EVENTS[i].cat === 'shop' || EVENTS[i].cat === 'free';
-  let at = P.doors.findIndex((i) => !keep(i));
-  if (at < 0) at = P.doors.findIndex((i, k) => P.doors.some((j, m) => m !== k && keep(j)));
+  let at = P.doors.findIndex((i) => !keepCat(i));
+  if (at < 0) at = P.doors.findIndex((i, k) => P.doors.some((j, m) => m !== k && keepCat(j)));
   if (at < 0) at = 0;
   P.doors[at] = hit[0];
 }
@@ -263,7 +285,45 @@ export function insertPlan(z: Zone, i: number, size: number, ignore: Card | null
   }
   if (items[0].p < 0) return null;
   const me = items.find((t) => !t.o)!;
-  return { i: me.p, moves: items.filter((t) => t.o && t.p !== t.o.idx).map((t) => [t.o, t.p] as [Card, number]) };
+  return { i: me.p, moves: items.filter((t) => t.o && t.p !== t.o.idx).map((t) => [t.o!, t.p, z as Area] as Move) };
+}
+
+/** 一步挪动：卡挪到哪个区的第几格 / one move: which zone and slot a card goes to */
+type Area = 'board' | 'stash';
+export type Move = [Card, number, Area];
+
+/** 交换：目标位置挤不下时，把压在那里的卡换走——先放回拖起来那张卡空出来的地方，再找两个区里任何空位。有地方放就能换
+ * swap: when the target cannot make room by pushing, move the cards sitting there away, first into the spot the dragged card left, then any free slot in either zone. Any swap with room to land is allowed */
+export function swapPlan(z: Area, i: number, size: number, me: Card | null): { i: number; moves: Move[] } | null {
+  if (i < 0 || i + size > zoneN(z)) return null;
+  const ZS: Area[] = ['board', 'stash'];
+  const grid = {} as Record<Area, (Card | 0 | null)[]>;
+  for (const zz of ZS) grid[zz] = occ(zz).map((x) => (x === me ? null : x));
+  const hit = [...new Set(grid[z].slice(i, i + size).filter((x): x is Card => !!x))];
+  if (!hit.length) return null;
+  for (const h of hit) for (const zz of ZS) grid[zz] = grid[zz].map((x) => (x === h ? null : x));
+  for (let k = i; k < i + size; k++) grid[z][k] = 0;
+  const free = (zz: Area, k: number, n: number) => k >= 0 && k + n <= zoneN(zz) && grid[zz].slice(k, k + n).every((x) => x === null);
+  const from = me && (me.loc === 'board' || me.loc === 'stash') ? me.loc : null;
+  const order: Area[] = from ? [from, ...ZS.filter((x) => x !== from)] : ['stash', 'board'];
+  const moves: Move[] = [];
+  for (const h of hit.slice().sort((a, b) => b.size - a.size)) {
+    let spot: [Area, number] | null = null;
+    for (const zz of order) {
+      /* 先试被拖走那张卡原来的位置（往左挪一挪也行），这样像是两张卡对调 / first try where the dragged card was (shifting left a bit is fine), so it reads as the two cards trading places */
+      const near = zz === from ? [me!.idx, me!.idx + me!.size - h.size] : [];
+      const ks = [...near, ...Array.from({ length: zoneN(zz) }, (_, k) => k)];
+      const k = ks.find((x) => free(zz, x, h.size));
+      if (k !== undefined) {
+        spot = [zz, k];
+        break;
+      }
+    }
+    if (!spot) return null;
+    for (let k = spot[1]; k < spot[1] + h.size; k++) grid[spot[0]][k] = h;
+    moves.push([h, spot[1], spot[0]]);
+  }
+  return { i, moves };
 }
 
 /** 新开一局时放下起手卡 / place the opening cards when a run starts */

@@ -8,7 +8,7 @@ import { L, t } from '../../i18n';
 import { clamp } from '../../core/util';
 import { G, type Card, type CardSpec, type Offer, type Zone } from '../../game/state';
 import { fits, occ, zoneN, sellValue } from '../../game/cards';
-import { insertPlan } from '../../game/prep';
+import { insertPlan, swapPlan, type Move } from '../../game/prep';
 import { FX } from '../../render/overlay';
 import { SFX } from '../../audio/sfx';
 import { $, $$ } from '../../ui/dom';
@@ -22,7 +22,7 @@ type Target =
   | { z: 'sell' }
   | { z: 'bag'; i: number; ok: boolean }
   | { z: 'merge'; card: Card }
-  | { z: Zone; i: number; ok: boolean; moves?: [Card, number][] };
+  | { z: Zone; i: number; ok: boolean; moves?: Move[] };
 
 interface Drag {
   src: SheetSrc & { el: HTMLElement };
@@ -174,7 +174,7 @@ function hitTest(px: number, py: number, gx: number): Target | null {
     }
     const i = clamp(Math.round((gx - (r.left + 4)) / cw), 0, zoneN(z) - c.size);
     if (fits(z, i, c.size, ig)) return { z, i, ok: true, moves: [] };
-    const pl = insertPlan(z, i, c.size, ig);
+    const pl = insertPlan(z, i, c.size, ig) || swapPlan(z as 'board' | 'stash', i, c.size, ig);
     return pl ? { z, i: pl.i, ok: true, moves: pl.moves } : { z, i, ok: false };
   }
   return null;
@@ -202,10 +202,11 @@ function showTgt(tg: Target | null) {
     elOf((tg as any).card)?.classList.add('mergeT');
     return;
   }
-  const t2 = tg as { z: Zone; i: number; ok: boolean; moves?: [Card, number][] };
+  const t2 = tg as { z: Zone; i: number; ok: boolean; moves?: Move[] };
   if (t2.moves)
-    for (const [o, p] of t2.moves) {
-      moveEl(o, p);
+    for (const [o, p, mz] of t2.moves) {
+      /* 换到另一个区的卡只闪一下，不在原区里挪 / a card swapping into the other zone just flashes instead of sliding within its own zone */
+      if (mz === o.loc) moveEl(o, p);
       elOf(o)?.classList.add('nudge');
     }
   const cs = cells(t2.z);
@@ -226,7 +227,11 @@ function markSyn(c: CardSpec, ignore: Card | null) {
   for (let i = 0; i + c.size <= 8; i++) if (fits('board', i, c.size, ignore) && synergyAt(c, i, ignore)) cs[i].classList.add('syn');
 }
 const applyMoves = (tg: any) => {
-  if (tg && tg.moves) for (const [o, p] of tg.moves) o.idx = p;
+  if (tg && tg.moves)
+    for (const [o, p, mz] of tg.moves as Move[]) {
+      o.loc = mz;
+      o.idx = p;
+    }
 };
 
 function endDrag(d: Drag) {
