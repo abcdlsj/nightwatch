@@ -137,6 +137,18 @@ export const CARD_HOOKS: Record<string, CardHook> = {
     },
   },
   pocketwatch: { on: { start: (c) => { for (const o of boardCards()) if (o !== c && o.size === 1) haste(o, 3, c); } } },
+  /* 月晷：C 位暴击时，其他卡都充能一点 */
+  moondial: {
+    on: {
+      crit: (c, x) => {
+        const b = bt();
+        if (!x.src || !x.src.carry || c.lastT > b.t - 0.3) return;
+        c.lastT = b.t;
+        view.cardFx(c, 'pop');
+        for (const o of boardCards()) if (o !== c && o !== x.src) chargeCard(o, 0.08 + 0.03 * stepOf(c), c);
+      },
+    },
+  },
 };
 
 export const RELIC_HOOKS: Record<string, Record<string, (n: number, x: X) => void>> = {

@@ -80,14 +80,18 @@ const JUMPS: Record<string, () => { opts: Opt[] }> = {
       } })),
     };
   },
-  /* 萤「图纸」：改装一张小卡——升一档（最多到钻）并立为 C 位 */
+  /* 萤「图纸」：改装一张小卡——升一档（最多到钻），再照着它做一张同流派的小卡。萤靠的是数量，不立 C 位 */
   ying: () => {
-    let cs = byDmg(board().filter((c) => c.size === 1));
-    if (!cs.length) cs = byDmg(board());
+    let cs = board().filter((c) => c.size === 1);
+    if (!cs.length) cs = board();
+    cs = cs.sort((a, b) => b.tier - a.tier || stats(b, null).total - stats(a, null).total);
     return {
       opts: cs.slice(0, 3).map((c) => ({ card: c, label: t('jump.ying.pick', { n: ITEMS[c.key].n }), sub: c.tier < 3 ? t('jump.ying.pickSub', { t: TIERS[c.tier + 1].n }) : L.ui.jump.ying.pickMax, act: () => {
         if (c.tier < 3) c.tier++;
-        crown(c);
+        repaint(c);
+        restart(elOf(c), 'merge');
+        const p = pathsOf('ying').find((x) => x.cards.includes(c.key) && pathOpen('ying', x));
+        gift((it) => it.size === 1 && it.hero === 'ying' && (!p || p.cards.some((k) => ITEMS[k] === it)), 0);
         afterMerge();
       } })),
     };

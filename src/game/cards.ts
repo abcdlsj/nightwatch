@@ -214,13 +214,16 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
   if (a === 'deadly') xs.push([ADJ.deadly.n, 1.5]);
   if (c.tier >= 3) xs.push([T.diamond, TUNE.diamond]);
   if (c.carry) xs.push([T.carry, TUNE.carry * (1 + TUNE.star * ((c as Card).star || 0)) * (1 + mv('xcarry'))]);
+  if (c.carry && it.asCarry) xs.push([T.asCarry, 1 + it.asCarry]);
   /* 【站位】 */
   if (c.loc === 'board') {
     const nb = c.nb || neighbors(c as Card);
     const bc = boardCards();
-    if (it.posMid && isMid(c as Card)) xs.push([T.pos, 1 + it.posMid]);
-    if (it.posEdge && (bc[0] === c || bc[bc.length - 1] === c)) xs.push([T.pos, 1 + it.posEdge]);
-    if (it.flank && nb.length === 2 && nb.every((n) => ITEMS[n.key].dmg === 0)) xs.push([T.pos, 1 + it.flank]);
+    /* 中军帐：占着正中时，所有站位乘区再加一截 */
+    const pb = bc.filter((o) => ITEMS[o.key].posBoost && isMid(o)).reduce((s2, o) => s2 + ITEMS[o.key].posBoost! * (1 + 0.25 * stepOf(o)), 0);
+    if (it.posMid && isMid(c as Card)) xs.push([T.pos, 1 + it.posMid + pb]);
+    if (it.posEdge && (bc[0] === c || bc[bc.length - 1] === c)) xs.push([T.pos, 1 + it.posEdge + pb]);
+    if (it.flank && nb.length === 2 && nb.every((n) => ITEMS[n.key].dmg === 0)) xs.push([T.pos, 1 + it.flank + pb]);
   }
   const xm = (k: string, l: string) => {
     const v = mv(k);
@@ -243,7 +246,10 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
   }
   if (mv('t_last') && G.wall < G.wallMax * 0.35) spd += 0.25;
   spd = Math.max(0.3, spd + mv('spd') + fitSpd(c as Card));
-  return { base, flat, pct, psum, xs, mult, total, cd: Math.max(0.25, cd / spd), cdRaw: it.cd, crit: 0.05 + (a === 'precise' ? 0.2 : 0) + mv('crit') };
+  /* 军旗手：相邻的兵器卡暴击率加一截 */
+  let critNb = 0;
+  if (it.kind === 'weapon' && c.loc === 'board') for (const n of c.nb || neighbors(c as Card)) critNb += (ITEMS[n.key].critNb || 0) * (1 + 0.5 * stepOf(n));
+  return { base, flat, pct, psum, xs, mult, total, cd: Math.max(0.25, cd / spd), cdRaw: it.cd, crit: 0.05 + (a === 'precise' ? 0.2 : 0) + mv('crit') + critNb };
 }
 
 /** 占着棋盘正中（第 4、5 格） */

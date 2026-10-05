@@ -57,6 +57,16 @@ export interface ItemDef {
   critCarry?: number;
   /** 辅助：触发时 C 位下一击附带【冻结】若干秒 */
   freezeCarry?: number;
+  /** 被其他卡带动出手（连锁、齐鸣、回响）时，伤害 ×(1+值) */
+  onChain?: number;
+  /** 辅助：相邻的【兵器】卡暴击率 +值 */
+  critNb?: number;
+  /** 当 C 位时，伤害再 ×(1+值) */
+  asCarry?: number;
+  /** 辅助：触发时 C 位本场伤害 +值（叠加，打完这夜清零） */
+  stackCarry?: number;
+  /** 占着正中时，所有【站位】乘区再 +值 */
+  posBoost?: number;
   /* 文案 */
   n: string; d: string; f: string; lore?: string; dn?: string; dl?: string;
   /** 任务说明（如「累计闪电弹跳」） */

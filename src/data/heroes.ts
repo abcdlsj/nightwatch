@@ -147,19 +147,18 @@ export const KITS: Record<string, KitDef[]> = {
   {
    "cards": [
     [
-     "dagger",
+     "pike",
      0
     ],
     [
-     "vetblade",
+     "warhorn",
      1
     ],
     [
-     "rally",
-     1
+     "dagger",
+     0
     ]
    ],
-   "gold": -3,
    "path": "drill"
   }
  ],
@@ -239,15 +238,19 @@ export const KITS: Record<string, KitDef[]> = {
   {
    "cards": [
     [
-     "oilspill",
+     "firecracker",
      0
     ],
     [
-     "paperkite",
-     1
+     "matchbox",
+     0
+    ],
+    [
+     "crackers",
+     0
     ]
    ],
-   "path": "lamp"
+   "path": "cracker"
   },
   {
    "cards": [
@@ -416,28 +419,29 @@ export interface PathDef {
 }
 export const PATHS: Record<string, PathDef[]> = {
   ayla: [
-    { id: 'blade', mast: 0, cards: ['oathsword', 'cleaver', 'arrowrain', 'greatsword', 'executioner', 'vetblade', 'javelin', 'ballista', 'whetstone', 'bloodrage', 'nightsword'], n: '', d: '' },
-    { id: 'oil', mast: 1, cards: ['oilflask', 'firebrand', 'detonate', 'emberblade', 'brand', 'flamethrower', 'phoenix', 'cinder', 'oilpit', 'oiltrap'], n: '', d: '' },
-    { id: 'drill', mast: 2, cards: ['warhorn', 'rally', 'wardrum', 'flagpole', 'banner', 'shieldwall', 'pike', 'tower'], n: '', d: '' },
+    { id: 'blade', mast: 0, cards: ['oathsword', 'cleaver', 'arrowrain', 'greatsword', 'executioner', 'vetblade', 'javelin', 'ballista', 'whetstone', 'bloodrage', 'nightsword', 'axe', 'headxbow', 'armorer', 'guillotine', 'honeblade'], n: '', d: '' },
+    { id: 'oil', mast: 1, cards: ['oilflask', 'firebrand', 'detonate', 'emberblade', 'brand', 'flamethrower', 'phoenix', 'cinder', 'oilpit', 'oiltrap', 'sparkwick'], n: '', d: '' },
+    { id: 'drill', mast: 2, cards: ['warhorn', 'rally', 'wardrum', 'flagpole', 'banner', 'shieldwall', 'pike'], n: '', d: '' },
   ],
   mo: [
-    { id: 'elem', mast: 0, cards: ['vial', 'prism', 'starfall', 'frostvial', 'icebomb', 'condenser', 'crucible', 'sunflare', 'jars'], n: '', d: '' },
-    { id: 'poison', mast: 1, cards: ['acidvial', 'plague', 'putrefy', 'needle', 'snakekiss', 'acidrain', 'plagueburst', 'concentrate', 'miasma', 'quicklime', 'midas', 'supersat', 'sagedrop'], n: '', d: '' },
-    { id: 'storm', mast: 2, cards: ['arcbottle', 'stormflask', 'resonate', 'shockvenom'], n: '', d: '' },
+    { id: 'elem', mast: 0, cards: ['vial', 'prism', 'starfall', 'frostvial', 'icebomb', 'condenser', 'crucible', 'sunflare', 'jars', 'frost', 'rime', 'dualflask'], n: '', d: '' },
+    { id: 'poison', mast: 1, cards: ['acidvial', 'plague', 'putrefy', 'needle', 'snakekiss', 'acidrain', 'plagueburst', 'concentrate', 'miasma', 'quicklime', 'midas', 'supersat', 'sagedrop', 'smokebomb'], n: '', d: '' },
+    { id: 'storm', mast: 2, cards: ['arcbottle', 'stormflask', 'resonate', 'shockvenom', 'tesla', 'thunder', 'netcoil', 'appwand', 'thunderking'], n: '', d: '' },
   ],
   ying: [
     { id: 'lamp', mast: 0, cards: ['firefly', 'oilspill', 'fuse', 'dragonlantern', 'paperlamp', 'paperkite', 'lamplight', 'beacon', 'oilpot', 'moth', 'skylantern', 'marquee', 'lamps', 'ffjar'], n: '', d: '' },
-    { id: 'gear', mast: 1, cards: ['musicbox', 'pendulum', 'gear', 'windup', 'clockwork', 'mainspring', 'toolbox', 'wickcut', 'pocketwatch'], n: '', d: '' },
-    { id: 'cracker', mast: 2, cards: ['firecracker', 'crackers', 'rocket', 'fireworks', 'matchbox', 'stall'], n: '', d: '' },
+    { id: 'gear', mast: 1, cards: ['musicbox', 'pendulum', 'gear', 'windup', 'clockwork', 'mainspring', 'toolbox', 'wickcut', 'pocketwatch', 'clock'], n: '', d: '' },
+    { id: 'cracker', mast: 2, cards: ['firecracker', 'crackers', 'rocket', 'fireworks', 'matchbox', 'stall', 'volley'], n: '', d: '' },
   ],
   jun: [
-    { id: 'turret', mast: 0, cards: ['turret', 'scaffold', 'bigcannon', 'mortar', 'shellman', 'gunner', 'grapeshot', 'bombard'], n: '', d: '' },
-    { id: 'works', mast: 1, cards: ['palisade', 'caltrop', 'watchtower', 'bastion', 'moat', 'spikewall', 'mason', 'stakes'], n: '', d: '' },
+    { id: 'turret', mast: 0, cards: ['turret', 'scaffold', 'bigcannon', 'mortar', 'shellman', 'gunner', 'grapeshot', 'bombard', 'cannon', 'tent', 'kiln', 'crenel'], n: '', d: '' },
+    { id: 'works', mast: 1, cards: ['palisade', 'caltrop', 'watchtower', 'bastion', 'moat', 'spikewall', 'mason', 'stakes', 'sling', 'alarmbell'], n: '', d: '' },
     { id: 'line', mast: 2, cards: ['powderkeg', 'crossbows', 'cogline', 'beehive', 'beacontower', 'trebuchet'], n: '', d: '' },
   ],
   li: [
-    { id: 'chart', mast: 0, cards: ['astrolabe', 'lens', 'comet', 'starseed', 'orrery', 'sextant', 'spyglass', 'wishstar'], n: '', d: '' },
-    { id: 'frost', mast: 1, cards: ['frostar', 'glacier', 'rimelance', 'northstar', 'rimeglass', 'aurora', 'icemoon'], n: '', d: '' },
+    { id: 'chart', mast: 0, cards: ['astrolabe', 'lens', 'comet', 'starseed', 'orrery', 'sextant', 'spyglass', 'wishstar', 'chartpage', 'sirius', 'moondial'], n: '', d: '' },
+    { id: 'frost', mast: 1, cards: ['frostar', 'glacier', 'rimelance', 'northstar', 'rimeglass', 'aurora', 'icemoon', 'frostseal', 'avalanche'], n: '', d: '' },
     { id: 'meteor', mast: 2, cards: ['stardust', 'starfire', 'pulsar', 'fallstar', 'galaxy', 'nova'], n: '', d: '' },
   ],
 };
+

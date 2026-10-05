@@ -51,6 +51,7 @@ export default {
     full: '满员',
     diamond: '钻',
     carry: 'C位',
+    asCarry: '当C位',
     pos: '站位',
   },
 
@@ -352,8 +353,8 @@ export default {
       ico: 'gear',
       hint: '改装一张小卡',
       pick: '改装 {n}',
-      pickSub: '升到{t}，并立为 C 位',
-      pickMax: '已经是钻了：立为 C 位',
+      pickSub: '升到{t}，再照着它做一张同流派的小卡',
+      pickMax: '已经是钻了：照着它再做一张同流派的小卡',
     },
     jun: {
       title: '布防图',

@@ -136,8 +136,13 @@ function fire(c: Card, depth: number) {
       view.link(c, n, '#73eff7', 0.25);
     }
   /* 为 C 位服务的辅助卡 */
-  const cc = it.chargeCarry || it.buffCarry || it.hasteCarry || it.critCarry || it.freezeCarry ? carryCard() : null;
+  const cc = it.chargeCarry || it.buffCarry || it.hasteCarry || it.critCarry || it.freezeCarry || it.stackCarry ? carryCard() : null;
   if (cc && cc !== c) {
+    if (it.stackCarry) {
+      cc.stk += it.stackCarry * (1 + 0.25 * stepOf(c));
+      view.link(c, cc, '#c2f4ff', 0.2);
+      view.cardNum(cc);
+    }
     if (it.chargeCarry) chargeCard(cc, it.chargeCarry * (1 + 0.2 * stepOf(c)), c);
     if (it.hasteCarry) haste(cc, it.hasteCarry * (1 + 0.2 * stepOf(c)), c);
     if (it.critCarry) {
@@ -238,7 +243,9 @@ function attack(c: Card, st: Stats, depth = 0) {
     dmg *= 1 + c.anvil;
     c.anvil = 0;
   }
-  const mods: HitMods = { slow: c.adj === 'chill' ? 0.3 : 0, kb: c.adj === 'heavy' ? 0.035 : 0, freeze: Math.max(it.freeze || 0, c.frostNext || 0), vuln: it.vuln || null, exec: it.exec || 0, burnDur: it.burnDur || 0, poisonDur: it.poisonDur || 0 };
+  /* 被别的卡带动出手（艾拉的军令） */
+  if (depth > 0 && it.onChain) dmg *= 1 + it.onChain;
+  const mods: HitMods = { slow: c.adj === 'chill' ? 0.3 : 0, kb: c.adj === 'heavy' ? 0.035 : 0, freeze: Math.max(it.freeze || 0, c.frostNext || 0), vuln: it.vuln || null, exec: it.exec || 0, burnDur: it.burnDur || 0, poisonDur: it.poisonDur || 0, pen: it.pen || 0 };
   c.frostNext = 0;
   const bm = crit && it.critBurn ? it.critBurn : 1;
   const W = world.W,
@@ -410,8 +417,8 @@ function attack(c: Card, st: Stats, depth = 0) {
     }
     case 'shell':
       proj(o, t, { spd: 0, kind: 'shell', arc: 1, dur: 0.42 }, (e, x, y) => {
-        view.boom(x!, y!, A, '#ef7d57');
-        inR(x!, y!, A, (en) => H_(en, 1, it.burn ? { burn: burnAmt() } : null));
+        view.boom(x!, y!, A, it.slow && !it.burn ? '#73eff7' : '#ef7d57');
+        inR(x!, y!, A, (en) => H_(en, 1, { ...(it.burn ? { burn: burnAmt() } : {}), ...(it.slow ? { slow: it.slow } : {}) }));
       });
       break;
     case 'quake': {

@@ -11,6 +11,7 @@ import { G, type Card, type Offer, type Wave, type Zone } from './state';
 import { recalcMods } from './mods';
 import { newCard, firstFit, countSame, zoneN } from './cards';
 import { talentOk, type ItemFilter } from './loot';
+import { cardOpen } from './unlocks';
 import { foeKey } from './foes';
 
 /* ---------------- 备战事件的条件 ---------------- */
@@ -23,7 +24,12 @@ export const EVENT_FILTER: Record<string, ItemFilter> = {
   armory: (it) => it.kind === 'weapon' || it.kind === 'firearm',
   apothecary: (it) => it.kind === 'potion' || it.kind === 'lamp',
 };
+/** 这个人物能买到的卡里，满足条件的有几张（专属卡要流派解锁） */
+const poolN = (f: ItemFilter) => Object.keys(ITEMS).filter((k) => !ITEMS[k].noPool && (!ITEMS[k].hero || ITEMS[k].hero === G.hero) && cardOpen(k) && f(ITEMS[k])).length;
+/** 专卖店（铁匠铺、炼火工坊……）：这个人物能买的同类卡不到 4 张就不开 */
+const shopOk = (id: string) => () => poolN(EVENT_FILTER[id]) >= 4;
 const EVENT_NEED: Record<string, () => boolean> = {
+  ...Object.fromEntries(Object.keys(EVENT_FILTER).map((id) => [id, shopOk(id)])),
   enchant: () => G.cards.length > 0,
   train: () => G.cards.some((c) => c.tier < 2),
   gamble: () => G.gold >= 3,

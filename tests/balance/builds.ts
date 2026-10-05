@@ -19,33 +19,33 @@ interface Arch {
 export const ARCHS: Record<string, Arch> = {
   volt: {
     hero: 'mo',
-    board: [[1, 'appwand'], [1, 'arcbottle'], [3, 'prism'], [2, 'stormflask'], [4, 'tesla']],
+    board: [[1, 'appwand'], [1, 'arcbottle'], [3, 'resonate'], [2, 'stormflask'], [4, 'tesla'], [6, 'thunder']],
     quests: { appwand: [3, 'thunderking'] },
     relics: ['wire', 'cloud', 'notes', 'stormeye', 'coil', 'medal'],
     talents: ['mo_20', 'quick', 'mo_21', 'mo_22'],
   },
   fire: {
     hero: 'mo',
-    board: [[1, 'vial'], [1, 'sparkwick'], [2, 'cannon'], [3, 'fuse'], [4, 'dragon']],
+    board: [[1, 'vial'], [1, 'icicle', undefined, 4], [2, 'prism'], [3, 'dualflask'], [5, 'sunflare']],
     relics: ['tinder', 'oil', 'wisp', 'powder', 'dragonheart', 'medal'],
     talents: ['mo_00', 'quick', 'mo_01', 'mo_02'],
   },
   blade: {
     hero: 'ayla',
-    board: [[1, 'dagger'], [1, 'oathsword'], [3, 'warhorn'], [2, 'xbow'], [4, 'axe']],
+    board: [[1, 'dagger'], [1, 'oathsword'], [3, 'warhorn'], [2, 'arrowrain'], [4, 'axe']],
     quests: { oathsword: [4, 'nightsword'] },
     relics: ['whet', 'spike', 'scope', 'fang', 'medal', 'venom'],
     talents: ['ayla_10', 'sharp', 'ayla_11', 'ayla_12'],
   },
   ice: {
     hero: 'mo',
-    board: [[1, 'condenser'], [1, 'frostvial', undefined, 4], [1, 'vial', undefined, 4], [2, 'frost'], [3, 'rime'], [5, 'blizzard']],
+    board: [[1, 'condenser'], [1, 'vial'], [2, 'dualflask'], [3, 'rime'], [5, 'icebomb']],
     relics: ['icepack', 'charm', 'permafrost', 'medal', 'timer', 'glass'],
     talents: ['mo_10', 'quick', 'mo_11', 'mo_12'],
   },
   poison: {
     hero: 'mo',
-    board: [[1, 'needle'], [1, 'acidvial', undefined, 4], [2, 'gasbomb'], [2, 'snakekiss', undefined, 4], [3, 'concentrate'], [5, 'miasma']],
+    board: [[1, 'needle'], [1, 'acidvial', undefined, 4], [2, 'plague'], [2, 'snakekiss', undefined, 4], [3, 'concentrate'], [5, 'miasma']],
     relics: ['expired', 'medal', 'timer', 'scope', 'fang', 'shard'],
     talents: ['quick', 'sharp', 'heavy', 'early'],
   },
@@ -57,10 +57,10 @@ export const ARCHS: Record<string, Arch> = {
   },
   drill: {
     hero: 'ayla',
-    board: [[1, 'pike'], [1, 'banner'], [2, 'shieldwall'], [2, 'rally'], [3, 'tower'], [5, 'warhorn']],
+    board: [[1, 'pike'], [1, 'warhorn'], [2, 'shieldwall'], [3, 'rally'], [4, 'executioner'], [6, 'banner']],
     relics: ['whet', 'spike', 'medal', 'scope', 'fang', 'venom'],
     talents: ['ayla_10', 'sharp', 'ayla_11', 'ayla_12'],
-    carry: ['shieldwall', 'tower'],
+    carry: ['shieldwall', 'executioner'],
   },
   cracker: {
     hero: 'ying',

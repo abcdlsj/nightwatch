@@ -175,7 +175,10 @@ export function pickKit(done: (k: KitDef, heat: number, full: boolean) => void) 
   const H = HEROES[G.hero];
   const all = KITS[G.hero] || [{ n: '', d: '', path: '', cards: H.start.map((s) => [s[0], s[1]] as [string, number]) }];
   const open = all.filter((k) => kitOpen(G.hero, k));
-  const list = [open[0], ...shuffled(open.slice(1))].slice(0, 3);
+  /* 每个解锁了的流派先出一套（第一个流派固定第一套），不够三套再从剩下的里随机补 */
+  const byPath: KitDef[] = [];
+  for (const k of [open[0], ...shuffled(open.slice(1))]) if (!byPath.some((x) => x.path === k.path)) byPath.push(k);
+  const list = [...byPath, ...shuffled(open.filter((k) => !byPath.includes(k)))].slice(0, 3);
   const sc = $('#screen');
   const T = L.ui.kits;
   setScene('title');

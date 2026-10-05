@@ -166,6 +166,16 @@ function jump(focus: Focus) {
     if (c) setCarry(c);
     return;
   }
+  if (h === 'ying') {
+    /* 萤的图纸：升一张小卡，再送一张同流派的小卡（不立 C 位） */
+    const c = bestDmg(focus, (x) => x.size === 1) || bestDmg(focus);
+    if (c && c.tier < 3) c.tier++;
+    const of = makeOffer((it) => it.size === 1 && it.hero === 'ying', { free: 1 });
+    if (!acquireState(of, null).ok) G.gold += 5;
+    checkMerges();
+    arrange(focus);
+    return;
+  }
   const cur = G.cards.find((c) => c.carry && c.loc === 'board');
   const c = h === 'li' && cur ? cur : h === 'ying' ? bestDmg(focus, (x) => x.size === 1) || bestDmg(focus) : bestDmg(focus);
   if (!c) return;
