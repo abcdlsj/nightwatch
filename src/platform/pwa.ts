@@ -5,16 +5,31 @@ import { isNative, isIOS } from './env';
 export const standalone = () =>
   (typeof matchMedia !== 'undefined' && matchMedia('(display-mode: standalone)').matches) || !!(navigator as any).standalone;
 
-/** iOS 26 主屏模式下 100% 高度少了顶部安全区那一截，底部留空、状态栏被毛玻璃盖住：直接按屏幕高度撑满 / in iOS 26 home-screen mode, 100% height is short by the top safe area, leaving a bottom gap and a frosted status bar: size to the screen height directly */
+/** iOS 26 主屏模式下 100% 高度少了顶部安全区那一截，底部留空、状态栏被毛玻璃盖住：直接按屏幕高度撑满。
+ * 切后台再回来时 iOS 会先报一次「对的」innerHeight 再缩回去，且不再发 resize，所以不能按 innerHeight 判断清掉，回前台后还要延时再撑一遍
+ * in iOS 26 home-screen mode, 100% height is short by the top safe area, leaving a bottom gap and a frosted status bar: size to the screen height directly.
+ * On returning from the background iOS briefly reports the "right" innerHeight, then shrinks back without another resize, so never clear based on innerHeight, and refit with delays after coming back */
 export function fitStandalone() {
   if (!isIOS() || isNative() || !standalone()) return;
   const fit = () => {
     const portrait = innerHeight >= innerWidth;
     const h = portrait ? Math.max(screen.width, screen.height) : Math.min(screen.width, screen.height);
-    document.documentElement.style.height = h > innerHeight ? h + 'px' : '';
+    document.documentElement.style.height = Math.max(h, innerHeight) + 'px';
+    if (scrollY || scrollX) scrollTo(0, 0);
+  };
+  const refit = () => {
+    fit();
+    requestAnimationFrame(fit);
+    for (const ms of [120, 400, 1000]) setTimeout(fit, ms);
   };
   fit();
   addEventListener('resize', fit);
+  addEventListener('orientationchange', refit);
+  addEventListener('pageshow', refit);
+  addEventListener('focus', refit);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refit();
+  });
 }
 
 /** 只在正式构建的网页版里注册（开发服务器和原生壳都不需要） / register only in production web builds (neither the dev server nor native needs it) */

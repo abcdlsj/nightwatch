@@ -27,11 +27,13 @@ export const EVENT_FILTER: Record<string, ItemFilter> = {
 /** 这个人物能买到的卡里，满足条件的有几张（专属卡要流派解锁） / how many of the cards this hero can buy meet the condition (exclusive cards need their archetype unlocked) */
 const poolN = (f: ItemFilter) => Object.keys(ITEMS).filter((k) => !ITEMS[k].noPool && (!ITEMS[k].hero || ITEMS[k].hero === G.hero) && cardOpen(k) && f(ITEMS[k])).length;
 /** 专卖店（铁匠铺、炼火工坊……）：这个人物能买的同类卡不到 4 张就不开 / specialty shop (smithy, fire forge…): does not open unless this hero has at least 4 buyable cards of that kind */
+/** 训练场能升到的最高档：第 4 夜前最多到银，之后最多到金 / highest tier the training ground can reach: silver before night 4, gold from then on */
+export const trainCap = () => (G.round < 4 ? 1 : 2);
 const shopOk = (id: string) => () => poolN(EVENT_FILTER[id]) >= 4;
 const EVENT_NEED: Record<string, () => boolean> = {
   ...Object.fromEntries(Object.keys(EVENT_FILTER).map((id) => [id, shopOk(id)])),
   enchant: () => G.cards.length > 0,
-  train: () => G.cards.some((c) => c.tier < 2),
+  train: () => G.cards.some((c) => c.tier < trainCap()),
   gamble: () => G.gold >= 3,
   spring: () => G.wall < G.wallMax,
   furnace: () => G.cards.length >= 2,

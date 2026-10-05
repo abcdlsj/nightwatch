@@ -11,7 +11,7 @@ import { G, type Card, type Offer, type PrepStop } from '../../game/state';
 import { stats, sellValue, basePrice, setCarry } from '../../game/cards';
 import { unlock, foundSecret, mastLv } from '../../game/meta';
 import { rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, rollItem, rollRule } from '../../game/loot';
-import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, type Dest } from '../../game/prep';
+import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, trainCap, type Dest } from '../../game/prep';
 import { heat } from '../../game/state';
 import { SFX } from '../../audio/sfx';
 import { buzz } from '../../audio/settings';
@@ -96,7 +96,7 @@ export function enterEvent(id: string) {
   } else if (id === 'train') {
     cur.mode = 'choice';
     cur.hint = T.trainHint;
-    cur.opts = shuffled(G.cards.filter((c) => c.tier < 2))
+    cur.opts = shuffled(G.cards.filter((c) => c.tier < trainCap()))
       .slice(0, 3)
       .map((c) => {
         const nx = Object.assign({}, c, { tier: c.tier + 1 });

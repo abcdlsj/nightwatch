@@ -40,14 +40,23 @@ let on = true,
   swAt = 0,
   step = 0,
   nextT = 0;
-let gain: GainNode | null = null,
+let gctx: AudioContext | null = null,
+  gain: GainNode | null = null,
   nbuf: AudioBuffer | null = null,
   hp: BiquadFilterNode | null = null;
 
 function setup(a: AudioContext) {
-  if (gain) return;
+  if (gain && gctx === a) return;
+  /* 音效那边换了新的 AudioContext（切后台回来），整套节点跟着重建 / the SFX side swapped in a fresh AudioContext (back from the background), so rebuild the whole graph */
+  const again = !!gain;
+  gctx = a;
   gain = a.createGain();
   gain.gain.value = 0;
+  if (again && cur && on) {
+    gain.gain.setValueAtTime(0.0001, a.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.9, a.currentTime + 0.5);
+    nextT = a.currentTime + 0.05;
+  }
   gain.connect(SFX.out() || a.destination);
   const n = (a.sampleRate * 0.3) | 0;
   nbuf = a.createBuffer(1, n, a.sampleRate);
@@ -161,7 +170,7 @@ export function initMusic() {
   setInterval(tick, 40);
   document.addEventListener('visibilitychange', () => {
     const a = SFX.ctx();
-    if (!a || !gain) return;
+    if (!a || !gain || a !== gctx) return;
     if (!document.hidden) nextT = a.currentTime + 0.1;
   });
 }
@@ -172,7 +181,7 @@ export const MUSIC = {
     mood = m;
     const a = SFX.ctx();
     pend = m;
-    if (a && gain && cur) {
+    if (a && gain && cur && a === gctx) {
       const now = a.currentTime;
       gain.gain.cancelScheduledValues(now);
       gain.gain.setValueAtTime(Math.max(0.0001, gain.gain.value), now);
@@ -183,7 +192,7 @@ export const MUSIC = {
   enable(v: boolean) {
     on = v;
     const a = SFX.ctx();
-    if (!a || !gain) return;
+    if (!a || !gain || a !== gctx) return;
     const now = a.currentTime;
     gain.gain.cancelScheduledValues(now);
     if (v) {

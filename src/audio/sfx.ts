@@ -5,6 +5,9 @@ let ac: AudioContext | null = null;
 let out: GainNode | null = null;
 let muted = false;
 let unlocked = false;
+/** 切过后台，下一次点按要换新的 AudioContext / went to the background; the next tap should swap in a fresh AudioContext */
+let stale = false;
+let hiddenAt = 0;
 let sil: HTMLAudioElement | null = null;
 let mbI = 0;
 const last: Record<string, number> = {};
@@ -27,7 +30,43 @@ function silentWav() {
   return 'data:audio/wav;base64,' + btoa(s);
 }
 
-/** 手机上要在点按里解锁：iOS 还得先切到「播放」音频会话，不然手机开了静音就全没声 / on phones audio must be unlocked inside a tap; iOS also needs the session switched to playback, or everything is silent with the mute switch on */
+function build() {
+  try {
+    ac = new (window.AudioContext || (window as any).webkitAudioContext)();
+  } catch {
+    ac = null;
+  }
+  if (!ac) return;
+  const c = ac.createDynamicsCompressor();
+  c.threshold.value = -12;
+  c.ratio.value = 12;
+  c.attack.value = 0.002;
+  c.connect(ac.destination);
+  out = ac.createGain();
+  out.gain.value = 2.2;
+  out.connect(c);
+  unlocked = false;
+}
+
+/** iOS 静音开关打开时靠这段循环静音把会话撑在「播放」；切后台会被系统暂停，回来要重新放 / with the iOS mute switch on, this looping silence holds the session at playback; the system pauses it in the background, so replay it on return */
+function keepSession() {
+  if (!isIOS()) return;
+  try {
+    if (!sil) {
+      sil = new Audio(silentWav());
+      sil.loop = true;
+      sil.setAttribute('playsinline', '');
+    }
+    if (sil.paused) sil.play()?.catch(() => {});
+  } catch {
+    sil = null;
+  }
+}
+
+/** 手机上要在点按里解锁：iOS 还得先切到「播放」音频会话，不然手机开了静音就全没声。
+ * 切后台再回来，iOS（尤其主屏模式）的 AudioContext 常常停在 interrupted，或者报 running 却没声，所以回来后的第一次点按直接换一个新的
+ * on phones audio must be unlocked inside a tap; iOS also needs the session switched to playback, or everything is silent with the mute switch on.
+ * After a trip to the background, iOS (especially home-screen mode) often leaves the AudioContext 'interrupted', or 'running' but silent, so the first tap after returning swaps in a fresh one */
 export function ensure() {
   try {
     const as = (navigator as any).audioSession;
@@ -35,25 +74,16 @@ export function ensure() {
   } catch {
     /* 不支持 audioSession 的浏览器 / browsers without audioSession support */
   }
-  if (!ac) {
-    try {
-      ac = new (window.AudioContext || (window as any).webkitAudioContext)();
-    } catch {
-      ac = null;
-    }
-    if (ac) {
-      const c = ac.createDynamicsCompressor();
-      c.threshold.value = -12;
-      c.ratio.value = 12;
-      c.attack.value = 0.002;
-      c.connect(ac.destination);
-      out = ac.createGain();
-      out.gain.value = 2.2;
-      out.connect(c);
-    }
+  if (stale && ac && isIOS()) {
+    ac.close().catch(() => {});
+    ac = null;
+    out = null;
   }
+  stale = false;
+  if (!ac) build();
   if (!ac) return;
   if (ac.state !== 'running') ac.resume().catch(() => {});
+  keepSession();
   if (!unlocked) {
     unlocked = true;
     try {
@@ -65,25 +95,23 @@ export function ensure() {
     } catch {
       /* 忽略 / ignore */
     }
-    if (!sil && isIOS()) {
-      try {
-        sil = new Audio(silentWav());
-        sil.loop = true;
-        sil.setAttribute('playsinline', '');
-        sil.play()?.catch(() => {
-          sil = null;
-        });
-      } catch {
-        sil = null;
-      }
-    }
   }
 }
 
 export function initSfx() {
   for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) document.addEventListener(ev, ensure, { capture: true, passive: true });
+  const back = () => {
+    if (document.hidden || !ac) return;
+    /* 先试着直接恢复（桌面和安卓够用了）；iOS 等下一次点按换新的 / try a plain resume first (enough on desktop and Android); on iOS the next tap swaps in a fresh context */
+    if (ac.state !== 'running') ac.resume().catch(() => {});
+    if (isIOS()) stale = true;
+  };
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && ac && ac.state !== 'running') ac.resume().catch(() => {});
+    if (document.hidden) hiddenAt = Date.now();
+    else if (hiddenAt) back();
+  });
+  addEventListener('pageshow', (e) => {
+    if ((e as PageTransitionEvent).persisted) back();
   });
 }
 
