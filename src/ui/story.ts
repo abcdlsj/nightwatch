@@ -9,7 +9,7 @@ import { spr } from '../render/sprites';
 import { SFX } from '../audio/sfx';
 import { $ } from './dom';
 
-import { fullPages, noDawnPages, type Page } from '../game/story';
+import { fullPages, noDawnPages, prologuePages, winPages, hiddenPrePages, type Page } from '../game/story';
 import { voiceOf } from './voice';
 type Mode = 'dawn' | 'fall' | 'night';
 
@@ -85,7 +85,13 @@ export function playStory(pages: Page[], mode: Mode, done?: () => void) {
   show();
 }
 
-export const playPrologue = (done: () => void) => playStory(L.story.prologue as Page[], 'night', done);
+export const playPrologue = (done: () => void) => playStory(prologuePages(), 'night', done);
+/** 完整线第 15 夜：隐藏首领出来之前（人物写了才有） */
+export function playHiddenPre(done: () => void) {
+  const p = hiddenPrePages();
+  if (p) playStory(p, 'night', done);
+  else done();
+}
 /** 完整线：第 9 夜首领倒下，天没亮 */
 export const playNoDawn = (done: () => void) => playStory(noDawnPages(G.boss9), 'night', done);
 /** 完整线：第 15 夜宝石不全，安静地天亮 */
@@ -97,7 +103,7 @@ export const playLose = (done: () => void) => playStory(L.story.lose as Page[], 
 /** 黎明：首领不同第一句不同；满足条件时多出隐藏剧情（借来的星、第七百零一下） */
 export function playWin(done: () => void) {
   const S = L.story as any;
-  const pages: Page[] = [{ who: 'narr', t: S.winBy[G.boss9] || S.win[0].t }, ...S.win.slice(1)];
+  const pages: Page[] = winPages(G.boss9);
   const onBoard = (k: string) => boardCards().some((c) => c.key === k);
   if (G.hero === 'mo' && onBoard('starfall')) {
     foundSecret('star');

@@ -3299,6 +3299,90 @@ def portraits():
     for x, y in ((8, 28), (23, 28)): c.px(x, y, 'w', True)
     c.rect(15, 22, 17, 24, 'Y', True); c.px(16, 21, 'Y', True); c.px(16, 25, 'Y', True); c.px(14, 23, 'y', True); c.px(18, 23, 'y', True); c.px(16, 23, 'w', True)  # 星扣
     P['p_li'] = c.done(hl=HLP)
+    P.update(cast())
+    return P
+
+
+# ---------------------------------------------------------------- 配角立绘 32×32：剧情里和守夜人说话的人
+def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', shade='F', eyes='open', age=0, beard=None, extra=None):
+    """配角通用的半身像。style：short 短发 / long 长发 / bun 发髻 / bald 光头 / cap 布帽 / hood 兜帽 / helm 头盔 / scarf 头巾；
+    eyes：open / closed（瞎了或闭着）/ glasses；age：0 年轻 1 中年 2 老；beard：胡子颜色；extra(c) 再画点别的"""
+    c = Cv(32, 32)
+    if style == 'long': c.ell(16, 13, 10.5, 11, hair); c.poly([(5.5, 13), (26.5, 13), (27, 27), (5, 27)], hair)
+    elif style in ('short', 'bun', 'scarf'): c.ell(16, 12, 9.5, 10, hair)
+    elif style == 'hood': c.ell(16, 14, 11.5, 12.5, cloth2)
+    c.poly([(2, 32), (4, 25), (10, 21), (22, 21), (28, 25), (30, 32)], cloth)
+    c.poly([(11, 21), (21, 21), (19, 28), (13, 28)], cloth2)
+    c.rect(13, 18, 18, 22, shade)
+    c.ell(16, 13.5 if age < 2 else 14, 6.6, 7.6, skin)
+    for y in range(6, 23):
+        for x in range(18, 24):
+            if c.get(x, y) == skin and (x - 16) > 3: c.px(x, y, shade)
+    if style in ('short', 'long', 'bun'):
+        c.poly([(8.5, 12), (9, 6), (13, 3), (19, 3), (23.5, 6), (23.5, 12), (21, 8), (16, 7.5), (11, 8.5)], hair)
+        if style == 'bun': c.ell(16, 2.5, 3.5, 2.6, hair); c.px(16, 2, hl, True)
+        for x, y in ((11, 4), (12, 4), (13, 4)): c.px(x, y, hl, True)
+    elif style == 'bald':
+        for x, y in ((12, 7), (13, 6), (14, 6)): c.px(x, y, 'i', True)
+        c.px(9, 12, hair); c.px(9, 13, hair); c.px(23, 12, hair); c.px(23, 13, hair)
+    elif style == 'cap': c.poly([(8, 11), (8, 5), (12, 2.5), (20, 2.5), (24, 5), (24, 11), (21, 7.5), (11, 7.5)], hair); c.line(8, 8, 24, 8, hl, 1, True)
+    elif style == 'scarf': c.rect(8, 5, 24, 9, hair); c.line(8, 9, 24, 9, hl, 1, True); c.poly([(23, 8), (27, 10), (26, 14), (24, 11)], hair)
+    elif style == 'hood': c.poly([(5, 17), (7, 5), (16, 1), (25, 5), (27, 17), (23, 8), (16, 5), (9, 8)], cloth2)
+    elif style == 'helm':
+        c.ell(16, 8, 8.5, 6.5, 's'); c.rect(8, 8, 24, 10, 's'); c.line(8, 10, 24, 10, 'd', 1, True); c.line(16, 2, 16, 9, 'g', 1, True)
+    if eyes == 'closed':
+        c.line(11, 13, 13, 13, 'k', 1, True); c.line(18, 13, 20, 13, 'k', 1, True)
+    else:
+        c.rect(11, 12, 13, 13, 'k', True); c.px(12, 12, 'w', True); c.rect(18, 12, 20, 13, 'k', True); c.px(19, 12, 'w', True)
+        if eyes == 'glasses': c.rect(10, 11, 14, 14, 'g'); c.rect(17, 11, 21, 14, 'g'); c.rect(11, 12, 13, 13, 'k', True); c.rect(18, 12, 20, 13, 'k', True); c.px(12, 12, 'C', True); c.px(19, 12, 'C', True); c.line(14, 12, 17, 12, 'g', 1, True)
+    if age >= 1: c.line(11, 14, 12, 14, shade, 1, True); c.line(19, 14, 20, 14, shade, 1, True)
+    if age >= 2: c.px(10, 16, shade, True); c.px(21, 16, shade, True); c.line(14, 20, 18, 20, shade, 1, True)
+    c.px(16, 15, shade, True); c.px(16, 16, shade, True)
+    c.line(15, 18, 17, 18, 'r', 1, True)
+    if beard:
+        for x in range(10, 23):
+            for y in range(16, 23):
+                if c.get(x, y) in (skin, shade) and (y >= 18 or x <= 10 or x >= 22): c.px(x, y, beard, True)
+        c.line(14, 18, 18, 18, 'r', 1, True)
+    if extra: extra(c)
+    return c.done(hl=HLP)
+
+
+def cast():
+    P = {}
+    # 艾拉那边
+    P['p_karl'] = person(hair='y', hl='Y', style='short', cloth='p', cloth2='P', age=1, beard='N',            # 卡尔：金发络腮胡，紫披风，额上一道旧疤
+                         extra=lambda c: (c.line(13, 8, 15, 10, 'r', 1, True), c.ell(5.5, 25, 4.5, 3.2, 'g'), c.ell(26.5, 25, 4.5, 3.2, 'g')))
+    P['p_xiaoman'] = person(hair='n', hl='N', style='scarf', cloth='b', cloth2='c',                          # 小满：十三岁，扎头巾，背着水罐
+                            extra=lambda c: (c.px(11, 15, 'o', True), c.px(20, 15, 'o', True), c.rect(24, 24, 28, 30, 'N'), c.rect(25, 23, 27, 23, 'n')))
+    P['p_chu'] = person(hair='w', hl='w', style='bald', cloth='d', cloth2='s', eyes='closed', age=2, beard='w',  # 老褚：瞎了的老队长，白胡子，旧军服
+                        extra=lambda c: (c.px(8, 26, 'y', True), c.px(9, 26, 'y', True), c.line(11, 11, 13, 11, 'w', 1, True), c.line(18, 11, 20, 11, 'w', 1, True)))
+    # 墨那边
+    P['p_suyan'] = person(hair='a', hl='A', style='bun', cloth='g', cloth2='w', eyes='glasses',               # 苏砚：学院的研究员，盘发，灰白学袍
+                          extra=lambda c: (c.line(20, 2, 24, 0, 'y', 1, True), c.px(14, 24, 'P', True), c.px(18, 24, 'P', True)))
+    P['p_shen'] = person(hair='s', hl='g', style='bun', cloth='b', cloth2='c', age=2, skin='f', shade='F',     # 老沈：墨的娘，染坊老板娘，靛蓝的手
+                         extra=lambda c: (c.rect(5, 28, 9, 31, 'b'), c.rect(23, 28, 27, 31, 'b'), c.px(6, 29, 'c', True)))
+    # 萤那边
+    P['p_qin'] = person(hair='g', hl='w', style='cap', cloth='n', cloth2='N', eyes='glasses', age=2, beard='g',  # 秦师父：灯匠，老花镜，皮围裙
+                        extra=lambda c: (c.rect(24, 24, 28, 29, 'd'), c.rect(25, 25, 27, 28, 'Y', True)))
+    P['p_ahe'] = person(hair='x', hl='m', style='short', cloth='G', cloth2='l',                              # 阿禾：卖灯油的小伙子，挑着油桶
+                        extra=lambda c: (c.line(2, 22, 30, 22, 'n', 1), c.rect(1, 23, 4, 28, 'N'), c.rect(28, 23, 31, 28, 'N')))
+    P['p_douzi'] = person(hair='a', hl='A', style='short', cloth='R', cloth2='o',                            # 豆子：萤教做纸灯的孩子，缺了门牙
+                          extra=lambda c: (c.px(11, 15, 'o', True), c.px(20, 15, 'o', True), c.px(16, 18, 'k', True), c.rect(4, 24, 8, 29, 'y'), c.px(6, 26, 'Y', True)))
+    # 钧那边
+    P['p_oldshi'] = person(hair='x', hl='m', style='scarf', cloth='g', cloth2='n', age=2, beard='s',          # 老石：钧的爹，砌了一辈子墙，雾一样淡
+                           extra=lambda c: [c.px(x, y, '.') for y in range(26, 32) for x in range(0, 32) if (x + y) % 3 == 0])
+    P['p_guizhi'] = person(hair='a', hl='A', style='bun', cloth='R', cloth2='y', age=1,                       # 桂枝：钧的媳妇，面摊老板娘
+                           extra=lambda c: (c.ell(16, 2.5, 3.5, 2.6, 'a'), c.line(13, 1, 19, 4, 'y', 1, True)))
+    P['p_shitou'] = person(hair='x', hl='m', style='short', cloth='N', cloth2='n',                           # 石头：钧的儿子，九岁，手里一块砖
+                           extra=lambda c: (c.px(11, 15, 'o', True), c.px(20, 15, 'o', True), c.rect(23, 25, 28, 28, 'r'), c.line(23, 26, 28, 26, 'e', 1, True)))
+    P['p_hans'] = person(hair='g', hl='w', style='helm', cloth='s', cloth2='g', age=2, beard='g',             # 汉斯：死了三年的老兵，盔是旧的
+                         extra=lambda c: (c.px(12, 12, 'C', True), c.px(19, 12, 'C', True)))
+    # 璃那边
+    P['p_popo'] = person(hair='w', hl='w', style='bun', cloth='d', cloth2='b', eyes='closed', age=2,         # 婆婆：老守星人，眼睛快看不见了
+                         extra=lambda c: (c.px(5, 27, 'Y', True), c.px(26, 28, 'Y', True), c.line(19, 0, 22, 3, 'Y', 1, True)))
+    P['p_lifa'] = person(hair='g', hl='w', style='hood', cloth='d', cloth2='s', age=1, beard='g',            # 璃的爹：往北走了的人，兜帽上落满雪
+                         extra=lambda c: (c.px(8, 6, 'w', True), c.px(23, 5, 'w', True), c.px(13, 2, 'w', True), c.px(26, 12, 'w', True)))
     return P
 
 

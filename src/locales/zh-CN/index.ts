@@ -8,5 +8,6 @@ import terms from './terms';
 import meta from './meta';
 import story from './story';
 import ui from './ui';
+import heroStory from './story/index';
 
-export default { cards, relics, talents, enemies, events, heroes, terms, meta, story, ui };
+export default { cards, relics, talents, enemies, events, heroes, terms, meta, story, ui, heroStory };

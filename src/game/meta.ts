@@ -12,6 +12,7 @@ import { HEROES, HERO_ORDER } from '../data/heroes';
 import { recalcMods } from './mods';
 import { pick } from '../core/rng';
 import { finalBosses, lastNight } from './plan';
+import { heroStory } from './story';
 
 export interface HistEntry {
   id: number; t: number; h: string; w: number; r: number; en: number; heat: number; set: string; boss: string;
@@ -36,6 +37,8 @@ export interface Meta {
   heroes?: Record<string, number>;
   /** 每个人物各自的长夜难度：最高解锁到几档、现在选的几档 */
   heat?: Record<string, { max: number; sel: number }>;
+  /** 每个人物下一局走第几套剧情 */
+  arcNext?: Record<string, number>;
   /** 第 9 夜首领轮换：每个人物这一轮已经打过的首领 */
   bossCycle?: Record<string, string[]>;
   /** 每个人物用哪些流派的起手守到过黎明 */
@@ -137,6 +140,16 @@ export function fullDone(kind: 'hidden' | 'quiet') {
     unlock('truth');
     unlock('hid_' + G.hero);
   }
+}
+
+/* ---------------- 剧情：每个人物的几套夜晚按顺序轮，一局一套 ---------------- */
+export function nextArc(hero: string) {
+  const n = heroStory(hero).arcs?.length || 1;
+  const A = (META.arcNext ||= {});
+  const k = (A[hero] || 0) % n;
+  A[hero] = k + 1;
+  saveMeta();
+  return k;
 }
 
 /* ---------------- 第 9 夜首领轮换：这个人物还没打过的先来，五个都打过一轮再重新开始 ---------------- */

@@ -259,6 +259,20 @@ export default {
   "narr": "战报",
   "soldier": "城头守军",
   "bellman": "敲钟人老吉",
-  "greyrobe": "灰袍的声音"
+  "greyrobe": "灰袍的声音",
+  "karl": "卡尔",
+  "xiaoman": "小满",
+  "chu": "老褚",
+  "suyan": "苏砚",
+  "shen": "老沈",
+  "qin": "秦师父",
+  "ahe": "阿禾",
+  "douzi": "豆子",
+  "oldshi": "老石",
+  "guizhi": "桂枝",
+  "shitou": "石头",
+  "hans": "汉斯",
+  "popo": "婆婆",
+  "lifa": "璃的父亲"
  }
 };

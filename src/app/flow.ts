@@ -9,7 +9,7 @@ import { pick, reseed, newSeed, rng } from '../core/rng';
 import { G, freshRun, type PrepStop } from '../game/state';
 import { recalcMods } from '../game/mods';
 import { boardCards } from '../game/cards';
-import { codexSweep, runWon, mastStart, nextBoss, markBoss, fullDone } from '../game/meta';
+import { codexSweep, runWon, mastStart, nextBoss, markBoss, fullDone, nextArc } from '../game/meta';
 import { markPathWin } from '../game/unlocks';
 import { NIGHTS, GEM_NIGHTS, nightKind, lastNight, finalBosses } from '../game/plan';
 import { rollDoors, hordeWave, ambushWave, ambushGold, placeKit } from '../game/prep';
@@ -30,7 +30,7 @@ import { elOf, renderOwned, repaint, clearCardEls, clearCharges } from '../ui/ca
 import { updateHUD, renderRelics, toast, banner, resetGoldBump } from '../ui/hud';
 import { say, clearVO } from '../ui/voice';
 import { closeSheet } from '../ui/sheets';
-import { playPrologue, playWin, playLose, playNoDawn, playQuiet, playTrueWin } from '../ui/story';
+import { playPrologue, playWin, playLose, playNoDawn, playQuiet, playTrueWin, playHiddenPre } from '../ui/story';
 import { showReport, type Row } from '../ui/report';
 import { prepBossbar } from '../ui/battle-view';
 import { renderPreview, renderPrep } from './prep/view';
@@ -58,6 +58,7 @@ export function newGame(hero: string) {
     cards: [], relics: [], skills: [], bestChain: 0, secret: {}, foeSet: pick(Object.keys(FOESETS)), full: false, gems: {}, arc: 0,
   });
   G.boss9 = nextBoss(G.hero);
+  G.arc = nextArc(G.hero);
   G.boss12 = pick(finalBosses().filter((k) => k !== G.boss9));
   recalcMods();
   renderRelics();
@@ -123,6 +124,11 @@ export function toPrep() {
   renderOwned();
   updateHUD();
   if (G.firstPrep && !G.prep.talk) G.firstPrep = false;
+  /* 完整线第 15 夜：隐藏首领出来之前，先有一段话（只播一次，读档回来不再播） */
+  if (nightKind(G.round) === 'hidden' && !G.secret.hiddenPre) {
+    G.secret.hiddenPre = 1;
+    playHiddenPre(() => {});
+  }
   /* 完整线第 15 夜宝石不全：北边什么都没出来，听完一段话天就亮了 */
   if (nightKind(G.round) === 'quiet') {
     $('#prep').hidden = true;

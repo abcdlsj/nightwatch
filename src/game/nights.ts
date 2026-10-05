@@ -2,6 +2,7 @@
 import { L, t } from '../i18n';
 import { G } from './state';
 import { nightBoss, nightKind, NIGHTS } from './plan';
+import { heroBeats } from './story';
 
 export interface NightInfo {
   title: string;
@@ -11,7 +12,19 @@ export interface NightInfo {
 /** 第几夜（汉字） */
 export const nightNum = (r: number) => (L.ui.night.num as string[])[r - 1] || String(r);
 
+/** 公共剧情 + 这个人物自己的几句（人物写了，就不用公共剧情里给每个人物准备的那几句） */
+function merge(base: NightInfo, own: [number, string, any][] | null): NightInfo {
+  if (!own) return base;
+  const beats = base.beats.filter((b) => b[1] !== 'hero').concat(own);
+  return { title: base.title, beats: beats.sort((a, b) => a[0] - b[0]) };
+}
+
 export function nightInfo(r: number): NightInfo {
+  const kind = nightKind(r);
+  return kind === 'endless' ? baseInfo(r) : merge(baseInfo(r), heroBeats(r, nightBoss(r)));
+}
+
+function baseInfo(r: number): NightInfo {
   const S = L.story as any;
   const kind = nightKind(r);
   if (kind === 'endless') return { title: t('night.endless', { r }), beats: [] };

@@ -20,7 +20,7 @@ import { elOf, renderOwned, repaint } from '../../ui/card-view';
 import { updateHUD, renderRelics, toast, tipOnce } from '../../ui/hud';
 import { renderPrep } from './view';
 import { prepStops } from './jumps';
-import { gemScene } from '../../game/story';
+import { gemScene, talkScene } from '../../game/story';
 import { GEMS, gemCount, type Gem } from '../../game/plan';
 import { pickLine } from '../../game/text';
 
@@ -324,8 +324,7 @@ export function endGem() {
 
 /* ---------------- 夜谈 / 学天赋 ---------------- */
 export function startTalk() {
-  const talks = L.story.talks as any[];
-  const sc = talks[Math.floor((G.round - 1) / 2) % talks.length];
+  const sc = talkScene(G.round);
   G.prep.cur = { id: 'talk', talk: 1, mode: 'talk', who: sc.who, title: sc.title, sc, li: 1, intro: sc.lines };
 }
 /** 夜谈选了一个回答：按回答的倾向抽天赋 */
