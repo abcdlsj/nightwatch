@@ -110,6 +110,9 @@ export default {
     sum: '合计',
     leaked: '这夜漏过去最多的',
     leakedV: '{n} · 撞墙 {w}',
+    isNew: '新',
+    gone: '上夜出手、今夜没上：',
+    vs: '灰色小字是第{r}夜',
   },
 
   flow: {

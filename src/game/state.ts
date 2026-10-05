@@ -83,6 +83,16 @@ export interface SpawnSpec {
 export type Wave = SpawnSpec[] & { surges?: number[]; threats?: string[] };
 
 /** 这一局的统计（成就、过往守夜用） / this run's stats (for achievements and past nights) */
+/** 一夜战报的快照：每张卡的伤害、出手次数，和整夜的几项数 / one night's report snapshot: per-card damage and trigger counts, plus the night's totals */
+export interface RepSnap {
+  r: number;
+  cards: { key: string; tier: number; dmg: number; trig: number }[];
+  kills: number;
+  chain: number;
+  combo: number;
+  wall: number;
+}
+
 export interface RunStats {
   maxBoard: number;
   wallLost: number;
@@ -91,6 +101,8 @@ export interface RunStats {
   wagers: number;
   maxCombo: number;
   got: string[];
+  /** 上一夜战报的快照，下一夜战报拿来对照 / a snapshot of last night's report, compared against in the next one */
+  prevRep?: RepSnap;
   lastPure?: boolean;
   lastSmall?: boolean;
   lastBig?: boolean;

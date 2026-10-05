@@ -3,7 +3,7 @@ import { ITEMS, TAGC } from '../data/cards';
 import { EN } from '../data/enemies';
 import { L, t } from '../i18n';
 import { fmt } from '../core/util';
-import { G, type Card } from '../game/state';
+import { G, type Card, type RepSnap } from '../game/state';
 import { pickLine } from '../game/text';
 import { CARD_HOOKS, passiveSrc } from '../sim/hooks';
 import type { Battle } from '../sim/types';
@@ -40,6 +40,29 @@ function srcLine(c: Card) {
 
 export type Row = [string, number, number?, string?];
 
+/** 和上一夜对照：同名卡按伤害高低一一配对（合成、升档也算同一张），配不上的是新上场的；上夜有、这夜没出手的另列一行
+ * compare with last night: same-name cards pair up by damage rank (merges and upgrades count as the same card); unpaired ones are new; cards that played last night but not tonight get their own line */
+function pairPrev(bc: Card[], prev: RepSnap | undefined) {
+  const left = prev ? prev.cards.slice().sort((a, z) => z.dmg - a.dmg) : [];
+  const got = new Map<Card, RepSnap['cards'][number] | null>();
+  for (const c of bc) {
+    const i = left.findIndex((p) => p.key === c.key);
+    got.set(c, i >= 0 ? left.splice(i, 1)[0] : null);
+  }
+  return { got, gone: left.filter((p) => p.dmg > 0 || p.trig > 0) };
+}
+function deltaCell(now: number, was: number | undefined, isNew: boolean) {
+  const T = L.ui.report;
+  if (isNew) return `<i class="rp-dl new">${T.isNew}</i>`;
+  if (was === undefined) return '<i class="rp-dl"></i>';
+  if (!was && !now) return '<i class="rp-dl"></i>';
+  const d = was ? (now - was) / was : 1;
+  const cls = d > 0.05 ? 'up' : d < -0.05 ? 'down' : '';
+  const v = !was ? '' : Math.abs(d) < 0.05 ? '≈' : (d > 0 ? '▲' : '▼') + Math.min(999, Math.round(Math.abs(d) * 100)) + '%';
+  return `<i class="rp-dl ${cls}"><small>${fmt(was)}</small>${v}</i>`;
+}
+const vsMeta = (now: number, was: number | undefined) => (was === undefined ? '' : `<small>${now > was ? '▲' : now < was ? '▼' : ''}${fmt(was)}</small>`);
+
 /** 守住一夜的战报，点「收下」后回调 / the report after holding a night; the callback runs when 'Collect' is tapped */
 export function showReport(b: Battle, was: number, rows: Row[], total: number, onCash: () => void) {
   const T = L.ui.report;
@@ -48,19 +71,41 @@ export function showReport(b: Battle, was: number, rows: Row[], total: number, o
     .filter((c) => c.bTrig > 0 || c.bDmg > 0 || supOf(c) || (c.loc === 'board' && ITEMS[c.key].passive))
     .sort((a, z) => z.bDmg - a.bDmg);
   const mx = Math.max(1, ...bc.map((c) => c.bDmg));
+  const prev = G.run?.prevRep && G.run.prevRep.r === was - 1 ? G.run.prevRep : undefined;
+  const { got, gone } = pairPrev(bc, prev);
   rp.innerHTML = `<div class="rp-title win">${t('report.title', { r: was, s: pickLine(L.story.report.win) })}</div>
+  ${prev ? `<div class="rp-legend">${t('report.vs', { r: prev.r })}</div>` : ''}
   <div class="rp-list">${
     bc
       .map(
         (c, i) =>
-          `<div class="rp-row" style="animation-delay:${i * 0.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${spr(c.key).url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${((c.bDmg / mx) * 100).toFixed(1)}"></i></div><b>${c.bDmg ? fmt(c.bDmg) : supOf(c) ? `<em>${T.support}</em>` : ITEMS[c.key].passive ? `<em>${T.passive}</em>` : '0'}<small>×${c.bTrig}</small></b>${srcLine(c)}</div>`,
+          `<div class="rp-row" style="animation-delay:${i * 0.07}s;--tagc:${TAGC[ITEMS[c.key].tag]}"><img src="${spr(c.key).url}" alt=""><span>${ITEMS[c.key].n}</span><div class="bar"><i data-w="${((c.bDmg / mx) * 100).toFixed(1)}"></i></div><b>${c.bDmg ? fmt(c.bDmg) : supOf(c) ? `<em>${T.support}</em>` : ITEMS[c.key].passive ? `<em>${T.passive}</em>` : '0'}<small>×${c.bTrig}</small></b>${prev ? deltaCell(c.bDmg, got.get(c)?.dmg, !got.get(c)) : ''}${srcLine(c)}</div>`,
       )
       .join('') || `<div class="rp-meta">${T.nobody}</div>`
+  }${
+    gone.length
+      ? `<div class="rp-gone">${T.gone}${gone.map((p) => `<span><img src="${spr(p.key).url}" alt="">${ITEMS[p.key].n} ${fmt(p.dmg)}</span>`).join('')}</div>`
+      : ''
   }</div>
-  <div class="rp-meta">${(was + 1) % 2 === 1 ? `<b style="color:#ffd166">${T.talkTomorrow}</b>　` : ''}${t('report.meta', { c: b.maxChain || 1, k: b.kills, cb: b.maxCombo, w: Math.ceil(b.wallLost) })}</div>
+  <div class="rp-meta">${(was + 1) % 2 === 1 ? `<b style="color:#ffd166">${T.talkTomorrow}</b>　` : ''}${t('report.meta', {
+    c: (b.maxChain || 1) + vsMeta(b.maxChain || 1, prev?.chain),
+    k: b.kills + vsMeta(b.kills, prev?.kills),
+    cb: b.maxCombo + vsMeta(b.maxCombo, prev?.combo),
+    w: Math.ceil(b.wallLost) + vsMeta(Math.ceil(b.wallLost), prev?.wall),
+  })}</div>
   <div class="rp-cash" id="cash"></div>
   <button class="btn gold big" id="cashBtn" style="flex:none">${T.take} <img class="ico" src="${spr('coin').url}" alt=""><b>${total}</b></button>`;
   rp.hidden = false;
+  rp.classList.toggle('vs', !!prev);
+  if (G.run)
+    G.run.prevRep = {
+      r: was,
+      cards: bc.map((c) => ({ key: c.key, tier: c.tier, dmg: Math.round(c.bDmg), trig: c.bTrig })),
+      kills: b.kills,
+      chain: b.maxChain || 1,
+      combo: b.maxCombo,
+      wall: Math.ceil(b.wallLost),
+    };
   setTimeout(() => $$('.bar i', rp).forEach((i) => (i.style.width = i.dataset.w + '%')), 60);
   const cash = $('#cash');
   let i = 0;

@@ -17,3 +17,12 @@
 .cash-row{display:flex;justify-content:space-between;font-size:15px;opacity:0;animation:rowIn .25s ease-out forwards}
 .cash-row b{font-family:var(--px);color:#ffd166}
 .cash-row.total{border-top:2px dashed rgba(255,255,255,.15);padding-top:4px;font-size:18px}
+#report.vs .rp-row{grid-template-columns:34px 44px 1fr auto 46px}
+.rp-dl{font-style:normal;font-family:var(--px);font-size:12px;line-height:1.1;text-align:right;color:var(--muted);display:flex;flex-direction:column;align-items:flex-end}
+.rp-dl small{font-size:10px;opacity:.75}
+.rp-dl.up{color:#9bf0b8}.rp-dl.down{color:#ff8a7a}.rp-dl.new{color:#ffd166;font-family:var(--zh);font-size:12px}
+.rp-gone{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:12px;color:var(--muted);padding:2px 2px 0}
+.rp-gone span{display:flex;align-items:center;gap:3px;font-family:var(--px)}
+.rp-gone img{width:18px;height:18px;image-rendering:pixelated}
+.rp-legend{text-align:right;font-size:11px;color:var(--muted);margin-bottom:-2px}
+.rp-meta b small{font-size:10px;margin-left:2px;color:var(--muted)}
