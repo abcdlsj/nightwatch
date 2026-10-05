@@ -22,8 +22,6 @@
   padding-top:var(--sat);
   padding-bottom:var(--sab);
 }
-/* iOS 26 主屏模式在状态栏下方加了一条渐隐毛玻璃，会压到顶栏：顶栏只下移一点，躲开最浓的那段 / iOS 26 home-screen mode adds a fading frosted strip under the status bar that covers the top bar: nudge the top bar down just enough to clear its densest part */
-@supports (-webkit-touch-callout:none){ :root.standalone{--sat:calc(env(safe-area-inset-top,0px) + 12px)} }
 /* 游戏本身就是暗色美术，明暗两种环境使用同一套色板 / the game is dark art by design, so light and dark environments share one palette */
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0f1c20; --panel:#1c2a30; } }
 :root[data-theme="dark"]{ --bg:#0f1c20; --panel:#1c2a30; }
