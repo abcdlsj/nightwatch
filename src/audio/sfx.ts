@@ -44,7 +44,8 @@ export function ensure() {
     if (ac) {
       const c = ac.createDynamicsCompressor();
       c.threshold.value = -12;
-      c.ratio.value = 6;
+      c.ratio.value = 12;
+      c.attack.value = 0.002;
       c.connect(ac.destination);
       out = ac.createGain();
       out.gain.value = 2.2;
@@ -94,14 +95,17 @@ function tone(f: number, d: number, type?: OscillatorType, vol?: number, slide?:
   o.type = type || 'square';
   o.frequency.setValueAtTime(f, t);
   if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, f * slide), t + d);
-  g.gain.setValueAtTime(vol || 0.04, t);
+  /* 几毫秒渐入，免得起音直接顶满在手机外放上爆音 / a few ms fade-in so the attack doesn't hit full level and crackle on phone speakers */
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(vol || 0.04, t + 0.004);
   g.gain.exponentialRampToValueAtTime(0.0001, t + d);
   o.connect(g);
   g.connect(out!);
   o.start(t);
   o.stop(t + d + 0.03);
 }
-function noise(d: number, vol: number) {
+/** 噪声默认滤掉高频再渐入：直接放白噪声在手机外放上像喇叭破了 / noise is low-passed and faded in: raw white noise sounds like a blown speaker on phones */
+function noise(d: number, vol: number, lp = 2400) {
   if (!ac || muted) return;
   const n = Math.floor(ac.sampleRate * d);
   const b = ac.createBuffer(1, n, ac.sampleRate);
@@ -109,11 +113,17 @@ function noise(d: number, vol: number) {
   for (let i = 0; i < n; i++) a[i] = (Math.random() * 2 - 1) * (1 - i / n);
   const s = ac.createBufferSource();
   s.buffer = b;
-  const g = ac.createGain();
-  g.gain.value = vol;
-  s.connect(g);
+  const f = ac.createBiquadFilter();
+  f.type = 'lowpass';
+  f.frequency.value = lp;
+  const g = ac.createGain(),
+    t = ac.currentTime;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(vol, t + 0.006);
+  s.connect(f);
+  f.connect(g);
   g.connect(out!);
-  s.start();
+  s.start(t);
 }
 
 /** 卡牌出手音按元素区分音高 / card firing SFX vary in pitch by element */
@@ -137,8 +147,8 @@ export function play(k: string, p?: string | number) {
     case 'buy': tone(660, 0.05, 'square', 0.03); tone(990, 0.08, 'square', 0.03, 1, 0.05); break;
     case 'sell': tone(880, 0.05, 'square', 0.03); tone(587, 0.09, 'square', 0.03, 1, 0.05); break;
     case 'merge': [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.1, 'square', 0.035, 1, i * 0.06)); break;
-    case 'hurt': noise(0.18, 0.12); tone(90, 0.2, 'sawtooth', 0.05, 0.5); break;
-    case 'boom': noise(0.25, 0.1); tone(70, 0.25, 'square', 0.05, 0.4); break;
+    case 'hurt': noise(0.18, 0.08); tone(90, 0.2, 'triangle', 0.06, 0.5); break;
+    case 'boom': noise(0.25, 0.07, 1600); tone(70, 0.25, 'triangle', 0.06, 0.4); break;
     case 'bell': tone(523, 0.6, 'triangle', 0.05); tone(784, 0.5, 'triangle', 0.03, 1, 0.02); break;
     case 'intent': tone(180, 0.25, 'sawtooth', 0.04, 1.8); break;
     case 'win': [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.14, 'square', 0.035, 1, i * 0.08)); break;
