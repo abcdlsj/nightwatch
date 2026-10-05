@@ -5,6 +5,7 @@ import { EVENTS } from '../../data/events';
 import { RELICS } from '../../data/relics';
 import { TALENTS, TCAT } from '../../data/talents';
 import { WAGERS, SYN, SYN2 } from '../../data/meta';
+import { THREATS } from '../../data/threats';
 import { L, t } from '../../i18n';
 import { vr, rand } from '../../core/rng';
 import type { Tag } from '../../data/types';
@@ -45,7 +46,12 @@ export function renderPreview() {
   const ds = Object.keys(cnt).map((k) => EN[k]);
   const boss = ds.find((d) => d.intents);
   const tough = ds.filter((d) => d.tip).sort((a, b) => b.hp * (1 + b.armor) - a.hp * (1 + a.armor))[0];
-  $('#pvNote').innerHTML = boss ? boss.intents!.map((it) => `【${it.n}】${it.d}`).join('<br>') : tough ? `${tough.n}${L.ui.common.colon}${tough.tip}` : '';
+  /* 敌情：主力带说明，其余只写名字 / threats: the main one with its description, the rest by name only */
+  const th = w.threats || [];
+  const thLine = th.length
+    ? `<b>${t('prep.threats', { s: th.map((k, i) => (i ? THREATS[k].n : `${THREATS[k].n}（${THREATS[k].d}）`)).join(' · ') })}</b><br>`
+    : '';
+  $('#pvNote').innerHTML = thLine + (boss ? boss.intents!.map((it) => `【${it.n}】${it.d}`).join('<br>') : tough ? `${tough.n}${L.ui.common.colon}${tough.tip}` : '');
 }
 
 /* ---------------- 羁绊条：凑到新的一层时提示 ---------------- / ---------------- Synergy bar: announce each new tier reached ---------------- */
@@ -505,7 +511,9 @@ function readyHtml() {
   const tips = L.meta.readyTips as string[];
   if (P.tipI == null) P.tipI = Math.floor(vr() * tips.length);
   return `<div class="ready"><div class="rd-t">${T.ready}</div><p>${nightInfo(G.round).title}</p>
-    <div class="intel"><div class="il-h">${T.coming}</div>${ks
+    <div class="intel"><div class="il-h">${T.coming}</div>${(G.nextWave!.threats || [])
+      .map((k) => `<div class="ithreat"><b>${THREATS[k].n}</b><span>${THREATS[k].d}</span></div>`)
+      .join('')}${ks
       .map((k) => {
         const d = EN[k];
         return `<div class="ifoe${d.boss || d.elite ? ' elite' : ''}"><img src="${spr(d.spr).url}" alt=""><b>${d.n}</b><small>${d.boss ? T.boss : d.elite ? T.elite : '×' + cnt[k]}</small><span>${d.tip || T.minion}</span></div>`;

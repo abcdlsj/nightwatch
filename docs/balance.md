@@ -30,6 +30,13 @@
 
 旋钮：`rx`、`rxCd`、`streakWin`、`streakN`、`streakCd`、`frenzy`、`syn2`（后两个填 0 可关掉，用来测各自贡献）。
 
+## 敌情（`src/data/threats.ts`）
+
+- 每夜剧情点名的敌人固定（第 2 夜炸弹鼠、第 4 夜暗影骑士、第 6 夜攻城塔……），其余出怪从 8 套敌情里抽 1~3 套：蜂群、空袭、重甲、亡灵、冲锋、雾魂、巫祝、火药。第 1 夜全固定。
+- 抽取只看本局种子和夜数，不动 `rng`；主力不和上一夜重样。备战页「敌情」一行预告。
+- 组数按被换掉那包折算：强度比和数量比取几何平均，再除以该套的 `pw`；只数最多比原来多四成（手机性能）。
+- 调 `pw`：`NIGHTS=7,8 N=10 npx vitest run -c vitest.balance.config.ts tests/balance/threats.balance.ts --reporter=verbose`，看各套守住率是否接近。
+
 ## 怪物成长
 
 - 普通敌人血量第 1~7 夜每夜 ×1.34，第 6 夜起每夜再 ×1.18；第 8、9 夜按第 7 夜的倍数单独定（×1.25、×1.65），多出来的一夜让玩家多一轮备战，怪不必再翻一倍。
@@ -57,7 +64,7 @@ npm run bench                       # 各流派成型阵容逐夜打（tests/bal
 BUILD=mult RUNS=12 npm run bench    # mult：凑出乘区和连锁（回响、传说遗物、钻卡）
 FULL=1 BUILD=mult npm run bench     # 完整游戏线：跑到第 15 夜（三颗宝石都拿，第 15 夜打隐藏首领）
 TUNE='{"bossHp":2}' npm run bench   # 临时改系数试效果
-ARCH=ice R=4 npx vitest run -c vitest.balance.config.ts tests/balance/why.balance.ts --reporter=verbose   # 单夜诊断（R 大于 9 时按完整线算，BOSS=mutebell 指定第 9 夜首领）
+ARCH=ice R=4 SEED=3 npx vitest run -c vitest.balance.config.ts tests/balance/why.balance.ts --reporter=verbose   # 单夜诊断（SEED 决定敌情；R 大于 9 时按完整线算，BOSS=mutebell 指定第 9 夜首领）
 ```
 
 阵容是按「认真玩的玩家到第 N 夜大概有什么」手写的估计，用来看相对强弱和成长曲线，不等于真实胜率；前两夜只放了起手卡，偏难。

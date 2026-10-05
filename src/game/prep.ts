@@ -103,6 +103,7 @@ export function hordeWave(w: Wave): Wave {
     .map((s) => Object.assign({}, s, { t: s.t + rnd(0.3, 1.2), x: clamp(s.x + rnd(-0.08, 0.08), 0.05, 0.95) }));
   const out = w.concat(add).sort((a, b) => a.t - b.t) as Wave;
   out.surges = w.surges;
+  out.threats = w.threats;
   return out;
 }
 /** 这些敌人不随夜数加量 / these enemies do not scale in number with the night */

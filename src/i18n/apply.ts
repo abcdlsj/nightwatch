@@ -7,6 +7,7 @@ import { EVENTS } from '../data/events';
 import { HEROES, KITS, PATHS } from '../data/heroes';
 import { ACH, WAGERS } from '../data/meta';
 import { VOICES } from '../data/voices';
+import { THREATS } from '../data/threats';
 import type { LocalePack } from './index';
 
 const fill = (reg: Record<string, any>, text: Record<string, any>) => {
@@ -20,6 +21,7 @@ export function applyLocale(P: LocalePack) {
   fill(EVENTS, P.events);
   fill(ADJ, P.terms.adj);
   fill(WAGERS, P.meta.wagers);
+  fill(THREATS, P.terms.threats);
   for (const k in EN) {
     const tx = (P.enemies as any)[k] || {};
     const e = EN[k];

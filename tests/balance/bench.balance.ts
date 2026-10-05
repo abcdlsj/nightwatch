@@ -38,7 +38,7 @@ function night(arch: string, r: number, seed: number, foeSet: string) {
   reseed(seed);
   const H = HEROES[A.hero];
   Object.assign(G, {
-    hero: A.hero, heat: HEAT, run: freshRun(), round: r, maxRound: LAST, endless: false, gold: 0, wall: H.wall, wallMax: H.wall, cards: [], relics: relicsFor(arch, r),
+    hero: A.hero, seed, heat: HEAT, run: freshRun(), round: r, maxRound: LAST, endless: false, gold: 0, wall: H.wall, wallMax: H.wall, cards: [], relics: relicsFor(arch, r),
     skills: talentsFor(arch, r), secret: {}, seenFoes: {}, foeSet, phase: 'battle', speed: 1, full: FULL, gems: FULL ? { red: 1, blue: 1, green: 1 } : {},
     boss9: finalBosses()[seed % finalBosses().length], boss12: finalBosses()[(seed + 2) % finalBosses().length],
   });

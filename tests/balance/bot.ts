@@ -295,7 +295,7 @@ export function playRun(hero: string, focus: Focus, seed: number, opts: { heat?:
   reseed(seed);
   const H = HEROES[hero];
   Object.assign(G, {
-    hero, heat: opts.heat || 0, run: freshRun(), round: 1, maxRound: 9, endless: false, lock: null, fightWave: null, gold: H.gold, wall: H.wall, wallMax: H.wall,
+    hero, seed, heat: opts.heat || 0, run: freshRun(), round: 1, maxRound: 9, endless: false, lock: null, fightWave: null, gold: H.gold, wall: H.wall, wallMax: H.wall,
     cards: [], relics: [], skills: [], bestChain: 0, secret: {}, seenFoes: {}, foeSet: pick(Object.keys(FOESETS)), speed: 1, full: !!opts.full, gems: {}, arc: 0,
   });
   G.boss9 = pick(finalBosses());

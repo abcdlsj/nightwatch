@@ -10,6 +10,7 @@ import { EN } from '../../src/data/enemies';
 import { EVENTS } from '../../src/data/events';
 import { HEROES } from '../../src/data/heroes';
 import { ACH } from '../../src/data/meta';
+import { THREATS } from '../../src/data/threats';
 
 const walk = (d: string): string[] => readdirSync(d).flatMap((f) => (statSync(join(d, f)).isDirectory() ? walk(join(d, f)) : f.endsWith('.ts') ? [join(d, f)] : []));
 const get = (o: any, k: string) => k.split('.').reduce((x, p) => (x == null ? x : x[p]), o);
@@ -31,6 +32,7 @@ describe('zh-CN 语言包', () => {
     expect(lack(TALENTS, zh.talents)).toEqual([]);
     expect(lack(EN, zh.enemies)).toEqual([]);
     expect(lack(EVENTS, zh.events)).toEqual([]);
+    expect(lack(THREATS, zh.terms.threats)).toEqual([]);
     expect(lack(HEROES, zh.heroes.heroes)).toEqual([]);
     expect(ACH.filter((a) => !(zh.meta.ach as any)[a.id]?.n)).toEqual([]);
   });

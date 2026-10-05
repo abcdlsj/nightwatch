@@ -79,7 +79,8 @@ export interface SpawnSpec {
   x: number;
   y: number;
 }
-export type Wave = SpawnSpec[] & { surges?: number[] };
+/** threats：这夜抽到的敌情（第一个是主力） / threats: this night's drawn threats (the first is the main one) */
+export type Wave = SpawnSpec[] & { surges?: number[]; threats?: string[] };
 
 /** 这一局的统计（成就、过往守夜用） / this run's stats (for achievements and past nights) */
 export interface RunStats {

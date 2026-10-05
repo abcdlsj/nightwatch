@@ -1,5 +1,15 @@
 /* 从旧版数据迁移而来，直接在这里改 / migrated from the old data format; edit here directly */
 export default {
+ "threats": {
+  "swarm": { "n": "蜂群", "d": "又多又软" },
+  "air": { "n": "空袭", "d": "飞得快，冲到墙下就炸" },
+  "armor": { "n": "重甲", "d": "护甲厚，怕穿甲和毒" },
+  "undead": { "n": "亡灵", "d": "死灵法师把倒下的拉起来" },
+  "charge": { "n": "冲锋", "d": "鼓手催着狂战士往前冲" },
+  "mist": { "n": "雾魂", "d": "从半路的雾里冒出来" },
+  "rite": { "n": "巫祝", "d": "萨满给身边的回血" },
+  "blast": { "n": "火药", "d": "炸弹鼠成群，专炸城墙" }
+ },
  "tags": {
   "blade": "刃",
   "fire": "火",
