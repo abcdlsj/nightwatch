@@ -10,6 +10,8 @@ export const TUNE = {
   carry: 1.25,
   /** 狼牙拍这类「护盾转伤害」的卡，护盾最多算多少点 / for 'shield-to-damage' cards like the Wolf-Tooth Flail, the maximum shield points counted */
   shieldDmgCap: 40,
+  /** 城墙护盾最多叠到城墙上限的几倍（钧的工事靠无限叠盾硬扛，压一压） / wall shield stacks to at most this multiple of max wall (Jun's works tanked by stacking shields without limit) */
+  shieldCap: 1.2,
   /** 星辉每层 / starlight per stack */
   star: 0.1,
   /** 钻品质的独立乘区 / the diamond tier's independent multiplier */

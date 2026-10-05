@@ -16,7 +16,7 @@ import { boardCards, ends, stepOf, dmgMul, growCard, questAdd, countKind, kindOf
 import { K, ex, ey } from './world';
 import { view } from './view';
 import { B, bt, later, near } from './battle';
-import { chargeCard, haste, reload, hurt, trigger, vuln } from './combat';
+import { chargeCard, haste, reload, hurt, trigger, vuln, addShield } from './combat';
 
 export type X = Record<string, any>;
 export type CardHook = { on?: Record<string, (c: Card, x: X) => void>; onWin?: (c: Card) => void };
@@ -111,8 +111,7 @@ export const CARD_HOOKS: Record<string, CardHook> = {
         if (c.lastT > b.t - 2) return;
         c.lastT = b.t;
         view.cardFx(c, 'pop');
-        b.shield += 1 * (1 + 0.4 * stepOf(c));
-        view.hud();
+        addShield(1 + 0.4 * stepOf(c));
       },
     },
   },

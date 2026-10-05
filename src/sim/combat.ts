@@ -163,14 +163,8 @@ function fire(c: Card, depth: number) {
     }
   }
   if (c.adj === 'ignite' && c.right) chargeCard(c.right, 0.1, c);
-  if (it.shieldGain) {
-    b.shield += it.shieldGain * (1 + 0.4 * stepOf(c));
-    view.hud();
-  }
-  if (c.adj === 'sturdy') {
-    b.shield += c.size * (c.tier + 1);
-    view.hud();
-  }
+  if (it.shieldGain) addShield(it.shieldGain * (1 + 0.4 * stepOf(c)));
+  if (c.adj === 'sturdy') addShield(c.size * (c.tier + 1));
   if (c.adj === 'momentum') c.mom = Math.min(10, c.mom + 1);
   emit('use', { c, depth });
   for (const n of nb) {
@@ -183,8 +177,7 @@ function fire(c: Card, depth: number) {
       showChain(d + 1, c);
       if (mv('shellChain') && (d + 1) % 5 === 0 && !(B!.flags.shellT > B!.t - 1)) {
         B!.flags.shellT = B!.t;
-        B!.shield += 3;
-        view.hud();
+        addShield(3);
       }
       view.sfx('echo', d);
       trigger(n, d, ADJ.echo.n);
@@ -625,6 +618,13 @@ export function hurt(e: Enemy, amt: number, src: Card | null, crit: boolean, o: 
   if (src && !tick && !o.rx && !e.dead && e.hp > 0 && ITEMS[src.key].tag === 'fire' && mv('t_kiln') && rand() < 0.5) freeze(e, 0.5, src);
   view.hit(ex(e), ey(e) - 5, o.burnTick ? 'fire' : o.poisonTick ? 'poison' : src ? ITEMS[src.key].tag : null, crit, e.hp <= 0);
   if (e.hp <= 0) kill(e, src);
+}
+
+/** 给城墙加护盾，最多叠到城墙上限的 TUNE.shieldCap 倍 / add wall shield, stacking to at most TUNE.shieldCap × max wall */
+export function addShield(n: number) {
+  const b = bt();
+  b.shield = Math.max(b.shield, Math.min(b.shield + n, G.wallMax * TUNE.shieldCap));
+  view.hud();
 }
 
 export function freeze(e: Enemy, t: number, src?: Card | null) {
