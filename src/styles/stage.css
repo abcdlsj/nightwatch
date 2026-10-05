@@ -14,9 +14,10 @@
 .pv{display:inline-flex;align-items:center;gap:2px;background:rgba(255,255,255,.07);border-radius:6px;padding:1px 6px 1px 1px;font-family:var(--px);font-size:13px}
 .pv img{width:24px;height:24px;image-rendering:pixelated}
 .pv.elite{background:rgba(226,71,59,.35);box-shadow:inset 0 0 0 2px rgba(255,120,100,.5)}
-#pvNote{font-size:12px;color:#ffc3b8;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#pvNote{font-size:12px;color:#ffc3b8;line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 #pvNote:empty{display:none}
 #pvNote b{color:#ffe0a8;font-weight:normal}
+#pvNote b.next{color:#9ad8ff}
 
 #shopHead{display:flex;align-items:center;gap:6px}
 #shopHead h2{margin:0;font-weight:400;font-size:22px;flex:1;text-shadow:0 2px 0 rgba(0,0,0,.5)}
@@ -29,7 +30,7 @@
 .offer .osz{font-size:12px;color:var(--muted)}
 .offer .oflav{display:none}
 .price.free{color:#9bf0b8;background:#173a28}
-.offer .odesc{font-family:var(--body);font-size:12px;line-height:1.35;color:#c5d2d6;text-align:center;padding:0 2px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.offer .odesc{font-family:var(--body);font-size:12px;line-height:1.35;color:#c5d2d6;text-align:center;padding:0 2px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 /* 三张货并排时逐行对齐：卡图同高、名字同一行、价格贴底；卡图不缩放，像素保持清楚 / align rows when three items sit side by side: equal art height, names on one line, prices at the bottom; art is never scaled so pixels stay crisp */
 .offer .card.static{margin-bottom:6px}
 .offer .price{margin-top:auto}

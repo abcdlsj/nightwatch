@@ -1,5 +1,5 @@
-/* 风向与外乡卡：风向只挑买得到的元素，第一次挑遗物有顺风的；外乡卡要那个人物解锁了才来，加价，不卖剧情卡；敌情读档不变
- * Wind and foreign cards: the wind only picks buyable elements and the first relic pick includes a wind relic; foreign cards need their hero unlocked, cost more, and never include story cards; threats survive a reload
+/* 风向与外乡卡：风向只挑买得到的元素，第一次挑遗物有顺风的；外乡卡要那个人物解锁了才来，加价，不卖剧情卡；敌情四夜一段
+ * Wind and foreign cards: the wind only picks buyable elements and the first relic pick includes a wind relic; foreign cards need their hero unlocked, cost more, and never include story cards; threats come in four-night segments
  */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { initLocale } from '../../src/i18n';
@@ -10,7 +10,7 @@ import { ITEMS } from '../../src/data/cards';
 import { HERO_ORDER } from '../../src/data/heroes';
 import { rollItem, rollWind, rollGear, windRelic, makeOffer, isForeign, FOREIGN_TAX } from '../../src/game/loot';
 import { basePrice } from '../../src/game/cards';
-import { nightThreats } from '../../src/game/threats';
+import { nightThreats, nextSeg } from '../../src/game/threats';
 
 beforeAll(() => initLocale());
 
@@ -63,12 +63,24 @@ describe('外乡卡', () => {
 });
 
 describe('敌情', () => {
-  it('同种子同夜结果一样，主力不和上一夜重样', () => {
+  it('四夜一段：段内不变，同种子复现，主力不和上一段重样', () => {
     G.seed = 12345;
-    for (let r = 2; r <= 15; r++) {
-      const a = nightThreats(r, 3);
-      expect(nightThreats(r, 3)).toEqual(a);
-      if (r > 2) expect(a[0]).not.toBe(nightThreats(r - 1, 1)[0]);
+    Object.assign(G, { full: true, endless: false });
+    expect(nightThreats(1, 3)).toEqual([]);
+    for (const [a, b] of [[2, 5], [6, 9], [10, 13], [14, 15]]) {
+      for (let r = a; r <= b; r++) expect(nightThreats(r, 3)).toEqual(nightThreats(a, 3));
+      if (a > 2) expect(nightThreats(a, 1)[0]).not.toBe(nightThreats(a - 1, 1)[0]);
     }
+  });
+  it('段末那夜预告下一段，普通流程第 9 夜不预告', () => {
+    G.seed = 7;
+    Object.assign(G, { full: false, endless: false });
+    expect(nextSeg(4)).toBeNull();
+    expect(nextSeg(5)).toEqual({ from: 6, to: 9, ids: nightThreats(6, 3) });
+    expect(nextSeg(9)).toBeNull();
+    G.full = true;
+    expect(nextSeg(9)?.from).toBe(10);
+    expect(nextSeg(13)).toEqual({ from: 14, to: 15, ids: nightThreats(14, 3) });
+    G.full = false;
   });
 });

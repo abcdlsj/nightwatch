@@ -161,6 +161,7 @@ export default {
   prep: {
     tonight: '今晚',
     threats: '敌情：{s}',
+    threatsNext: '第 {a}~{b} 夜敌情：{s}',
     sellHere: '拖到这里出售',
     sellFor: '卖掉<br><b>+{n}</b>',
     syn: '羁绊',

@@ -6,6 +6,7 @@ import { RELICS } from '../../data/relics';
 import { TALENTS, TCAT } from '../../data/talents';
 import { WAGERS, SYN, SYN2 } from '../../data/meta';
 import { THREATS } from '../../data/threats';
+import { nextSeg } from '../../game/threats';
 import { L, t } from '../../i18n';
 import { vr, rand } from '../../core/rng';
 import type { Tag } from '../../data/types';
@@ -49,9 +50,10 @@ export function renderPreview() {
   const tough = ds.filter((d) => d.tip).sort((a, b) => b.hp * (1 + b.armor) - a.hp * (1 + a.armor))[0];
   /* 敌情：主力带说明，其余只写名字 / threats: the main one with its description, the rest by name only */
   const th = w.threats || [];
-  const thLine = th.length
-    ? `<b>${t('prep.threats', { s: th.map((k, i) => (i ? THREATS[k].n : `${THREATS[k].n}（${THREATS[k].d}）`)).join(' · ') })}</b><br>`
-    : '';
+  const nx = nextSeg(G.round);
+  const thLine =
+    (th.length ? `<b>${t('prep.threats', { s: th.map((k, i) => (i ? THREATS[k].n : `${THREATS[k].n}（${THREATS[k].d}）`)).join(' · ') })}</b><br>` : '') +
+    (nx ? `<b class="next">${t('prep.threatsNext', { a: nx.from, b: nx.to, s: nx.ids.map((k) => THREATS[k].n).join(' · ') })}</b><br>` : '');
   $('#pvNote').innerHTML = thLine + (boss ? boss.intents!.map((it) => `【${it.n}】${it.d}`).join('<br>') : tough ? `${tough.n}${L.ui.common.colon}${tough.tip}` : '');
 }
 
@@ -517,7 +519,7 @@ function readyHtml() {
   return `<div class="ready"><div class="rd-t">${T.ready}</div><p>${nightInfo(G.round).title}</p>
     <div class="intel"><div class="il-h">${T.coming}</div>${(G.nextWave!.threats || [])
       .map((k) => `<div class="ithreat"><b>${THREATS[k].n}</b><span>${THREATS[k].d}</span></div>`)
-      .join('')}${ks
+      .join('')}${nextLine()}${ks
       .map((k) => {
         const d = EN[k];
         return `<div class="ifoe${d.boss || d.elite ? ' elite' : ''}"><img src="${spr(d.spr).url}" alt=""><b>${d.n}</b><small>${d.boss ? T.boss : d.elite ? T.elite : '×' + cnt[k]}</small><span>${d.tip || T.minion}</span></div>`;
@@ -525,6 +527,12 @@ function readyHtml() {
       .join('')}</div>
     ${warn.length ? `<div class="iwarn">${warn.map((w) => `<span>${w}</span>`).join('')}</div>` : ''}
     <p class="muted">${T.tipPre}${tips[P.tipI]}</p></div>`;
+}
+
+/** 段末那夜：下一段的敌情 / on a segment's last night: the next segment's threats */
+function nextLine() {
+  const nx = nextSeg(G.round);
+  return nx ? `<div class="ithreat next"><b>${t('prep.threatsNext', { a: nx.from, b: nx.to, s: '' })}</b><span>${nx.ids.map((k) => `${THREATS[k].n}（${THREATS[k].d}）`).join(' · ')}</span></div>` : '';
 }
 
 function wagerHtml() {

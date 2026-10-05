@@ -98,11 +98,11 @@ await shot('rule');
 await g(() => { const g = __game, G = g.G; G.prep.cur = G.prep.saved; g.renderPrep(); });
 await g(() => { const g = __game, G = g.G; G.prep.cur = null; G.prep.step = 3;
   [['vial', 0, null, 0], ['prism', 1, null, 1], ['frost', 2, 'chill', 3], ['starfall', 3, 'echo', 5]].forEach(([k, t, a, i]) => { const c = g.newCard(k, t, a); c.loc = 'stash'; c.idx = 0; });
-  /* 第 8 夜有三套敌情，预告最长（第 7 夜前有跃迁，不能用） / night 8 has three threats, the longest preview (night 7 has a leap stop first) */
-  G.round = 8; G.nextWave = g.makeWave(8); g.renderPreview();
+  /* 完整线第 13 夜：三套敌情，还要预告下一段，预告最长 / full-line night 13: three threats plus the next segment's preview, the longest preview */
+  G.full = true; G.round = 13; G.nextWave = g.makeWave(13); g.renderPreview();
   g.afterChange(); });
 await shot('ready');
-await g(() => { const g = __game, G = g.G; G.round = 1; G.nextWave = g.makeWave(1); g.renderPreview(); g.afterChange(); });
+await g(() => { const g = __game, G = g.G; G.full = false; G.round = 1; G.nextWave = g.makeWave(1); g.renderPreview(); g.afterChange(); });
 await g(() => __game.setDrawer(true));
 await shot('drawer');
 await g(() => __game.setDrawer(false));

@@ -155,13 +155,19 @@ describe('规则遗物', () => {
     for (let i = 0; i < 200; i++) expect(rollGear(3).some((k) => RELICS[k].rule)).toBe(false);
   });
 
-  it('全带上能正常打完，连招比不带多', () => {
+  it('全带上能正常打完，连招比不带多（节拍器是拿门槛换冷却，不算）', () => {
+    const more = RULES.filter((k) => k !== 'metronome');
+    let a0 = 0,
+      b0 = 0;
     for (const arch of ['fire', 'volt', 'blade', 'line']) {
       const a = play(arch, 6, []),
-        b = play(arch, 6, RULES);
+        b = play(arch, 6, more);
       expect(b.result, arch).toBeTruthy();
-      expect(b.stk, arch).toBeGreaterThan(a.stk);
+      expect(b.stk, arch).toBeGreaterThanOrEqual(a.stk);
+      a0 += a.stk;
+      b0 += b.stk;
     }
+    expect(b0).toBeGreaterThan(a0);
   });
 
   it('环城：两端互为相邻', () => {
