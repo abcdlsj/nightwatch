@@ -13,7 +13,7 @@ import { codexSweep, runWon, mastStart, nextBoss, markBoss, fullDone, nextArc } 
 import { markPathWin } from '../game/unlocks';
 import { NIGHTS, FULL_NIGHTS, GEM_NIGHTS, nightKind, lastNight, finalBosses } from '../game/plan';
 import { rollDoors, hordeWave, ambushWave, ambushGold, placeKit } from '../game/prep';
-import { rollGear, withFit } from '../game/loot';
+import { rollGear, withFit, rollWind } from '../game/loot';
 import { nightInfo } from '../game/nights';
 import { nightRewards } from '../game/rewards';
 import { saveGame, loadSave, restoreSave } from '../game/save';
@@ -60,6 +60,8 @@ export function newGame(hero: string) {
   G.boss9 = nextBoss(G.hero);
   G.arc = nextArc(G.hero);
   G.boss12 = pick(finalBosses().filter((k) => k !== G.boss9));
+  G.wind = rollWind();
+  G.windRelic = false;
   recalcMods();
   renderRelics();
   pickKit((kit, hh, full) => {

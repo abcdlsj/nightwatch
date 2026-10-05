@@ -164,6 +164,10 @@ export interface GameState {
   lock: Offer | null;
   seenFoes: Record<string, number>;
   secret: Record<string, number>;
+  /** 本局风向：这个元素的卡、专卖店、遗物更常见（空串表示没有） / this run's wind: cards, specialty shops and relics of this element show up more ('' for none) */
+  wind: Tag | '';
+  /** 风向的保底遗物已经给过 / the wind's guaranteed relic has been offered */
+  windRelic: boolean;
   /** 本局种子：开局时定好，和 rng 的状态一起存档 / this run's seed: set at run start and saved alongside the rng state */
   seed: number;
 }
@@ -199,6 +203,8 @@ export const G: GameState = {
   seenFoes: {},
   secret: {},
   seed: 0,
+  wind: '',
+  windRelic: false,
 };
 
 export const freshRun = (): RunStats => ({ maxBoard: 0, wallLost: 0, maxHit: 0, kills: 0, wagers: 0, maxCombo: 0, got: [] });

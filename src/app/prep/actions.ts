@@ -1,4 +1,5 @@
 /* 备战的操作：进一站、拿卡、卖卡、拿遗物、学天赋、夜谈、离开。改完状态顺手刷新界面 / Prep actions: enter a stop, take a card, sell a card, take a relic, learn a talent, night talk, leave. Refresh the UI right after changing state. */
+import type { Tag } from '../../data/types';
 import { ITEMS, ADJ, TIERS, UPS } from '../../data/cards';
 import { EVENTS } from '../../data/events';
 import { RELICS } from '../../data/relics';
@@ -377,6 +378,7 @@ export function endTalk(cur: PrepStop) {
     if (G.firstPrep) {
       G.firstPrep = false;
       setTimeout(() => toast(t('prep.foeSetToast', { n: (L.terms.foesets as Record<string, string>)[G.foeSet] })), 700);
+      if (G.wind) setTimeout(() => toast(t('prep.windToast', { t: L.terms.tags[G.wind as Tag] })), 3200);
     }
   } else finishStep();
 }

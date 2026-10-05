@@ -6,7 +6,8 @@ import { FIT_CHANCE } from '../data/meta';
 import { rand, pick } from '../core/rng';
 import { G, heat, type Offer } from './state';
 import { basePrice, hasKind, hasTag, hasGrow, hasAmmo, hasBig } from './cards';
-import { cardOpen } from './unlocks';
+import { cardOpen, heroUnlocked } from './unlocks';
+import type { Tag } from '../data/types';
 import { mv } from './mods';
 
 /* ---------------- 卡牌 ---------------- / ---------------- Cards ---------------- */
@@ -26,16 +27,34 @@ export function rollAdj(key: string, force?: boolean, exclude?: string | null, m
 
 export type ItemFilter = (it: (typeof ITEMS)[string]) => boolean;
 
+/** 外乡卡：别的守夜人的专属卡（那个人物解锁了才会来），贵一点；不管解锁了几个人物，总共只占一成左右
+ * foreign cards: another watcher's exclusive cards (only once that hero is unlocked), a bit pricier; about a tenth of draws in total however many heroes are unlocked */
+export const isForeign = (k: string) => !!ITEMS[k].hero && ITEMS[k].hero !== G.hero;
+const FOREIGN_SHARE = 0.1;
+export const FOREIGN_TAX = 2;
+const foreignOk = (k: string) => !ITEMS[k].local && heroUnlocked(ITEMS[k].hero!);
+/** 风向的卡权重翻倍 / the wind's cards get double weight */
+const WIND_W = 2;
+
 export function rollItem(filter?: ItemFilter | null) {
   const R = G.round;
   const pool: [string, number][] = [];
   for (const k in ITEMS) {
     const it = ITEMS[k];
-    if (it.noPool || (it.hero && it.hero !== G.hero) || !cardOpen(k)) continue;
+    const fg = isForeign(k);
+    if (it.noPool || (fg && !foreignOk(k)) || !cardOpen(k)) continue;
     if (filter && !filter(it)) continue;
     if (it.t === 2 && R < 2) continue;
-    const w = (it.size === 1 ? 4 : it.size === 2 ? 3 : R >= 4 ? 2.5 : 1.3) * (it.hero ? 1.4 : 1);
+    const w = (it.size === 1 ? 4 : it.size === 2 ? 3 : R >= 4 ? 2.5 : 1.3) * (fg ? 1 : it.hero ? 1.4 : 1) * (G.wind === it.tag ? WIND_W : 1);
     pool.push([k, w]);
+  }
+  /* 外乡卡整体缩到总权重的一成 / scale foreign cards down to a tenth of the total weight */
+  let own = 0,
+    far = 0;
+  for (const [k, w] of pool) isForeign(k) ? (far += w) : (own += w);
+  if (far && own) {
+    const f = (own * FOREIGN_SHARE) / (1 - FOREIGN_SHARE) / far;
+    for (const p of pool) if (isForeign(p[0])) p[1] *= f;
   }
   if (!pool.length) return pick(Object.keys(ITEMS).filter((k) => !ITEMS[k].noPool && !ITEMS[k].hero));
   let t = rand() * pool.reduce((a, b) => a + b[1], 0);
@@ -54,7 +73,7 @@ export function makeOffer(filter?: ItemFilter | null, opt: { black?: number | bo
   let price = basePrice(key, adj, tier);
   if (opt.black) price = Math.round(price * 1.5);
   if (opt.free) price = 0;
-  else price += (heat(3) ? 1 : 0) + mv('tax');
+  else price += (heat(3) ? 1 : 0) + mv('tax') + (isForeign(key) ? FOREIGN_TAX : 0);
   return { card: { key, tier, adj, size: ITEMS[key].size, dl: 0, hoard: 0 }, price, sold: false };
 }
 
@@ -65,6 +84,23 @@ export function lockedOffers(offers: Offer[]) {
   offers[0] = { card: Object.assign({}, L0.card), price: L0.price, sold: false, locked: true };
   return offers;
 }
+
+/* ---------------- 风向 ---------------- / ---------------- Wind ---------------- */
+/** 开局定风向：只在这个人物能买到至少 4 张的元素里挑 / pick the run's wind at start: only among elements this hero can buy at least 4 cards of */
+export function rollWind(): Tag | '' {
+  const n: Partial<Record<Tag, number>> = {};
+  for (const k in ITEMS) {
+    const it = ITEMS[k];
+    if (it.noPool || (it.hero && it.hero !== G.hero) || !cardOpen(k)) continue;
+    n[it.tag] = (n[it.tag] || 0) + 1;
+  }
+  const ts = (Object.keys(n) as Tag[]).filter((t) => n[t]! >= 4).sort();
+  return ts.length ? pick(ts) : '';
+}
+/** 这件遗物顺不顺风：加这个元素的伤害、攻速，或者加它的招牌状态 / whether a relic suits the wind: boosts this element's damage or speed, or its signature status */
+const WIND_MOD: Partial<Record<Tag, string[]>> = { fire: ['burn'], ice: ['slow', 'slowVuln'], volt: ['chain'] };
+export const windRelic = (k: string, w: Tag | '' = G.wind) =>
+  !!w && Object.keys(RELICS[k].m).some((m) => m === 'tag_' + w || m === 'xtag_' + w || m === 'tspd_' + w || (WIND_MOD[w] || []).includes(m));
 
 /* ---------------- 遗物 ---------------- / ---------------- Relics ---------------- */
 export function rollGear(n: number, bonus?: number, maxTier?: number) {
@@ -83,13 +119,20 @@ export function rollGear(n: number, bonus?: number, maxTier?: number) {
         break;
       }
     }
-    const pool = Object.keys(RELICS).filter(
-      (k) => RELICS[k].t === tier && !RELICS[k].fit && !RELICS[k].gem && (!RELICS[k].hero || RELICS[k].hero === G.hero) && !out.includes(k) && !(RELICS[k].u && G.relics.includes(k)),
-    );
+    const pool = Object.keys(RELICS).filter((k) => RELICS[k].t === tier && gearOk(k) && !out.includes(k));
     if (pool.length) out.push(pick(pool));
+  }
+  /* 风向保底：第一次挑遗物时，没有顺风的就换掉最后一件 / wind guarantee: the first relic pick swaps its last item for a wind relic if none is there */
+  if (G.wind && !G.windRelic && out.length) {
+    G.windRelic = true;
+    if (!out.some((k) => windRelic(k))) {
+      const pool = Object.keys(RELICS).filter((k) => w[RELICS[k].t] > 0 && gearOk(k) && windRelic(k) && !out.includes(k));
+      if (pool.length) out[out.length - 1] = pick(pool);
+    }
   }
   return out;
 }
+const gearOk = (k: string) => !RELICS[k].fit && !RELICS[k].gem && (!RELICS[k].hero || RELICS[k].hero === G.hero) && !(RELICS[k].u && G.relics.includes(k));
 export const gearPrice = (k: string) => [5, 9, 14, 20][RELICS[k].t] + Math.floor(G.round / 2) + mv('tax');
 
 /* ---------------- 天赋 ---------------- / ---------------- Talents ---------------- */

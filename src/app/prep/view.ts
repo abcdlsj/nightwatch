@@ -15,7 +15,8 @@ import { synCount, synLevel, synPairs } from '../../game/synergy';
 import { modText, plainMods, pickLine } from '../../game/text';
 import { nightInfo } from '../../game/nights';
 import { rollWagers, ambushGold, EVENT_FILTER } from '../../game/prep';
-import { makeOffer, rollGear, gearPrice, withFit } from '../../game/loot';
+import { makeOffer, rollGear, gearPrice, withFit, isForeign } from '../../game/loot';
+import { HEROES } from '../../data/heroes';
 import { icon, spr } from '../../render/sprites';
 import { FX } from '../../render/overlay';
 import { SFX } from '../../audio/sfx';
@@ -84,7 +85,9 @@ export function renderSyn() {
   synPrev = n;
   if (!el) return;
   const ts = (Object.keys(n) as Tag[]).sort((a, b) => n[b]! - n[a]!);
-  el.innerHTML = ts.length
+  /* 风向一直挂着，提醒这局往哪边凑 / the wind chip stays up as a reminder of which way this run leans */
+  const wind = G.wind ? `<span class="sy-l">${L.ui.prep.wind}</span><span class="sy on wind" style="--tagc:${TAGC[G.wind]}">${L.terms.tags[G.wind]}</span>` : '';
+  el.innerHTML = wind + (ts.length
     ? `<span class="sy-l">${L.ui.prep.syn}</span>` +
       ts
         .map((tg) => {
@@ -94,7 +97,7 @@ export function renderSyn() {
         })
         .join('') +
       pairs.map((k) => `<span class="sy on pair" style="--tagc:${TAGC[SYN2[k].a]};--tagc2:${TAGC[SYN2[k].b]}">${pairName(k)}</span>`).join('')
-    : '';
+    : '');
 }
 
 /* ---------------- 各站 ---------------- / ---------------- The stops ---------------- */
@@ -332,7 +335,7 @@ function offerEl(of: Offer) {
   o.appendChild(cel);
   o.insertAdjacentHTML(
     'beforeend',
-    `<div class="oname">${it.n}</div><div class="oadj"><span style="color:${TIERS[c.tier].c}">${TIERS[c.tier].n}</span>${ad ? ` · <span style="color:${ad.c}">${ad.n}</span>` : ''}</div><div class="odesc">${ad ? ad.d : it.d}</div><div class="oflav">${it.f}</div><div class="price${of.price === 0 ? ' free' : of.price > G.gold ? ' cant' : ''}" data-p="${of.price}">${of.price === 0 ? T.free : `<img class="ico" src="${spr('coin').url}" alt="${T.gold}">${of.price}`}</div>`,
+    `<div class="oname">${it.n}${isForeign(c.key) ? `<small class="fg">${t('prep.foreign', { h: HEROES[it.hero!].n })}</small>` : ''}</div><div class="oadj"><span style="color:${TIERS[c.tier].c}">${TIERS[c.tier].n}</span>${ad ? ` · <span style="color:${ad.c}">${ad.n}</span>` : ''}</div><div class="odesc">${ad ? ad.d : it.d}</div><div class="oflav">${it.f}</div><div class="price${of.price === 0 ? ' free' : of.price > G.gold ? ' cant' : ''}" data-p="${of.price}">${of.price === 0 ? T.free : `<img class="ico" src="${spr('coin').url}" alt="${T.gold}">${of.price}`}</div>`,
   );
   if (!of.sold) cel.addEventListener('pointerdown', (e) => startDragOffer(e, of, cel));
   lockBtn(o, of, G.prep && G.prep.cur);

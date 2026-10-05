@@ -124,7 +124,7 @@ cards: {
 | `fx` | 攻击方式，见下表 |
 | `n` `d` | 名字和说明 |
 
-可选：`kind`（weapon 兵器、firearm 火器、potion 药剂、gadget 机关、lamp 灯具、sky 天象）、`hero`（写人物名字就是专属卡）、`f`（闲话）、`lore` / `dn` / `dl`（金卡的传闻、钻卡的名字和传闻）、`noPool: 1`（不进店，只能靠任务变出来）。
+可选：`kind`（weapon 兵器、firearm 火器、potion 药剂、gadget 机关、lamp 灯具、sky 天象）、`hero`（写人物名字就是专属卡）、`f`（闲话）、`lore` / `dn` / `dl`（金卡的传闻、钻卡的名字和传闻）、`noPool: 1`（不进店，只能靠任务变出来）、`local: 1`（专属卡不当外乡卡卖给别的人物，适合剧情里点名的卡）。
 
 攻击方式 `fx`：
 

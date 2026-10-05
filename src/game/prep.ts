@@ -55,6 +55,10 @@ const SECRET_DOORS: [string, () => boolean][] = [
   ['s_karl', () => G.hero === 'ayla' && !!G.secret.karlKill && !G.secret.karl],
 ];
 
+/** 风向对应的专卖店，抽中的权重翻倍 / the specialty shop matching the wind gets double draw weight */
+const WIND_SHOP: Partial<Record<string, string>> = { blade: 'smith', mech: 'smith', fire: 'forge', volt: 'storm', ice: 'frostshop' };
+const doorW = (i: string) => EVENTS[i].w * (G.wind && WIND_SHOP[G.wind] === i ? 2 : 1);
+
 export function rollDoors() {
   const R = G.round,
     P = G.prep;
@@ -68,10 +72,10 @@ export function rollDoors() {
   while (out.length < 3) {
     const pool = ids.filter((i) => !out.includes(i) && !(isRare(i) && (P.rare || out.some(isRare))));
     if (!pool.length) break;
-    let t = rand() * pool.reduce((s, i) => s + EVENTS[i].w, 0);
+    let t = rand() * pool.reduce((s, i) => s + doorW(i), 0);
     let got: string | null = null;
     for (const i of pool) {
-      t -= EVENTS[i].w;
+      t -= doorW(i);
       if (t <= 0) {
         got = i;
         break;

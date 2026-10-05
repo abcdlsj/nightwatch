@@ -159,6 +159,7 @@ export const ITEMS: Record<string, ItemDef> = {
   "kind": "potion"
  },
  "oathsword": {
+  "local": 1,
   "size": 2,
   "tag": "blade",
   "t": 1,
@@ -645,6 +646,7 @@ export const ITEMS: Record<string, ItemDef> = {
   "kind": "lamp"
  },
  "musicbox": {
+  "local": 1,
   "size": 2,
   "tag": "mech",
   "t": 1,

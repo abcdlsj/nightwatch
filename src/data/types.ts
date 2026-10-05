@@ -18,6 +18,8 @@ export interface ItemDef {
   kind?: Kind;
   hero?: string;
   noPool?: number;
+  /** 离不开自己人物的机制，不当外乡卡卖给别人 / depends on its own hero's mechanics, so never sold to others as a foreign card */
+  local?: number;
   passive?: number;
   snd?: string;
   /* 攻击附带 / attack adds */
