@@ -4,5 +4,6 @@ import ayla from './ayla';
 import mo from './mo';
 import ying from './ying';
 import jun from './jun';
+import li from './li';
 
-export default { ayla, mo, ying, jun } as Record<string, any>;
+export default { ayla, mo, ying, jun, li } as Record<string, any>;
