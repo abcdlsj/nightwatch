@@ -53,7 +53,7 @@ export function renderPreview() {
   const th = w.threats || [];
   const nx = nextSeg(G.round);
   const thLine =
-    (th.length ? `<b>${t('prep.threats', { s: th.map((k, i) => (i ? THREATS[k].n : `${THREATS[k].n}（${THREATS[k].d}）`)).join(' · ') })}</b><br>` : '') +
+    (th.length ? `<b>${t('prep.threats', { s: th.map((k, i) => (i ? THREATS[k].n : `${THREATS[k].n}${L.ui.common.lp}${THREATS[k].d}${L.ui.common.rp}`)).join(' · ') })}</b><br>` : '') +
     (nx ? `<b class="next">${t('prep.threatsNext', { a: nx.from, b: nx.to, s: nx.ids.map((k) => THREATS[k].n).join(' · ') })}</b><br>` : '');
   /* 异象和流派轮换一直挂在今晚情报里 / the omen and archetype rotation stay listed in tonight's intel */
   const pathN = (h: string, id: string) => pathsOf(h).find((p) => p.id === id)?.n || id;
@@ -548,7 +548,7 @@ function readyHtml() {
 /** 段末那夜：下一段的敌情 / on a segment's last night: the next segment's threats */
 function nextLine() {
   const nx = nextSeg(G.round);
-  return nx ? `<div class="ithreat next"><b>${t('prep.threatsNext', { a: nx.from, b: nx.to, s: '' })}</b><span>${nx.ids.map((k) => `${THREATS[k].n}（${THREATS[k].d}）`).join(' · ')}</span></div>` : '';
+  return nx ? `<div class="ithreat next"><b>${t('prep.threatsNext', { a: nx.from, b: nx.to, s: '' })}</b><span>${nx.ids.map((k) => `${THREATS[k].n}${L.ui.common.lp}${THREATS[k].d}${L.ui.common.rp}`).join(' · ')}</span></div>` : '';
 }
 
 function wagerHtml() {

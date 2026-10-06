@@ -9,9 +9,13 @@ import { applyLocale } from './apply';
 
 export type LocalePack = typeof zhCN;
 
+/* 中文打进主包；其他语言按需加载 / Chinese ships in the main bundle; other languages load on demand */
 const PACKS: Record<string, () => Promise<LocalePack> | LocalePack> = {
   'zh-CN': () => zhCN,
+  en: () => import('../locales/en').then((m) => m.default),
 };
+/** 设置页里显示的语言名（用各自的语言写） / language names shown in settings (each in its own language) */
+export const LANG_NAMES: Record<string, string> = { 'zh-CN': '中文', en: 'English' };
 
 export let L: LocalePack = zhCN;
 export let lang = 'zh-CN';

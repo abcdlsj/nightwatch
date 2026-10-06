@@ -53,7 +53,7 @@ function cardHTML(c: CardSpec) {
   const it = ITEMS[c.key];
   const ad = c.adj ? ADJ[c.adj] : null;
   const nm = cardName(c);
-  return `<div class="inner" style="--dl:${c.dl || 0}s"><div class="face"><div class="band"></div><div class="nm${nm.length > (c.size > 1 ? 5 : 3) ? ' long' : ''}">${nm}</div><img class="spr" src="${spr(c.key + (ad?.tag ? '@' + ad.tag : '')).url}" alt="${it.n}" draggable="false"><div class="num"></div>${it.ammo != null ? '<div class="am"></div>' : ''}<div class="cdv"></div><div class="holo"></div><div class="flash"></div></div><div class="tb">${TIERS[c.tier].n}</div>${ad ? `<div class="adj">${ad.ch}</div>` : ''}${(c as Card).carry ? `<div class="cw" title="${t('card.carry')}">C</div>` : ''}</div>`;
+  return `<div class="inner" style="--dl:${c.dl || 0}s"><div class="face"><div class="band"></div><div class="nm${nm.length > (c.size > 1 ? 5 : 3) ? ' long' : ''}">${nm}</div><img class="spr" src="${spr(c.key + (ad?.tag ? '@' + ad.tag : '')).url}" alt="${it.n}" draggable="false"><div class="num"></div>${it.ammo != null ? '<div class="am"></div>' : ''}<div class="cdv"></div><div class="holo"></div><div class="flash"></div></div><div class="tb">${[...TIERS[c.tier].n][0]}</div>${ad ? `<div class="adj">${ad.ch}</div>` : ''}${(c as Card).carry ? `<div class="cw" title="${t('card.carry')}">C</div>` : ''}</div>`;
 }
 
 export function paintCard(el: HTMLElement, c: CardSpec | Card, extra?: string) {

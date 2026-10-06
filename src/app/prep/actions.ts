@@ -279,7 +279,7 @@ function enterMore(id: string, cur: PrepStop) {
       renderPrep();
     } })));
   } else if (id === 'quench')
-    choice(T.quenchHint, shuffled(G.cards.filter((c) => c.tier < 3 && c.adj)).slice(0, 3).map((c) => ({ card: c, label: `${ITEMS[c.key].n}：${TIERS[c.tier].n} → ${TIERS[c.tier + 1].n}`, sub: t('prep.loseAdj', { a: ADJ[c.adj!].n }), act: () => {
+    choice(T.quenchHint, shuffled(G.cards.filter((c) => c.tier < 3 && c.adj)).slice(0, 3).map((c) => ({ card: c, label: `${ITEMS[c.key].n}${L.ui.common.colon}${TIERS[c.tier].n} → ${TIERS[c.tier + 1].n}`, sub: t('prep.loseAdj', { a: ADJ[c.adj!].n }), act: () => {
       c.tier++;
       c.adj = null;
       repaint(c);

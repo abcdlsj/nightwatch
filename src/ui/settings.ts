@@ -1,5 +1,5 @@
 /* 设置页：声音、震动、震屏、伤害数字、新手提示、清除进度 / Settings page: sound, haptics, screen shake, damage numbers, tutorial hints, clear progress */
-import { L, t } from '../i18n';
+import { L, t, lang, languages, LANG_NAMES } from '../i18n';
 import { SETTINGS, setSetting, type Settings } from '../platform/settings';
 import { store, KEYS } from '../platform/storage';
 import { SFX } from '../audio/sfx';
@@ -20,6 +20,10 @@ export function openSettings(onReset?: () => void, onQuit?: () => void) {
     <div class="tlist set-list">${rows
       .map((k) => `<button class="trow set-row" data-k="${k}"><div><b>${(T as any)[k]}</b><span>${(T as any)[k + 'D']}</span></div><i class="tog${SETTINGS[k] ? ' on' : ''}" aria-hidden="true"></i></button>`)
       .join('')}</div>
+    <p class="set-bk"><b>${T.language}</b>${T.languageD}</p>
+    <div class="sh-btns set-lang">${languages()
+      .map((c) => `<button class="btn${c === lang ? ' on' : ''}" data-lang="${c}">${LANG_NAMES[c] || c}</button>`)
+      .join('')}</div>
     <p class="set-bk"><b>${T.backup}</b>${T.backupD}</p>
     <div class="sh-btns"><button class="btn" id="setExport">${T.exportBtn}</button><button class="btn" id="setImport">${T.importBtn}</button></div>
     <div class="sh-btns"><button class="btn" id="setTips">${T.resetTips}</button><button class="btn red" id="setWipe">${T.wipe}</button></div>
@@ -35,6 +39,17 @@ export function openSettings(onReset?: () => void, onQuit?: () => void) {
         SFX.ensure();
         SFX.play('ui');
         if (k === 'haptics' && SETTINGS.haptics) buzz(20);
+      }),
+  );
+  sh.querySelectorAll<HTMLElement>('[data-lang]').forEach(
+    (b) =>
+      (b.onclick = () => {
+        const c = b.dataset.lang!;
+        if (c === lang) return;
+        SFX.play('ui');
+        store.set(KEYS.lang, c);
+        /* 文字散落在各处，整页重载最稳；对局存档每进备战都会存，不会丢 / text is spread everywhere, so a full reload is safest; the run is saved on every prep, so nothing is lost */
+        setTimeout(() => location.reload(), 150);
       }),
   );
   $('#setTips').onclick = () => {

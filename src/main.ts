@@ -18,4 +18,10 @@ registerSW(__BUILD_ID__);
 
 initPlatform()
   .catch((e) => console.error('平台初始化失败，退回网页存储', e))
+  .then(async () => {
+    /* 语言：设置里选过就用选的，默认中文 / language: use the one chosen in settings, Chinese by default */
+    const [{ setLocale }, { store, KEYS }] = await Promise.all([import('./i18n'), import('./platform/storage')]);
+    const code = store.get(KEYS.lang);
+    if (code && code !== 'zh-CN') await setLocale(code).catch((e) => console.error('语言包加载失败', e));
+  })
   .then(() => import('./app/boot'));

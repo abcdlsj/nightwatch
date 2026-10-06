@@ -243,7 +243,7 @@ export function pickKit(done: (k: KitDef, o: KitOpts) => void) {
     .map((k, i) => {
       const p = pathsOf(G.hero).find((x) => x.id === k.path);
       return `<button class="kit" data-i="${i}" style="--hc:${H.col}"><div class="kc">${k.cards.map((c) => `<img src="${spr(c[0]).url}" alt="${ITEMS[c[0]].n}">`).join('')}</div>
-  <div><b>${k.n}${p ? `<small class="gt">${p.n}</small>` : ''}</b><span>${k.cards.map((c) => ITEMS[c[0]].n + (c[1] > ITEMS[c[0]].t ? '（' + TIERS[c[1]].n + '）' : '')).join(' · ')}${k.gold ? t('kits.gold', { g: (k.gold > 0 ? '+' : '') + k.gold }) : ''}</span><span>${k.d}</span></div></button>`;
+  <div><b>${k.n}${p ? `<small class="gt">${p.n}</small>` : ''}</b><span>${k.cards.map((c) => ITEMS[c[0]].n + (c[1] > ITEMS[c[0]].t ? L.ui.common.lp + TIERS[c[1]].n + L.ui.common.rp : '')).join(' · ')}${k.gold ? t('kits.gold', { g: (k.gold > 0 ? '+' : '') + k.gold }) : ''}</span><span>${k.d}</span></div></button>`;
     })
     .join('')}</div>
   ${pathsHtml(G.hero)}</div>`;

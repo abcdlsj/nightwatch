@@ -1,7 +1,7 @@
 /* 界面文字（简体中文）。参数写成 {名字}，由 t() 替换；可以带少量 HTML / UI strings (Simplified Chinese). Parameters are written as {name} and replaced by t(); a little HTML is allowed */
 export default {
   docTitle: 'Night Watch',
-  common: { colon: '：', comma: '，', period: '。' },
+  common: { colon: '：', comma: '，', period: '。', lp: '（', rp: '）' },
 
   hud: {
     nightPre: '第',
@@ -458,6 +458,8 @@ export default {
     importBad: '存档码不对，检查一下是不是没复制全',
     imported: '存档已导入',
     version: '版本 {v}',
+    language: '语言',
+    languageD: '切换后游戏会重新载入',
   },
 
   story: {
