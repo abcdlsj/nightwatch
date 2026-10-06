@@ -11,7 +11,13 @@ export const standalone = () =>
  * On returning from the background iOS briefly reports the "right" innerHeight, then shrinks back without another resize, so never clear based on innerHeight, and refit with delays after coming back */
 export function fitStandalone() {
   if (!isIOS() || isNative() || !standalone()) return;
+  /* 输入框聚焦时键盘弹起，iOS 会缩视口并把页面滚到输入框：这时不能撑高、不能滚回顶部，不然光标被挪到顶上 / while an input is focused the keyboard is up and iOS shrinks the viewport and scrolls to the field: don't resize or scroll back to the top then, or the caret jumps to the top */
+  const typing = () => {
+    const a = document.activeElement as HTMLElement | null;
+    return !!a && (a.tagName === 'TEXTAREA' || a.tagName === 'INPUT' || a.isContentEditable);
+  };
   const fit = () => {
+    if (typing()) return;
     const portrait = innerHeight >= innerWidth;
     const h = portrait ? Math.max(screen.width, screen.height) : Math.min(screen.width, screen.height);
     document.documentElement.style.height = Math.max(h, innerHeight) + 'px';
@@ -27,6 +33,8 @@ export function fitStandalone() {
   addEventListener('orientationchange', refit);
   addEventListener('pageshow', refit);
   addEventListener('focus', refit);
+  /* 键盘收起后再撑回去 / refit once the keyboard is dismissed */
+  document.addEventListener('focusout', () => setTimeout(refit, 50));
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) refit();
   });
