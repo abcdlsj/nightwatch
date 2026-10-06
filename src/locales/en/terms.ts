@@ -225,6 +225,6 @@ export default {
   "shitou": "Shitou",
   "hans": "Hans",
   "popo": "Granny",
-  "lifa": "Li's Father"
+  "lifa": "Xingyao's Father"
  }
 };

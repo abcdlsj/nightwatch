@@ -1,4 +1,4 @@
-/* Li's story.
+/* Xingyao's story.
  * Three night sets: North Sky (the missing star and her father heading north), Granny (an old star-watcher going blind), Signal (flash a mirror north three times at midnight).
  */
 export default {
@@ -20,7 +20,7 @@ export default {
         1: {
           title: "Observatory", who: "popo",
           lines: [
-            ["popo", "Li, tell me tonight's sky."],
+            ["popo", "Yao, tell me tonight's sky."],
             ["hero", "Seven north, three east. South, nothing visible."],
             ["popo", "And west?"],
             ["hero", "West... is behind mist."],
@@ -65,7 +65,7 @@ export default {
         7: {
           title: "Counting Stars", who: "bellman",
           lines: [
-            ["bellman", "Li, watcher's rule: count the stars before dawn. Done?"],
+            ["bellman", "Xingyao, watcher's rule: count the stars before dawn. Done?"],
             ["hero", "Seven."],
             ["bellman", "And seven hundred years ago?"],
             ["hero", "Granny's book says one thousand two hundred and four."],
@@ -81,7 +81,7 @@ export default {
     },
     {
       n: "Granny",
-      intro: [{ who: "popo", t: "Li, read me tonight's sky. You're all the eyes I have left." }],
+      intro: [{ who: "popo", t: "Yao, read me tonight's sky. You're all the eyes I have left." }],
       nights: {
         1: [[9, "hero", "The stars are calm tonight. Calm nights need the most care."], [22, "hero", "Granny's waiting on the observatory for me to read. I have to live to read to her."]],
         2: [[12, "hero", "Powder underground... no star chart shows that."], [26, "hero", "Granny says what's missing from the chart gets added. One stroke tonight."]],
@@ -169,7 +169,7 @@ export default {
         1: {
           title: "The Mirror", who: "soldier",
           lines: [
-            ["soldier", "Miss Li, you flash a mirror north every night. Who are you talking to?"],
+            ["soldier", "Miss Xingyao, you flash a mirror north every night. Who are you talking to?"],
             ["hero", "I don't know."],
             ["soldier", "You don't know?"],
             ["hero", "Watcher family rule. Three at midnight, seven hundred years. No one's answered."],
@@ -214,7 +214,7 @@ export default {
         7: {
           title: "Lamp in the North", who: "bellman",
           lines: [
-            ["bellman", "Li, I saw that north light from the tower too."],
+            ["bellman", "Xingyao, I saw that north light from the tower too."],
             ["bellman", "Sixty years, and first time I've seen a lamp up north."],
             ["bellman", "Who do you think lit it?"],
           ],
@@ -302,7 +302,7 @@ export default {
       11: [[6, "hero", "Footprints on the north road, a drag mark beside them, like something heavy."], [26, "hero", "Dad, what are you carrying?"]],
       12: [[4, "hero", "Another one. It's blocking the north light."], [28, "hero", "Move. My father's behind you."]],
       13: [[8, "hero", "A sprout by the Wall. Its leaves face north."], [24, "narr", "On the observatory, the copper plate rang three times."], [26, "hero", "(Twice.)"]],
-      14: [[6, "hero", "Everyone's on the Wall. Granny too, on the platform, the plate on her knees."], [22, "popo", "Li! The edge! The eastern edge of the sky!"], [34, "hero", "That's no star. ...That's where the sun will rise."]],
+      14: [[6, "hero", "Everyone's on the Wall. Granny too, on the platform, the plate on her knees."], [22, "popo", "Yao! The edge! The eastern edge of the sky!"], [34, "hero", "That's no star. ...That's where the sun will rise."]],
       15: [[4, "hero", "Dad."], [18, "hero", "It's too heavy to carry alone. I'm here."]],
     },
     talks: {
@@ -326,7 +326,7 @@ export default {
       red: {
         title: "Heart of a Meteor", who: "soldier",
         lines: [
-          ["soldier", "Miss Li, a meteor fell from the north. Hit outside the Wall."],
+          ["soldier", "Miss Xingyao, a meteor fell from the north. Hit outside the Wall."],
           ["soldier", "We went to fetch it. The shell's shattered. Just a core left, red, still hot."],
           ["hero", "...A fallen star with a red core. Granny says it hasn't cooled yet."],
         ],
@@ -360,7 +360,7 @@ export default {
     hiddenPre: [
       { who: "narr", t: "A star rises from the northern rift. Bright, its light cold." },
       { who: "narr", t: "Beneath it, a man carries it on his back, step by step, south." },
-      { who: "lifa", t: "...Li?" },
+      { who: "lifa", t: "...Yao?" },
       { who: "hero", t: "Dad. I'll help you carry it." },
     ],
     quiet: [
@@ -373,7 +373,7 @@ export default {
     ],
     trueWin: [
       { who: "narr", t: "The Fallen Star stopped struggling. It rose slowly, higher and higher." },
-      { who: "lifa", t: "Li. I couldn't lift it because it takes two." },
+      { who: "lifa", t: "Yao. I couldn't lift it because it takes two." },
       { who: "hero", t: "Granny said so. Stars are for two to watch." },
       { who: "narr", t: "The star settled in the north sky's empty place. Then the sun came up." },
       { who: "narr", t: "On the observatory, the copper plate rang three times." },

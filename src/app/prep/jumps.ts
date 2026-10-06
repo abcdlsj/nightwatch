@@ -103,7 +103,7 @@ export const JUMPS: Record<string, () => { opts: Opt[] }> = {
 
 /** 这一夜备战一共几站：平时 3 站，跃迁夜多一站 / how many prep stops this night: 3 normally, one more on leap nights */
 export const prepStops = () => (hasJump() ? 4 : 3);
-/* 钧「布防图」：定一处主炮位（C 位 + 城墙上限）；或者领一张流派卡 / Jun's 'Defense Map': stake out a main gun position (carry + wall cap); or take an archetype card */
+/* 石钧「布防图」：定一处主炮位（C 位 + 城墙上限）；或者领一张流派卡 / Jun's 'Defense Map': stake out a main gun position (carry + wall cap); or take an archetype card */
 JUMPS.jun = () => {
   const n = 2 + G.round;
   const opts: Opt[] = byDmg(board())
@@ -119,7 +119,7 @@ JUMPS.jun = () => {
     } });
   return { opts };
 };
-/* 璃「星象」：已经有 C 位就再为它点一颗星（倍率一路往上叠）；也可以换一颗星 / Li's 'Astrology': if a carry already exists, light another star for it (the multiplier keeps stacking); or move the star */
+/* 星遥「星象」：已经有 C 位就再为它点一颗星（倍率一路往上叠）；也可以换一颗星 / Li's 'Astrology': if a carry already exists, light another star for it (the multiplier keeps stacking); or move the star */
 JUMPS.li = () => {
   const cur = board().find((c) => c.carry);
   const opts: Opt[] = [];

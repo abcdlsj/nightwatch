@@ -73,8 +73,8 @@ export default {
       "ayla": "They're crawling in! Captain… is this all of us?",
       "mo": "They're crawling in! Alchemist, have you got enough bottles?",
       "ying": "They're crawling in! Miss Ying, get behind me!",
-      "jun": "They're crawling in! Master Jun, will the Wall hold?",
-      "li": "They're crawling in! Miss Li, what do the stars say?"
+      "jun": "They're crawling in! Master Shi, will the Wall hold?",
+      "li": "They're crawling in! Miss Xingyao, what do the stars say?"
      }
     ],
     [
@@ -276,8 +276,8 @@ export default {
       "ayla": "The children are passing up bricks! Captain, the Wall still stands!",
       "mo": "The children are passing up bricks! Alchemist, we're holding!",
       "ying": "The children are passing up bricks! Miss Ying, your students came too!",
-      "jun": "The children are passing up bricks! Master Jun, say where it's short and we'll fill it!",
-      "li": "The children are passing up bricks! Miss Li, are the stars still there?"
+      "jun": "The children are passing up bricks! Master Shi, say where it's short and we'll fill it!",
+      "li": "The children are passing up bricks! Miss Xingyao, are the stars still there?"
      }
     ],
     [
@@ -302,8 +302,8 @@ export default {
       "ayla": "Captain, they're running, aren't they? Looks like they're fleeing.",
       "mo": "Alchemist, why do they look like something's chasing them here?",
       "ying": "Miss Ying, there's something bigger behind them.",
-      "jun": "Master Jun, they don't look like they're attacking. They look like they're fleeing.",
-      "li": "Miss Li, is there a star in the north moving this way?"
+      "jun": "Master Shi, they don't look like they're attacking. They look like they're fleeing.",
+      "li": "Miss Xingyao, is there a star in the north moving this way?"
      }
     ],
     [
@@ -710,11 +710,11 @@ export default {
     "So many torches… more than the city's lamps!"
    ],
    "jun": [
-    "Master Jun! Torches all across the north!",
-    "Another big wave! Master Jun, will the Wall hold?"
+    "Master Shi! Torches all across the north!",
+    "Another big wave! Master Shi, will the Wall hold?"
    ],
    "li": [
-    "Miss Li, another big wave!",
+    "Miss Xingyao, another big wave!",
     "So many torches… can you still see the stars?"
    ]
   },
@@ -732,11 +732,11 @@ export default {
     "Wounded here! Stretcher!"
    ],
    "jun": [
-    "Master Jun, the east stretch is shedding bricks!",
+    "Master Shi, the east stretch is shedding bricks!",
     "They've rammed a crack in the Wall!"
    ],
    "li": [
-    "Miss Li, the Wall's cracked!",
+    "Miss Xingyao, the Wall's cracked!",
     "Wounded here! Stretcher!"
    ]
   }
@@ -788,7 +788,7 @@ export default {
     "ayla": "Ayla… your sword… still so true…",
     "mo": "This light… so bright…",
     "ying": "Little one… your lamp… reminds me of…",
-    "jun": "Old Jun… the wall you mended… I can't break it…",
+    "jun": "Shi Jun… the wall you mended… I can't break it…",
     "li": "Little starkeeper… my star… is it still there…"
    },
    "heroLow": {
@@ -923,7 +923,7 @@ export default {
     "mo": "Little Mo, the dye vat's waiting. Come home for supper.",
     "ying": "Ying, did you top up the oil? Then come down, don't stand in the wind.",
     "jun": "Jun, east stretch, third course — the joint's crooked. Come here, I'll show you.",
-    "li": "Li, come down. There are no stars in the north. Father looked."
+    "li": "Yao, come down. There are no stars in the north. Father looked."
    },
    "heroLow": {
     "ayla": "Karl never said he was cold.",
@@ -945,7 +945,7 @@ export default {
     "ayla": "Watcher, your wall and mine come from the same plans. Whose bricks are harder?",
     "mo": "Alchemist, you can reckon my weak points — can you reckon how many of your people are in me?",
     "ying": "Little lampwright, the lamp on my gatehouse — your master lit it.",
-    "jun": "Master Jun, we learned to open the gates you drew. Shall I teach you to close them?",
+    "jun": "Master Shi, we learned to open the gates you drew. Shall I teach you to close them?",
     "li": "Stargazer, I have walked seven hundred years. Is my city on your star chart?"
    },
    "heroLow": {
@@ -1008,7 +1008,7 @@ export default {
     "starfall": "(Shards rain from the sky.)",
     "gravity": "(Everything tips toward it.)"
    },
-   "low": "Li, I found it. But it's too heavy. I can't carry it back alone.",
+   "low": "Yao, I found it. But it's too heavy. I can't carry it back alone.",
    "heroLow": "Father, if you can't carry it alone, I'll help. Granny said a star takes two to watch.",
    "die": "(The star rises, higher and higher, and stops in the empty place in the northern sky.)"
   }
@@ -1028,8 +1028,8 @@ export default {
       "ayla": "Twenty years, and you never talk before going up. Say a word or two today?",
       "mo": "Everyone from the Academy left. Only you came back. What for?",
       "ying": "Little Ying, if your master saw you on the Wall, he'd scold me for not stopping you.",
-      "jun": "Jun, you've mended this Wall eighteen years, know it best. Give it to me straight?",
-      "li": "Li, the observatory's in ruins and you still climb it daily. What do you see?"
+      "jun": "Shi Jun, you've mended this Wall eighteen years, know it best. Give it to me straight?",
+      "li": "Xingyao, the observatory's in ruins and you still climb it daily. What do you see?"
      }
     ]
    ],
@@ -1080,8 +1080,8 @@ export default {
       "ayla": "Captain… my hands won't stop shaking.",
       "mo": "Alchemist, sir, those bottles of yours… do they really work?",
       "ying": "Miss Ying, aren't you scared at all?",
-      "jun": "Master Jun… my hands won't stop shaking.",
-      "li": "Miss Li, can the stars tell us if we live through tonight?"
+      "jun": "Master Shi… my hands won't stop shaking.",
+      "li": "Miss Xingyao, can the stars tell us if we live through tonight?"
      }
     ],
     [
@@ -1140,8 +1140,8 @@ export default {
       "ayla": "Karl kept watch like this too. You know how he ended up.",
       "mo": "Mo, the Academy door is still open for you. Come back.",
       "ying": "Your master is with me. He's doing well. He misses you a little.",
-      "jun": "Jun, I still have your plans. Come back and draw me new ones?",
-      "li": "Li, the star you seek is in my hand. If you want it, come take it."
+      "jun": "Shi Jun, I still have your plans. Come back and draw me new ones?",
+      "li": "Xingyao, the star you seek is in my hand. If you want it, come take it."
      }
     ]
    ],
@@ -1196,8 +1196,8 @@ export default {
       "ayla": "Ayla, thank you for all these years.",
       "mo": "Dawn or no dawn, you're one of this city's own now.",
       "ying": "Go on, child. Your master's lamp has burned in the bell tower all along.",
-      "jun": "Jun, your father laid half this Wall, you laid the other half. Well done.",
-      "li": "Li, the starkeepers' rule — count every star before dawn. Done counting?"
+      "jun": "Shi Jun, your father laid half this Wall, you laid the other half. Well done.",
+      "li": "Xingyao, the starkeepers' rule — count every star before dawn. Done counting?"
      }
     ]
    ],

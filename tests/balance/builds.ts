@@ -190,7 +190,7 @@ export function relicsFor(arch: string, r: number) {
   return list;
 }
 export const talentsFor = (arch: string, r: number) => ARCHS[arch].talents.slice(0, Math.ceil(r / 2));
-/** C 位：第 3 夜起有（跃迁事件）；璃每经过一次跃迁再点一颗星 / carry: present from night 3 (the leap event); Li lights another star after each leap */
+/** C 位：第 3 夜起有（跃迁事件）；星遥每经过一次跃迁再点一颗星 / carry: present from night 3 (the leap event); Li lights another star after each leap */
 export function carryFor(arch: string, r: number, keys: string[]): { key: string; star: number } | null {
   if (r < 3) return null;
   const A = ARCHS[arch];

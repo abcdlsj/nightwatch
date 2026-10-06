@@ -19,7 +19,7 @@ export interface Card {
   qp: number;
   /** C 位：这局的主力，自带独立乘区（同一时间只有一张） / carry: this run's main card, with its own independent multiplier (only one at a time) */
   carry?: boolean;
-  /** 星辉：璃的跃迁事件给 C 位叠的层数，每层再乘一截 / starlight: stacks Li's leap event adds to the carry, each stacking another multiplier */
+  /** 星辉：星遥的跃迁事件给 C 位叠的层数，每层再乘一截 / starlight: stacks Li's leap event adds to the carry, each stacking another multiplier */
   star?: number;
   /** 卡面闪光动画的错开延迟（纯表现） / staggered delay for the card-face flash animation (cosmetic) */
   dl: string | number;

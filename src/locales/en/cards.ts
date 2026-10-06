@@ -820,7 +820,7 @@ export default {
   "f": "Granny says the missing page of the star chart is yours to fill in.",
   "lore": "The year the observatory fell, the wind took a few pages of the star chart. One caught in a crenel on the Wall, a child's name on the back.",
   "dn": "The Mended Page",
-  "dl": "Li tucked it back in. Different paper, different hand—but the stars lined up."
+  "dl": "Xingyao tucked it back in. Different paper, different hand—but the stars lined up."
  },
  "sirius": {
   "n": "Sirius",
@@ -842,9 +842,9 @@ export default {
   "n": "Command Tent",
   "d": "No cooldown. In the center (slots 4-5), all 【Position】 multipliers +0.2; more at higher tiers. 【Position】",
   "f": "Where the tent goes up, the battle starts.",
-  "lore": "Jun's father pitched this tent. The pole is an old beam from the Wall, still bearing his measuring marks.",
+  "lore": "Shi Jun's father pitched this tent. The pole is an old beam from the Wall, still bearing his measuring marks.",
   "dn": "The Old Beam",
-  "dl": "Jun has counted the notches on that beam many times. Forty-seven."
+  "dl": "Shi Jun has counted the notches on that beam many times. Forty-seven."
  },
  "crenel": {
   "n": "Crenel",
@@ -852,15 +852,15 @@ export default {
   "f": "The plainest gap in the Wall is the deadliest.",
   "lore": "A crenel is as wide as a person turned sideways. Set seven hundred years ago, never changed.",
   "dn": "Sideways Width",
-  "dl": "Jun measured it: exactly one person. No more, no less."
+  "dl": "Shi Jun measured it: exactly one person. No more, no less."
  },
  "kiln": {
   "n": "Brick Kiln",
   "d": "Belches kiln fire for area damage and ignites; gives the Wall 2 shield on trigger. 【Position】 ×1.3 damage in the center.",
   "f": "Fire that bakes bricks bakes other things too.",
-  "lore": "The old kiln south of the city, where Jun's father fired bricks all his life. The fire never went out; relighting takes three days.",
+  "lore": "The old kiln south of the city, where Shi Jun's father fired bricks all his life. The fire never went out; relighting takes three days.",
   "dn": "The Undying Kiln",
-  "dl": "The last batch of bricks is still inside. Jun says they'll open it after dawn."
+  "dl": "The last batch of bricks is still inside. Shi Jun says they'll open it after dawn."
  },
  "dualflask": {
   "n": "Fire-Ice Flask",

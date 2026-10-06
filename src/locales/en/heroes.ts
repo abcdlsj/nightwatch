@@ -12,25 +12,25 @@ export default {
    "n": "Mo",
    "title": "Exiled Alchemist",
    "tag": "Elemental reactions",
-   "desc": "A prodigy thrown out of the Academy. Thin Wall, deep pockets. Ice meets fire, poison on poison, lightning running wild: reactions multiply the damage.",
+   "desc": "A prodigy struck from the Academy roll; the ink blotted out her name, and \"Mo\" (ink) is all that's left. Thin Wall, deep pockets. Ice meets fire, poison on poison, lightning running wild: reactions multiply the damage.",
    "intro": "The Academy threw me out for saying alchemy could light the sun. For now, I'll settle for lighting a few monsters."
   },
   "ying": {
    "n": "Ying",
    "title": "Lampwright's Apprentice",
    "tag": "Small cards in numbers",
-   "desc": "The lampwright's apprentice, keeper of the city's lamps. More small cards, more power: more lamps, more light; one spring winds them all; one spark lights the string.",
+   "desc": "The lampwright's apprentice, keeper of the city's lamps. No one uses her real name anymore; Master called her Ying (firefly), and the city followed. More small cards, more power: more lamps, more light; one spring winds them all; one spark lights the string.",
    "intro": "Master said as long as one lamp still burns, the city hasn't lost. My job is to keep them burning."
   },
   "jun": {
-   "n": "Jun",
+   "n": "Shi Jun",
    "title": "Wallwright",
    "tag": "【Position】 and fortifications",
    "desc": "He laid half the bricks in this Wall; his is the thickest. It's all in the layout: cannon in the middle, crossbows on the ends, like beside like. Shields can even be thrown to hurt.",
    "intro": "How to stack bricks, where to set cannon: I know it all. The Wall holds because every brick is where it belongs."
   },
   "li": {
-   "n": "Li",
+   "n": "Xingyao",
    "title": "Stargazer",
    "tag": "Carry",
    "desc": "A star-keeper's apprentice. One main card; everything else serves it: charge, damage, sure crits, freeze-then-strike. Each Leap lights one more star for the main.",

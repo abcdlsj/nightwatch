@@ -1,4 +1,4 @@
-/* Jun's story.
+/* Shi Jun's story.
  * Three night sets: the East Wall (his father Old Shi and the collapse eighteen years ago), Blueprints (the catapult he drew at seventeen), Home (his wife Guizhi and son Shitou).
  */
 export default {
@@ -20,7 +20,7 @@ export default {
         1: {
           title: "Under the Bell Tower", who: "bellman",
           lines: [
-            ["bellman", "Jun, eighteen years on this Wall, you know it best. Straight answer?"],
+            ["bellman", "Shi Jun, eighteen years on this Wall, you know it best. Straight answer?"],
             ["hero", "East's no good."],
             ["bellman", "That's it?"],
             ["hero", "West's not great either. North gate, passable."],
@@ -65,7 +65,7 @@ export default {
         7: {
           title: "East Wall", who: "bellman",
           lines: [
-            ["bellman", "Jun, your dad laid half this Wall. You laid the other half."],
+            ["bellman", "Shi Jun, your dad laid half this Wall. You laid the other half."],
             ["hero", "His half's straighter than mine."],
             ["bellman", "His half fell once."],
             ["hero", "...Yeah."],
@@ -96,14 +96,14 @@ export default {
         1: {
           title: "Work Shed", who: "soldier",
           lines: [
-            ["soldier", "Master Jun, did you draw this? Found it in the old files."],
+            ["soldier", "Master Shi, did you draw this? Found it in the old files."],
             ["hero", "...Where?"],
             ["soldier", "A bundle the Academy sent back. Stamped: VOID."],
           ],
           q: "A catapult on yellowed paper. In the corner, your signature at seventeen.",
           ans: [
             { cat: "atk", t: "Void? They're using it fine outside the Wall.", re: "Outside? You mean..." },
-            { cat: "def", t: "Burn it.", re: "Yes. ...Master Jun, it's a fine drawing." },
+            { cat: "def", t: "Burn it.", re: "Yes. ...Master Shi, it's a fine drawing." },
             { cat: "tech", t: "Leave it. I'll see what they've changed.", re: "You'll... counter it from this?" },
           ],
         },
@@ -124,7 +124,7 @@ export default {
         5: {
           title: "A Voice in the Wall", who: "greyrobe",
           lines: [
-            ["greyrobe", "Jun. I still have your blueprints."],
+            ["greyrobe", "Shi Jun. I still have your blueprints."],
             ["greyrobe", "Your catapult outranged the Academy's by a third. Counterweights mastered at seventeen."],
             ["greyrobe", "Come back. Draw me a new one."],
           ],
@@ -333,7 +333,7 @@ export default {
       blue: {
         title: "Plumb Bob", who: "soldier",
         lines: [
-          ["soldier", "Master Jun, found a plumb bob on the north road."],
+          ["soldier", "Master Shi, found a plumb bob on the north road."],
           ["soldier", "Blue line, blue stone weight. Hang it anywhere, it leans north."],
           ["hero", "...Dad's. He never plumbed a wall with anyone else's."],
         ],

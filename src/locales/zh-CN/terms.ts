@@ -225,6 +225,6 @@ export default {
   "shitou": "石头",
   "hans": "汉斯",
   "popo": "婆婆",
-  "lifa": "璃的父亲"
+  "lifa": "星遥的父亲"
  }
 };

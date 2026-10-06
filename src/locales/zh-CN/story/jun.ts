@@ -1,4 +1,4 @@
-/* 钧的剧情。
+/* 石钧的剧情。
  * 三套夜晚：东墙（他爹老石和十八年前那次塌方）、图纸（十七岁画的投石车）、家（媳妇桂枝和儿子石头）。
  * Jun's story. Three night sets: the East Wall (his father Old Shi and the collapse eighteen years ago), Blueprints (the catapult he drew at seventeen), Home (his wife Guizhi and son Shitou).
  */
@@ -21,7 +21,7 @@ export default {
         1: {
           title: '钟楼下', who: 'bellman',
           lines: [
-            ['bellman', '钧，这墙你修了十八年，比谁都熟。给句实话？'],
+            ['bellman', '石钧，这墙你修了十八年，比谁都熟。给句实话？'],
             ['hero', '东段不行。'],
             ['bellman', '就这？'],
             ['hero', '西段也不太行。北门那段，凑合。'],
@@ -66,7 +66,7 @@ export default {
         7: {
           title: '东墙', who: 'bellman',
           lines: [
-            ['bellman', '钧，这道墙，你爹砌一半，你砌一半。'],
+            ['bellman', '石钧，这道墙，你爹砌一半，你砌一半。'],
             ['hero', '我爹砌的那一半，比我的直。'],
             ['bellman', '你爹砌的那一半，塌过一次。'],
             ['hero', '……嗯。'],
@@ -97,14 +97,14 @@ export default {
         1: {
           title: '工棚', who: 'soldier',
           lines: [
-            ['soldier', '钧师傅，这张图是你画的吗？我在旧档里翻到的。'],
+            ['soldier', '石师傅，这张图是你画的吗？我在旧档里翻到的。'],
             ['hero', '……哪儿翻的？'],
             ['soldier', '学院退回来的旧档，一捆。上面写着：作废。'],
           ],
           q: '泛黄的纸上画着一架投石车。角落里，是你十七岁时的签名。',
           ans: [
             { cat: 'atk', t: '作废？它们在墙外用得好好的。', re: '墙外？您是说……' },
-            { cat: 'def', t: '拿去烧了。', re: '是。……钧师傅，它画得真好。' },
+            { cat: 'def', t: '拿去烧了。', re: '是。……石师傅，它画得真好。' },
             { cat: 'tech', t: '放下。我看看它们现在改了哪儿。', re: '您要……照着它对着改？' },
           ],
         },
@@ -125,7 +125,7 @@ export default {
         5: {
           title: '墙缝里的声音', who: 'greyrobe',
           lines: [
-            ['greyrobe', '钧。你画的图纸，我还留着。'],
+            ['greyrobe', '石钧。你画的图纸，我还留着。'],
             ['greyrobe', '你的投石车，射程比学院的远三成。十七岁就把配重想明白了。'],
             ['greyrobe', '回来，给我画张新的。'],
           ],
@@ -334,7 +334,7 @@ export default {
       blue: {
         title: '铅垂', who: 'soldier',
         lines: [
-          ['soldier', '钧师傅，北边路上捡到一个铅垂。'],
+          ['soldier', '石师傅，北边路上捡到一个铅垂。'],
           ['soldier', '线是蓝的，垂头是块蓝石头。往哪儿挂，它都往北偏。'],
           ['hero', '……我爹的。他吊墙从来不用别人的铅垂。'],
         ],

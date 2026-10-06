@@ -143,11 +143,11 @@ export default {
   },
   "h_jun": {
    "n": "Wall and City",
-   "d": "Reach dawn with Jun"
+   "d": "Reach dawn with Shi Jun"
   },
   "h_li": {
    "n": "Star Returns North",
-   "d": "Reach dawn with Li"
+   "d": "Reach dawn with Xingyao"
   },
   "gems3": {
    "n": "All Three",
@@ -175,11 +175,11 @@ export default {
   },
   "hid_jun": {
    "n": "The 48th Brick",
-   "d": "Defeat the Black Wall with Jun"
+   "d": "Defeat the Black Wall with Shi Jun"
   },
   "hid_li": {
    "n": "Watching Together",
-   "d": "Defeat the Fallen Star with Li"
+   "d": "Defeat the Fallen Star with Xingyao"
   }
  },
  "heats": [
