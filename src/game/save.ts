@@ -67,6 +67,9 @@ export function restoreSave(s: SaveData | null): boolean {
     c.star = d.star || 0;
     G.cards.push(c);
   }
+  /* 上一夜战报的快照里也可能有改了名或删掉的卡 / last night's report snapshot may also hold renamed or removed cards */
+  const pr = G.run?.prevRep;
+  if (pr) pr.cards = (pr.cards || []).map((p) => ({ ...p, key: CARD_OLD[p.key] || p.key })).filter((p) => ITEMS[p.key]);
   recalcMods();
   return true;
 }

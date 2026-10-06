@@ -43,7 +43,8 @@ export type Row = [string, number, number?, string?];
 /** 和上一夜对照：同名卡按伤害高低一一配对（合成、升档也算同一张），配不上的是新上场的；上夜有、这夜没出手的另列一行
  * compare with last night: same-name cards pair up by damage rank (merges and upgrades count as the same card); unpaired ones are new; cards that played last night but not tonight get their own line */
 function pairPrev(bc: Card[], prev: RepSnap | undefined) {
-  const left = prev ? prev.cards.slice().sort((a, z) => z.dmg - a.dmg) : [];
+  /* 认不出的卡（老存档里改名或删掉的）不参与对照，不然战报报错、整局卡住 / unknown cards (renamed or removed in old saves) are left out, or the report throws and the run freezes */
+  const left = prev ? prev.cards.filter((p) => ITEMS[p.key]).sort((a, z) => z.dmg - a.dmg) : [];
   const got = new Map<Card, RepSnap['cards'][number] | null>();
   for (const c of bc) {
     const i = left.findIndex((p) => p.key === c.key);
