@@ -270,7 +270,8 @@ function dawnTitle() {
   if (!G.full) return T.dawn;
   return nightKind(G.maxRound) === 'hidden' ? T.dawnTrue : T.dawnQuiet;
 }
-export function endScreen(win: boolean) {
+/** quit：玩家自己在设置里结算这局（不写「谁漏过去最多」） / quit: the player ended the run from settings (no 'who leaked through most') */
+export function endScreen(win: boolean, quit = false) {
   const sc = $('#screen');
   const T = L.ui.end;
   setScene(win ? 'shop' : 'over');
@@ -300,9 +301,9 @@ export function endScreen(win: boolean) {
   ${row(T.relicsTalents, t('end.relicsTalentsV', { r: G.relics.length, t: G.skills.length }))}
   ${row(T.bestChain, '×' + (G.bestChain || 1))}
   ${row(T.kills, R.kills + ' / ' + R.maxCombo)}
-  ${best ? row(T.ace, `${best.adj && ADJ[normAdj(best.adj)!] ? t('sheet.adjOf', { a: ADJ[normAdj(best.adj)!].n }) : ''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}`) : ''}</div>
+  ${best && best.bDmg ? row(T.ace, `${best.adj && ADJ[normAdj(best.adj)!] ? t('sheet.adjOf', { a: ADJ[normAdj(best.adj)!].n }) : ''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}`) : ''}</div>
   ${runSrcBlock()}
-  ${endNote}${win ? '' : loseNote(B)}
+  ${endNote}${win || quit ? '' : loseNote(B)}
   ${mastNote}
   ${R.newHeat ? `<div class="newheat">${t('end.newHeat', { h: R.newHeat, d: (L.meta.heats as string[])[R.newHeat] })}</div>` : ''}
   ${newPaths.map((p) => `<div class="newheat">${t('end.newPath', { h: H.n, p: p.n })}</div>`).join('')}

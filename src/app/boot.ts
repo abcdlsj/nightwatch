@@ -4,7 +4,6 @@ import { loadMods } from '../mod/load';
 import { on } from '../core/events';
 import { clamp } from '../core/util';
 import { G } from '../game/state';
-import { clearSave } from '../game/save';
 import { META, mastLv } from '../game/meta';
 import { boardCards, newCard, stats } from '../game/cards';
 import { TALENTS } from '../data/talents';
@@ -143,12 +142,15 @@ $('#muteBtn').onclick = () => {
   SFX.ensure();
   openSettings(undefined, G.phase === 'title' || G.phase === 'over' ? undefined : quitRun);
 };
-/** 放弃这局：删掉存档，停掉战斗，回到首页 / abandon the run: delete the save, stop the battle, back to the title */
+/** 结算这局：打到一半也算，直接进结局页（整局伤害来源照常列出） / end this run: counts even mid-fight, straight to the ending screen (run damage sources listed as usual) */
 function quitRun() {
-  if (B) B.over = true;
-  clearSave();
-  G.phase = 'title';
-  titleScreen();
+  if (B && G.phase === 'battle' && !B.over) {
+    B.over = true;
+    if (G.run) G.run.kills += B.kills;
+    G.bestChain = Math.max(G.bestChain, B.maxChain);
+  }
+  G.phase = 'over';
+  endScreen(false, true);
 }
 
 /* ---------- 主循环：模拟按 1/60 秒定步长推进，画面每帧画一次 ---------- / ---------- Main loop: the sim advances in fixed 1/60s steps, rendering once per frame ---------- */

@@ -11,7 +11,7 @@ import { exportCode, importCode } from '../platform/backup';
 
 const VERSION = __APP_VERSION__;
 
-/** onQuit：对局中打开时传入，多出「放弃这局」 / onQuit: passed when opened mid-run, adds an "abandon this run" button */
+/** onQuit：对局中打开时传入，多出「结算这局」 / onQuit: passed when opened mid-run, adds an "end this run" button */
 export function openSettings(onReset?: () => void, onQuit?: () => void) {
   SFX.play('ui');
   const T = L.ui.settings;
