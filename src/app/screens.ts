@@ -18,7 +18,8 @@ import { SFX } from '../audio/sfx';
 import { $ } from '../ui/dom';
 import { openSettings } from '../ui/settings';
 import { openAch } from '../ui/sheets';
-import { loseNote } from '../ui/report';
+import { loseNote, runSrcBlock } from '../ui/report';
+import { foldDmg } from '../sim/dmgsrc';
 import { openCodex, openHistory } from '../ui/codex';
 import { canInstallIOS } from '../platform/pwa';
 import { openWorkshop } from '../ui/workshop';
@@ -273,6 +274,8 @@ export function endScreen(win: boolean) {
   const sc = $('#screen');
   const T = L.ui.end;
   setScene(win ? 'shop' : 'over');
+  /* 输掉的那一场也算进整局伤害来源 / the lost fight also counts toward the run's damage sources */
+  foldDmg(B);
   recordRun(win, B && B.wallBy ? B.wallBy : null);
   const best = G.cards.slice().sort((a, b) => b.bDmg - a.bDmg)[0];
   const R = G.run || freshRun();
@@ -298,6 +301,7 @@ export function endScreen(win: boolean) {
   ${row(T.bestChain, '×' + (G.bestChain || 1))}
   ${row(T.kills, R.kills + ' / ' + R.maxCombo)}
   ${best ? row(T.ace, `${best.adj && ADJ[normAdj(best.adj)!] ? t('sheet.adjOf', { a: ADJ[normAdj(best.adj)!].n }) : ''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}`) : ''}</div>
+  ${runSrcBlock()}
   ${endNote}${win ? '' : loseNote(B)}
   ${mastNote}
   ${R.newHeat ? `<div class="newheat">${t('end.newHeat', { h: R.newHeat, d: (L.meta.heats as string[])[R.newHeat] })}</div>` : ''}

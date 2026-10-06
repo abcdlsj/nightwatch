@@ -61,7 +61,7 @@ export const CARD_HOOKS: Record<string, CardHook> = {
         const amt = Math.max(4, e.burnD * Math.max(1, e.burnT) * 2) * dmgMul(c) * (1 + mv('burn'));
         view.boom(X, Y, R, '#ef7d57');
         view.cardFx(c, 'pop');
-        later(0.04, () => around(X, Y, R, (o) => hurt(o, amt, c, false, { burn: 2 })));
+        later(0.04, () => around(X, Y, R, (o) => hurt(o, amt, c, false, { burn: 2, k: 'fx' })));
       },
     },
   },
@@ -86,7 +86,7 @@ export const CARD_HOOKS: Record<string, CardHook> = {
       },
     },
   },
-  shockvenom: { on: { bounce: (c, x) => { if (x.src === c && x.e.poisonT > 0 && !x.e.dead) hurt(x.e, x.e.poisonD, c, false, { poisonTick: 1 }); } } },
+  shockvenom: { on: { bounce: (c, x) => { if (x.src === c && x.e.poisonT > 0 && !x.e.dead) hurt(x.e, x.e.poisonD, c, false, { poisonTick: 1, k: 'fx' }); } } },
   midas: {
     on: {
       kill: (c, x) => {
@@ -181,7 +181,7 @@ export const CARD_HOOKS: Record<string, CardHook> = {
           R = 18 * K();
         const amt = stats(c, bt().t).total * 0.5;
         view.ring(X, Y, 2, R, '#c2f4ff', 0.3);
-        later(0.03, () => around(X, Y, R, (o) => hurt(o, amt, c, false, { splash: 1 })));
+        later(0.03, () => around(X, Y, R, (o) => hurt(o, amt, c, false, { splash: 1, k: 'fx' })));
       },
     },
   },
@@ -215,7 +215,7 @@ export const RELIC_HOOKS: Record<string, Record<string, (n: number, x: X) => voi
         Y = ey(x.e) - 4,
         R = 16 * K();
       view.ring(X, Y, 2, R, '#c2f4ff', 0.3);
-      later(0.03, () => around(X, Y, R, (o) => hurt(o, 8 * n, null, false, {})));
+      later(0.03, () => around(X, Y, R, (o) => hurt(o, 8 * n, null, false, { k: 'relic.icechain' })));
     },
   },
   chaingear: {
@@ -256,7 +256,7 @@ export const RELIC_HOOKS: Record<string, Record<string, (n: number, x: X) => voi
       const ns = near(x.e, R);
       if (!ns.length) return;
       view.ring(ex(x.e), ey(x.e) - 5, 2, R, '#e3e9f0', 0.2);
-      for (const o of ns) hurt(o, x.a * 0.35 * n, x.src, false, { splash: 1 });
+      for (const o of ns) hurt(o, x.a * 0.35 * n, x.src, false, { splash: 1, k: 'relic.scabbard' });
     },
   },
   groove: {
@@ -268,7 +268,7 @@ export const RELIC_HOOKS: Record<string, Record<string, (n: number, x: X) => voi
         R = 18 * K();
       const amt = stats(s, bt().t).total * 0.6 * n;
       view.ring(X, Y, 2, R, '#ff5a5a', 0.25);
-      later(0.03, () => around(X, Y, R, (o) => hurt(o, amt, s, false, { splash: 1 })));
+      later(0.03, () => around(X, Y, R, (o) => hurt(o, amt, s, false, { splash: 1, k: 'relic.groove' })));
     },
   },
   bellows: {
@@ -352,7 +352,7 @@ export const TALENT_HOOKS: Record<string, Record<string, (x: X) => void>> = {
   f_sweep: {
     crit: (x) => {
       if (!x.src || kindOf(x.src) !== 'weapon' || !x.a || !x.e) return;
-      for (const o of near(x.e, 16 * K())) hurt(o, x.a, x.src, false, { splash: 1 });
+      for (const o of near(x.e, 16 * K())) hurt(o, x.a, x.src, false, { splash: 1, k: 't.f_sweep' });
     },
   },
 };

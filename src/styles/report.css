@@ -26,3 +26,20 @@
 .rp-gone img{width:18px;height:18px;image-rendering:pixelated}
 .rp-legend{text-align:right;font-size:11px;color:var(--muted);margin-bottom:-2px}
 .rp-meta b small{font-size:10px;margin-left:2px;color:var(--muted)}
+/* 战报分页：按卡牌 / 今夜来源 / 整局来源 / report tabs: by card / tonight by source / run by source */
+.rp-tabs{display:flex;gap:4px;justify-content:center}
+.rp-tabs button{font-family:var(--zh);font-size:13px;color:var(--muted);background:rgba(255,255,255,.06);border:0;border-radius:8px;padding:4px 10px;cursor:pointer}
+.rp-tabs button.on{color:#1a1c2c;background:#ffd166}
+#report [data-for][hidden]{display:none}
+.rs-total{text-align:center;font-size:13px;color:var(--muted)}
+.rs-total b{font-family:var(--px);color:#ffd166;font-size:15px}
+.rs-row{display:grid;grid-template-columns:minmax(84px,auto) 1fr auto;align-items:center;gap:6px;font-size:14px;opacity:0;animation:rowIn .3s ease-out forwards;padding:1px 0}
+.rs-row>span{color:var(--tagc);white-space:nowrap}
+.rs-row .bar{height:9px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.rs-row .bar i{display:block;height:100%;background:var(--tagc);width:0;transition:width .6s cubic-bezier(.2,.9,.3,1)}
+.rs-row b{font-family:var(--px);font-size:15px;text-align:right;min-width:62px}
+.rs-row b small{color:var(--muted);font-size:11px;margin-left:4px;font-weight:400}
+.rs-cards{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:-2px;font-family:var(--body);font-size:12px;color:#9fb3ba}
+.rs-cards span{display:flex;align-items:center;gap:3px}
+.rs-cards img{width:18px;height:18px;image-rendering:pixelated}
+.dmgsrc small{color:var(--muted);font-size:12px;align-self:center}

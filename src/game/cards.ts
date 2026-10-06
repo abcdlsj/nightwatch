@@ -15,7 +15,7 @@ export function newCard(key: string, tier?: number | null, adj?: string | null):
     hoard: 0, grow: 0, qp: 0, dl: (vr() * -3.4).toFixed(2),
     charge: 0, mom: 0, frozen: 0, hasteT: 0, anvil: 0, ammo: null, stk: 0, rage: 0, cnt: 0, lastT: -9, lastFire: -9, ox: 0,
     nb: null, right: null, echoLog: [], evLog: {},
-    bDmg: 0, bTrig: 0, bSrc: null, bCh: 0, bHs: 0, bRl: 0, bBf: 0, bTr: 0,
+    bDmg: 0, bTrig: 0, bSrc: null, bBy: null, bCh: 0, bHs: 0, bRl: 0, bBf: 0, bTr: 0,
   };
 }
 

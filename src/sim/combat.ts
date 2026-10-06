@@ -12,6 +12,7 @@ import { view } from './view';
 import { B, bt, later, emit, front, phased, dist, targets, near } from './battle';
 import { spawn, comboKill } from './enemies';
 import { react, was, streak, ultimate, refOf } from './combo';
+import { bookDmg } from './dmgsrc';
 import type { Enemy, Projectile } from './types';
 
 /* ---------------- 触发与连锁 ---------------- / ---------------- Triggers and chains ---------------- */
@@ -127,7 +128,7 @@ function fire(c: Card, depth: number) {
       e.burnT = 0;
       e.burnD = 0;
       view.ring(ex(e), ey(e) - 8, 3, 34, '#ff7a2a', 0.45);
-      hurt(e, amt, c, false, {});
+      hurt(e, amt, c, false, { k: 'det' });
     }
     if (n) {
       view.sfx('boom');
@@ -143,7 +144,7 @@ function fire(c: Card, depth: number) {
       e.poisonT = 0;
       e.poisonD = 0;
       view.ring(ex(e), ey(e) - 8, 3, 34, '#7ddc5f', 0.45);
-      hurt(e, amt, c, false, {});
+      hurt(e, amt, c, false, { k: 'det' });
     }
     if (n) {
       view.sfx('boom');
@@ -249,7 +250,7 @@ function showChain(n: number, c: Card) {
 }
 
 /* ---------------- 攻击方式 ---------------- / ---------------- Attack modes ---------------- */
-type HitMods = { rx?: number; slow?: number; kb?: number; freeze?: number; vuln?: [number, number] | null; exec?: number; burnDur?: number; poisonDur?: number; burn?: number; poison?: number; pen?: number; splash?: number; burnTick?: number; poisonTick?: number };
+type HitMods = { rx?: number; slow?: number; kb?: number; freeze?: number; vuln?: [number, number] | null; exec?: number; burnDur?: number; poisonDur?: number; burn?: number; poison?: number; pen?: number; splash?: number; burnTick?: number; poisonTick?: number; /** 伤害来源（见 dmgsrc.ts），不写就按 tick/rx/splash 推断 / damage source (see dmgsrc.ts); inferred from tick/rx/splash when omitted */ k?: string };
 
 
 /** 多重里的第几下、共几下、是不是最后一发弹药 / which hit of the multicast, how many in total, and whether this is the last round of ammo */
@@ -370,6 +371,7 @@ function attack(c: Card, st: Stats, depth = 0, shot: Shot = { i: 0, n: 1, last: 
     if (it.armorShred && e.poisonT > 0) e.armorB = Math.max(-5 - e.armor, e.armorB - it.armorShred);
     const hp0 = e.hp;
     const amt = dmg * (m || 1) * hitMul(e);
+    ex0.k ||= depth > 0 ? 'chain' : crit ? 'crit' : 'hit';
     hurt(e, amt, c, crit, ex0);
     const isFirst = first && e === t;
     if (isFirst) first = false;
@@ -379,7 +381,7 @@ function attack(c: Card, st: Stats, depth = 0, shot: Shot = { i: 0, n: 1, last: 
         const n = b.en.filter((x) => !x.dead && x.y <= e.y + 0.02 && Math.hypot(ex(x) - ex(e), ey(x) - ey(e)) <= 40 * K()).sort((p, q) => dist(p, e) - dist(q, e))[0];
         if (n) {
           view.bolt([[ex(e), ey(e) - 5], [ex(n), ey(n) - 5]], '#ff5a5a', 0.14, true);
-          hurt(n, (amt - hp0) * it.overkill, c, false, { rx: 1, splash: 1 });
+          hurt(n, (amt - hp0) * it.overkill, c, false, { rx: 1, splash: 1, k: 'ovk' });
         }
       }
     } else {
@@ -408,7 +410,7 @@ function attack(c: Card, st: Stats, depth = 0, shot: Shot = { i: 0, n: 1, last: 
         const n = near(e, 40 * K())[0];
         if (n) {
           view.bolt([[ex(e), ey(e) - 5], [ex(n), ey(n) - 5]], '#dfe6ee', 0.12, true);
-          hurt(n, amt * it.boomer!, c, crit, Object.assign({}, mods));
+          hurt(n, amt * it.boomer!, c, crit, Object.assign({}, mods, { k: 'boomer' }));
         }
       });
     /* 雷鸣：再跳一个敌人 / Thunder: arc to one more enemy */
@@ -416,7 +418,7 @@ function attack(c: Card, st: Stats, depth = 0, shot: Shot = { i: 0, n: 1, last: 
       const n = near(e, 50 * K())[0];
       if (n) {
         view.bolt([[ex(e), ey(e) - 5], [ex(n), ey(n) - 5]], '#fee761', 0.14);
-        hurt(n, amt * 0.5, c, false, Object.assign({}, mods, { splash: 1 }));
+        hurt(n, amt * 0.5, c, false, Object.assign({}, mods, { splash: 1, k: 'adj.' + c.adj }));
         emit('bounce', { e: n, src: c });
       }
     }
@@ -756,6 +758,7 @@ export function hurt(e: Enemy, amt: number, src: Card | null, crit: boolean, o: 
   e.hp -= a;
   e.flash = 0.08;
   if (src) src.bDmg += a;
+  bookDmg(b, src, o.k || (o.burnTick ? 'burn' : o.poisonTick ? 'poison' : o.rx ? 'rx' : o.splash ? 'aoe' : crit ? 'crit' : 'hit'), a);
   if (a > b.maxHit) {
     b.maxHit = a;
     if (a >= 1000) unlock('hit1k');
@@ -869,7 +872,7 @@ export function kill(e: Enemy, src: Card | null) {
     view.boom(X, Y, R, '#ef7d57');
     view.shake(3);
     later(0.04, () => {
-      for (const o of B!.en) if (!o.dead && o !== e && Math.hypot(ex(o) - X, ey(o) - Y) <= R) hurt(o, o.maxHp * e.d.bomb! + 4, null, false, {});
+      for (const o of B!.en) if (!o.dead && o !== e && Math.hypot(ex(o) - X, ey(o) - Y) <= R) hurt(o, o.maxHp * e.d.bomb! + 4, null, false, { k: 'foe' });
     });
   }
   if (e.d.cargo) {

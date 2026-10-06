@@ -60,7 +60,7 @@ export function react(e: Enemy, a: number, src: Card, crit: boolean, w: Was, bur
       if (!mv('t_kiln')) e.frzT = 0;
       view.ring(X, Y, 2, 12 * K(), col, 0.3);
       for (let i = 0; i < 10; i++) view.part(X + vrnd(-4, 4), Y, vrnd(-25, 25), -vrnd(30, 70), vrnd(0.3, 0.5), vr() < 0.5 ? '#c2f4ff' : col, 2);
-      hurt(e, bonus(mv('t_kiln') ? 1.5 : 0.6), src, false, { rx: 1 });
+      hurt(e, bonus(mv('t_kiln') ? 1.5 : 0.6), src, false, { rx: 1, k: 'rx.' + k });
       break;
     case 'shatter': {
       if (!mv('t_kiln')) e.frzT = 0;
@@ -71,9 +71,9 @@ export function react(e: Enemy, a: number, src: Card, crit: boolean, w: Was, bur
           s = vrnd(40, 90);
         view.part(X, Y, Math.cos(ang) * s, Math.sin(ang) * s, vrnd(0.25, 0.45), vr() < 0.5 ? '#ffffff' : '#73eff7', 2);
       }
-      hurt(e, bonus(0.8), src, false, { rx: 1 });
+      hurt(e, bonus(0.8), src, false, { rx: 1, k: 'rx.' + k });
       const d = bonus(0.4);
-      around(e, 16 * K(), (o) => hurt(o, d, src, false, { rx: 1 }));
+      around(e, 16 * K(), (o) => hurt(o, d, src, false, { rx: 1, k: 'rx.' + k }));
       break;
     }
     case 'overload': {
@@ -82,7 +82,7 @@ export function react(e: Enemy, a: number, src: Card, crit: boolean, w: Was, bur
       view.ring(X, Y, 3, R * 1.1, '#ef7d57', 0.3);
       const d = bonus(0.5),
         bd = e.burnD * 0.6;
-      around(e, R, (o) => hurt(o, d, src, false, { rx: 1, burn: bd, burnDur: 3 }));
+      around(e, R, (o) => hurt(o, d, src, false, { rx: 1, burn: bd, burnDur: 3, k: 'rx.' + k }));
       break;
     }
     case 'toxic': {
@@ -97,9 +97,9 @@ export function react(e: Enemy, a: number, src: Card, crit: boolean, w: Was, bur
       /* 毒往外传只拉平到源头的一部分，不叠加：互相传来传去也不会越滚越大 / poison spread only levels out toward a fraction of the source and does not stack, so back-and-forth spreading never snowballs */
       const d = bonus(0.3),
         pd = e.poisonD * Math.min(1, 0.5 * m);
-      hurt(e, d, src, false, { rx: 1 });
+      hurt(e, d, src, false, { rx: 1, k: 'rx.' + k });
       around(e, R, (o) => {
-        hurt(o, d, src, false, { rx: 1 });
+        hurt(o, d, src, false, { rx: 1, k: 'rx.' + k });
         if (o.dead || o.poisonD >= pd) return;
         o.poisonD = pd;
         o.poisonT = Math.max(o.poisonT, 3);
@@ -228,7 +228,7 @@ const STREAK: Record<Tag, (c: Card, ref: number) => void> = {
           d = i % 2 ? 1 : -1;
         view.bolt([[X - 10 * d, Y - 8], [X + 10 * d, Y + 4]], '#ffffff', 0.16, true);
         view.bolt([[X + 8 * d, Y - 8], [X - 8 * d, Y + 4]], '#fff4cf', 0.16, true);
-        hurt(e, ref * 0.7, c, false, { splash: 1 });
+        hurt(e, ref * 0.7, c, false, { splash: 1, k: 'ult.blade' });
       }),
     );
     view.shake(3);
@@ -239,7 +239,7 @@ const STREAK: Record<Tag, (c: Card, ref: number) => void> = {
     for (let i = 0; i < 30; i++) view.part(vrnd(0, W), world.top + vrnd(10, 60) * K(), vrnd(-10, 10), -vrnd(20, 60), vrnd(0.4, 0.8), vpick(['#ffcd75', '#ef7d57', '#ff5a2a']), 2);
     for (const e of inRange()) {
       view.ring(ex(e), ey(e) - 5, 2, 10 * K(), '#ef7d57', 0.3);
-      hurt(e, ref * 0.3, c, false, { splash: 1, burn: ref * 0.2 * (1 + mv('burn')), burnDur: 4 });
+      hurt(e, ref * 0.3, c, false, { splash: 1, k: 'ult.fire', burn: ref * 0.2 * (1 + mv('burn')), burnDur: 4 });
     }
     view.shake(3);
   },
@@ -248,7 +248,7 @@ const STREAK: Record<Tag, (c: Card, ref: number) => void> = {
     view.ring(world.W / 2, world.H * 0.5, 4, world.W * 0.7, '#c2f4ff', 0.5);
     for (let i = 0; i < 30; i++) view.part(vrnd(0, world.W), vrnd(world.top, world.H * 0.8), vrnd(-20, 20), vrnd(10, 40), vrnd(0.4, 0.8), vr() < 0.5 ? '#ffffff' : '#73eff7', 1);
     for (const e of inRange()) {
-      hurt(e, ref * 0.4, c, false, { splash: 1 });
+      hurt(e, ref * 0.4, c, false, { splash: 1, k: 'ult.ice' });
       if (!e.dead) freeze(e, 0.8, c);
     }
   },
@@ -264,7 +264,7 @@ const STREAK: Record<Tag, (c: Card, ref: number) => void> = {
           Y = ey(e) - 5;
         view.bolt([[X + vrnd(-12, 12), world.top], [X, Y]], '#fee761', 0.2);
         view.ring(X, Y, 2, 9 * K(), '#ffffff', 0.2);
-        hurt(e, ref * 0.6, c, false, { splash: 1 });
+        hurt(e, ref * 0.6, c, false, { splash: 1, k: 'ult.volt' });
       });
     view.shake(3);
   },
@@ -281,7 +281,7 @@ const STREAK: Record<Tag, (c: Card, ref: number) => void> = {
     for (let i = 0; i < 24; i++) view.part(vrnd(0, world.W), vrnd(world.top, world.H * 0.7), vrnd(-15, 15), vrnd(-15, 5), vrnd(0.5, 0.9), vr() < 0.5 ? '#7ddc5f' : '#a7f070', 2);
     for (const e of inRange()) {
       view.ring(ex(e), ey(e) - 5, 2, 9 * K(), '#7ddc5f', 0.35);
-      hurt(e, 1, c, false, { splash: 1, poison: ref * 0.2 * (1 + mv('poison')), poisonDur: 4 });
+      hurt(e, 1, c, false, { splash: 1, k: 'ult.poison', poison: ref * 0.2 * (1 + mv('poison')), poisonDur: 4 });
     }
   },
 };

@@ -1,11 +1,14 @@
 /* 战报：每张卡打了多少、被谁触发、帮队友干了什么；城破时谁漏过去最多 / Battle report: damage per card, what triggered it, how it helped allies; on breach, who leaked through most */
-import { ITEMS, TAGC } from '../data/cards';
+import { ITEMS, TAGC, ADJ } from '../data/cards';
+import { RELICS } from '../data/relics';
+import { TALENTS } from '../data/talents';
 import { EN } from '../data/enemies';
 import { L, t } from '../i18n';
 import { fmt } from '../core/util';
 import { G, type Card, type RepSnap } from '../game/state';
 import { pickLine } from '../game/text';
 import { CARD_HOOKS, passiveSrc } from '../sim/hooks';
+import { RXC } from '../sim/combo';
 import type { Battle } from '../sim/types';
 import { spr } from '../render/sprites';
 import { FX } from '../render/overlay';
@@ -35,8 +38,105 @@ function srcLine(c: Card) {
   else if (it.passive && !ks.length) out.push(CARD_HOOKS[c.key]?.on ? t('report.passiveFires', { s: passiveSrc(c.key) }) : T.passiveAlways);
   const s = supOf(c);
   if (s) out.push(s);
+  const sp = splitLine(c);
+  if (sp) out.push(sp);
   return out.length ? `<small class="rp-src">${out.join('　')}</small>` : '';
 }
+
+
+/* ---------------- 伤害来源 ---------------- / ---------------- Damage by source ---------------- */
+const KC: Record<string, string> = { hit: '#ffd166', crit: '#ff5a5a', chain: '#e0c8ff', aoe: '#dfe6ee', rx: '#9ad8ff', burn: '#ef7d57', poison: '#7ddc5f', det: '#ff7a2a', ovk: '#ff8a7a', boomer: '#dfe6ee', zone: '#73eff7', fx: '#8ff0c8', foe: '#9fb3ba' };
+const cut = (k: string) => {
+  const i = k.indexOf('.');
+  return i < 0 ? [k, ''] : [k.slice(0, i), k.slice(i + 1)];
+};
+function srcColor(k: string) {
+  const [p, x] = cut(k);
+  if (p === 'rx') return (RXC as Record<string, string>)[x] || KC.rx;
+  if (p === 'ult') return (TAGC as Record<string, string>)[x] || KC.hit;
+  if (p === 'adj') return (ADJ[x]?.tag && (TAGC as Record<string, string>)[ADJ[x].tag!]) || KC.hit;
+  if (p === 'relic' || p === 't') return '#c9a0ff';
+  return KC[k] || '#9fb3ba';
+}
+/** 来源的名字 / a source's display name */
+export function srcName(k: string) {
+  const [p, x] = cut(k);
+  if (p === 'rx' && x) return t('report.srcRx', { n: (L.ui.battle.rx as Record<string, string>)[x] || x });
+  if (p === 'ult') return ((L.ui.battle.streak as Record<string, string>)[x] || x).replace(/\s*·\s*/, '·');
+  if (p === 'adj') return t('report.srcAdj', { n: ADJ[x]?.n || x });
+  if (p === 'relic') return t('report.srcRelic', { n: RELICS[x]?.n || x });
+  if (p === 't') return t('report.srcTalent', { n: TALENTS[x]?.n || x });
+  return L.ui.report.src[k] || k;
+}
+type SrcRow = { k: string; n: number; cards: [string, number][] };
+/** 「来源|卡牌」→ 按来源合并、从大到小，每个来源下列出出力的卡 / 'source|card' → merged by source, largest first, each with the cards that dealt it */
+export function groupSrc(by: Record<string, number> | undefined) {
+  const m = new Map<string, SrcRow>();
+  let total = 0;
+  for (const key in by || {}) {
+    const v = by![key];
+    if (!(v > 0)) continue;
+    const i = key.lastIndexOf('|');
+    const k = key.slice(0, i),
+      card = key.slice(i + 1);
+    let r = m.get(k);
+    if (!r) m.set(k, (r = { k, n: 0, cards: [] }));
+    r.n += v;
+    total += v;
+    if (card && ITEMS[card]) r.cards.push([card, v]);
+  }
+  const rows = [...m.values()].sort((a, z) => z.n - a.n);
+  for (const r of rows) r.cards.sort((a, z) => z[1] - a[1]);
+  return { rows, total };
+}
+const pct = (v: number, of: number) => {
+  const p = (v / Math.max(1, of)) * 100;
+  return p >= 10 ? Math.round(p) + '%' : p >= 1 ? p.toFixed(1) + '%' : '&lt;1%';
+};
+/** 战报里的来源面板 / the by-source panel in the report */
+function srcList(by: Record<string, number> | undefined) {
+  const T = L.ui.report;
+  const { rows, total } = groupSrc(by);
+  if (!rows.length) return `<div class="rp-meta">${T.srcNone}</div>`;
+  const mx = rows[0].n;
+  return (
+    `<div class="rs-total">${t('report.srcTotal', { n: fmt(Math.round(total)) })}</div>` +
+    rows
+      .map(
+        (r, i) =>
+          `<div class="rs-row" style="animation-delay:${i * 0.05}s;--tagc:${srcColor(r.k)}"><span>${srcName(r.k)}</span><div class="bar"><i data-w="${((r.n / mx) * 100).toFixed(1)}"></i></div><b>${fmt(Math.round(r.n))}<small>${pct(r.n, total)}</small></b>${
+            r.cards.length
+              ? `<small class="rs-cards">${r.cards
+                  .slice(0, 4)
+                  .map(([k, v]) => `<span><img src="${spr(k).url}" alt="">${ITEMS[k].n} ${fmt(Math.round(v))}</span>`)
+                  .join('')}</small>`
+              : ''
+          }</div>`,
+      )
+      .join('')
+  );
+}
+/** 一张卡的伤害由哪些来源组成（只有一种普通命中就不写） / which sources a card's damage came from (omitted when it is all normal hits) */
+function splitLine(c: Card) {
+  const by = c.bBy || {};
+  const tot = Object.keys(by).reduce((s, k) => s + (by[k] > 0 ? by[k] : 0), 0);
+  const ks = Object.keys(by).filter((k) => by[k] >= tot * 0.01 && by[k] > 0).sort((a, z) => by[z] - by[a]);
+  if (!ks.length || (ks.length === 1 && ks[0] === 'hit')) return '';
+  return L.ui.report.split + ks.slice(0, 4).map((k) => `<span style="color:${srcColor(k)}">${srcName(k)}</span> ${pct(by[k], tot)}`).join(L.ui.report.sep);
+}
+/** 结局页的整局来源 / the whole-run sources on the ending screen */
+export function runSrcBlock() {
+  const { rows, total } = groupSrc(G.run?.dmgBy);
+  if (!rows.length) return '';
+  return `<div class="rules res dmgsrc"><div><span>${L.ui.end.dmgSrc}</span><i style="margin-left:auto">${fmt(Math.round(total))}</i></div>${rows
+    .slice(0, 8)
+    .map(
+      (r) =>
+        `<div><span style="color:${srcColor(r.k)}">${srcName(r.k)}</span>${r.cards[0] ? `<small>${ITEMS[r.cards[0][0]].n}</small>` : ''}<i style="margin-left:auto">${fmt(Math.round(r.n))} · ${pct(r.n, total)}</i></div>`,
+    )
+    .join('')}</div>`;
+}
+let tab = 'card';
 
 export type Row = [string, number, number?, string?];
 
@@ -75,8 +175,11 @@ export function showReport(b: Battle, was: number, rows: Row[], total: number, o
   const prev = G.run?.prevRep && G.run.prevRep.r === was - 1 ? G.run.prevRep : undefined;
   const { got, gone } = pairPrev(bc, prev);
   rp.innerHTML = `<div class="rp-title win">${t('report.title', { r: was, s: pickLine(L.story.report.win) })}</div>
-  ${prev ? `<div class="rp-legend">${t('report.vs', { r: prev.r })}</div>` : ''}
-  <div class="rp-list">${
+  <div class="rp-tabs">${(['card', 'night', 'run'] as const).map((k) => `<button class="${k === tab ? 'on' : ''}" data-tab="${k}">${k === 'card' ? T.tabCards : k === 'night' ? T.tabNight : T.tabRun}</button>`).join('')}</div>
+  ${prev ? `<div class="rp-legend" data-for="card">${t('report.vs', { r: prev.r })}</div>` : ''}
+  <div class="rp-list rs-list" data-for="night">${srcList(b.dmgBy)}</div>
+  <div class="rp-list rs-list" data-for="run">${srcList(G.run?.dmgBy)}</div>
+  <div class="rp-list" data-for="card">${
     bc
       .map(
         (c, i) =>
@@ -107,6 +210,13 @@ export function showReport(b: Battle, was: number, rows: Row[], total: number, o
       combo: b.maxCombo,
       wall: Math.ceil(b.wallLost),
     };
+  const show = (k: string) => {
+    tab = k;
+    $$('[data-for]', rp).forEach((x) => (x.hidden = x.dataset.for !== k));
+    $$('.rp-tabs button', rp).forEach((x) => x.classList.toggle('on', x.dataset.tab === k));
+  };
+  show(tab);
+  $$('.rp-tabs button', rp).forEach((x) => (x.onclick = () => (SFX.play('ui'), show(x.dataset.tab!))));
   setTimeout(() => $$('.bar i', rp).forEach((i) => (i.style.width = i.dataset.w + '%')), 60);
   const cash = $('#cash');
   let i = 0;

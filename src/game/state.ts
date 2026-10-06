@@ -54,6 +54,8 @@ export interface Card {
   bDmg: number;
   bTrig: number;
   bSrc: Record<string, number> | null;
+  /** 这一场按伤害来源分的伤害（键见 sim/dmgsrc.ts） / this fight's damage split by source (keys in sim/dmgsrc.ts) */
+  bBy?: Record<string, number> | null;
   bCh: number;
   bHs: number;
   bRl: number;
@@ -118,6 +120,8 @@ export interface RunStats {
   /** 这局解锁了完整游戏线 / the full game line was unlocked this run */
   newFull?: boolean;
   hid?: number;
+  /** 整局按来源累计的伤害，键是「来源|卡牌」 / whole-run damage by source, keyed 'source|card' */
+  dmgBy?: Record<string, number>;
 }
 
 /** 备战时当前打开的那一站 / the prep stop currently open */

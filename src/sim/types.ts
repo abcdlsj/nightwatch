@@ -85,6 +85,9 @@ export interface Battle {
   slowT: number;
   kt?: number[];
   wallBy?: Record<string, number>;
+  /** 这一场按来源分的伤害，键是「来源|卡牌」；folded 表示已经并进整局 / this fight's damage by source, keyed 'source|card'; folded means already merged into the run */
+  dmgBy: Record<string, number>;
+  folded?: boolean;
   /** 本场元素反应、流派连招次数 / this battle's elemental reaction and archetype combo counts */
   rxN?: number;
   stkN?: number;

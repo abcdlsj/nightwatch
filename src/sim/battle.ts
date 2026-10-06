@@ -17,6 +17,7 @@ import { TUNE } from '../game/tuning';
 import { view } from './view';
 import { CARD_HOOKS, RELIC_HOOKS, TALENT_HOOKS, passiveSrc } from './hooks';
 import { trigger, stepProj, canFire, hurt } from './combat';
+import { foldDmg } from './dmgsrc';
 import { spawn, enemyStep, stepERocks, surge } from './enemies';
 import type { Battle, Enemy } from './types';
 
@@ -102,10 +103,10 @@ export function startBattle(o: StartOpts): Battle {
   B = {
     t: 0, spawns: o.wave, si: 0, en: [], pr: [], epr: [], graves: [], sched: [], shield: 0, maxChain: 0, wallLost: 0, endT: 0, over: false,
     acc: 0, boss: null, greed: 0, kills: 0, flags: {}, rlog: {}, beats: o.beats, bi: 0, surges: (o.wave.surges || []).slice(),
-    lowSaid: false, wager: o.wager, ambush: o.ambush, maxCombo: 0, combo: 0, maxHit: 0, slowT: 0,
+    lowSaid: false, wager: o.wager, ambush: o.ambush, maxCombo: 0, combo: 0, maxHit: 0, dmgBy: {}, slowT: 0,
   };
   for (const c of G.cards) {
-    Object.assign(c, { charge: 0, mom: 0, bDmg: 0, bTrig: 0, bSrc: {}, bCh: 0, bHs: 0, bRl: 0, bBf: 0, bTr: 0, frozen: 0, echoLog: [], evLog: {}, hasteT: 0, stk: 0, sw: 0, chN: 0, alt: 0, lastT: -9, lastFire: -9, rage: 0, cnt: 0 });
+    Object.assign(c, { charge: 0, mom: 0, bDmg: 0, bTrig: 0, bSrc: {}, bBy: {}, bCh: 0, bHs: 0, bRl: 0, bBf: 0, bTr: 0, frozen: 0, echoLog: [], evLog: {}, hasteT: 0, stk: 0, sw: 0, chN: 0, alt: 0, lastT: -9, lastFire: -9, rage: 0, cnt: 0 });
     c.ammo = maxAmmo(c);
     view.cardFlag(c, 'frozen', false);
     view.cardFlag(c, 'haste', false);
@@ -218,7 +219,7 @@ function stepZones(dt: number) {
     view.ring(z.x, z.y, z.r * 0.6, z.r, z.col, 0.35);
     for (const e of b.en)
       if (!e.dead && Math.hypot(ex(e) - z.x, ey(e) - z.y) <= z.r) {
-        hurt(e, z.dmg, z.src, false, { splash: 1, burn: z.burn, poison: z.poison, slow: z.slow });
+        hurt(e, z.dmg, z.src, false, { splash: 1, burn: z.burn, poison: z.poison, slow: z.slow, k: 'zone' });
         if (b.over) return;
       }
   }
@@ -274,6 +275,7 @@ export function settleWin() {
     G.run.maxHit = Math.max(G.run.maxHit, b.maxHit);
     G.run.maxCombo = Math.max(G.run.maxCombo, b.maxCombo);
   }
+  foldDmg(b);
   if (!b.ambush) {
     if (b.kills >= 150) unlock('kills150');
     for (const c of G.cards) if (c.adj === 'golden') c.hoard++;
