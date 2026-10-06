@@ -8,7 +8,7 @@ import { shuffled } from '../../core/rng';
 import type { Tag } from '../../data/types';
 import { G, type Card, type PrepStop } from '../../game/state';
 import { stats, setCarry } from '../../game/cards';
-import { makeOffer } from '../../game/loot';
+import { makeOffer, freeCap } from '../../game/loot';
 import { acquireState } from '../../game/prep';
 import { pathsOf, pathOpen } from '../../game/unlocks';
 import { jumpNights } from '../../game/plan';
@@ -37,7 +37,8 @@ function crown(c: Card) {
 /** 送一张卡；没地方放就折成金币 / grant a card; if there is no room, convert it to gold */
 function gift(filter: (it: (typeof ITEMS)[string]) => boolean, up: number) {
   const of = makeOffer(filter, { free: 1 });
-  of.card.tier = Math.min(2, of.card.tier + up);
+  /* 跃迁送的卡也守白送的品质上限 / leap gifts also obey the free-card tier cap */
+  of.card.tier = Math.min(Math.max(freeCap(), ITEMS[of.card.key].t), of.card.tier + up);
   const r = acquireState(of, null);
   if (r.ok) {
     afterChange(r.card);

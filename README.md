@@ -87,7 +87,7 @@ docs/                 模组教程、平衡说明、字体授权
 
 - 屏幕上的字全部在 `src/locales/zh-CN/`：`cards` `relics` `talents` `enemies` `events` `heroes` 是内容文案，`story` 是剧情和台词，`terms` 是术语，`meta` 是成就、难度、加码等，`ui` 是界面文字。
 - 数据表（`src/data`）只放机制，不放文字；启动时 `i18n/apply.ts` 把文案填进去，代码里照常读 `ITEMS[k].n`。
-- 界面文字用 `t('prep.refresh', { n: 2 })`，参数写成 `{n}`。
+- 界面文字用 `t('prep.trainSub', { a: 1, b: 2 })`，参数写成 `{n}`。
 - 加一门语言：复制 `locales/zh-CN` 改译文，在 `i18n/index.ts` 的 `PACKS` 里登记，再给字体子集补字。`tests/unit/i18n.test.ts` 会检查缺键。
 
 ## 网页与 PWA

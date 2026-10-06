@@ -279,5 +279,5 @@ export function setCarry(c: Card) {
 
 /* ---------------- 价格 ---------------- / ---------------- Price ---------------- */
 export const basePrice = (k: string, adj: string | null, tier: number) =>
-  [3, 6, 10, 16][tier] + (ITEMS[k].size - 1) + (adj ? [1, 2, 3][ADJ[adj].r] : 0);
+  [3, 7, 13, 22][tier] + (ITEMS[k].size - 1) + (adj ? [1, 2, 3][ADJ[adj].r] : 0);
 export const sellValue = (c: Card) => Math.max(1, Math.floor(basePrice(c.key, c.adj, c.tier) / 2)) + c.hoard;

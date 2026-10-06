@@ -62,17 +62,35 @@ export const foreignTax = () => (G.rot || (G.omen && OMENS[G.omen].foreign) ? 0 
 /** 风向的卡权重翻倍 / the wind's cards get double weight */
 const WIND_W = 2;
 
-export function rollItem(filter?: ItemFilter | null) {
+/* ---------------- 品质曲线 ---------------- / ---------------- Tier curve ----------------
+ * 白送的卡（宝箱、野地、跃迁……）硬上限：第 4 夜前最多铜、第 6 夜前最多银、之后最多金（白送永远不出钻）
+ * 商店是软上限：超过这一档的卡照样可能出，只是越往上越少见
+ * free cards (chests, fields, leaps...) have a hard cap: bronze before night 4, silver before night 6, gold after that (free never gives diamond)
+ * shops use a soft cap: cards above it can still show up, just rarer the further above */
+export const freeCap = () => (G.round < 4 ? 0 : G.round < 6 ? 1 : 2);
+export const shopCap = () => (G.round < 4 ? 0 : G.round < 6 ? 1 : G.round < 8 ? 2 : 3);
+/** 商店里高出软上限每一档，权重乘这个数 / in shops, weight multiplier per tier above the soft cap */
+const OVER_CAP_W = 0.15;
+
+/** maxT：硬上限（底档高过它的卡不进池；整池都高过时退回到池里最低的那一档） / maxT: hard cap (cards whose base tier is above it are left out; if the whole pool is above, fall back to its lowest tier)
+ * soft：软上限（高出的卡降权） / soft: soft cap (cards above it get less weight) */
+export function rollItem(filter?: ItemFilter | null, cap: { maxT?: number; soft?: number } = {}) {
   const R = G.round;
-  const pool: [string, number][] = [];
+  let pool: [string, number][] = [];
   for (const k in ITEMS) {
     const it = ITEMS[k];
     const fg = isForeign(k);
     if (it.noPool || (fg ? !foreignOk(k) : !homeOk(k))) continue;
     if (filter && !filter(it)) continue;
     if (it.t === 2 && R < 2) continue;
-    const w = (it.size === 1 ? 4 : it.size === 2 ? 3 : R >= 4 ? 2.5 : 1.3) * (fg ? 1 : it.hero ? 1.4 : 1) * (G.wind === it.tag || G.wind2 === it.tag ? WIND_W : 1);
+    const w =
+      (it.size === 1 ? 4 : it.size === 2 ? 3 : R >= 4 ? 2.5 : 1.3) * (fg ? 1 : it.hero ? 1.4 : 1) * (G.wind === it.tag || G.wind2 === it.tag ? WIND_W : 1) *
+      (cap.soft !== undefined && it.t > cap.soft ? OVER_CAP_W ** (it.t - cap.soft) : 1);
     pool.push([k, w]);
+  }
+  if (cap.maxT !== undefined && pool.length) {
+    const lo = Math.max(cap.maxT, Math.min(...pool.map(([k]) => ITEMS[k].t)));
+    pool = pool.filter(([k]) => ITEMS[k].t <= lo);
   }
   /* 外乡卡整体缩到总权重的一成 / scale foreign cards down to a tenth of the total weight */
   let own = 0,
@@ -93,9 +111,13 @@ export function rollItem(filter?: ItemFilter | null) {
 }
 
 export function makeOffer(filter?: ItemFilter | null, opt: { black?: number | boolean; free?: number | boolean } = {}): Offer {
-  const key = rollItem(filter);
+  const free = !!opt.free;
+  const cap = free ? freeCap() : shopCap();
+  const key = rollItem(filter, free ? { maxT: cap } : { soft: cap });
   let tier = ITEMS[key].t;
-  if (opt.black || rand() < (G.round >= 5 ? 0.18 : G.round >= 3 ? 0.08 : 0)) tier = Math.min(opt.free ? 2 : 3, tier + 1);
+  /* 随机升一档：白送的不能升过硬上限；商店升过软上限的再打三五折 / random +1 tier: free cards never go past the hard cap; in shops going past the soft cap is a further 35% roll */
+  const up = opt.black || (rand() < (G.round >= 5 ? 0.18 : G.round >= 3 ? 0.08 : 0) && (free ? tier < cap : tier < cap || rand() < 0.35));
+  if (up) tier = Math.min(free ? Math.max(cap, ITEMS[key].t) : 3, tier + 1);
   const adj = rollAdj(key, !!opt.black);
   let price = basePrice(key, adj, tier);
   if (opt.black) price = Math.round(price * 1.5);
@@ -111,6 +133,10 @@ export function lockedOffers(offers: Offer[]) {
   offers[0] = { card: Object.assign({}, L0.card), price: L0.price, sold: false, locked: true };
   return offers;
 }
+
+/** 商店刷新的价钱：每家店第一次 2 金，同一家店再刷每次 +1 / shop refresh cost: 2 gold the first time in each shop, +1 for each further refresh there */
+export const REFRESH_BASE = 2;
+export const refreshCost = (n: number) => REFRESH_BASE + n;
 
 /* ---------------- 风向 ---------------- / ---------------- Wind ---------------- */
 /** 开局定风向：只在这个人物能买到至少 4 张的元素里挑 / pick the run's wind at start: only among elements this hero can buy at least 4 cards of */
@@ -192,7 +218,7 @@ export function rollRule(n: number) {
   }
   return out;
 }
-export const gearPrice = (k: string) => [5, 9, 14, 20][RELICS[k].t] + Math.floor(G.round / 2) + mv('tax');
+export const gearPrice = (k: string) => [5, 10, 16, 24][RELICS[k].t] + Math.floor(G.round / 2) + mv('tax');
 
 /* ---------------- 天赋 ---------------- / ---------------- Talents ---------------- */
 export function talentOk(id: string) {

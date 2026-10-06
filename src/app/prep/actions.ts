@@ -10,7 +10,7 @@ import { clamp } from '../../core/util';
 import { G, type Card, type Offer, type PrepStop } from '../../game/state';
 import { stats, sellValue, basePrice, setCarry, firstFit, newCard } from '../../game/cards';
 import { unlock, foundSecret, mastLv } from '../../game/meta';
-import { rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, rollItem, rollRule, wpick } from '../../game/loot';
+import { freeCap, rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, rollItem, rollRule, wpick } from '../../game/loot';
 import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, trainCap, type Dest } from '../../game/prep';
 import { heat } from '../../game/state';
 import { SFX } from '../../audio/sfx';
@@ -141,7 +141,7 @@ export function enterEvent(id: string) {
     Object.assign(cur, { mode: 'talent', who: m.who, intro: [[m.who, m.say]], picks: rollTalents(2), title: m.n });
   } else if (id === 'manual') {
     cur.mode = 'pick';
-    cur.offers = [0, 1].map(() => makeOffer((it) => it.hero === G.hero && it.t >= 1, { free: 1 }));
+    cur.offers = [0, 1].map(() => makeOffer((it) => it.hero === G.hero && it.t >= Math.min(1, freeCap()), { free: 1 }));
   } else if (id === 'spring') {
     const h = Math.min(8, G.wallMax - G.wall);
     Object.assign(cur, {

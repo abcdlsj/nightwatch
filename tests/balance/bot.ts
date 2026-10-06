@@ -12,7 +12,7 @@ import { reseed, pick, rng } from '../../src/core/rng';
 import { G, freshRun, type Card, type Offer } from '../../src/game/state';
 import { recalcMods } from '../../src/game/mods';
 import { stats, sellValue, chainOf, zoneN, fits, setCarry } from '../../src/game/cards';
-import { rollGear, gearPrice, makeOffer, withFit, rollTalents } from '../../src/game/loot';
+import { rollGear, gearPrice, makeOffer, withFit, rollTalents, refreshCost, freeCap } from '../../src/game/loot';
 import { rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, placeKit, EVENT_FILTER } from '../../src/game/prep';
 import { nightRewards } from '../../src/game/rewards';
 import { nightInfo } from '../../src/game/nights';
@@ -212,8 +212,12 @@ function prep(focus: Focus) {
     if (ev.cat === 'shop') {
       let offers = [0, 1, 2].map(() => makeOffer(EVENT_FILTER[d], { black: ev.black }));
       buyFrom(offers, focus, false);
-      offers = [0, 1, 2].map(() => makeOffer(EVENT_FILTER[d], { black: ev.black }));
-      buyFrom(offers, focus, false);
+      /* 刷新要花钱：钱够买一张铜卡再刷 / rerolls cost gold: only reroll with enough left for a bronze card */
+      if (G.gold >= refreshCost(0) + 3) {
+        G.gold -= refreshCost(0);
+        offers = [0, 1, 2].map(() => makeOffer(EVENT_FILTER[d], { black: ev.black }));
+        buyFrom(offers, focus, false);
+      }
     } else if (d === 'field') buyFrom([0, 1, 2].map(() => makeOffer(null, { free: 1 })), focus, true);
     else if (d === 'chest') buyFrom([makeOffer(null, { free: 1 })], focus, true);
     else if (d === 'altar') takeRelic(withFit(rollGear(3, 0, 2)), focus);
@@ -235,7 +239,7 @@ function prep(focus: Focus) {
       }
     } else if (d === 'spring') G.wall = Math.min(G.wallMax, G.wall + 8);
     else if (d === 'camp' && hurt.length) G.wall = Math.min(G.wallMax, G.wall + 6);
-    else if (d === 'manual') buyFrom([0, 1].map(() => makeOffer((it) => it.hero === G.hero && it.t >= 1, { free: 1 })), focus, true);
+    else if (d === 'manual') buyFrom([0, 1].map(() => makeOffer((it) => it.hero === G.hero && it.t >= Math.min(1, freeCap()), { free: 1 })), focus, true);
     else if (d === 'job') G.gold += 3;
     else if (d === 'bank') G.gold += Math.max(2, Math.min(10, Math.round(G.gold * 0.3)));
     arrange(focus);

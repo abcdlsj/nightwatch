@@ -204,7 +204,7 @@ export default {
     rotLine: '轮换：这局不卖「{off}」，{h}的「{p}」来客串',
     rotLineSolo: '轮换：这局不卖「{off}」',
     pickOne: '挑一张',
-    refresh: '刷新 <small>(剩{n}次)</small>',
+    refresh: '刷新',
     leave: '离开',
     next: '继续',
     noThanks: '不要了',

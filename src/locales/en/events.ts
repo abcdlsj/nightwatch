@@ -52,7 +52,7 @@ export default {
  },
  "grocer": {
   "n": "General Store",
-  "d": "Buy Relics; one reroll",
+  "d": "Buy Relics; rerolls cost gold",
   "f": "Half the shelf is useful. The other half is unsettling."
  },
  "parcel": {

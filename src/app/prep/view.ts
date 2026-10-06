@@ -17,7 +17,7 @@ import { synCount, synLevel, synPairs } from '../../game/synergy';
 import { modText, plainMods, pickLine } from '../../game/text';
 import { nightInfo } from '../../game/nights';
 import { rollWagers, ambushGold, EVENT_FILTER } from '../../game/prep';
-import { makeOffer, rollGear, gearPrice, withFit, isForeign } from '../../game/loot';
+import { makeOffer, rollGear, gearPrice, withFit, isForeign, refreshCost } from '../../game/loot';
 import { HEROES } from '../../data/heroes';
 import { icon, spr } from '../../render/sprites';
 import { FX } from '../../render/overlay';
@@ -132,8 +132,22 @@ function btnRow(defs: [string, string, () => void][]) {
   });
   return row;
 }
-const refreshBtn = (n: number) => t('prep.refresh', { n });
 const coinImg = () => `<img class="ico" src="${spr('coin').url}" alt="">`;
+const refreshBtn = (cur: PrepStop) => `${L.ui.prep.refresh} ${coinImg()}<b>${refreshCost(cur.rn || 0)}</b>`;
+/** 付刷新钱；不够就抖一下金币 / pay for a refresh; shake the gold chip if short */
+function payRefresh(cur: PrepStop) {
+  const c = refreshCost(cur.rn || 0);
+  if (G.gold < c) {
+    toast(L.ui.prep.noGold);
+    restart($('#goldChip'), 'shake');
+    SFX.play('bad');
+    return false;
+  }
+  G.gold -= c;
+  cur.rn = (cur.rn || 0) + 1;
+  updateHUD();
+  return true;
+}
 
 export function gearLabel(k: string) {
   const g = RELICS[k];
@@ -209,8 +223,8 @@ export function renderPrep() {
       body.appendChild(
         btnRow([
           ...(cur.refresh > 0
-            ? [[refreshBtn(cur.refresh), 'blue', () => {
-                cur.refresh--;
+            ? [[refreshBtn(cur), 'blue', () => {
+                if (!payRefresh(cur)) return;
                 cur.offers = cur.offers.map((o: Offer) => (o.locked && !o.sold ? o : makeOffer(EVENT_FILTER[cur.id], { black: cur.ev.black })));
                 SFX.play('buy');
                 renderPrep();
@@ -274,8 +288,8 @@ export function renderPrep() {
     body.appendChild(
       btnRow([
         ...(cur.refresh > 0
-          ? [[refreshBtn(cur.refresh), 'blue', () => {
-              cur.refresh--;
+          ? [[refreshBtn(cur), 'blue', () => {
+              if (!payRefresh(cur)) return;
               cur.goods = withFit(rollGear(3, 1)).map((k) => ({ k, price: gearPrice(k), sold: false }));
               SFX.play('buy');
               renderPrep();

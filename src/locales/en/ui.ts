@@ -204,7 +204,7 @@ export default {
     rotLine: 'Rotation: no "{off}" this run; {h}\'s "{p}" guest-stars',
     rotLineSolo: 'Rotation: no "{off}" this run',
     pickOne: 'Pick one',
-    refresh: 'Reroll <small>({n} left)</small>',
+    refresh: 'Reroll',
     leave: 'Leave',
     next: 'Continue',
     noThanks: 'No thanks',
