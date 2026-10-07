@@ -12,10 +12,9 @@ The same build ships as a web game (Vercel) or inside a Capacitor native shell f
 
 - An 8-slot board; cards are small / medium / large (1 / 2 / 3 slots), with adjacency and position affecting synergy.
 - Tier merging: Bronze → Silver → Gold → Diamond, with damage / cooldown / hybrid upgrade paths.
-- Three random event stops each night; nights 4, 8 and 9 bring elites and bosses, with five rotating final bosses.
-- Five heroes (Ayla / Mo / Ying / Jun / Li), each with three archetypes and their own story.
-- Endless nights, mastery, 8 difficulty tiers, a codex, and 31 achievements.
-- Once a hero has reached dawn with all three archetypes and unlocked difficulty 5, two opt-in variants open up: omens (a run-wide rule picked from three) and archetype rotation (one home archetype drops out, a guest archetype from another hero joins).
+- Random events between nights, with elites and bosses along the way.
+- Several heroes, each with their own archetypes and story.
+- Meta progression, multiple difficulty tiers, a codex and achievements.
 - Reproducible rule RNG — same seed and inputs give the same result; combat simulation is UI-independent.
 - Full localization packs, offline PWA, and a Capacitor native shell.
 
