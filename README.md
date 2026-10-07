@@ -151,3 +151,7 @@ python3 tools/pixelgen.py --preview      # 另外输出 shots/ 下的预览图�
 - [ ] 敌人与首领立绘升级到 16×16 / 32×32
 - [x] 平衡模拟：`npm run bench`
 - [ ] 横屏布局、手柄操作、Steam 桌面壳
+
+## 许可
+
+代码和美术以 [MIT](LICENSE) 发布。`public/fonts/` 里的字体不在其内，各自是 SIL Open Font License 1.1，见 [docs/fonts.md](docs/fonts.md)。

@@ -151,3 +151,7 @@ python3 tools/pixelgen.py --preview      # also output previews under shots/ (re
 - [ ] Upgrade enemy and boss art to 16×16 / 32×32
 - [x] Balance simulation: `npm run bench`
 - [ ] Landscape layout, gamepad support, Steam desktop shell
+
+## License
+
+Code and art are released under the [MIT License](LICENSE). The fonts in `public/fonts/` are excluded and keep their own SIL Open Font License 1.1; see [docs/fonts.md](docs/fonts.md).
