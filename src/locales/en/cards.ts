@@ -11,7 +11,7 @@ export default {
  "spark": {
   "n": "Spark",
   "d": "Ignites the target, dealing Burn damage each second for 3s.",
-  "f": "It's small. But it holds a grudge.",
+  "f": "Small spark. Burns a long time.",
   "lore": "The night the bell tower brazier went out, a child shielded the last ember in their sleeve and ran up the Wall.",
   "dn": "Undying Ember",
   "dl": "Every lamp in Dawnbell was lit from this one flame."
@@ -20,7 +20,7 @@ export default {
   "n": "Icicle",
   "d": "On hit, Slows by 25% for 2s.",
   "f": "Grew under the North Tower's eaves for three winters.",
-  "lore": "The watchers say the North Tower's icicles are the tower weeping for fallen sentries. That's why they never melt.",
+  "lore": "The watchers say the North Tower's icicles are dead sentries' tears, frozen in place. They don't melt in summer either.",
   "dn": "Sentry's Tear",
   "dl": "When it strikes, it lets out a very soft sigh."
  },
@@ -28,9 +28,9 @@ export default {
   "n": "Lightning Rod",
   "d": "Lightning bounces to 2 extra enemies (60% damage), +1 bounce per tier.",
   "f": "Least popular job on the tower: holding it.",
-  "lore": "A blacksmith raised the first rod. He was struck seven times. When the eighth bolt came, he raised his hammer, smiling.",
+  "lore": "A blacksmith raised the first rod. He was struck seven times. Before the eighth, he gave the tip one tap with his hammer and said that should fix it.",
   "dn": "Eighth Bolt",
-  "dl": "There's still a hammer mark on the rod's tip."
+  "dl": "The hammer mark is still there on the tip."
  },
  "sling": {
   "n": "Sling",
@@ -38,7 +38,7 @@ export default {
   "f": "A shepherd's craft. Works on wolves, and other things.",
   "lore": "Abu the shepherd drove his flock in just before the gates shut. The sheep were all eaten. He kept the sling.",
   "dn": "Abu's Whip",
-  "dl": "He says every stone is named after a sheep."
+  "dl": "He gave every stone a name. Sheep names."
  },
  "clock": {
   "n": "Clockspring",
@@ -46,7 +46,7 @@ export default {
   "f": "The old clockmaker said: no gear turns alone.",
   "lore": "Before leaving the city, the clockmaker took apart his pocket watch and gave a gear to every crossbow on the Wall.",
   "dn": "Last Pocket Watch",
-  "dl": "All the gears still turn to the same beat."
+  "dl": "The crossbows on the Wall still wind on the same beat."
  },
  "axe": {
   "n": "Throwing Axe",
@@ -54,12 +54,12 @@ export default {
   "f": "Twenty years splitting firewood. First time splitting plate.",
   "lore": "The woodcutter turned the forest outside into the Wall. Now he aims his axe at what walks out of the forest.",
   "dn": "Forest Feller",
-  "dl": "Every notch in the blade is the name of a tree."
+  "dl": "He remembers every notch in the blade, and which tree put it there."
  },
  "cannon": {
   "n": "Cannon",
   "d": "Fires a shell at the densest enemy cluster; explodes on impact.",
-  "f": "The bang arrives first. Then nothing's left.",
+  "f": "First the bang, then the smoke.",
   "lore": "Dawnbell has only twelve cannons, each named after a gunner's wife.",
   "dn": "Marta",
   "dl": "Marta's husband never came back. Her cannon never stopped firing."
@@ -76,14 +76,14 @@ export default {
   "n": "Coil",
   "d": "Lightning bounces to 4 extra enemies, +1 per tier; each bounce charges adjacent cards by 3%.",
   "f": "When the humming stops, cover your ears.",
-  "lore": "A forbidden Academy experiment Mo smuggled out of the city. A storm that never broke is still locked inside.",
+  "lore": "A forbidden Academy experiment Mo smuggled out of the city. A storm that hasn't broken yet is locked inside.",
   "dn": "Page Nine",
   "dl": "The Academy tore this page out. Mo had it memorized."
  },
  "anvil": {
   "n": "Anvil",
   "d": "On trigger, adjacent cards' next attack deals +50% damage.",
-  "f": "Never strikes itself. Only makes others sharper.",
+  "f": "Doesn't fight. Just keeps everyone else's blades sharp.",
   "lore": "The old smith kept this anvil forty years. On the day he left, the last thing on it was Ayla's Oath Sword.",
   "dn": "Forty-Year Anvil",
   "dl": "The center is worn into a hollow: forty years of hammer blows."
@@ -91,7 +91,7 @@ export default {
  "bell": {
   "n": "Bell Tower",
   "d": "Toll: damages all enemies in range and charges all other cards by 25%.",
-  "f": "One toll, and every weapon in the city wakes. The day the sun rises, it'll ring once more.",
+  "f": "One toll, and every weapon in the city wakes.",
   "lore": "Dawnbell is named for this bell. For seven hundred years it rang every morning—even after morning stopped coming.",
   "dn": "Dawn Bell",
   "dl": "They say on the day the sun rises, it will ring the 701st time on its own."
@@ -100,7 +100,7 @@ export default {
   "n": "Thunderstorm",
   "d": "Lightning bounces through the horde once per enemy in range (max 12).",
   "f": "The watchers call it \"Heaven's temper.\"",
-  "lore": "What's locked in the Thunder Tower isn't thunder, but a cranky old god. The watchers offer him a jar of wine each year.",
+  "lore": "The watchers say a cranky old god lives in the Thunder Tower. He gets a jar of wine every year.",
   "dn": "Thunder God's Jar",
   "dl": "The offerings have shrunk lately. His temper has grown."
  },
@@ -122,7 +122,7 @@ export default {
   "n": "War Horn",
   "d": "When blown, adjacent cards each trigger once immediately, as a 【Chain】.",
   "f": "Three short, one long: everyone to the Wall.",
-  "lore": "Three short, one long: everyone to the Wall. Dawnbell's children learn this rhythm before they learn to talk.",
+  "lore": "Three short, one long: everyone to the Wall. Dawnbell's children clap along to it before they can talk.",
   "dn": "Three Short, One Long",
   "dl": "The last to blow it was a ten-year-old."
  },
@@ -154,7 +154,7 @@ export default {
   "n": "Starfall",
   "d": "Calls a meteor on the horde; explodes and leaves flames. +4% damage per enemy in range (max 12).",
   "f": "She says she only \"borrowed\" a star. She'll return it at dawn.",
-  "lore": "Observatory records show that the night Mo \"borrowed\" a star, the northern sky really was one short. The Starkeepers are still looking.",
+  "lore": "Observatory records show that the night Mo \"borrowed\" a star, the northern sky really was one short. The Starkeepers are still looking for it.",
   "dn": "Borrowed Star",
   "dl": "She promised to give it back after dawn."
  },
@@ -171,7 +171,7 @@ export default {
  "detonate": {
   "n": "Det Cord",
   "d": "Detonates Burn on all enemies, dealing remaining Burn damage instantly.",
-  "f": "One pull, and the whole night remembers the sound."
+  "f": "One pull and half the city hears it."
  },
  "acidvial": {
   "n": "Acid Vial",
@@ -231,7 +231,7 @@ export default {
  "cinder": {
   "n": "Cinder",
   "d": "A tiny spark with a very short cooldown. Burn stacks: each hit adds +1 Burn per second.",
-  "f": "A single spark can start a wildfire—she tested it."
+  "f": "A single spark can start a wildfire. She checked."
  },
  "executioner": {
   "n": "Headsman's Axe",
@@ -319,13 +319,13 @@ export default {
   "f": "One lamp lights a stretch of wall. Three fireflies light three pieces of bad news.",
   "lore": "Ying was afraid of the dark as a child, so her master made her a lamp that could fly. Later she taught the craft to every child in the city.",
   "dn": "The First Lamp",
-  "dl": "That lamp still hangs atop the bell tower. It'll be the last light in the city to go out—if that day ever comes."
+  "dl": "That lamp still hangs atop the bell tower. It hasn't gone out once."
  },
  "musicbox": {
   "n": "Music Box",
   "d": "On trigger, charges all other Small cards on the board by 20%; more at higher tiers.",
   "f": "It plays just one song. Master said one is enough.",
-  "lore": "The old clockmaker only ever made one song. He said it's not how many songs, but whether every gear knows when to turn.",
+  "lore": "The old clockmaker only ever made one song. He said one song is enough if you learn it properly. Every gear has to know when to turn.",
   "dn": "Master's Song",
   "dl": "Ying has never heard the song to the end. The last bar waits for Master to come home and wind it."
  },
@@ -380,12 +380,12 @@ export default {
  "clockwork": {
   "n": "Clockwork Guard",
   "d": "A wind-up soldier fires bolts. +1 bolt per other 【Gadget】 card (max +4).",
-  "f": "Fully wound, it's braver than anyone."
+  "f": "Wind it all the way and it just keeps walking."
  },
  "beacon": {
   "n": "Lighthouse",
   "d": "Its beam sweeps all enemies in range and charges all other cards by 20%.",
-  "f": "Wherever the light reaches is the Wall."
+  "f": "Wherever the lamps reach, someone's on watch."
  },
  "oilpot": {
   "n": "Refill Oil",
@@ -395,7 +395,7 @@ export default {
  "moth": {
   "n": "Moth",
   "d": "Seeks burning enemies, slashing them and those beside them; on burning enemies, instantly burns off half their remaining Burn.",
-  "f": "It knew it would burn. It went anyway."
+  "f": "Once it's up, it isn't coming back."
  },
  "mainspring": {
   "n": "Mainspring",
@@ -410,7 +410,7 @@ export default {
  "toolbox": {
   "n": "Toolbox",
   "d": "On trigger, adjacent cards' next attack +35% damage; +10% more per 【Gadget】 card.",
-  "f": "Hammer, wrench, victory."
+  "f": "Hammer and wrench, both packed."
  },
  "sparkwick": {
   "n": "Spark Wick",
@@ -692,7 +692,7 @@ export default {
  "orrery": {
   "n": "Orrery",
   "d": "On trigger, the Carry attacks once immediately (counts as 【Chain】).",
-  "f": "The whole sky turns in brass rings. The fastest one is you."
+  "f": "Turn the brass ring and the whole sky turns with it."
  },
  "frostar": {
   "n": "Frost Star",
@@ -797,7 +797,7 @@ export default {
  "icemoon": {
   "n": "Cold Moon",
   "d": "Fires a cold beam; ×1.8 damage to 【Freeze】 enemies. As Carry, another ×1.4.",
-  "f": "The moon doesn't shine. It just lends you its cold."
+  "f": "Moonlight feels cold on your skin."
  },
  "fallstar": {
   "n": "Falling Star",
@@ -812,7 +812,7 @@ export default {
  "nova": {
   "n": "Supernova",
   "d": "A meteor crashes, bursts, and leaves fire. +2 damage per trigger this battle.",
-  "f": "Burns brighter and brighter, right to the end."
+  "f": "Burns brighter and brighter, then it's gone."
  },
  "chartpage": {
   "n": "Star Chart Page",
@@ -828,7 +828,7 @@ export default {
   "f": "The brightest one is often the closest.",
   "lore": "The Starkeepers call it \"the Gatekeeper.\" When the northern sky fell, it was the only star still standing in place.",
   "dn": "The Gatekeeper",
-  "dl": "Seven hundred years, it has stood there. No one ever told it it could leave."
+  "dl": "Seven hundred years, and it hasn't moved."
  },
  "moondial": {
   "n": "Moondial",
@@ -852,7 +852,7 @@ export default {
   "f": "The plainest gap in the Wall is the deadliest.",
   "lore": "A crenel is as wide as a person turned sideways. Set seven hundred years ago, never changed.",
   "dn": "Sideways Width",
-  "dl": "Shi Jun measured it: exactly one person. No more, no less."
+  "dl": "Shi Jun put a ruler to it: exactly one person wide."
  },
  "kiln": {
   "n": "Brick Kiln",

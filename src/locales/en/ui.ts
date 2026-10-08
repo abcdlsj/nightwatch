@@ -65,7 +65,7 @@ export default {
     exec: 'Execute',
     gazed: 'It has its eye on you: two cards can\'t move',
     drained: 'Acid fog rolls over the wall: cards lose half their charge',
-    hushed: 'The bell drowns out everything: your cards can\'t hear each other',
+    hushed: 'The bell drowns out everything: your cards stop triggering each other',
     veiled: 'The fog rises: they must come closer before you can see them',
     pilfered: 'A hand reaches out of the fog and lifts {n} gold',
     dueled: 'It singled out your {n}: it can\'t move',
@@ -186,6 +186,20 @@ export default {
     low: 'Field more damage cards next night, or look for relics and talents that repair the wall.',
     s_karl: 'The two swords were forged from the same iron.',
     rx: 'Reactions: Fire on frozen = Melt. Crit on frozen = Shatter. Volt on burning = Overload. Fire on poisoned = Toxic Burst. Volt on slowed = Superconduct.',
+  },
+
+  tut: {
+    label: 'Tutorial {n}/{m}',
+    next: 'Next',
+    done: 'Got it',
+    skip: 'Skip',
+    steps: {
+      doors: 'You get three stops before each fight. Pick a door: cards, relics and wall repairs all come from these.',
+      board: 'Cards on the board fire on their own once the fight starts. Cards placed side by side set each other off.',
+      bag: 'Cards in the bag don\'t fight, but they still merge: two copies of the same card at the same tier become one card a tier higher.',
+      wall: 'This is the Wall. Enemies that reach it knock bricks off. Lose them all and the run is over.',
+      fight: 'When your stops are done, start the fight here.',
+    },
   },
 
   prep: {

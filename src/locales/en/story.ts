@@ -225,7 +225,7 @@ export default {
     [
      1,
      "narr",
-     "The ground shakes. The Abyss rolls up siege towers — it is learning to wage war like us."
+     "The ground shakes. The Abyss rolls up siege towers. It's learning how we fight."
     ],
     [
      6,
@@ -801,7 +801,7 @@ export default {
    "die": "Hold… until dawn… for me."
   },
   "eye": {
-   "spawn": "Tiny flames. You don't guard a Wall. You guard a morning that will never come.",
+   "spawn": "Little lights. Keep watching. Morning isn't coming.",
    "intent": {
     "summon": "Fly, my eyes.",
     "gaze": "Look at me.",
@@ -1303,7 +1303,7 @@ export default {
     [
      1,
      "narr",
-     "The northern sky splits open. The eye opens and looks at the city — at you."
+     "The northern sky splits open. The eye opens and looks down at the city."
     ],
     [
      4,

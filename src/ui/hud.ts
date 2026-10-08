@@ -91,7 +91,7 @@ let tipEl: HTMLElement | null = null,
 let tipSeen: Record<string, number> = store.json(KEYS.tips, {});
 /** 设置里「重新显示新手提示」 / 'Show tutorial hints again' in settings */
 export function resetTips() {
-  tipSeen = {};
+  tipSeen = { tutorial: 0 };
   store.setJson(KEYS.tips, tipSeen);
 }
 
@@ -136,6 +136,15 @@ export function tipOnce(key: string, html: string, delay?: number) {
     showTip(L.ui.tips.label, html);
     SFX.play('hint');
   }, delay || 0);
+}
+
+/** 新手教学该不该放：放过就不再放；打完过一局的老玩家默认算看过，设置里「重新显示提示」会重新打开 / whether the tutorial should play: never twice; players who have finished a run count as having seen it, and 'Show tutorial hints again' in settings re-enables it */
+export function takeTutorial(veteran: boolean) {
+  const s = tipSeen.tutorial;
+  if (!SETTINGS.tips || s === 1 || (s == null && veteran)) return false;
+  tipSeen.tutorial = 1;
+  store.setJson(KEYS.tips, tipSeen);
+  return true;
 }
 
 /** 顶栏三个数字点一下有说明 / each of the three top-bar numbers shows help when tapped */
