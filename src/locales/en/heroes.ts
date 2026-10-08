@@ -27,7 +27,7 @@ export default {
    "title": "Wallwright",
    "tag": "【Position】 and fortifications",
    "desc": "He laid half the bricks in this Wall; his is the thickest. It's all in the layout: cannon in the middle, crossbows on the ends, like beside like. Shields can even be thrown to hurt.",
-   "intro": "How to stack bricks, where to set cannon: I know it all. The Wall holds because every brick is where it belongs."
+   "intro": "How to stack bricks, where to set cannon: I know it all. The Wall holds because every brick went in the right spot."
   },
   "li": {
    "n": "Xingyao",

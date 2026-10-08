@@ -9,7 +9,7 @@ import { rand, pick, shuffled } from '../../core/rng';
 import { clamp } from '../../core/util';
 import { G, type Card, type Offer, type PrepStop } from '../../game/state';
 import { stats, sellValue, basePrice, setCarry, firstFit, newCard } from '../../game/cards';
-import { unlock, foundSecret, mastLv } from '../../game/meta';
+import { unlock, foundSecret, mastLv, META } from '../../game/meta';
 import { freeCap, rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, rollItem, rollRule, wpick } from '../../game/loot';
 import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, trainCap, type Dest } from '../../game/prep';
 import { heat } from '../../game/state';
@@ -18,7 +18,8 @@ import { buzz } from '../../audio/settings';
 import { FX } from '../../render/overlay';
 import { $, restart } from '../../ui/dom';
 import { elOf, renderOwned, repaint } from '../../ui/card-view';
-import { updateHUD, renderRelics, toast, tipOnce } from '../../ui/hud';
+import { updateHUD, renderRelics, toast, tipOnce, takeTutorial } from '../../ui/hud';
+import { playTutorial } from '../../ui/tutorial';
 import { renderPrep } from './view';
 import { prepStops } from './jumps';
 import { gemScene, talkScene } from '../../game/story';
@@ -455,6 +456,7 @@ export function endTalk(cur: PrepStop) {
     renderPrep();
     if (G.firstPrep) {
       G.firstPrep = false;
+      if (G.round === 1 && takeTutorial(META.runs > 0)) setTimeout(playTutorial, 300);
       setTimeout(() => toast(t('prep.foeSetToast', { n: (L.terms.foesets as Record<string, string>)[G.foeSet] })), 700);
       if (G.wind) setTimeout(() => toast(t('prep.windToast', { t: L.terms.tags[G.wind as Tag] })), 3200);
     }

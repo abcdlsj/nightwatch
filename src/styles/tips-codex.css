@@ -49,3 +49,10 @@
 .ws-go .btn{flex:1}
 .trow.mod.bad{box-shadow:inset 4px 0 0 #ff8a80}
 .moderr{margin:4px 0 0;padding-left:16px;color:#ff8a80;font-family:var(--body);font-size:12px;line-height:1.5}
+/* 新手教学：挖空高亮 + 说明气泡 / tutorial: cut-out spotlight + caption bubble */
+#tut{position:fixed;inset:0;z-index:97}
+#tut .tut-hole{position:fixed;border-radius:10px;box-shadow:0 0 0 9999px rgba(4,10,12,.72),inset 0 0 0 2px #ffd166;transition:all .25s;pointer-events:none}
+#tut .tut-bub{position:fixed;left:50%;transform:translateX(-50%);width:min(340px,calc(100vw - 32px));background:rgba(16,26,32,.98);border-radius:11px;padding:9px 12px 10px;box-shadow:0 4px 0 rgba(0,0,0,.5),inset 0 0 0 2px #ffd166aa;transition:top .25s}
+#tut .tut-bub small{display:block;font-size:11px;letter-spacing:2px;color:#ffd166}
+#tut .tut-bub p{margin:3px 0 8px;font-family:var(--body);font-size:13px;line-height:1.5;color:#eef3f4}
+#tut .tut-btns{display:flex;justify-content:flex-end;gap:8px}

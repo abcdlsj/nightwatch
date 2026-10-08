@@ -22,7 +22,7 @@ export default {
  },
  "jar": {
   "n": "Coin Jar",
-  "f": "Security that jingles."
+  "f": "Jingles when you walk."
  },
  "icepack": {
   "n": "Ice Pack",
@@ -98,7 +98,7 @@ export default {
  },
  "spike": {
   "n": "Piercing Spike",
-  "f": "The smith says it's not a nail. It's a point."
+  "f": "Drive it deep enough and any armor gives."
  },
  "rampart": {
   "n": "Reinforced Rampart",
@@ -138,11 +138,11 @@ export default {
  },
  "glass": {
   "n": "Glass Cannon",
-  "f": "Devastating, and shatters at a touch. Meaning you."
+  "f": "Hits hard. Doesn't take a hit."
  },
  "shell": {
   "n": "Echo Conch",
-  "f": "Hold it to your ear and hear the echo of an echo."
+  "f": "Hold it to your ear and hear the last sound come back."
  },
  "purse": {
   "n": "Fat Purse",
@@ -154,7 +154,7 @@ export default {
  },
  "wisp": {
   "n": "Wisp Lantern",
-  "f": "It doesn't burn oil. It burns something else."
+  "f": "No oil in it. Still burning."
  },
  "stormeye": {
   "n": "Eye of the Storm",
@@ -186,7 +186,7 @@ export default {
  },
  "shard": {
   "n": "Abyss Shard",
-  "f": "Power seeps from the cracks. The enemy smells it too."
+  "f": "Light seeps from the cracks. The enemy smells it and moves faster."
  },
  "box": {
   "n": "Puzzle Box",
@@ -230,7 +230,7 @@ export default {
  },
  "notes": {
   "n": "Charred Notes",
-  "f": "The last page was burned. By her."
+  "f": "She burned the last page herself."
  },
  "catalyst": {
   "n": "Universal Catalyst",
@@ -270,7 +270,7 @@ export default {
  },
  "chaingear": {
   "n": "Chain Ratchet",
-  "f": "Click, click, click. After the fifth, there's always one more."
+  "f": "Click, click, click, click. After the fifth, one extra."
  },
  "lootbag": {
   "n": "Loot Sack",
@@ -286,7 +286,7 @@ export default {
  },
  "thunderdrum": {
   "n": "Thunder Drum",
-  "f": "Every blow to the Wall, a beat of the drum. The enemy soon learned to fear it."
+  "f": "Every blow to the Wall, a beat of the drum."
  },
  "tyrantnail": {
   "n": "Tyrant's Nail",
@@ -354,7 +354,7 @@ export default {
  },
  "plumb": {
   "n": "Plumb Bob",
-  "f": "The line hangs straighter than any heart."
+  "f": "Straight line, straight wall."
  },
  "mortarboard": {
   "n": "Mortar Board",

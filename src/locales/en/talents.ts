@@ -86,11 +86,11 @@ export default {
  },
  "ayla_01": {
   "n": "Hold Fast",
-  "say": "A shield isn't for hiding. It's for standing your ground."
+  "say": "Shield up. Don't step back."
  },
  "ayla_02": {
   "n": "Wall and Watcher",
-  "say": "While the Wall stands, so do we. That's our oath."
+  "say": "While the Wall stands, so do we."
  },
  "ayla_10": {
   "n": "Hone",
@@ -118,7 +118,7 @@ export default {
  },
  "mo_00": {
   "n": "Accelerant",
-  "say": "Fire is the most honest reaction: feed it, and it pays you back."
+  "say": "Fire's easy. Feed it and it puts on a show."
  },
  "mo_01": {
   "n": "Flashover",
@@ -130,7 +130,7 @@ export default {
  },
  "mo_10": {
   "n": "Chill",
-  "say": "Cold is the magic that slows all things down."
+  "say": "Get cold enough and everything slows."
  },
  "mo_11": {
   "n": "Brittle",
@@ -138,19 +138,19 @@ export default {
  },
  "mo_12": {
   "n": "Absolute Zero",
-  "say": "Absolute zero. Even the Abyss will shiver."
+  "say": "Absolute zero. Never reached it. Tonight, maybe."
  },
  "mo_20": {
   "n": "Conductor",
-  "say": "Current always finds the shortest path: through them."
+  "say": "Current takes the shortest path. Right through them."
  },
  "mo_21": {
   "n": "Overload",
-  "say": "Overload? Fuses are for cowards."
+  "say": "Fuse? Pulled it out ages ago."
  },
  "mo_22": {
   "n": "Stormheart",
-  "say": "A thunderstorm in the heart. I've wanted this for ages."
+  "say": "A thunderstorm in my chest. Been meaning to try that."
  },
  "ying_00": {
   "n": "Little Lamp",
@@ -162,7 +162,7 @@ export default {
  },
  "ying_02": {
   "n": "A Thousand Lights",
-  "say": "Look: the whole city's lit."
+  "say": "Look, the whole street's lit."
  },
  "ying_10": {
   "n": "Wind Up",
@@ -186,7 +186,7 @@ export default {
  },
  "ying_22": {
   "n": "Before Dawn",
-  "say": "It's brightest just before dawn. I've always believed that."
+  "say": "Master said it's darkest before dawn, so that's when the lamps burn brightest."
  },
  "f_sweep": {
   "n": "Sweep",

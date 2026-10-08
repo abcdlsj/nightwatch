@@ -8,7 +8,7 @@ export default {
  "smith": {
   "n": "Smithy",
   "d": "Only 【Blade】 and 【Mech】 gear",
-  "f": "The forge never goes out. Neither does the smith."
+  "f": "The forge hasn't gone out. The smith hasn't slept."
  },
  "forge": {
   "n": "Flame Works",
@@ -158,7 +158,7 @@ export default {
  "pilgrim": {
   "n": "Pilgrim",
   "d": "Pick one of two hero-exclusive cards",
-  "f": "He walked to every city still lit, just to deliver one thing."
+  "f": "He's walked through several cities that still have lights, just to deliver one thing."
  },
  "swap": {
   "n": "Changing of the Guard",

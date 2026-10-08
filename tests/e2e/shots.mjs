@@ -13,6 +13,7 @@ const pg = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleF
 /* 测试用存档：人物全部解锁 / test save: all heroes unlocked */
 await pg.addInitScript(() => {
   if (!localStorage.getItem('chain-meta-v1')) localStorage.setItem('chain-meta-v1', JSON.stringify({ heroes: { ayla: 1, mo: 1, ying: 1, jun: 1, li: 1 } }));
+  if (!localStorage.getItem('chain-tips')) localStorage.setItem('chain-tips', JSON.stringify({ tutorial: 1 }));
 });
 const errs = [];
 pg.on('pageerror', (e) => errs.push(String(e)));
