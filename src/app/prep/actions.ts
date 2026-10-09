@@ -9,7 +9,7 @@ import { rand, pick, shuffled } from '../../core/rng';
 import { clamp } from '../../core/util';
 import { G, type Card, type Offer, type PrepStop } from '../../game/state';
 import { stats, sellValue, basePrice, setCarry, firstFit, newCard } from '../../game/cards';
-import { unlock, foundSecret, mastLv, META } from '../../game/meta';
+import { unlock, foundSecret, runMastLv, META } from '../../game/meta';
 import { freeCap, rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, rollItem, rollRule, wpick } from '../../game/loot';
 import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, trainCap, type Dest } from '../../game/prep';
 import { heat } from '../../game/state';
@@ -413,7 +413,7 @@ export function answerTalk(cur: PrepStop, ans: string, re: string, cat: string) 
   cur.re = re;
   cur.gain = talkReward(cat);
   cur.mode = 'talent';
-  cur.picks = rollTalents((heat(8) ? 2 : 3) + (mastLv() >= 2 ? 1 : 0), cat);
+  cur.picks = rollTalents((heat(8) ? 2 : 3) + (runMastLv() >= 2 ? 1 : 0), cat);
   renderPrep();
 }
 /** 夜谈的回答当场给东西：攻 → 一张卡，守 → 城墙，术 → 遗物，财 → 金币 / a night-talk answer pays out on the spot: attack → a card, defense → wall, arcane → a relic, fortune → gold */

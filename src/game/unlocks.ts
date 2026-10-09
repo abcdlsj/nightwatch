@@ -4,9 +4,11 @@ import { ITEMS } from '../data/cards';
 import { HEAT_MAX } from '../data/meta';
 import type { KitDef } from '../data/types';
 import { META, saveMeta, mastLv } from './meta';
+import { G } from './state';
 
 /* ---------------- 人物 ---------------- / ---------------- Heroes ---------------- */
-export const heroUnlocked = (h: string) => !!META.heroes?.[h] || !!HEROES[h]?.free;
+/* 每日挑战里所有人物和流派都算开放（外乡卡、商店卡池对所有人一样） / in the daily challenge every hero and archetype counts as open (foreign cards and shop pools are the same for everyone) */
+export const heroUnlocked = (h: string) => !!G.daily || !!META.heroes?.[h] || !!HEROES[h]?.free;
 export const heroList = () => HERO_ORDER.filter((h) => HEROES[h]);
 /** 解锁 h 需要先用谁守到黎明 / which hero must be held to dawn to unlock h */
 export const heroNeeds = (h: string) => HERO_ORDER[HERO_ORDER.indexOf(h) - 1] || HERO_ORDER[0];
@@ -36,7 +38,7 @@ export function heatWon(h: string, played: number) {
 
 /* ---------------- 专属卡流派 ---------------- / ---------------- Exclusive card archetypes ---------------- */
 export const pathsOf = (h: string): PathDef[] => PATHS[h] || [];
-export const pathOpen = (h: string, p: PathDef) => mastLv(h) >= p.mast;
+export const pathOpen = (h: string, p: PathDef) => !!G.daily || mastLv(h) >= p.mast;
 const PATH_OF: Record<string, [string, PathDef]> = {};
 /** 这张专属卡属于哪个人物的哪个流派 / which hero and archetype an exclusive card belongs to */
 export const pathOf = (k: string) => PATH_OF[k];

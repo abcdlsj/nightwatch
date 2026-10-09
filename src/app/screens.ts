@@ -25,18 +25,23 @@ import { canInstallIOS } from '../platform/pwa';
 import { openWorkshop } from '../ui/workshop';
 import { store, KEYS } from '../platform/storage';
 import { newGame, resumeSave, continueEndless } from './flow';
+import { openDaily, dailyEndHtml, bindDailyEnd } from './daily';
+import { track } from '../platform/telemetry';
 
 /* ---------------- 标题 ---------------- / ---------------- Title ---------------- */
 export function titleScreen() {
   const sc = $('#screen');
   const T = L.ui.title;
   setScene('title');
+  /* 回到标题页就不在每日挑战里了（继续存档时会从存档读回来） / back on the title screen we're no longer in a daily (continuing a save reads it back) */
+  G.daily = '';
   const sv = loadSave();
   sc.innerHTML = `<div class="scr"><div class="logo" aria-label="${T.logoAria}">${(T.logo as string[]).map((c) => `<span>${c}</span>`).join('')}</div><div class="logo-sub">NIGHT WATCH</div>
   <p class="tagline">${T.tagline}</p>
   <div class="rules">${(T.rules as string[]).map((r, i) => `<div><i>${i + 1}</i><span>${r}</span></div>`).join('')}</div>
   ${sv && HEROES[sv.hero] ? `<button class="btn gold big" id="contBtn">${t('title.cont', { h: HEROES[sv.hero].n, r: sv.round })}</button>` : ''}
   <button class="btn ${sv ? 'alt' : 'red'} big" id="startBtn">${sv ? T.newRun : T.start}</button>
+  <button class="btn alt" id="dailyBtn">${L.ui.daily.btn}</button>
   <div class="tbtns"><button class="btn alt" id="achBtn">${t('title.ach', { n: achCount(), max: ACH.length })}${META.heatMax ? t('title.heat', { h: META.heatMax }) : ''}</button><button class="btn alt" id="cdxBtn">${T.codex}</button><button class="btn alt" id="hisBtn">${T.history}</button><button class="btn alt" id="wsBtn">${T.workshop}</button><button class="btn alt" id="sndBtn" style="flex:none" aria-label="${L.ui.settings.title}">⚙</button></div></div>`;
   sc.hidden = false;
   $('#startBtn').onclick = () => {
@@ -47,6 +52,20 @@ export function titleScreen() {
   $('#achBtn').onclick = () => {
     SFX.ensure();
     openAch();
+  };
+  $('#dailyBtn').onclick = () => {
+    SFX.ensure();
+    openDaily(
+      (spec) => {
+        SFX.play('merge');
+        sc.hidden = true;
+        newGame(spec.hero, spec);
+      },
+      () => {
+        sc.hidden = true;
+        resumeSave();
+      },
+    );
   };
   $('#cdxBtn').onclick = () => {
     SFX.ensure();
@@ -131,6 +150,7 @@ export function heroSelect() {
   const sc = $('#screen');
   const T = L.ui.heroes;
   setScene('title');
+  G.daily = '';
   sc.innerHTML = `<div class="scr"><button class="btn alt sm hs-back" id="hsBack">‹ ${T.back}</button><h1 style="font-size:32px">${T.title}</h1><div class="heroes">${heroList()
     .map((k) => {
       const H = HEROES[k];
@@ -238,8 +258,10 @@ export function pickKit(done: (k: KitDef, o: KitOpts) => void) {
   const sc = $('#screen');
   const T = L.ui.kits;
   setScene('title');
-  sc.innerHTML = `<div class="scr">${fullBox(G.hero)}${variantBoxes(G.hero)}<img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="font-size:28px">${T.title}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
-  ${heatBar(G.hero)}
+  /* 每日挑战：难度定死，不出完整线、异象、轮换 / daily: fixed difficulty, no full line, omens or rotation */
+  const daily = !!G.daily;
+  sc.innerHTML = `<div class="scr">${daily ? '' : fullBox(G.hero) + variantBoxes(G.hero)}<img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="font-size:28px">${T.title}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
+  ${daily ? `<div class="logo-sub">${L.ui.daily.title} · ${G.daily} · ${G.heat ? t('heroes.heat', { h: G.heat }) : L.ui.daily.normal}</div>` : heatBar(G.hero)}
   <div class="kits">${list
     .map((k, i) => {
       const p = pathsOf(G.hero).find((x) => x.id === k.path);
@@ -258,7 +280,7 @@ export function pickKit(done: (k: KitDef, o: KitOpts) => void) {
         SFX.ensure();
         SFX.play('merge');
         sc.hidden = true;
-        done(list[+b.dataset.i!], { heat: heatOf(G.hero).sel, full: fullSelected(G.hero), omen: omenSelected(G.hero), rot: rotSelected(G.hero) });
+        done(list[+b.dataset.i!], daily ? { heat: G.heat, full: false, omen: false, rot: false } : { heat: heatOf(G.hero).sel, full: fullSelected(G.hero), omen: omenSelected(G.hero), rot: rotSelected(G.hero) });
       }),
   );
 }
@@ -286,7 +308,9 @@ export function endScreen(win: boolean, quit = false) {
     META.runs++;
     saveMeta();
   }
-  const mg = endl ? null : mastGain(win);
+  const daily = !!G.daily;
+  const mg = endl || daily ? null : mastGain(win);
+  track('run_end', { win, quit, r: G.round, hero: G.hero, heat: G.heat, kit: G.kitPath, full: G.full, daily, endless: endl, kills: R.kills, relics: G.relics.length });
   const newPaths = mg && mg.up ? pathsOf(G.hero).filter((p) => p.mast === mg.lv) : [];
   const got = R.got.map((id) => ACHM[id]).filter(Boolean);
   const H = HEROES[G.hero];
@@ -303,6 +327,7 @@ export function endScreen(win: boolean, quit = false) {
   ${row(T.kills, R.kills + ' / ' + R.maxCombo)}
   ${best && best.bDmg ? row(T.ace, `${best.adj && ADJ[normAdj(best.adj)!] ? t('sheet.adjOf', { a: ADJ[normAdj(best.adj)!].n }) : ''}${ITEMS[best.key].n} · ${TIERS[best.tier].n}`) : ''}</div>
   ${runSrcBlock()}
+  ${daily ? dailyEndHtml(win) : ''}
   ${endNote}${win || quit ? '' : loseNote(B)}
   ${mastNote}
   ${R.newHeat ? `<div class="newheat">${t('end.newHeat', { h: R.newHeat, d: (L.meta.heats as string[])[R.newHeat] })}</div>` : ''}
@@ -310,9 +335,10 @@ export function endScreen(win: boolean, quit = false) {
   ${R.newHero ? `<div class="newheat">${t('end.newHero', { h: HEROES[R.newHero].n, t: HEROES[R.newHero].title })}</div>` : ''}
   ${R.newFull ? `<div class="newheat full">${t('end.newFull', { h: H.n })}</div>` : R.pathWin && R.pathWin[0] < R.pathWin[1] ? `<div class="newheat">${t('end.pathWin', { n: R.pathWin[0], m: R.pathWin[1] })}</div>` : ''}
   ${got.length ? `<div class="rules res achgot"><div><span>${T.gotAch}</span></div>${got.map((a) => `<div><i>★</i><span><b>${a.n}</b> ${a.d}</span></div>`).join('')}</div>` : ''}
-  ${win ? `<button class="btn gold big" id="endlessBtn">${T.goOn}</button>` : ''}<button class="btn red big" id="againBtn">${T.again}</button><button class="btn alt sm" id="hisBtn2">${T.history}</button></div>`;
+  ${win && !daily ? `<button class="btn gold big" id="endlessBtn">${T.goOn}</button>` : ''}<button class="btn red big" id="againBtn">${T.again}</button><button class="btn alt sm" id="hisBtn2">${T.history}</button></div>`;
   clearSave();
   sc.hidden = false;
+  if (daily) bindDailyEnd();
   $('#againBtn').onclick = () => {
     SFX.ensure();
     SFX.play('ui');

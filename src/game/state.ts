@@ -201,6 +201,10 @@ export interface GameState {
   windRelic: boolean;
   /** 本局种子：开局时定好，和 rng 的状态一起存档 / this run's seed: set at run start and saved alongside the rng state */
   seed: number;
+  /** 每日挑战的日期（YYYY-MM-DD）；普通局是空串 / the daily challenge's date (YYYY-MM-DD); '' for a normal run */
+  daily?: string;
+  /** 每日挑战正在打第几夜（开战时记下，打完清掉；读档时还在就算中途退出） / the night the daily is fighting (set when a battle starts, cleared when it ends; still set on load means the player quit mid-battle) */
+  dailyFight?: number;
 }
 
 export const G: GameState = {
@@ -234,6 +238,8 @@ export const G: GameState = {
   seenFoes: {},
   secret: {},
   seed: 0,
+  daily: '',
+  dailyFight: 0,
   wind: '',
   windRelic: false,
 };

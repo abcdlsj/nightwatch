@@ -63,4 +63,10 @@ export const KEYS = {
   lang: 'chain-lang',
   settings: 'chain-settings',
   iosHint: 'nw-ios-hint',
+  /** 每日挑战的本机记录 / local record of the daily challenge */
+  daily: 'nw-daily',
+  /** 匿名统计用的随机 ID / random id for anonymous stats */
+  uid: 'nw-uid',
+  /** 排行榜昵称 / leaderboard nickname */
+  nick: 'nw-nick',
 };

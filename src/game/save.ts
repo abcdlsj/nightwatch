@@ -24,6 +24,9 @@ export interface SaveData {
   /** 新版加的：种子和随机数状态（旧存档没有，读的时候另起一个） / added in the new version: seed and RNG state (missing in old saves; start a fresh one on load) */
   seed?: number;
   rng?: number;
+  /** 每日挑战（见 game/daily.ts） / daily challenge (see game/daily.ts) */
+  daily?: string;
+  dailyFight?: number;
 }
 
 /** rngState：进入备战之前的随机数状态（读档后今晚的出怪和三站不变） / rngState: the RNG state from before prep (loading gives the same spawns and three stops) */
@@ -35,6 +38,7 @@ export function saveGame(rngState = rng.state) {
     cards: G.cards.map((c) => ({ key: c.key, tier: c.tier, adj: c.adj, loc: c.loc, idx: c.idx, hoard: c.hoard, grow: c.grow || 0, qp: c.qp || 0, carry: c.carry || undefined, star: c.star || undefined })),
     secret: G.secret, seed: G.seed, rng: rngState, wind: G.wind, windRelic: G.windRelic,
     wind2: G.wind2 || '', omen: G.omen || '', rot: G.rot || null,
+    daily: G.daily || undefined, dailyFight: G.dailyFight || undefined,
   };
   store.setJson(KEYS.save, s);
 }
@@ -52,6 +56,7 @@ export function restoreSave(s: SaveData | null): boolean {
     endless: !!s.endless, maxRound: s.endless ? 999 : s.full ? FULL_NIGHTS : NIGHTS, lock: s.lock && ITEMS[s.lock.card?.key] ? s.lock : null, fightWave: null, cards: [],
     secret: s.secret || {}, seed: s.seed ?? 0, wind: (s.wind || '') as GameState['wind'], windRelic: !!s.windRelic,
     wind2: (s.wind2 || '') as GameState['wind'], omen: OMENS[s.omen || ''] ? s.omen : '', rot: s.rot || null,
+    daily: s.daily || '', dailyFight: s.dailyFight || 0,
   });
   if (s.rng != null) rng.state = s.rng;
   for (const d of s.cards || []) {

@@ -1,0 +1,15 @@
+name = "nightwatch-api"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+[vars]
+# 允许哪些网页来调接口，逗号分隔；* 表示都放行。上线后改成游戏的域名
+# which pages may call the API, comma-separated; * allows all. Set to the game's domains once live
+ALLOWED_ORIGINS = "*"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nightwatch"
+# 跑 npx wrangler d1 create nightwatch 之后，把输出里的 database_id 填到这里
+# after npx wrangler d1 create nightwatch, paste the database_id from its output here
+database_id = "REPLACE_WITH_DATABASE_ID"

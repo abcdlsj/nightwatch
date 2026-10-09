@@ -12,7 +12,7 @@ import { rollGear } from './loot';
 import { RELICS } from '../data/relics';
 import { HEROES, HERO_ORDER } from '../data/heroes';
 import { recalcMods } from './mods';
-import { pick } from '../core/rng';
+import { pick, rand } from '../core/rng';
 import { finalBosses, lastNight } from './plan';
 import { heroStory } from './story';
 
@@ -106,7 +106,8 @@ const ACH_OK: Record<string, (R: RunStats) => unknown> = {
 };
 
 export function unlock(id: string) {
-  if (META.ach[id] || !ACHM[id]) return;
+  /* 每日挑战不算成就 / the daily challenge never grants achievements */
+  if (G.daily || META.ach[id] || !ACHM[id]) return;
   META.ach[id] = Date.now();
   saveMeta();
   if (G.run) G.run.got.push(id);
@@ -116,6 +117,8 @@ export const achCount = () => ACH.filter((a) => META.ach[a.id]).length;
 
 /** 守到黎明：记录进度、解锁下一档长夜、检查要通关才算的成就 / reaching dawn: record progress, unlock the next Long Night tier, and check achievements that need a completed run */
 export function runWon() {
+  /* 每日挑战不解锁难度、人物和完整线 / the daily challenge unlocks no difficulty, hero or full line */
+  if (G.daily) return;
   const R = G.run || freshRun();
   META.wins++;
   META.sets[G.foeSet] = 1;
@@ -150,6 +153,8 @@ export function fullDone(kind: 'hidden' | 'quiet') {
 /* ---------------- 剧情：每个人物的几套夜晚按顺序轮，一局一套 ---------------- / ---------------- Story: each hero's night sets cycle in order, one per run ---------------- */
 export function nextArc(hero: string) {
   const n = heroStory(hero).arcs?.length || 1;
+  /* 每日挑战：由种子定，不动轮换进度 / daily challenge: decided by the seed, leaving the rotation untouched */
+  if (G.daily) return Math.floor(rand() * n);
   const A = (META.arcNext ||= {});
   const k = (A[hero] || 0) % n;
   A[hero] = k + 1;
@@ -160,11 +165,13 @@ export function nextArc(hero: string) {
 /* ---------------- 第 9 夜首领轮换：这个人物还没打过的先来，五个都打过一轮再重新开始 ---------------- / ---------------- Night-9 boss rotation: bosses this hero has not fought come first; once all five are done, the cycle restarts ---------------- */
 export function nextBoss(hero: string) {
   const all = finalBosses();
+  if (G.daily) return pick(all);
   const seen = META.bossCycle?.[hero] || [];
   const pool = all.filter((k) => !seen.includes(k));
   return pick(pool.length ? pool : all);
 }
 export function markBoss(hero: string, k: string) {
+  if (G.daily) return;
   const C = (META.bossCycle ||= {});
   const seen = (C[hero] ||= []);
   if (!seen.includes(k)) seen.push(k);
@@ -184,9 +191,12 @@ export const mastNext = (h?: string) => {
   return n ? n - p : 0;
 };
 
+/** 这局实际生效的熟练等级：每日挑战按 0 级算，大家起点一样 / the mastery level in effect this run: the daily counts as level 0 so everyone starts equal */
+export const runMastLv = () => (G.daily ? 0 : mastLv());
+
 /** 开局按等级发放：多 2 金 / 夜谈多一选（在夜谈里看） / 送普通遗物 / 首卡升银 / granted by level at run start: +2 gold / one extra night-talk option (shown in the talk) / a common relic / first card upgraded to silver */
 export function mastStart() {
-  const lv = mastLv();
+  const lv = runMastLv();
   if (!lv) return;
   G.gold += 2;
   if (lv >= 3) {

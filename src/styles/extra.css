@@ -54,3 +54,16 @@
 .fullbox.locked{opacity:.55;cursor:default}
 .kit.omen{min-height:72px}
 #pvNote .omen{color:#d0a6ff}
+/* 每日挑战和排行榜 / daily challenge and leaderboard */
+.daily-rules{margin:8px 0;font-size:14px}
+.daily-end .sh-btns{margin-top:6px}
+.daily-send{display:flex;gap:8px;margin:8px 0;align-items:center}
+.daily-send input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--edge);border-radius:8px;background:rgba(0,0,0,.35);color:var(--ink);font:16px var(--body);user-select:text;-webkit-user-select:text}
+.daily-send .btn{flex:none}
+.dboard{max-height:50vh;overflow:auto;margin:8px 0;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.dboard table{width:100%;border-collapse:collapse;font:14px var(--body)}
+.dboard th{position:sticky;top:0;background:var(--panel);color:var(--muted);font-weight:400;text-align:left;padding:4px 6px}
+.dboard td{padding:4px 6px;border-top:1px solid rgba(255,255,255,.06);white-space:nowrap}
+.dboard td:nth-child(2){max-width:9em;overflow:hidden;text-overflow:ellipsis}
+.dboard tr.won td:nth-child(4){color:#ffe79a}
+.dboard tr.me td{background:rgba(255,209,102,.14);color:#ffe79a}

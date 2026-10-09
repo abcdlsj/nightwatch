@@ -1,6 +1,7 @@
 /* 新手教学：第一局第一夜的夜谈结束后，按顺序圈出几个地方，各配一句话。只放一次，可以跳过 / First-run tutorial: after the first night talk of the first run, spotlight a few spots in order, one line each. Shown once, skippable */
 import { L, t } from '../i18n';
 import { SFX } from '../audio/sfx';
+import { track } from '../platform/telemetry';
 
 const STEPS: [string, keyof typeof L.ui.tut.steps][] = [
   ['#pbody', 'doors'],
@@ -47,6 +48,7 @@ export function playTutorial() {
     place();
   };
   const end = () => {
+    track('tutorial', { step: i + 1, of: STEPS.length, done: i >= STEPS.length });
     window.removeEventListener('resize', place);
     ov?.remove();
     ov = null;

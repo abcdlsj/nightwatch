@@ -8,6 +8,7 @@ import { $ } from './dom';
 import { sheetOpen, closeSheet } from './sheets';
 import { resetTips, toast } from './hud';
 import { exportCode, importCode } from '../platform/backup';
+import { apiOn } from '../platform/api';
 
 const VERSION = __APP_VERSION__;
 
@@ -15,7 +16,7 @@ const VERSION = __APP_VERSION__;
 export function openSettings(onReset?: () => void, onQuit?: () => void) {
   SFX.play('ui');
   const T = L.ui.settings;
-  const rows: (keyof Settings)[] = ['music', 'sfx', 'haptics', 'shake', 'nums', 'tips'];
+  const rows: (keyof Settings)[] = ['music', 'sfx', 'haptics', 'shake', 'nums', 'tips', ...(apiOn() ? (['stats'] as const) : [])];
   const sh = sheetOpen(`<div class="sh" role="dialog" aria-label="${T.title}"><h3>${T.title}</h3>
     <div class="tlist set-list">${rows
       .map((k) => `<button class="trow set-row" data-k="${k}"><div><b>${(T as any)[k]}</b><span>${(T as any)[k + 'D']}</span></div><i class="tog${SETTINGS[k] ? ' on' : ''}" aria-hidden="true"></i></button>`)

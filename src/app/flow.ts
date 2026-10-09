@@ -18,6 +18,8 @@ import { rollGear, withFit, rollWind, RULE_NIGHTS } from '../game/loot';
 import { nightInfo } from '../game/nights';
 import { nightRewards } from '../game/rewards';
 import { saveGame, loadSave, restoreSave } from '../game/save';
+import { markDailyStart, type DailySpec } from '../game/daily';
+import { track } from '../platform/telemetry';
 import { makeWave } from '../sim/waves';
 import { B, startBattle as simStart, settleWin, clearBattle, setOnEnd } from '../sim/battle';
 import { world } from '../sim/world';
@@ -39,6 +41,7 @@ import { relicChoice, gainRelic } from './prep/actions';
 import { cancelDrag } from './prep/drag';
 import { setDrawer, UI_drawer } from './prep/drawer';
 import { pickKit, pickOmen, endScreen, heroSelect, type KitOpts } from './screens';
+import { mastLv } from '../game/meta';
 
 /** 网址里带 ?seed=123 时用固定种子（测试和复现问题用） / with ?seed=123 in the URL, use a fixed seed (for tests and reproducing bugs) */
 function seedFromUrl() {
@@ -47,18 +50,23 @@ function seedFromUrl() {
 }
 
 /* ---------------- 开局 ---------------- / ---------------- Run start ---------------- */
-export function newGame(hero: string) {
+/** daily：开每日挑战（种子、人物、难度都按日期定） / daily: start the daily challenge (seed, hero and difficulty all come from the date) */
+export function newGame(hero: string, daily?: DailySpec) {
   clearCardEls();
-  G.seed = seedFromUrl() ?? newSeed();
+  G.seed = daily ? daily.seed : (seedFromUrl() ?? newSeed());
   reseed(G.seed);
-  G.hero = hero || G.hero;
+  G.hero = daily ? daily.hero : hero || G.hero;
   const H = HEROES[G.hero];
 
   Object.assign(G, {
     heat: 0, run: freshRun(), round: 1, maxRound: NIGHTS, endless: false, lock: null, fightWave: null, gold: H.gold, wall: H.wall, wallMax: H.wall,
     cards: [], relics: [], skills: [], bestChain: 0, secret: {}, foeSet: pick(Object.keys(FOESETS)), full: false, gems: {}, arc: 0,
-    omen: '', rot: null, wind2: '',
+    omen: '', rot: null, wind2: '', daily: daily ? daily.day : '', dailyFight: 0,
   });
+  if (daily) {
+    G.heat = daily.heat;
+    markDailyStart(daily.day);
+  }
   G.boss9 = nextBoss(G.hero);
   G.arc = nextArc(G.hero);
   G.boss12 = pick(finalBosses().filter((k) => k !== G.boss9));
@@ -106,6 +114,7 @@ function startRun(kit: KitDef, o: KitOpts) {
   renderOwned();
   updateHUD();
   G.firstPrep = true;
+  track('run_start', { hero: G.hero, heat: G.heat, kit: G.kitPath, full: G.full, omen: G.omen || '', rot: !!G.rot, daily: !!G.daily, mast: mastLv() });
   playPrologue(() => toPrep());
 }
 
@@ -115,6 +124,17 @@ export function resumeSave() {
   clearCardEls();
   if (!restoreSave(s)) {
     heroSelect();
+    return;
+  }
+  /* 每日挑战打到一半退出：这一夜算失守，直接结算 / quit the daily mid-battle: that night counts as lost and the run ends */
+  if (G.daily && G.dailyFight) {
+    G.dailyFight = 0;
+    G.phase = 'over';
+    renderRelics();
+    renderOwned();
+    updateHUD();
+    endScreen(false, true);
+    toast(L.ui.daily.quitLoss);
     return;
   }
   renderRelics();
@@ -194,6 +214,11 @@ export function startBattle() {
   /* 第 6 夜起（含无尽）战斗曲换成更压抑的一首 / from night 6 on (endless included) battles switch to a darker track */
   setScene(wave.some((s) => EN[s.type].boss) ? 'boss' : G.round >= 6 || G.endless ? 'dread' : 'battle');
   if (!amb && G.round === NIGHTS && !G.endless) markBoss(G.hero, G.boss9);
+  /* 每日挑战：开战时先记一笔，打完才清掉；中途关掉游戏，读档时按失守算 / daily: mark the fight when it starts and clear it when it ends; closing mid-fight counts as a loss on load */
+  if (G.daily) {
+    G.dailyFight = G.round;
+    saveGame();
+  }
   clearVO();
   clearFieldFx();
   $('#prep').hidden = true;
@@ -217,6 +242,8 @@ export function startBattle() {
 /* ---------------- 收尾 ---------------- / ---------------- Wrap-up ---------------- */
 export function initFlow() {
   setOnEnd((b) => {
+    G.dailyFight = 0;
+    track('night_end', { r: G.round, win: b.result === 'win', ambush: !!b.ambush, wall: G.wall, kills: b.kills, t: Math.round(b.t), hero: G.hero, heat: G.heat, daily: !!G.daily, endless: !!G.endless });
     if (b.ambush) return b.result === 'win' ? ambushWin(b) : ambushLose(b);
     return b.result === 'win' ? winBattle(b) : loseBattle(b);
   });

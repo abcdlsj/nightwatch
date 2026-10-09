@@ -11,11 +11,13 @@ export interface Settings {
   nums: boolean;
   /** 新手提示 / tutorial hints */
   tips: boolean;
+  /** 匿名统计 / anonymous stats */
+  stats: boolean;
 }
 
 function load(): Settings {
   const old = +(store.get(KEYS.audio) || 0) || 0;
-  const d: Settings = { music: old === 0, sfx: old < 2, haptics: true, shake: true, nums: true, tips: true };
+  const d: Settings = { music: old === 0, sfx: old < 2, haptics: true, shake: true, nums: true, tips: true, stats: true };
   return Object.assign(d, store.json<Partial<Settings>>(KEYS.settings, {}));
 }
 export const SETTINGS: Settings = load();

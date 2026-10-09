@@ -1,5 +1,5 @@
 /* 装配各层，绑定底栏按钮，跑主循环（由 src/main.ts 在平台层就绪后加载） / wire up the layers, bind bottom-bar buttons and run the main loop (loaded by src/main.ts after the platform layer is ready) */
-import { initLocale, L } from '../i18n';
+import { initLocale, L, lang } from '../i18n';
 import { loadMods } from '../mod/load';
 import { on } from '../core/events';
 import { clamp } from '../core/util';
@@ -37,6 +37,8 @@ import { setPrepTotal } from '../ui/hud';
 setPrepTotal(prepStops);
 import { codexKill, markSeen, unlock } from '../game/meta';
 import { onBack, onPause, onResume } from '../platform/native';
+import { initTelemetry, track, flush } from '../platform/telemetry';
+import { standalone } from '../platform/pwa';
 
 /* ---------- 装配 ---------- / ---------- Wiring ---------- */
 initLocale();
@@ -186,6 +188,10 @@ function loop(now: number) {
 layout();
 titleScreen();
 requestAnimationFrame(loop);
+/* 匿名统计：开机记一次（没配接口地址或在设置里关了就不发） / anonymous stats: one event at launch (nothing is sent without an API base or when turned off in settings) */
+initTelemetry(lang, standalone());
+track('open', { runs: META.runs, w: innerWidth, h: innerHeight });
+onPause(() => flush(true));
 
 /* ---------- 给测试脚本用的入口 ---------- / ---------- Hooks for test scripts ---------- */
 (window as any).__game = {

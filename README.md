@@ -97,6 +97,12 @@ docs/                 模组教程、平衡说明、字体授权
 - `public/sw.js`：离线缓存。页面先走网络，带哈希的资源直接用缓存；每次构建换一个缓存版本（`__BUILD_ID__`）。只在正式构建的网页版注册。
 - 从主屏打开时 `<html>` 带 `standalone` 类；`src/platform/pwa.ts` 处理 iOS Safari 的安装提示。
 
+## 统计、每日挑战与排行榜
+
+接口是 `worker/` 下的 Cloudflare Worker + D1，部署步骤、事件列表和常用查询见 [worker/README.md](worker/README.md)。构建时设 `VITE_API_BASE=接口地址` 就会开启匿名统计和排行榜；不设就都不开，游戏照常玩。
+
+每日挑战按 UTC 日期定种子、人物和难度（`src/game/daily.ts`）：全部流派开放、熟练按 0 级算、只有一次机会、战斗中途退出算这一夜失守，不计熟练和成就。
+
 ## 移动端（iOS / Android）
 
 原生壳用 Capacitor，工程在 `ios/` 和 `android/`，配置在 `capacitor.config.ts`（appId `com.abcdlsj.nightwatch`）。
