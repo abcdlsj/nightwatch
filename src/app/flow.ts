@@ -13,7 +13,7 @@ import { boardCards } from '../game/cards';
 import { codexSweep, runWon, mastStart, nextBoss, markBoss, fullDone, nextArc } from '../game/meta';
 import { markPathWin, pathsOf, heroList, heroUnlocked } from '../game/unlocks';
 import { NIGHTS, FULL_NIGHTS, GEM_NIGHTS, nightKind, lastNight, finalBosses } from '../game/plan';
-import { rollDoors, hordeWave, ambushWave, ambushGold, placeKit } from '../game/prep';
+import { rollDoors, hordeWave, ambushWave, ambushGold, placeKit, bets, STACK_GOLD, stackRelic } from '../game/prep';
 import { rollGear, withFit, rollWind, RULE_NIGHTS } from '../game/loot';
 import { nightInfo } from '../game/nights';
 import { nightRewards } from '../game/rewards';
@@ -210,7 +210,7 @@ export function startBattle() {
   codexSweep();
   const amb = !!G.fightWave;
   let wave = G.fightWave || G.nextWave!;
-  if (!amb && G.prep.wager === 'horde') wave = hordeWave(wave);
+  if (!amb && bets().includes('horde')) wave = hordeWave(wave);
   /* 第 6 夜起（含无尽）战斗曲换成更压抑的一首 / from night 6 on (endless included) battles switch to a darker track */
   setScene(wave.some((s) => EN[s.type].boss) ? 'boss' : G.round >= 6 || G.endless ? 'dread' : 'battle');
   if (!amb && G.round === NIGHTS && !G.endless) markBoss(G.hero, G.boss9);
@@ -235,7 +235,7 @@ export function startBattle() {
   const hard = amb || nk === 'boss' || nk === 'hidden';
   banner(amb ? t('battle.ambushTitle', { n: bd!.n }) : nightInfo(G.round).title, hard ? '#ff6b5b' : nk === 'elite' ? '#ffb37a' : '#fff');
   SFX.play(hard || nk === 'elite' ? 'intent' : 'ui');
-  simStart({ wave, ambush: amb, wager: amb ? null : G.prep.wager || null, beats: amb ? [] : nightInfo(G.round).beats });
+  simStart({ wave, ambush: amb, wagers: amb ? [] : bets(), beats: amb ? [] : nightInfo(G.round).beats });
   updateHUD();
 }
 
@@ -272,7 +272,7 @@ function winBattle(b: Battle) {
   clearCharges();
   const was = G.round;
   if (was >= G.maxRound) {
-    if (b.wager && G.run) G.run.wagers++;
+    if (G.run) G.run.wagers += b.wagers.length;
     const hidden = nightKind(was) === 'hidden';
     if (hidden) fullDone('hidden');
     runWon();
@@ -307,32 +307,43 @@ function reportWin(b: Battle, was: number) {
   });
 }
 
-/** 加码守住了：发奖励，返回战报里的行 / modifier held: hand out the reward and return the report row */
+/** 加码守住了：每个加码各发各的奖励，叠得越多另有奖励；返回战报里的行 / modifiers held: each pays its own reward, stacking pays extra; return the report rows */
 function wagerPay(b: Battle): Row[] {
-  const W = WAGERS[b.wager!];
-  if (!W) return [];
-  G.run!.wagers++;
   const rows: Row[] = [];
-  const lb = L.ui.flow.wagerPre + W.n;
-  if (W.gold) rows.push([lb, W.gold]);
-  if (W.heal) {
-    G.wall = Math.min(G.wallMax, G.wall + W.heal);
-    rows.push([L.ui.flow.wagerHeal, 0, 0, t('flow.wallPlus', { n: W.heal })]);
-  }
-  if (W.relic) {
-    const r = rollGear(1, 1)[0];
-    if (r) {
-      gainRelic(r, true);
-      rows.push([lb, 0, 0, RELICS[r].n]);
+  for (const k of b.wagers) {
+    const W = WAGERS[k];
+    if (!W) continue;
+    G.run!.wagers++;
+    const lb = L.ui.flow.wagerPre + W.n;
+    if (W.gold) rows.push([lb, W.gold]);
+    if (W.heal) {
+      G.wall = Math.min(G.wallMax, G.wall + W.heal);
+      rows.push([L.ui.flow.wagerHeal, 0, 0, t('flow.wallPlus', { n: W.heal })]);
+    }
+    if (W.relic) {
+      const r = rollGear(1, 1)[0];
+      if (r) {
+        gainRelic(r, true);
+        rows.push([lb, 0, 0, RELICS[r].n]);
+      }
+    }
+    if (W.up) {
+      const c = pick(G.cards.filter((x) => x.loc === 'board' && x.tier < 2));
+      if (c) {
+        c.tier++;
+        repaint(c);
+        rows.push([lb, 0, 0, ITEMS[c.key].n + ' → ' + TIERS[c.tier].n]);
+      } else rows.push([lb, 3]);
     }
   }
-  if (W.up) {
-    const c = pick(G.cards.filter((x) => x.loc === 'board' && x.tier < 2));
-    if (c) {
-      c.tier++;
-      repaint(c);
-      rows.push([lb, 0, 0, ITEMS[c.key].n + ' → ' + TIERS[c.tier].n]);
-    } else rows.push([lb, 3]);
+  const n = b.wagers.length;
+  if (STACK_GOLD[n]) rows.push([t('flow.wagerStack', { n }), STACK_GOLD[n]]);
+  if (stackRelic(n)) {
+    const r = rollGear(1, 4)[0];
+    if (r) {
+      gainRelic(r, true);
+      rows.push([t('flow.wagerStack', { n }), 0, 0, RELICS[r].n]);
+    }
   }
   return rows;
 }

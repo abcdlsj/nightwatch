@@ -35,7 +35,7 @@ function night(r: number) {
   G.round = r;
   G.phase = 'battle';
   const wave = makeWave(r);
-  startBattle({ wave, ambush: false, wager: null, beats: nightInfo(r).beats });
+  startBattle({ wave, ambush: false, wagers: [], beats: nightInfo(r).beats });
   let steps = 0;
   while (!B!.over && steps < 60 * 300) {
     simStep(1 / 60);
@@ -142,7 +142,7 @@ describe('规则遗物', () => {
     }
     recalcMods();
     G.phase = 'battle';
-    startBattle({ wave: makeWave(r), ambush: false, wager: null, beats: [] });
+    startBattle({ wave: makeWave(r), ambush: false, wagers: [], beats: [] });
     let n = 0;
     while (!B!.over && n++ < 60 * 300) simStep(1 / 60);
     return { stk: B!.stkN || 0, rx: B!.rxN || 0, result: B!.result };

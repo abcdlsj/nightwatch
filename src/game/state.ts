@@ -147,7 +147,8 @@ export interface Prep {
   rare?: number;
   fought?: boolean;
   wagers?: string[];
-  wager?: string | null;
+  /** 加码：可以叠着选几个（旧存档是单个字符串） / modifiers: several can be stacked (old saves hold a single string) */
+  wager?: string[] | string | null;
   tipI?: number;
 }
 

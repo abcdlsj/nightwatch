@@ -16,7 +16,7 @@ import { boardCards, fits } from '../../game/cards';
 import { synCount, synLevel, synPairs } from '../../game/synergy';
 import { modText, plainMods, pickLine } from '../../game/text';
 import { nightInfo } from '../../game/nights';
-import { rollWagers, ambushGold, EVENT_FILTER } from '../../game/prep';
+import { rollWagers, ambushGold, EVENT_FILTER, bets, STACK_GOLD, stackRelic } from '../../game/prep';
 import { makeOffer, rollGear, gearPrice, withFit, isForeign, refreshCost } from '../../game/loot';
 import { HEROES } from '../../data/heroes';
 import { icon, spr } from '../../render/sprites';
@@ -569,22 +569,29 @@ function wagerHtml() {
   const P = G.prep;
   if (G.round >= G.maxRound) return '';
   if (!P.wagers) P.wagers = rollWagers();
-  return `<div class="wagers"><div class="wg-t">${L.ui.prep.wager}</div>${P.wagers
+  const on = bets();
+  return `<div class="wagers"><div class="wg-t">${L.ui.prep.wager}<small>${L.ui.prep.wagerStack}</small></div>${P.wagers
     .map((k) => {
       const W = WAGERS[k];
-      return `<button class="wg${P.wager === k ? ' on' : ''}" data-w="${k}"><b>${W.n}</b><span>${W.d}</span><em>${W.r}</em></button>`;
+      return `<button class="wg${on.includes(k) ? ' on' : ''}" data-w="${k}"><b>${W.n}</b><span>${W.d}</span><em>${W.r}</em></button>`;
     })
-    .join('')}</div>`;
+    .join('')}<div class="wg-sum">${stackLine(on.length)}</div></div>`;
 }
+/** 叠了几个、守住能多拿什么 / how many are stacked and what holding earns on top */
+const stackLine = (n: number) => (n >= 2 ? t('prep.wagerOn', { n, g: STACK_GOLD[n] }) + (stackRelic(n) ? L.ui.prep.wagerRelic : '') : '');
 function bindWagers() {
   $$('.wg').forEach(
     (b) =>
       (b.onclick = () => {
         SFX.ensure();
         const k = b.dataset.w!;
-        G.prep.wager = G.prep.wager === k ? null : k;
-        SFX.play(G.prep.wager ? 'intent' : 'ui');
-        $$('.wg').forEach((x) => x.classList.toggle('on', x.dataset.w === G.prep.wager));
+        const cur = bets();
+        const next = cur.includes(k) ? cur.filter((x) => x !== k) : cur.concat(k);
+        G.prep.wager = next;
+        SFX.play(next.length > cur.length ? 'intent' : 'ui');
+        $$('.wg').forEach((x) => x.classList.toggle('on', next.includes(x.dataset.w!)));
+        const sum = document.querySelector<HTMLElement>('.wg-sum');
+        if (sum) sum.textContent = stackLine(next.length);
       }),
   );
 }

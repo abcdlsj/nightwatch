@@ -273,7 +273,7 @@ export interface RunLog {
 function battle(r: number): NightLog {
   G.phase = 'battle';
   const wave = makeWave(r);
-  startBattle({ wave, ambush: false, wager: null, beats: nightInfo(r).beats });
+  startBattle({ wave, ambush: false, wagers: [], beats: nightInfo(r).beats });
   let steps = 0;
   while (!B!.over && steps < 60 * 400) {
     simStep(1 / 60);

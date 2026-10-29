@@ -60,7 +60,7 @@ function night(arch: string, r: number, seed: number, foeSet: string) {
   const wallMod = [...G.relics.map((k) => RELICS[k].m.wall || 0), ...G.skills.map((k) => TALENTS[k].m.wall || 0)].reduce((s, v) => s + v, 0);
   G.wallMax = Math.max(5, H.wall + wallMod);
   G.wall = G.wallMax;
-  startBattle({ wave: makeWave(r), ambush: false, wager: null, beats: nightInfo(r).beats });
+  startBattle({ wave: makeWave(r), ambush: false, wagers: [], beats: nightInfo(r).beats });
   let steps = 0;
   while (!B!.over && steps < 60 * 400) {
     simStep(1 / 60);

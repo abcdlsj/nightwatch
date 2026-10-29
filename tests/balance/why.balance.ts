@@ -21,7 +21,7 @@ it('why', () => {
   if (cr) { const c = G.cards.find((x) => x.key === cr.key)!; c.carry = true; c.star = cr.star; }
   recalcMods();
   console.log('board', G.cards.map((c) => `${c.key}@${c.tier} dmg${Math.round(stats(c, null).total)} cd${stats(c, null).cd.toFixed(2)}`).join(' | '));
-  startBattle({ wave: makeWave(r), ambush: false, wager: null, beats: nightInfo(r).beats });
+  startBattle({ wave: makeWave(r), ambush: false, wagers: [], beats: nightInfo(r).beats });
   let s = 0; let kn: any = null; while (!B!.over && s < 24000) { simStep(1 / 60); s++; kn = kn || B!.en.find((e) => e.type === 'knight' || e.d.boss); if (s % 300 === 0 && kn) console.log('t', B!.t.toFixed(0), 'knight hp', Math.round(kn.hp), '/', Math.round(kn.maxHp), 'shield', Math.round(kn.shield), 'y', kn.y.toFixed(2), 'dead', kn.dead, 'wall', G.wall.toFixed(1)); }
   console.log('result', B!.result, 't', B!.t.toFixed(1), 'kills', B!.kills, 'wallBy', JSON.stringify(B!.wallBy), 'dmg', G.cards.map((c) => c.key + ':' + Math.round(c.bDmg)).join(' '));
 });

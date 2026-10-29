@@ -72,3 +72,4 @@
 .t-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
 .t-grid .btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:17px;padding:10px 8px}
 .t-gear{position:absolute;top:calc(12px + var(--sat));right:12px;width:44px;height:44px;padding:0}
+.wg-sum{font-size:13px;color:#ffd166;text-align:center;min-height:1.2em}

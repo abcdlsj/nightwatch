@@ -25,7 +25,7 @@ function night(arch: string, r: number, seed: number, extra: string[] = []) {
   const wm = [...G.relics.map((k) => RELICS[k].m.wall || 0), ...G.skills.map((k) => TALENTS[k].m.wall || 0)].reduce((s, v) => s + v, 0);
   G.wallMax = G.wall = Math.max(5, H.wall + wm);
   const w = makeWave(r);
-  startBattle({ wave: w, ambush: false, wager: null, beats: [] });
+  startBattle({ wave: w, ambush: false, wagers: [], beats: [] });
   let n = 0; while (!B!.over && n++ < 24000) simStep(1 / 60);
   return { win: B!.result === 'win', lost: B!.wallLost, stk: B!.stkN || 0 };
 }

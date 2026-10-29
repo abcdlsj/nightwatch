@@ -155,6 +155,7 @@ export default {
     dropped: '打怪掉的金币（已到账）',
     wagerPre: '加码·',
     wagerHeal: '加码·补墙',
+    wagerStack: '叠了 {n} 个加码',
     wallPlus: '墙 +{n}',
     held: '守住了',
     notHeld: '没拦住',
@@ -326,6 +327,9 @@ export default {
     talkGold: '（+{n} 金）',
     talkFallback: '',
     wager: '加码？',
+    wagerStack: '可以叠着选',
+    wagerOn: '叠了 {n} 个：守住再多 {g} 金',
+    wagerRelic: '，外加一件好遗物',
   },
 
   sheet: {

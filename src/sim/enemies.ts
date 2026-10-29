@@ -19,7 +19,7 @@ import { frenzy } from './combo';
 import type { Enemy } from './types';
 import type { Card } from '../game/state';
 
-const wg = (k: string) => !!B && B.wager === k;
+const wg = (k: string) => !!B && B.wagers.includes(k);
 
 export function spawn(type: string, x?: number | null, y?: number | null): Enemy {
   const b = bt();

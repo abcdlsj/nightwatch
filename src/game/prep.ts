@@ -129,7 +129,15 @@ export function rollDoors() {
 }
 
 /* ---------------- 加码 ---------------- / ---------------- Modifiers ---------------- */
-export const rollWagers = () => shuffled(Object.keys(WAGERS)).slice(0, 2);
+export const rollWagers = () => shuffled(Object.keys(WAGERS)).slice(0, 3);
+/** 这夜选了哪些加码 / the modifiers picked for this night */
+export const bets = (): string[] => {
+  const w = G.prep.wager;
+  return Array.isArray(w) ? w : w ? [w] : [];
+};
+/** 叠了几个加码时的额外奖励：叠 2 个多给金币，叠 3 个再给一件好遗物 / extra reward for stacking: 2 gives bonus gold, 3 also a good relic */
+export const STACK_GOLD = [0, 0, 4, 6];
+export const stackRelic = (n: number) => n >= 3;
 
 /** 蜂拥：敌人多三成 / Swarm: 30% more enemies */
 export function hordeWave(w: Wave): Wave {

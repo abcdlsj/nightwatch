@@ -77,7 +77,7 @@ export function emit(ev: string, x: Record<string, any> = {}) {
 export interface StartOpts {
   wave: Wave;
   ambush: boolean;
-  wager: string | null;
+  wagers: string[];
   beats: any[];
 }
 
@@ -103,7 +103,7 @@ export function startBattle(o: StartOpts): Battle {
   B = {
     t: 0, spawns: o.wave, si: 0, en: [], pr: [], epr: [], graves: [], sched: [], shield: 0, maxChain: 0, wallLost: 0, endT: 0, over: false,
     acc: 0, boss: null, greed: 0, kills: 0, flags: {}, rlog: {}, beats: o.beats, bi: 0, surges: (o.wave.surges || []).slice(),
-    lowSaid: false, wager: o.wager, ambush: o.ambush, maxCombo: 0, combo: 0, maxHit: 0, dmgBy: {}, slowT: 0,
+    lowSaid: false, wagers: o.wagers, ambush: o.ambush, maxCombo: 0, combo: 0, maxHit: 0, dmgBy: {}, slowT: 0,
   };
   for (const c of G.cards) {
     Object.assign(c, { charge: 0, mom: 0, bDmg: 0, bTrig: 0, bSrc: {}, bBy: {}, bCh: 0, bHs: 0, bRl: 0, bBf: 0, bTr: 0, frozen: 0, echoLog: [], evLog: {}, hasteT: 0, stk: 0, sw: 0, chN: 0, alt: 0, lastT: -9, lastFire: -9, rage: 0, cnt: 0 });
@@ -120,7 +120,7 @@ export function startBattle(o: StartOpts): Battle {
   }
   recalcMods();
   noteLineup();
-  if (B.wager === 'dark')
+  if (B.wagers.includes('dark'))
     for (const c of boardCards()) {
       c.frozen = 2.5;
       view.cardFlag(c, 'frozen', true);
@@ -129,7 +129,7 @@ export function startBattle(o: StartOpts): Battle {
   B.flags.lime = boardCards().reduce((s, c) => s + (ITEMS[c.key].limeBurn || 0), 0);
   world.range = clamp(RANGE0 + mv('range'), 0.05, 0.35);
   for (const c of boardCards()) c.ox = world.originX(c);
-  if (B.wager) later(0.6, () => view.banner(L.ui.battle.wager + WAGERS[B!.wager!].n, '#ff8a5b'));
+  if (B.wagers.length) later(0.6, () => view.banner(L.ui.battle.wager + B!.wagers.map((k) => WAGERS[k].n).join(' · '), '#ff8a5b'));
   emit('start', {});
   return B;
 }

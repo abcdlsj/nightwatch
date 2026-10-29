@@ -155,6 +155,7 @@ export default {
     dropped: 'Gold dropped (already banked)',
     wagerPre: 'Wager · ',
     wagerHeal: 'Wager · wall repair',
+    wagerStack: '{n} wagers stacked',
     wallPlus: 'Wall +{n}',
     held: 'Held',
     notHeld: 'Broke through',
@@ -326,6 +327,9 @@ export default {
     talkGold: ' (+{n} gold)',
     talkFallback: '',
     wager: 'Wager?',
+    wagerStack: 'stack as many as you dare',
+    wagerOn: '{n} stacked: +{g} gold if you hold',
+    wagerRelic: ', plus a good relic',
   },
 
   sheet: {

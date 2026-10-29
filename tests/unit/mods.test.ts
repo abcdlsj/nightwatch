@@ -35,7 +35,7 @@ describe('模组', () => {
     placeKit(KITS.wei[0].cards);
     recalcMods();
     G.phase = 'battle';
-    startBattle({ wave: makeWave(1), ambush: false, wager: null, beats: [] });
+    startBattle({ wave: makeWave(1), ambush: false, wagers: [], beats: [] });
     for (let i = 0; i < 60 * 120 && !B!.over; i++) simStep(1 / 60);
     expect(['win', 'lose']).toContain(B!.result);
     expect(B!.kills).toBeGreaterThan(0);

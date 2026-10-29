@@ -74,7 +74,7 @@ export interface Battle {
   bi: number;
   surges: number[];
   lowSaid: boolean;
-  wager: string | null;
+  wagers: string[];
   ambush: boolean;
   fled?: number;
   maxCombo: number;
