@@ -276,7 +276,8 @@ export default {
   "card": "Cards",
   "relic": "Relics",
   "talent": "Talents",
-  "foe": "Enemies"
+  "foe": "Enemies",
+  "combo": "Combos"
  },
  "omens": {
   "lonely": { "n": "Lone City", "d": "Cards with no neighbors deal +70% damage" },

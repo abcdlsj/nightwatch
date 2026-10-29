@@ -13,6 +13,7 @@ import { $, restart } from './dom';
 import { elOf, setAmmo, setNum } from './card-view';
 import { updateHUD, toast, banner, tipOnce } from './hud';
 import { say, foeCard } from './voice';
+import { COMBO } from '../data/combos';
 
 let chainT = 0;
 
@@ -76,6 +77,23 @@ export const domView: SimView = {
     restart(el, 'show');
   },
   buzz,
+  discover(id, firstEver) {
+    const d = COMBO[id];
+    const T = (L.ui.combos as Record<string, { n: string; d: string }>)[id];
+    if (!d || !T) return;
+    let el = document.getElementById('discover');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'discover';
+      $('#banner').after(el);
+    }
+    el.style.setProperty('--dc', d.c);
+    el.classList.toggle('first', firstEver);
+    el.innerHTML = `<small>${firstEver ? L.ui.combo.newFound : L.ui.combo.again}</small><b>${T.n}</b><span>${T.d}</span>`;
+    restart(el, 'show');
+    SFX.play(firstEver ? 'win' : 'intent');
+    buzz(firstEver ? [20, 40, 20] : 15);
+  },
 };
 
 /** 开战前把首领血条摆好（它的高度决定战场顶部留多少） / lay out the boss health bar before battle (its height decides how much space the battlefield top reserves) */

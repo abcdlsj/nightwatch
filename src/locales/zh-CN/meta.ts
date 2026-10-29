@@ -276,7 +276,8 @@ export default {
   "card": "卡牌",
   "relic": "遗物",
   "talent": "天赋",
-  "foe": "敌人"
+  "foe": "敌人",
+  "combo": "连招谱"
  },
  "omens": {
   "lonely": { "n": "孤城", "d": "两边都没有卡的卡，伤害 +70%" },

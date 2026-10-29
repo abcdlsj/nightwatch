@@ -16,7 +16,21 @@ import { world, K, ex, ey } from './world';
 import { view } from './view';
 import { B, bt, later } from './battle';
 import { hurt, freeze, vuln, chargeCard, haste } from './combat';
+import { foundCombo } from '../game/meta';
 import type { Enemy } from './types';
+
+/* ---------------- 连招谱 ---------------- / ---------------- Combo book ---------------- */
+/** 打出一个组合：这局第一次时放慢半秒、报名字 / a combo happened: the first time this run, slow down briefly and announce it */
+export function discover(id: string) {
+  const b = bt();
+  const F: Record<string, 1> = b.flags.found || (b.flags.found = {});
+  if (F[id]) return;
+  F[id] = 1;
+  const r = foundCombo(id);
+  if (!r) return;
+  b.slowT = Math.max(b.slowT, r.firstEver ? 0.9 : 0.5);
+  view.discover(id, r.firstEver);
+}
 
 /* ---------------- 元素反应 ---------------- / ---------------- Elemental reactions ---------------- */
 export type Rx = 'melt' | 'shatter' | 'overload' | 'toxic' | 'super';
@@ -49,6 +63,10 @@ export function react(e: Enemy, a: number, src: Card, crit: boolean, w: Was, bur
   view.num(X, Y - 12, L.ui.battle.rx[k], col, 1);
   view.sfx('react', k);
   b.rxN = (b.rxN || 0) + 1;
+  discover('rx_' + k);
+  const kinds: Record<string, 1> = b.flags.rxKinds || (b.flags.rxKinds = {});
+  kinds[k] = 1;
+  if (Object.keys(kinds).length >= 4) discover('rx4');
   if (!b.flags.rxTip) {
     b.flags.rxTip = 1;
     view.tip('rx', L.ui.tips.rx, 600);
@@ -168,6 +186,7 @@ export function streak(c: Card, st: Stats) {
     if (B!.over) return;
     STREAK[tag](c, ref);
   });
+  ultFound(tag);
   /* 二重唱：窗口里出过手的另一种元素也跟着放一次（六成），冷却照算 / Duet: another element that fired within the window also unleashes once (60%), using its own cooldown */
   if (mv('t_duet')) {
     const other = (Object.keys(log) as Tag[])
@@ -192,6 +211,15 @@ export function ultimate(tag: Tag, c: Card, ref: number) {
   view.banner(L.ui.battle.streak[tag], RXC_TAG[tag]);
   view.sfx('streak', tag);
   STREAK[tag](c, ref);
+  ultFound(tag);
+}
+/** 大招进连招谱；1 秒内放出两种元素的大招算「合奏」 / ultimates go into the combo book; two elements' ultimates within 1 s count as a duet */
+function ultFound(tag: Tag) {
+  const b = bt();
+  discover('ult_' + tag);
+  const last = b.flags.lastUlt as { t: number; tag: Tag } | undefined;
+  if (last && last.tag !== tag && b.t - last.t <= 1) discover('duet');
+  b.flags.lastUlt = { t: b.t, tag };
 }
 /** 棋盘上数量最多的输出元素，和它最强一张卡的伤害 / the board's most common damage element and its strongest card's damage */
 export function mainTag(): { tag: Tag; c: Card; ref: number } | null {
@@ -293,6 +321,7 @@ export function frenzy(c: number) {
   const i = FRENZY.findIndex(([n]) => n === c);
   if (i < 0 || !TUNE.frenzy) return false;
   const t = FRENZY[i][1] * TUNE.frenzy;
+  if (c >= 100) discover('frenzy100');
   for (const o of boardCards()) haste(o, t);
   view.banner(L.ui.battle.frenzy[i], ['#ffe79a', '#ffb37a', '#ff7a5a', '#ff5a8a'][i]);
   view.sfx('streak', 'frenzy');

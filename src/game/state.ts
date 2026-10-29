@@ -109,6 +109,8 @@ export interface RunStats {
   got: string[];
   /** 守住且没掉砖的夜数（累计），攒到 3 夜工匠来一次 / nights held without losing a brick; at 3 the mason visits */
   intact?: number;
+  /** 这局打出过的组合（连招谱） / combos performed this run (combo book) */
+  combos?: string[];
   /** 上一夜战报的快照，下一夜战报拿来对照 / a snapshot of last night's report, compared against in the next one */
   prevRep?: RepSnap;
   lastPure?: boolean;

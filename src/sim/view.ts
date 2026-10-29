@@ -38,13 +38,15 @@ export interface SimView {
   chain(n: number): void;
   combo(n: number): void;
   buzz(p: number | number[]): void;
+  /** 连招谱：这局第一次打出某个组合 / combo book: a combo performed for the first time this run */
+  discover(id: string, firstEver: boolean): void;
 }
 
 const noop = () => {};
 export const nullView: SimView = {
   part: noop, num: noop, dmgNum: noop, ring: noop, bolt: noop, boom: noop, hit: noop, shake: noop, wallFlash: noop, coins: noop,
   cardFx: noop, cardFlag: noop, cardAmmo: noop, cardNum: noop, link: noop,
-  sfx: noop, say: noop, toast: noop, banner: noop, tip: noop, hud: noop, boss: noop, meetFoe: noop, chain: noop, combo: noop, buzz: noop,
+  sfx: noop, say: noop, toast: noop, banner: noop, tip: noop, hud: noop, boss: noop, meetFoe: noop, chain: noop, combo: noop, buzz: noop, discover: noop,
 };
 
 export let view: SimView = nullView;

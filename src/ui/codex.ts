@@ -5,7 +5,8 @@ import { TALENTS, TCAT } from '../data/talents';
 import { EN, FOESETS } from '../data/enemies';
 import { HEROES } from '../data/heroes';
 import { L, t } from '../i18n';
-import { META, ACHM, bestiary, foeSeen, type HistEntry } from '../game/meta';
+import { META, ACHM, bestiary, foeSeen, comboSeen, type HistEntry } from '../game/meta';
+import { COMBOS } from '../data/combos';
 import { modText } from '../game/text';
 import { icon, spr, hasSpr } from '../render/sprites';
 import { SFX } from '../audio/sfx';
@@ -100,7 +101,7 @@ function openRunDetail(i: number) {
 }
 
 /* ---------------- 图鉴 ---------------- / ---------------- Codex ---------------- */
-const TABS = ['card', 'relic', 'talent', 'foe'] as const;
+const TABS = ['card', 'relic', 'talent', 'foe', 'combo'] as const;
 function cxHead(tab: string, got: number, all: number) {
   const N = L.meta.codexTabs as Record<string, string>;
   return `<h3>${L.ui.codex.codex} <small class="spn">${got} / ${all}</small></h3>
@@ -120,7 +121,7 @@ export function openCodex(tab?: string, sub?: string) {
     tab = 'card';
   }
   tab = tab || 'card';
-  ({ card: cxCards, relic: cxRelics, talent: cxTalents, foe: cxFoes } as Record<string, (s?: string) => void>)[tab](sub);
+  ({ card: cxCards, relic: cxRelics, talent: cxTalents, foe: cxFoes, combo: cxCombos } as Record<string, (s?: string) => void>)[tab](sub);
 }
 
 function cxCards(sub?: string) {
@@ -210,6 +211,29 @@ function cxTalents() {
             })
             .join(''),
       )
+      .join('')}</div>
+    ${closeRow()}</div>`);
+  cxBind(sh);
+}
+
+/** 连招谱：打出过的写名字和说明，没打出过的只给提示 / combo book: performed ones show name and text, the rest only a hint */
+function cxCombos() {
+  SFX.play('ui');
+  const T = L.ui.combo;
+  const N = L.ui.combos as Record<string, { n: string; d: string; h: string }>;
+  const got = COMBOS.filter((d) => comboSeen(d.id)).length;
+  const sh = sheetOpen(`<div class="sh cdx-sh" role="dialog" aria-label="${T.book}">${cxHead('combo', got, COMBOS.length)}
+    <p class="muted2">${T.how}</p>
+    <div class="tlist">${(['rx', 'ult', 'build'] as const)
+      .map((g) => {
+        const ds = COMBOS.filter((d) => d.g === g);
+        return `<div class="hs-h">${(T.groups as Record<string, string>)[g]} <small>${ds.filter((d) => comboSeen(d.id)).length} / ${ds.length}</small></div>${ds
+          .map((d) => {
+            const ok = comboSeen(d.id);
+            return `<div class="trow${ok ? '' : ' cx-lock'}" style="--gc:${d.c}"><div>${ok ? `<b style="color:${d.c}">${N[d.id].n}</b><span>${N[d.id].d}</span><em>${t('combo.found', { d: new Date(META.combos![d.id]).toLocaleDateString() })}</em>` : `${cxLock()}<span>${N[d.id].h}</span>`}</div></div>`;
+          })
+          .join('')}`;
+      })
       .join('')}</div>
     ${closeRow()}</div>`);
   cxBind(sh);

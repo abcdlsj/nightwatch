@@ -11,7 +11,7 @@ import { world, K, ex, ey } from './world';
 import { view } from './view';
 import { B, bt, later, emit, front, phased, dist, targets, near } from './battle';
 import { spawn, comboKill } from './enemies';
-import { react, was, streak, ultimate, refOf } from './combo';
+import { react, was, streak, ultimate, refOf, discover } from './combo';
 import { bookDmg } from './dmgsrc';
 import type { Enemy, Projectile } from './types';
 
@@ -243,7 +243,10 @@ export function reload(c: Card, n: number, from?: Card | null) {
 function showChain(n: number, c: Card) {
   if (n < 2) return;
   if (n === 5 || n === 9) view.say('hero', L.story.barks.chain, 1);
-  if (n >= 8) unlock('chain8');
+  if (n >= 8) {
+    unlock('chain8');
+    discover('echo8');
+  }
   if (n >= 11) unlock('chain11');
   if (n % 5 === 0) emit('chain', { n, c });
   view.chain(n);

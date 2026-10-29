@@ -52,6 +52,8 @@ export interface Meta {
   rotSel?: Record<string, number>;
   /** 每个人物打倒过的隐藏首领 / 走到第十五夜的次数 / hidden bosses each hero has beaten / times they reached night 15 */
   fullDone?: Record<string, { hidden?: number; quiet?: number }>;
+  /** 连招谱：第一次打出某个组合的时间 / combo book: when each combo was first performed */
+  combos?: Record<string, number>;
 }
 
 function loadMeta(): Meta {
@@ -313,3 +315,19 @@ export function foundSecret(id: string) {
     saveMeta();
   }
 }
+
+/** 打出一个组合：返回这局是不是第一次、是不是有史以来第一次（这局已经打出过就返回 null） / a combo happened: returns whether it is the first this run and the first ever (null if already seen this run) */
+export function foundCombo(id: string): { firstEver: boolean } | null {
+  const R = G.run;
+  if (R) {
+    const seen = (R.combos ||= []);
+    if (seen.includes(id)) return null;
+    seen.push(id);
+  }
+  const C = (META.combos ||= {});
+  if (C[id]) return { firstEver: false };
+  C[id] = Date.now();
+  saveMeta();
+  return { firstEver: true };
+}
+export const comboSeen = (id: string) => !!META.combos?.[id];

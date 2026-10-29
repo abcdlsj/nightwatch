@@ -73,3 +73,12 @@
 .t-grid .btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:17px;padding:10px 8px}
 .t-gear{position:absolute;top:calc(12px + var(--sat));right:12px;width:44px;height:44px;padding:0}
 .wg-sum{font-size:13px;color:#ffd166;text-align:center;min-height:1.2em}
+/* 连招谱：第一次打出组合时报名字 / combo book: name announced the first time a combo happens */
+#discover{position:absolute;left:8px;right:8px;top:24%;text-align:center;pointer-events:none;opacity:0;z-index:6;display:flex;flex-direction:column;align-items:center;gap:2px;--dc:#fff}
+#discover small{font-size:13px;color:#ffe79a;letter-spacing:2px}
+#discover b{font-weight:400;font-size:38px;color:var(--dc);text-shadow:0 4px 0 rgba(0,0,0,.6),0 0 18px var(--dc)}
+#discover span{font-size:14px;color:#fff;background:rgba(0,0,0,.55);padding:2px 10px;border-radius:8px}
+#discover.first b{font-size:46px}
+#discover.show{animation:discA 2.2s ease-out forwards}
+@keyframes discA{0%{opacity:0;transform:scale(1.6)}12%{opacity:1;transform:scale(1)}80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:translateY(-10px)}}
+@media (prefers-reduced-motion:reduce){#discover.show{animation:discF 2.2s linear forwards}@keyframes discF{0%,85%{opacity:1}100%{opacity:0}}}
