@@ -19,6 +19,19 @@ import { nightInfo } from '../../src/game/nights';
 import { makeWave } from '../../src/sim/waves';
 import { B, startBattle, simStep, settleWin } from '../../src/sim/battle';
 import { finalBosses, lastNight, jumpNights, nightKind } from '../../src/game/plan';
+import { curWorld, ws } from '../../src/game/world';
+import { enterWorld } from '../../src/mod/enter';
+import { applyMod } from '../../src/mod/apply';
+import spire from '../../mods/spire';
+import deal, { bestHand } from '../../mods/midnight-deal';
+
+/** 把仓库里的两个模组世界也装上（MODS=1 时跑它们的人物） / also load the repo's two mod worlds (their heroes run with MODS=1) */
+let modsOn = false;
+export function loadWorldMods() {
+  if (modsOn) return;
+  modsOn = true;
+  for (const m of [deal, spire]) applyMod(m);
+}
 
 export type Focus = Tag | 'any';
 
@@ -202,8 +215,8 @@ function prep(focus: Focus) {
     rollDoors();
     const rich = G.gold >= 14;
     /* 墙掉了四成以上先去补 / if the wall has lost 40% or more, repair first */
-    const hurt = G.wall < G.wallMax * 0.6 ? ['spring', 'camp'] : [];
-    const pref = [...hurt, ...SHOP_FOR[focus], ...(rich ? ['black', 'grocer'] : []), 'shop', 'giant', 'altar', 'field', 'manual', 'train', 'grocer', 'chest', 'parcel', 'black', 'armory', 'forge', 'storm', 'smith', 'frostshop', 'apothecary', 'job', 'bank'];
+    const hurt = G.wall < G.wallMax * 0.6 ? ['spring', 'camp', 'sp_campfire'] : [];
+    const pref = [...hurt, ...SHOP_FOR[focus], ...(rich ? ['black', 'grocer'] : []), 'shop', 'giant', 'altar', 'field', 'manual', 'train', 'grocer', 'chest', 'parcel', 'black', 'armory', 'forge', 'storm', 'smith', 'frostshop', 'apothecary', 'job', 'bank', 'dl_planet', 'sp_campfire'];
     /* 不在偏好表里的门（机器人不会处理）排最后 / doors not in the preference table (which the bot cannot handle) come last */
     const rank = (id: string) => (pref.includes(id) ? pref.indexOf(id) : 999);
     const d = G.prep.doors.slice().sort((a, b) => rank(a) - rank(b))[0];
@@ -241,6 +254,19 @@ function prep(focus: Focus) {
     else if (d === 'camp' && hurt.length) G.wall = Math.min(G.wallMax, G.wall + 6);
     else if (d === 'manual') buyFrom([0, 1].map(() => makeOffer((it) => it.hero === G.hero && it.t >= Math.min(1, freeCap()), { free: 1 })), focus, true);
     else if (d === 'job') G.gold += 3;
+    /* 模组世界里的两个常见事件 / two common mod-world events */
+    else if (d === 'sp_campfire') {
+      const c = G.cards.filter((x) => x.tier < 2 && x.loc === 'board').sort((a, b) => cardScore(b, focus) - cardScore(a, focus))[0];
+      if (hurt.length || !c) G.wall = Math.min(G.wallMax, G.wall + Math.round(G.wallMax * 0.3));
+      else {
+        c.tier++;
+        checkMerges();
+      }
+    } else if (d === 'dl_planet') {
+      const lv = (ws().lv ||= {});
+      const h = bestHand();
+      lv[h] = (lv[h] || 1) + 1;
+    }
     else if (d === 'bank') G.gold += Math.max(2, Math.min(10, Math.round(G.gold * 0.3)));
     arrange(focus);
   }
@@ -300,8 +326,10 @@ export function playRun(hero: string, focus: Focus, seed: number, opts: { heat?:
   const H = HEROES[hero];
   Object.assign(G, {
     hero, seed, heat: opts.heat || 0, run: freshRun(), round: 1, maxRound: 9, endless: false, lock: null, fightWave: null, gold: H.gold, wall: H.wall, wallMax: H.wall,
-    cards: [], relics: [], skills: [], bestChain: 0, secret: {}, seenFoes: {}, foeSet: pick(Object.keys(FOESETS)), speed: 1, full: !!opts.full, gems: {}, arc: 0, wind: '', windRelic: false,
+    cards: [], relics: [], skills: [], bestChain: 0, secret: {}, seenFoes: {}, foeSet: '', ws: {}, speed: 1, full: !!opts.full, gems: {}, arc: 0, wind: '', windRelic: false,
   });
+  G.foeSet = curWorld()?.foeSet || pick(Object.keys(FOESETS).filter((k) => !FOESETS[k].world));
+  enterWorld();
   G.boss9 = pick(finalBosses());
   G.boss12 = pick(finalBosses().filter((k) => k !== G.boss9));
   G.maxRound = lastNight();
@@ -316,6 +344,7 @@ export function playRun(hero: string, focus: Focus, seed: number, opts: { heat?:
   const last = lastNight();
   for (let r = 1; r <= last; r++) {
     G.round = r;
+    curWorld()?.night?.();
     prep(focus);
     if (nightKind(r) === 'quiet') break;
     const n = battle(r);

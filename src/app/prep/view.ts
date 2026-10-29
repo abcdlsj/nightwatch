@@ -61,7 +61,7 @@ export function renderPreview() {
   const pathN = (h: string, id: string) => pathsOf(h).find((p) => p.id === id)?.n || id;
   const R = G.rot;
   const varLine =
-    (curWorld()?.note?.() || '') +
+    ((n) => (n ? n + '<br>' : ''))(curWorld()?.note?.()) +
     (G.omen ? `<b class="omen">${t('prep.omenLine', { n: OMENS[G.omen].n, d: OMENS[G.omen].d })}</b><br>` : '') +
     (R && R.off
       ? `<b class="omen">${R.gh ? t('prep.rotLine', { off: pathN(G.hero, R.off), h: HEROES[R.gh].n, p: pathN(R.gh, R.gp) }) : t('prep.rotLineSolo', { off: pathN(G.hero, R.off) })}</b><br>`

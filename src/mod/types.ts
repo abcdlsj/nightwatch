@@ -71,6 +71,8 @@ export interface ModPack {
   voices?: Record<string, { img: string; c: string; n: string }>;
   /** 公共剧情的补充（新首领的当夜剧情、台词、黎明第一句……），按 src/locales/zh-CN/story.ts 的结构合并 / additions to the shared story (a new boss's night scene, barks, dawn's first line…), merged in the shape of src/locales/zh-CN/story.ts */
   story?: Record<string, any>;
+  /** 自己的修正项：键 → 说明 n（show：0 数值、1 百分比、2 只显示说明（默认）、3 独立乘区；inv：越小越好）。遗物、天赋的 m 里就能写这个键，钩子里用 mv('键') 读 / own modifier keys: key → text n (show: 0 number, 1 percent, 2 text only (default), 3 independent multiplier; inv: lower is better). Relics' and talents' m may then use the key; read it in hooks with mv('key') */
+  mods?: Record<string, { n: string; show?: number; inv?: number }>;
   /** 世界：人物写 def.world 就进这个世界（见 src/game/world.ts） / worlds: a hero with def.world plays in it (see src/game/world.ts) */
   worlds?: Record<string, Omit<WorldDef, 'id'>>;
   /** 敌人套：按角色替换小怪，和霜潮一样（world 写了就只在那个世界出） / enemy sets: replace adds by role like Frost Tide (with world, only in that world) */

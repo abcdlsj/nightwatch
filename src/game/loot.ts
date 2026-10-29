@@ -199,7 +199,7 @@ export function rollGear(n: number, bonus?: number, maxTier?: number) {
   }
   return out;
 }
-const gearOk = (k: string) => inWorld(RELICS[k], 'relics') && !RELICS[k].fit && !RELICS[k].gem && !RELICS[k].rule && (!RELICS[k].hero || RELICS[k].hero === G.hero) && !(RELICS[k].u && G.relics.includes(k));
+const gearOk = (k: string) => inWorld(RELICS[k], 'relics') && !RELICS[k].fit && !RELICS[k].noPool && !RELICS[k].gem && !RELICS[k].rule && (!RELICS[k].hero || RELICS[k].hero === G.hero) && !(RELICS[k].u && G.relics.includes(k));
 /** 规则遗物三选一：第 2、6 夜守住之后（第 3、7 夜备战开头） / rule relics, three to choose from: after holding nights 2 and 6 (at the start of prep for nights 3 and 7) */
 export const RULE_NIGHTS = [3, 7];
 /** 规则遗物对不对路：用得上的权重 ×3（不对路的也可能出，给换打法留余地） / whether a rule relic suits the board: usable ones get ×3 weight (others can still show up, leaving room to pivot) */

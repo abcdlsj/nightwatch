@@ -19,7 +19,7 @@ import { WORLDS, HERO_HOOKS, HERO_STATS, ENEMY_HOOKS, EVENT_CODE } from '../game
 import { deepMerge, baseStory } from './enter';
 import type { ModPack, ModReport } from './types';
 
-const FX = ['knife', 'spark', 'ice', 'bolt', 'rock', 'none', 'arrow', 'axe', 'shell', 'quake', 'flame', 'bell', 'blizzard', 'sting', 'gas', 'meteor', 'slash', 'fslash', 'firefly', 'sweep', 'avalanche', 'discharge'];
+const FX = ['knife', 'spark', 'ice', 'bolt', 'rock', 'none', 'arrow', 'axe', 'shell', 'quake', 'flame', 'bell', 'blizzard', 'sting', 'gas', 'meteor', 'slash', 'fslash', 'firefly', 'sweep', 'avalanche', 'discharge', 'rain'];
 const KINDS = ['weapon', 'firearm', 'potion', 'gadget', 'lamp', 'sky'];
 const SHAPE = /^[a-z]+:[A-Za-z]$/;
 /** 跃迁事件可以借用的玩法（见 src/app/prep/jumps.ts） / leap gameplay a mod may borrow (see src/app/prep/jumps.ts) */
@@ -85,6 +85,18 @@ export function applyMod(pack: ModPack): ModReport {
     }
     INTENTS[k] = f;
     count('intents');
+  }
+
+  /* ---- 自己的修正项：遗物、天赋、天性里用，钩子里 mv('键') 读 ---- / ---- Own modifier keys: used by relics, talents and natures, read with mv('key') in hooks ---- */
+  for (const [k, md] of Object.entries(pack.mods || {})) {
+    if (clash(MODL, k, '修正项')) continue;
+    if (!md.n) {
+      err(`修正项「${k}」：缺说明 n`);
+      continue;
+    }
+    MODL[k] = md.inv ? [md.show ?? 2, 1] : [md.show ?? 2];
+    TEXT.push(() => ((L.terms.mods as Record<string, string>)[k] = md.n));
+    count('mods');
   }
 
   /* ---- 世界 ---- / ---- Worlds ---- */

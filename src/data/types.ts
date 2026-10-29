@@ -185,6 +185,8 @@ export interface RelicDef {
   fit?: number;
   /** 规则遗物：改玩法，不进普通遗物池，第 2、6 夜后三选一 / rule relic: changes how play works; not in the normal pool, offered three-choose-one after nights 2 and 6 */
   rule?: number;
+  /** 不进任何随机池，只能靠事件、剧情给（模组用） / never in any random pool; only events or story grant it (for mods) */
+  noPool?: number;
   /** 完整游戏线的宝石（red / blue / green），只在剧情里给 / full game line gems (red / blue / green), granted only through story */
   gem?: string;
   n: string; f: string;

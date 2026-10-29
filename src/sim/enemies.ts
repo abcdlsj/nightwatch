@@ -367,7 +367,7 @@ export const INTENTS: Record<string, IntentFn> = {
   /** 摸金：偷走 v 金（打倒她连本带利还回来） / pickpocket: steal v gold (beat her and it returns with interest) */
   pilfer: (e, v) => {
     const b = bt();
-    const n = Math.min(G.gold, v ?? 2);
+    const n = Math.max(0, Math.min(G.gold, v ?? 2));
     if (!n) return;
     G.gold -= n;
     b.flags.stolen = (b.flags.stolen || 0) + n;

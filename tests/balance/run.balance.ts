@@ -8,17 +8,21 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { initLocale } from '../../src/i18n';
 import { setOnEnd } from '../../src/sim/battle';
 import { HEROES } from '../../src/data/heroes';
-import { playRun, type Focus, type RunLog } from './bot';
+import { playRun, loadWorldMods, type Focus, type RunLog } from './bot';
 
 const RUNS = +(process.env.RUNS || 20);
 const FOCI = (process.env.FOCUS || 'blade,fire,ice,volt,mech,poison,any').split(',') as Focus[];
 const HEAT = +(process.env.HEAT || 0);
 /** FULL=1：跑完整游戏线（15 夜） / FULL=1: run the full game line (15 nights) */
 const FULL = !!+(process.env.FULL || 0);
+/** MODS=1：把模组世界的人物也跑上；HERO=a,b 只跑这几个人物 / MODS=1: include mod-world heroes; HERO=a,b runs only these heroes */
+const MODS = !!+(process.env.MODS || 0);
+const ONLY = (process.env.HERO || '').split(',').filter(Boolean);
 
 beforeAll(() => {
   initLocale();
   setOnEnd(() => {});
+  if (MODS) loadWorldMods();
 });
 
 it('平衡报告', () => {
@@ -26,7 +30,7 @@ it('平衡报告', () => {
   const rows: string[] = [];
   for (const focus of FOCI) {
     const mine: RunLog[] = [];
-    for (const hero of Object.keys(HEROES)) for (let i = 0; i < RUNS; i++) mine.push(playRun(hero, focus, 1000 * i + hero.length * 7 + 13, { heat: HEAT, full: FULL }));
+    for (const hero of Object.keys(HEROES).filter((h) => (!ONLY.length || ONLY.includes(h)) && (MODS || !HEROES[h].world))) for (let i = 0; i < RUNS; i++) mine.push(playRun(hero, focus, 1000 * i + hero.length * 7 + 13, { heat: HEAT, full: FULL }));
     logs.push(...mine);
     const win = mine.filter((r) => r.win).length / mine.length;
     const avg = mine.reduce((s, r) => s + (r.win ? r.night + 1 : r.night), 0) / mine.length;
