@@ -9,7 +9,7 @@
 .relic{flex:none;width:32px;height:32px;border:0;border-radius:8px;background:var(--panel);box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 0 0 2px rgba(208,166,255,.35);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
 .relic{position:relative;box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 0 0 2px var(--gc,#d0a6ff)!important}
 .relic img{width:16px;height:16px;image-rendering:pixelated}
-.relic sub{position:absolute;right:-3px;bottom:-4px;font-family:var(--px);font-size:11px;background:#1a1c2c;color:#fff;border-radius:4px;padding:0 3px;line-height:14px}
+.relic sub{position:absolute;right:-3px;bottom:-4px;font-family:var(--px);font-size:var(--fs-small);background:#1a1c2c;color:#fff;border-radius:4px;padding:0 3px;line-height:14px}
 .relic.new{animation:bump .4s 3}
 .steps{margin-left:auto;display:flex;gap:7px;align-self:center}
 .steps i{display:block;width:9px;height:9px;background:rgba(255,255,255,.18);transform:rotate(45deg)}
@@ -29,7 +29,7 @@
 .door div,.opt div{display:flex;flex-direction:column;gap:3px;min-width:0}
 .door b{font-weight:400;font-size:20px;color:var(--cc)}
 .door span{font-size:15px}
-.door em,.ev-head em,.opt em,.flav{font-family:var(--body);font-size:12px;color:#8fa4ab;line-height:1.4}
+.door em,.ev-head em,.opt em,.flav{font-family:var(--body);font-size:var(--fs-body);color:#8fa4ab;line-height:1.4}
 .nextstop{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
 .nextstop i{font-style:normal;display:flex;align-items:center;gap:3px;color:var(--cc,#c9d4d8);background:rgba(0,0,0,.25);border-radius:7px;padding:2px 7px 2px 3px}
 .nextstop img{width:18px;height:18px;image-rendering:pixelated}
@@ -47,12 +47,12 @@
 .opt .oc{flex:none;display:flex;justify-content:center;min-width:46px}
 .opt .oc .card.static{pointer-events:none;height:78px}
 .opt b{font-weight:400;font-size:17px}
-.opt span{font-family:var(--body);font-size:12px;color:#c5d2d6;line-height:1.4}
+.opt span{font-family:var(--body);font-size:var(--fs-body);color:#c5d2d6;line-height:1.4}
 /* 图标都是 16 格，显示尺寸取整倍（32 / 48），不糊 / icons are all 16 cells; display sizes are integer multiples (32 / 48) to stay crisp */
 .ricon{width:44px;height:44px;image-rendering:pixelated;background:rgba(0,0,0,.3);border-radius:10px;padding:6px;flex:none;box-shadow:inset 0 0 0 2px var(--gc,transparent)}
-.mg,.mb{display:block;font-style:normal;font-family:var(--body);font-size:12px;line-height:1.45}
+.mg,.mb{display:block;font-style:normal;font-family:var(--body);font-size:var(--fs-body);line-height:1.45}
 .mg{color:#8ff0b0}.mb{color:#ff8a80}
-.gt{font-size:11px;margin-left:6px;padding:1px 5px;border-radius:4px;background:rgba(255,255,255,.1);color:var(--gc,#c5d2d6);vertical-align:middle}
+.gt{font-size:var(--fs-small);margin-left:6px;padding:1px 5px;border-radius:4px;background:rgba(255,255,255,.1);color:var(--gc,#c5d2d6);vertical-align:middle}
 .gt.fit{background:rgba(126,232,162,.18);color:#7ee8a2}
 .opt .price{margin:0 0 0 auto;flex:none;color:#ffd166;font-family:var(--px);font-size:16px}
 .opt .price.cant{color:#b08a70}
@@ -71,5 +71,5 @@
 /* 事件稀有度：图标描边和名字后的小签 / event rarity: icon outline and a small tag after the name */
 .door{--rc:transparent}.door.rar1{--rc:#5aa9ff}.door.rar2{--rc:#b77cff}.door.rar3{--rc:#ff5a5a}
 .door.rar1 img,.door.rar2 img,.door.rar3 img{box-shadow:0 0 0 2px var(--rc),0 0 10px var(--rc)}
-.door .rarl{font-style:normal;font-family:var(--body);font-size:11px;color:#fff;background:var(--rc);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.door .rarl{font-style:normal;font-family:var(--body);font-size:var(--fs-small);color:#fff;background:var(--rc);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:middle}
 .nextstop i.rar1 img{box-shadow:0 0 0 1px #5aa9ff}.nextstop i.rar2 img{box-shadow:0 0 0 1px #b77cff}.nextstop i.rar3 img{box-shadow:0 0 0 1px #ff5a5a}

@@ -13,11 +13,15 @@ export interface Settings {
   tips: boolean;
   /** 匿名统计 / anonymous stats */
   stats: boolean;
+  /** 大字：说明文字调大 / large text: bigger body text */
+  big: boolean;
+  /** 扫描线（屏幕上的横纹和暗角） / scanlines (horizontal lines and vignette over the screen) */
+  crt: boolean;
 }
 
 function load(): Settings {
   const old = +(store.get(KEYS.audio) || 0) || 0;
-  const d: Settings = { music: old === 0, sfx: old < 2, haptics: true, shake: true, nums: true, tips: true, stats: true };
+  const d: Settings = { music: old === 0, sfx: old < 2, haptics: true, shake: true, nums: true, tips: true, stats: true, big: false, crt: true };
   return Object.assign(d, store.json<Partial<Settings>>(KEYS.settings, {}));
 }
 export const SETTINGS: Settings = load();

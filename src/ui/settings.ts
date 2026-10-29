@@ -1,6 +1,6 @@
-/* 设置页：声音、震动、震屏、伤害数字、新手提示、清除进度 / Settings page: sound, haptics, screen shake, damage numbers, tutorial hints, clear progress */
+/* 设置页：声音、震动、震屏、伤害数字、大字、扫描线、新手提示、清除进度 / Settings page: sound, haptics, screen shake, damage numbers, large text, scanlines, tutorial hints, clear progress */
 import { L, t, lang, languages, LANG_NAMES } from '../i18n';
-import { SETTINGS, setSetting, type Settings } from '../platform/settings';
+import { SETTINGS, setSetting, onSettings, type Settings } from '../platform/settings';
 import { store, KEYS } from '../platform/storage';
 import { SFX } from '../audio/sfx';
 import { buzz } from '../audio/settings';
@@ -12,11 +12,20 @@ import { apiOn } from '../platform/api';
 
 const VERSION = __APP_VERSION__;
 
+/* 大字、扫描线：挂在 <html> 的 class 上，样式见 base.css / large text and scanlines: classes on <html>, styled in base.css */
+function applyLook(st: Settings) {
+  const c = document.documentElement.classList;
+  c.toggle('big', st.big);
+  c.toggle('no-crt', !st.crt);
+}
+applyLook(SETTINGS);
+onSettings(applyLook);
+
 /** onQuit：对局中打开时传入，多出「结算这局」 / onQuit: passed when opened mid-run, adds an "end this run" button */
 export function openSettings(onReset?: () => void, onQuit?: () => void) {
   SFX.play('ui');
   const T = L.ui.settings;
-  const rows: (keyof Settings)[] = ['music', 'sfx', 'haptics', 'shake', 'nums', 'tips', ...(apiOn() ? (['stats'] as const) : [])];
+  const rows: (keyof Settings)[] = ['music', 'sfx', 'haptics', 'shake', 'nums', 'big', 'crt', 'tips', ...(apiOn() ? (['stats'] as const) : [])];
   const sh = sheetOpen(`<div class="sh" role="dialog" aria-label="${T.title}"><h3>${T.title}</h3>
     <div class="tlist set-list">${rows
       .map((k) => `<button class="trow set-row" data-k="${k}"><div><b>${(T as any)[k]}</b><span>${(T as any)[k + 'D']}</span></div><i class="tog${SETTINGS[k] ? ' on' : ''}" aria-hidden="true"></i></button>`)
