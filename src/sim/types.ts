@@ -26,6 +26,10 @@ export interface Enemy {
   dashT: number; hardT: number;
   /** 上弦：快一半的剩余秒数 / wind-up: roughly half the remaining seconds */
   rushT?: number;
+  /** 模组敌人：几秒内不动 / mod enemies: stand still for this many seconds */
+  holdT?: number;
+  /** 模组敌人自己记的东西 / whatever a mod enemy keeps for itself */
+  m?: Record<string, any>;
   /** 当前意图序号和倒计时 / current intent index and countdown */
   ii: number; it: number;
   dead: boolean;

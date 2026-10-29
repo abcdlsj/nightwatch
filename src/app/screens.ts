@@ -1,4 +1,5 @@
 /* 整屏页面：标题、选人、起手三选一、结局 / full-screen pages: title, hero select, opening choice, ending */
+import { WORLDS } from '../game/world';
 import { ITEMS, ADJ, TIERS, normAdj } from '../data/cards';
 import { HEROES, KITS } from '../data/heroes';
 import { ACH, OMENS } from '../data/meta';
@@ -160,7 +161,7 @@ export function heroSelect() {
     <div class="htag">${T.locked}</div><p>${t('heroes.unlockBy', { h: HEROES[heroNeeds(k)].n })}</p></button>`;
       const hh = heatOf(k).max;
       return `<button class="hero" data-h="${k}" style="--hc:${H.col}"><img class="por" src="${spr(H.portrait).url}" alt=""><div class="hn"><b>${H.n}</b><small>${H.title}</small></div>
-    <div class="htag">${H.tag}</div><div class="hstat"><span>${T.wall} <b>${H.wall}</b></span><span>${T.gold} <b>${H.gold}</b></span>${mastHtml(k)}${hh ? `<span>${t('heroes.heat', { h: hh })}</span>` : ''}</div><p>${H.desc}</p>
+    <div class="htag">${H.tag}</div>${H.world && WORLDS[H.world] ? `<div class="hworld">${t('heroes.world', { n: WORLDS[H.world].n })}</div>` : ''}<div class="hstat"><span>${T.wall} <b>${H.wall}</b></span><span>${T.gold} <b>${H.gold}</b></span>${mastHtml(k)}${hh ? `<span>${t('heroes.heat', { h: hh })}</span>` : ''}</div><p>${H.desc}</p>
     ${H.sig ? `<div class="hsig"><b>${L.ui.heroes.sig} · ${H.sig}</b><span>${H.sigD}</span></div>` : ''}
     ${pathsHtml(k)}
     <em>“${H.intro}”</em></button>`;

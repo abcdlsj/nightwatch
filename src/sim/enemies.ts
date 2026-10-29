@@ -18,6 +18,7 @@ import { hurt } from './combat';
 import { frenzy } from './combo';
 import type { Enemy } from './types';
 import type { Card } from '../game/state';
+import { ENEMY_HOOKS } from '../game/world';
 
 const wg = (k: string) => !!B && B.wagers.includes(k);
 
@@ -35,6 +36,7 @@ export function spawn(type: string, x?: number | null, y?: number | null): Enemy
   };
   e.x0 = e.x;
   b.en.push(e);
+  ENEMY_HOOKS[type]?.spawn?.(e);
   if ((d.boss || d.elite || d.big) && !b.flags['met' + type]) {
     b.flags['met' + type] = 1;
     later(1.2, () => view.say('hero', L.story.barks.elite, 2));
@@ -130,6 +132,12 @@ export function enemyStep(dt: number) {
         if (e.dead) continue;
       }
     }
+    const EH = ENEMY_HOOKS[e.type];
+    if (EH?.step) {
+      EH.step(e, dt);
+      if (b.over) return;
+      if (e.dead) continue;
+    }
     if (e.d.intents) {
       e.it -= dt;
       if (e.it <= 0) {
@@ -153,6 +161,11 @@ export function enemyStep(dt: number) {
     if (e.frzT > 0) {
       e.frzT -= dt;
       sp = 0;
+    }
+    /* 模组敌人「按兵不动」（比如睡着的） / a mod enemy holding still (asleep, say) */
+    if (e.holdT) {
+      e.holdT = Math.max(0, e.holdT - dt);
+      if (e.holdT > 0) sp = 0;
     }
     if (e.d.lob && e.y >= e.d.stopAt! - 0.02) {
       e.lobT -= dt;

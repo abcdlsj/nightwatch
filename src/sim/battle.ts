@@ -20,6 +20,7 @@ import { trigger, stepProj, canFire, hurt } from './combat';
 import { foldDmg } from './dmgsrc';
 import { spawn, enemyStep, stepERocks, surge } from './enemies';
 import type { Battle, Enemy } from './types';
+import { runHooks, ENEMY_HOOKS } from '../game/world';
 
 export let B: Battle | null = null;
 /** 战斗结束时调用（界面层接管后续流程：战报、拦路结算、城破……） / called at battle end (the UI layer takes over the rest: report, roadblock result, breach…) */
@@ -69,6 +70,15 @@ export function emit(ev: string, x: Record<string, any> = {}) {
     if (!h) continue;
     if (!evOk(B.rlog, 'T' + s + ev, 8)) continue;
     h(x);
+    if (B.over) return;
+  }
+  /* 模组：世界和人物的钩子、敌人自己的钩子 / mods: world and hero hooks, and enemies' own hooks */
+  if (evOk(B.rlog, 'W' + ev, 240)) runHooks(ev, x);
+  if (B.over) return;
+  for (const e of B.en) {
+    const h = !e.dead && ENEMY_HOOKS[e.type]?.on?.[ev];
+    if (!h) continue;
+    h(e, x);
     if (B.over) return;
   }
 }
@@ -263,6 +273,7 @@ export function finish(result: 'win' | 'lose') {
   b.over = true;
   b.result = result;
   if (result === 'lose') G.wall = b.ambush ? Math.max(1, G.wall) : 0;
+  runHooks('end', { b, result });
   onEnd(b);
 }
 

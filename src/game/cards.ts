@@ -7,6 +7,7 @@ import { G, type Card, type CardSpec, type Zone } from './state';
 import { mv } from './mods';
 import { TUNE } from './tuning';
 import { AWAKEN_NIGHT } from '../data/heroes';
+import { statHooks } from './world';
 
 let UID = 1;
 
@@ -172,8 +173,19 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
     U = UPS[it.up];
   const T = L.ui.stats;
   const base = Math.round((it.dmg * U.d[s] + (it.dmg > 0 ? (c.grow || 0) + (c.stk || 0) : 0)) * 10) / 10;
-  const flat = 0;
+  let flat = 0;
   const pct: [string, number][] = [];
+  /* 模组世界和人物的数值钩子（力量、牌型……） / mod world and hero stat hooks (strength, poker hands…) */
+  let hookSpd = 0;
+  const hx: [string, number][] = [];
+  for (const f of statHooks()) {
+    const r = f(c, it);
+    if (!r) continue;
+    if (r.flat && it.dmg > 0) flat += r.flat;
+    if (r.spd) hookSpd += r.spd;
+    if (r.xs) hx.push(...r.xs);
+    if (r.pct) pct.push(...r.pct);
+  }
   if (a === 'heavy') pct.push([ADJ.heavy.n, 0.5]);
   /* 钟摆越摆越狠；主发条越被上弦越狠 / the pendulum hits harder each swing; the mainspring hits harder the more it is wound */
   if (it.swing && (c as Card).sw) pct.push([L.ui.stats.swing + '×' + (c as Card).sw, it.swing[0] * (c as Card).sw!]);
@@ -252,6 +264,7 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
   xm('xtag_' + it.tag, T.bonus + '·' + L.terms.tags[it.tag]);
   /* 星遥觉醒「北辰」：C 位从觉醒那夜起每夜再乘一截 / Li's Pole Star: the carry multiplies again each night from the awakening on */
   if (c.carry && mv('carryGrow')) xs.push([T.poleStar, (1 + mv('carryGrow')) ** Math.max(1, G.round - AWAKEN_NIGHT + 1)]);
+  xs.push(...hx);
   const mult = xs.reduce((m, x) => m * x[1], 1);
   const total = (base + flat) * Math.max(0.1, 1 + psum) * mult;
   let cd = it.cd * U.c[s];
@@ -268,7 +281,7 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
   if (mv('t_last') && G.wall < G.wallMax * 0.35) spd += 0.25;
   if (mv('smallHaste') && it.size === 1 && c.loc === 'board') spd += mv('smallHaste') * smallN();
   if (mv('vetCd')) spd += mv('vetCd') * vn;
-  spd = Math.max(0.3, spd + mv('spd') + fitSpd(c as Card));
+  spd = Math.max(0.3, spd + mv('spd') + fitSpd(c as Card) + hookSpd);
   /* 军旗手：相邻的兵器卡暴击率加一截 / Standard-Bearer: adjacent weapon cards gain crit chance */
   let critNb = 0;
   if (it.kind === 'weapon' && c.loc === 'board') for (const n of c.nb || neighbors(c as Card)) critNb += (ITEMS[n.key].critNb || 0) * (1 + 0.5 * stepOf(n));
@@ -309,4 +322,4 @@ export function setCarry(c: Card) {
 /* ---------------- 价格 ---------------- / ---------------- Price ---------------- */
 export const basePrice = (k: string, adj: string | null, tier: number) =>
   [3, 7, 13, 22][tier] + (ITEMS[k].size - 1) + (adj ? [1, 2, 3][ADJ[adj].r] : 0);
-export const sellValue = (c: Card) => Math.max(1, Math.floor(basePrice(c.key, c.adj, c.tier) / 2)) + c.hoard;
+export const sellValue = (c: Card) => ITEMS[c.key].noSell ? 0 : Math.max(1, Math.floor(basePrice(c.key, c.adj, c.tier) / 2)) + c.hoard;

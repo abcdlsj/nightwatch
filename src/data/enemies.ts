@@ -858,7 +858,7 @@ export const FACTIONS = [
 ] as const;
 
 /** 两套敌人：霜潮按角色一一替换原来那套 / two enemy sets: Frost Tide replaces the original set role for role */
-export const FOESETS: Record<string, { map: Record<string, string>; n: string }> = {
+export const FOESETS: Record<string, { map: Record<string, string>; n: string; /** 只在这个模组世界里用 / only used in this mod world */ world?: string }> = {
  "dark": {
   "map": {}
  },

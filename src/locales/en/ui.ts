@@ -280,6 +280,7 @@ export default {
     gotRelic: 'Got relic: {n}',
     noGold: 'Not enough gold',
     noRoom: 'No room',
+    noSell: 'This one cannot be sold',
     bagFull: 'Bag is full',
     noFit: 'Won\'t fit',
     sold: 'Sold for {n} gold',
@@ -601,6 +602,7 @@ export default {
   },
 
   heroes: {
+    world: 'Mod world · {n}',
     title: 'Pick a watcher',
     back: 'Back',
     heat: 'Long Night {h}',

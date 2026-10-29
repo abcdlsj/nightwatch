@@ -22,11 +22,18 @@ export let lang = 'zh-CN';
 
 export const languages = () => Object.keys(PACKS);
 
+/** 换语言前后要做的事（模组把自己的文字和世界剧情重新挂上去） / work to do around a language switch (mods re-attach their text and world story) */
+export const beforeLocale: (() => void)[] = [];
+export const afterLocale: (() => void)[] = [];
+
 export async function setLocale(code: string) {
   const load = PACKS[code] || PACKS['zh-CN'];
-  L = await load();
+  const next = await load();
+  for (const f of beforeLocale) f();
+  L = next;
   lang = PACKS[code] ? code : 'zh-CN';
   applyLocale(L);
+  for (const f of afterLocale) f();
 }
 
 /** 同步初始化（默认语言已经打进包里） / synchronous init (the default language is already in the bundle) */

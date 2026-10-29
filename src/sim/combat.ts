@@ -14,6 +14,7 @@ import { spawn, comboKill } from './enemies';
 import { react, was, streak, ultimate, refOf, discover } from './combo';
 import { bookDmg } from './dmgsrc';
 import type { Enemy, Projectile } from './types';
+import { ENEMY_HOOKS } from '../game/world';
 
 /* ---------------- 触发与连锁 ---------------- / ---------------- Triggers and chains ---------------- */
 /** 这张卡现在能不能再触发（离上次触发够不够一个普朗克时间） / whether this card can trigger again now (whether one Planck time has passed) */
@@ -752,6 +753,12 @@ export function hurt(e: Enemy, amt: number, src: Card | null, crit: boolean, o: 
   const w0 = was(e);
   let a = Math.max(1, amt - Math.max(0, e.armor + e.armorB + (e.hardT > 0 ? 10 : 0) - (o.pen || 0) - mv('pen')));
   if (o.burnTick || o.poisonTick || o.rx) a = Math.max(1, amt);
+  /* 模组敌人可以改自己吃到的伤害（每秒封顶、换形态……） / a mod enemy may adjust the damage it takes (per-second caps, form shifts…) */
+  const EH = ENEMY_HOOKS[e.type];
+  if (EH?.hurt) {
+    a = EH.hurt(e, a, { src, crit, o });
+    if (!(a > 0)) return;
+  }
   if (e.shield > 0) {
     const s = Math.min(e.shield, a);
     e.shield -= s;
@@ -851,6 +858,7 @@ export function kill(e: Enemy, src: Card | null) {
   if (karl) G.secret.karlKill = 1;
   e.dead = true;
   b.kills++;
+  ENEMY_HOOKS[e.type]?.die?.(e);
   codexKill(e.type);
   view.sfx('kill');
   comboKill(e);

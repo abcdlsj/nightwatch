@@ -34,7 +34,8 @@ export interface DailySpec {
 }
 export function dailySpec(day = dayKey()): DailySpec {
   const n = dayNum(day);
-  const heroes = HERO_ORDER.filter((h) => HEROES[h]);
+  /* 每日挑战只轮原版和不带世界的人物：模组世界各家部署不一样，排行榜没法比 / the daily only rotates heroes outside mod worlds: worlds differ per deployment, so leaderboards could not compare */
+  const heroes = HERO_ORDER.filter((h) => HEROES[h] && !HEROES[h].world);
   return { day, seed: dailySeed(day), hero: heroes[n % heroes.length], heat: HEATS[n % HEATS.length] };
 }
 

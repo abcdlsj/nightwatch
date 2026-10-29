@@ -24,6 +24,8 @@ export interface Card {
   /** 艾拉「老规矩」：在 vetAt 这一格连着守了几夜 / Ayla's Old Habits: how many nights in a row it has held slot vetAt */
   vet?: number;
   vetAt?: number;
+  /** 花色：模组可以给单张卡另记一个元素（只给模组规则读，不改卡本身的元素） / suit: a mod may note another element on one card (read only by mod rules; the card's own element is unchanged) */
+  suit?: string;
   /** 卡面闪光动画的错开延迟（纯表现） / staggered delay for the card-face flash animation (cosmetic) */
   dl: string | number;
   /* ---- 战斗中 ---- / ---- In battle ---- */
@@ -203,6 +205,8 @@ export interface GameState {
   lock: Offer | null;
   seenFoes: Record<string, number>;
   secret: Record<string, number>;
+  /** 模组世界自己的局内状态（见 game/world.ts 的 ws()） / a mod world's own run state (see ws() in game/world.ts) */
+  ws?: Record<string, any>;
   /** 本局风向：这个元素的卡、专卖店、遗物更常见（空串表示没有） / this run's wind: cards, specialty shops and relics of this element show up more ('' for none) */
   wind: Tag | '';
   /** 第二个风向（异象「双风」） / a second wind (the 'Twin Winds' omen) */

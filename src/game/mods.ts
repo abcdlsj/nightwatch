@@ -29,3 +29,6 @@ export function recalcMods() {
 }
 
 export const mv = (k: string) => M[k] || 0;
+
+/** 钱够不够花：修正项 debt 允许欠几金（账房、信用卡） / whether you can pay: the debt modifier allows going that many gold below zero */
+export const afford = (n: number) => G.gold + mv('debt') >= n;

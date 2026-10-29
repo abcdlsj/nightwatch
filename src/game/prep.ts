@@ -8,10 +8,11 @@ import { WAGERS } from '../data/meta';
 import { rand, rnd, pick, shuffled } from '../core/rng';
 import { clamp } from '../core/util';
 import { G, type Card, type Offer, type Wave, type Zone } from './state';
-import { recalcMods, mv } from './mods';
+import { recalcMods, mv, afford } from './mods';
 import { newCard, firstFit, countSame, zoneN, occ } from './cards';
 import { talentOk, homeOk, type ItemFilter } from './loot';
 import { foeKey } from './foes';
+import { inWorld, curWorld, EVENT_CODE } from './world';
 
 /* ---------------- 备战事件的条件 ---------------- / ---------------- Prep event conditions ---------------- */
 export const EVENT_FILTER: Record<string, ItemFilter> = {
@@ -24,7 +25,7 @@ export const EVENT_FILTER: Record<string, ItemFilter> = {
   apothecary: (it) => it.kind === 'potion' || it.kind === 'lamp',
 };
 /** 这个人物能买到的卡里，满足条件的有几张（专属卡要流派解锁） / how many of the cards this hero can buy meet the condition (exclusive cards need their archetype unlocked) */
-const poolN = (f: ItemFilter) => Object.keys(ITEMS).filter((k) => !ITEMS[k].noPool && (!ITEMS[k].hero || ITEMS[k].hero === G.hero) && homeOk(k) && f(ITEMS[k])).length;
+const poolN = (f: ItemFilter) => Object.keys(ITEMS).filter((k) => !ITEMS[k].noPool && inWorld(ITEMS[k], 'cards') && (!ITEMS[k].hero || ITEMS[k].hero === G.hero) && homeOk(k) && f(ITEMS[k])).length;
 /** 专卖店（铁匠铺、炼火工坊……）：这个人物能买的同类卡不到 4 张就不开 / specialty shop (smithy, fire forge…): does not open unless this hero has at least 4 buyable cards of that kind */
 /** 训练场能升到的最高档：第 4 夜前最多到银，之后最多到金 / highest tier the training ground can reach: silver before night 4, gold from then on */
 export const trainCap = () => (G.round < 4 ? 1 : 2);
@@ -74,7 +75,10 @@ const doorW = (i: string) => EVENTS[i].w * ((G.wind && WIND_SHOP[G.wind] === i) 
 /** 这扇门现在能不能出 / whether this door can appear right now */
 const doorOk = (id: string) => {
   const e = EVENTS[id];
-  return (!e.minR || G.round >= e.minR) && (!EVENT_NEED[id] || EVENT_NEED[id]());
+  /* 模组世界：只出这个世界的事件和原版的通用事件；专属事件只给那个人物 / mod worlds: only this world's events plus base ones; hero events only for that hero */
+  if (!inWorld(e, 'events') || (e.hero && e.hero !== G.hero) || curWorld()?.noEvents?.includes(id)) return false;
+  const need = EVENT_NEED[id] || EVENT_CODE[id]?.need;
+  return (!e.minR || G.round >= e.minR) && (!need || need());
 };
 const isRare = (i: string) => EVENTS[i].cat === 'rare';
 const keepCat = (i: string) => EVENTS[i].cat === 'shop' || EVENTS[i].cat === 'free';
@@ -96,7 +100,7 @@ function drawDoor(out: string[]): string | null {
 function rollSet(step: number): string[] {
   const P = G.prep;
   const out: string[] = [];
-  if (G.round === 1 && step === 0) out.push('shop', 'field');
+  if (G.round === 1 && step === 0) out.push(...(curWorld()?.firstDoors || ['shop', 'field']).filter((i) => EVENTS[i]).slice(0, 3));
   while (out.length < 3) {
     const got = drawDoor(out);
     if (!got) break;
@@ -211,7 +215,7 @@ export function acquireState(of: Offer, dest: Dest): { ok: true; card: Card } | 
     dest = fit || (canMerge ? 'merge' : null);
     if (!dest) return { ok: false, why: 'full' };
   }
-  if (G.gold < of.price) return { ok: false, why: 'gold' };
+  if (!afford(of.price)) return { ok: false, why: 'gold' };
   G.gold -= of.price;
   of.sold = true;
   if (of.locked) {

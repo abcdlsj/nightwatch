@@ -3,7 +3,9 @@
  * Read the mods/ directory: each subdirectory's index.ts default-exports a mod pack, bundled at build time. Directories starting with an underscore (like mods/_example) are not loaded and serve as examples only.
  */
 import type { ModPack, ModReport } from './types';
-import { applyMod } from './apply';
+import { applyMod, reapplyModText } from './apply';
+import { enterWorld, restoreRenames } from './enter';
+import { beforeLocale, afterLocale } from '../i18n';
 
 const found = import.meta.glob<{ default: ModPack }>(['../../mods/*/index.ts', '!../../mods/_*/index.ts'], { eager: true });
 
@@ -11,6 +13,12 @@ const found = import.meta.glob<{ default: ModPack }>(['../../mods/*/index.ts', '
 export const MOD_REPORTS: ModReport[] = [];
 
 export function loadMods() {
+  /* 换语言：先把世界里换掉的名字还原，换完再把模组文字和世界挂回去 / language switch: restore renamed things first, then re-attach mod text and the world */
+  beforeLocale.push(restoreRenames);
+  afterLocale.push(() => {
+    reapplyModText();
+    enterWorld();
+  });
   const packs = Object.entries(found)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([path, m]) => ({ path, pack: m.default }));

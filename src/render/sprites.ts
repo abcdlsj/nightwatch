@@ -104,3 +104,5 @@ export function addSprites(more: Record<string, string[]>) {
   }
 }
 export const icon = spr;
+/** 已有的一张图的字母矩阵（模组拿来换色、镜像） / an existing sprite's letter rows (mods recolor or mirror them) */
+export const rowsOf = (k: string): string[] | null => ROWS[k] || null;

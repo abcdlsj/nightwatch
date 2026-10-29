@@ -280,6 +280,7 @@ export default {
     gotRelic: '拿到遗物：{n}',
     noGold: '钱不够',
     noRoom: '没地方放了',
+    noSell: '这张卖不掉',
     bagFull: '背包满了',
     noFit: '放不下了',
     sold: '卖了 {n} 金',
@@ -601,6 +602,7 @@ export default {
   },
 
   heroes: {
+    world: '模组世界 · {n}',
     title: '选择守夜人',
     back: '返回首页',
     heat: '长夜 {h}',

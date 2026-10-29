@@ -16,6 +16,8 @@ import { boardCards, fits } from '../../game/cards';
 import { synCount, synLevel, synPairs } from '../../game/synergy';
 import { modText, plainMods, pickLine } from '../../game/text';
 import { nightInfo } from '../../game/nights';
+import { afford } from '../../game/mods';
+import { curWorld } from '../../game/world';
 import { rollWagers, ambushGold, EVENT_FILTER, bets, STACK_GOLD, stackRelic } from '../../game/prep';
 import { makeOffer, rollGear, gearPrice, withFit, isForeign, refreshCost } from '../../game/loot';
 import { HEROES } from '../../data/heroes';
@@ -59,6 +61,7 @@ export function renderPreview() {
   const pathN = (h: string, id: string) => pathsOf(h).find((p) => p.id === id)?.n || id;
   const R = G.rot;
   const varLine =
+    (curWorld()?.note?.() || '') +
     (G.omen ? `<b class="omen">${t('prep.omenLine', { n: OMENS[G.omen].n, d: OMENS[G.omen].d })}</b><br>` : '') +
     (R && R.off
       ? `<b class="omen">${R.gh ? t('prep.rotLine', { off: pathN(G.hero, R.off), h: HEROES[R.gh].n, p: pathN(R.gh, R.gp) }) : t('prep.rotLineSolo', { off: pathN(G.hero, R.off) })}</b><br>`
@@ -137,7 +140,7 @@ const refreshBtn = (cur: PrepStop) => `${L.ui.prep.refresh} ${coinImg()}<b>${ref
 /** 付刷新钱；不够就抖一下金币 / pay for a refresh; shake the gold chip if short */
 function payRefresh(cur: PrepStop) {
   const c = refreshCost(cur.rn || 0);
-  if (G.gold < c) {
+  if (!afford(c)) {
     toast(L.ui.prep.noGold);
     restart($('#goldChip'), 'shake');
     SFX.play('bad');
@@ -308,7 +311,7 @@ export function renderPrep() {
           ? [[T.next, 'green', finishStep]]
           : [
               [`${T.bet} ${coinImg()}<b>3</b>`, 'gold', () => {
-                if (G.gold < 3) {
+                if (!afford(3)) {
                   toast(T.noGold);
                   return;
                 }

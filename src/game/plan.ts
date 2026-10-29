@@ -6,6 +6,7 @@
  */
 import { EN } from '../data/enemies';
 import { G } from './state';
+import { enemyInWorld } from './world';
 
 export const NIGHTS = 9;
 export const FULL_NIGHTS = 15;
@@ -26,7 +27,7 @@ export const jumpNights = () => (G.full ? [3, 5, 7, 11] : [3, 5, 7]);
 export const lastNight = () => (G.full ? FULL_NIGHTS : NIGHTS);
 
 /** 第 9 夜首领的候选（数据里标了 final 的首领） / night-9 boss candidates (bosses flagged final in the data) */
-export const finalBosses = () => Object.keys(EN).filter((k) => EN[k].final);
+export const finalBosses = () => Object.keys(EN).filter((k) => EN[k].final && enemyInWorld(EN[k]));
 /** 某个守夜人的隐藏首领 / a watcher's hidden boss */
 export const hiddenBoss = (hero: string) => Object.keys(EN).find((k) => EN[k].hidden === hero) || null;
 

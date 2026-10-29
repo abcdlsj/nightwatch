@@ -5,15 +5,18 @@
 import { ITEMS, UPS, TAGS } from '../data/cards';
 import { RELICS } from '../data/relics';
 import { TALENTS, TCAT } from '../data/talents';
-import { EN, FACTIONS } from '../data/enemies';
-import { HEROES, KITS, PATHS, HERO_ORDER } from '../data/heroes';
+import { EN, FACTIONS, FOESETS } from '../data/enemies';
+import { HEROES, KITS, PATHS, HERO_ORDER, SIGS, AWAKEN } from '../data/heroes';
+import { EVENTS } from '../data/events';
 import { VOICES } from '../data/voices';
 import { MODL } from '../data/mods';
 import { PAL } from '../data/art/palette';
 import { L } from '../i18n';
 import { CARD_HOOKS, RELIC_HOOKS, TALENT_HOOKS } from '../sim/hooks';
 import { INTENTS } from '../sim/enemies';
-import { addSprites, hasSpr } from '../render/sprites';
+import { addSprites, hasSpr, rowsOf } from '../render/sprites';
+import { WORLDS, HERO_HOOKS, HERO_STATS, ENEMY_HOOKS, EVENT_CODE } from '../game/world';
+import { deepMerge, baseStory } from './enter';
 import type { ModPack, ModReport } from './types';
 
 const FX = ['knife', 'spark', 'ice', 'bolt', 'rock', 'none', 'arrow', 'axe', 'shell', 'quake', 'flame', 'bell', 'blizzard', 'sting', 'gas', 'meteor', 'slash', 'fslash', 'firefly', 'sweep', 'avalanche', 'discharge'];
@@ -22,13 +25,11 @@ const SHAPE = /^[a-z]+:[A-Za-z]$/;
 /** 跃迁事件可以借用的玩法（见 src/app/prep/jumps.ts） / leap gameplay a mod may borrow (see src/app/prep/jumps.ts) */
 const JUMP_STYLES = ['ayla', 'mo', 'ying', 'jun', 'li'];
 
-/** 深合并（剧情这种嵌套对象用） / deep merge (for nested objects like story) */
-function deepMerge(into: any, from: any) {
-  for (const k in from) {
-    if (from[k] && typeof from[k] === 'object' && !Array.isArray(from[k]) && into[k] && typeof into[k] === 'object' && !Array.isArray(into[k])) deepMerge(into[k], from[k]);
-    else into[k] = from[k];
-  }
-}
+const EV_CATS = ['shop', 'free', 'relic', 'up', 'misc', 'rare', 'fight'];
+
+/** 模组的文字（剧情、觉醒名、敌人套名）挂在语言包上；换语言之后要重新挂一遍 / mod text (story, awakening names, enemy-set names) hangs on the locale pack; it has to be re-attached after a language switch */
+const TEXT: (() => void)[] = [];
+export const reapplyModText = () => TEXT.forEach((f) => f());
 
 export function applyMod(pack: ModPack): ModReport {
   const R: ModReport = { id: pack.id, name: pack.name || pack.id, author: pack.author, desc: pack.desc, added: {}, errors: [] };
@@ -47,7 +48,18 @@ export function applyMod(pack: ModPack): ModReport {
 
   /* ---- 像素图：先加，后面的检查要用 ---- / ---- Sprites: add first, later checks need them ---- */
   const goodSpr: Record<string, string[]> = {};
-  for (const [k, rows] of Object.entries(pack.sprites || {})) {
+  for (const [k, spec] of Object.entries(pack.sprites || {})) {
+    let rows = spec as string[];
+    /* 换色 / 镜像：{ from: '已有的图', swap: { 原字母: 新字母 }, flip: 1 } / recolor / mirror: { from: 'existing', swap: { old: new }, flip: 1 } */
+    if (!Array.isArray(spec)) {
+      const src = rowsOf(spec.from) || (Array.isArray(pack.sprites?.[spec.from]) ? (pack.sprites![spec.from] as string[]) : goodSpr[spec.from]);
+      if (!src) {
+        err(`像素图「${k}」要换色的原图「${spec.from}」不存在`);
+        continue;
+      }
+      rows = src.map((r) => [...r].map((ch) => spec.swap?.[ch] || ch).join(''));
+      if (spec.flip) rows = rows.map((r) => [...r].reverse().join(''));
+    }
     if (!Array.isArray(rows) || !rows.length) {
       err(`像素图「${k}」是空的`);
       continue;
@@ -63,6 +75,28 @@ export function applyMod(pack: ModPack): ModReport {
     }
   }
   addSprites(goodSpr);
+
+  /* ---- 首领招式：先加，后面检查敌人要用 ---- / ---- Boss moves: add first, the enemy check needs them ---- */
+  for (const [k, f] of Object.entries(pack.intents || {})) {
+    if (clash(INTENTS, k, '招式')) continue;
+    if (typeof f !== 'function') {
+      err(`招式「${k}」要是一个函数 (e, v, k) => {}`);
+      continue;
+    }
+    INTENTS[k] = f;
+    count('intents');
+  }
+
+  /* ---- 世界 ---- / ---- Worlds ---- */
+  for (const [k, w] of Object.entries(pack.worlds || {})) {
+    if (clash(WORLDS, k, '世界')) continue;
+    if (!w.n) {
+      err(`世界「${k}」：缺名字 n`);
+      continue;
+    }
+    WORLDS[k] = { ...w, id: k };
+    count('worlds');
+  }
 
   /* ---- 卡牌 ---- / ---- Cards ---- */
   for (const [k, c] of Object.entries(pack.cards || {})) {
@@ -110,6 +144,26 @@ export function applyMod(pack: ModPack): ModReport {
     count('talents');
   }
 
+  /* ---- 备战事件 ---- / ---- Prep events ---- */
+  for (const [k, ev] of Object.entries(pack.events || {})) {
+    if (clash(EVENTS, k, '事件')) continue;
+    const bad: string[] = [];
+    if (!ev.n) bad.push('缺名字 n');
+    if (!EV_CATS.includes(ev.cat)) bad.push(`cat 只能是 ${EV_CATS.join(' / ')}`);
+    if (!(ev.w >= 0)) bad.push('w（权重）要是不小于 0 的数');
+    if (!sprOk(ev.ico)) bad.push(`图标「${ev.ico}」不存在`);
+    if (typeof ev.enter !== 'function') bad.push('缺 enter(cur, api)');
+    if (ev.world && !WORLDS[ev.world]) bad.push(`世界「${ev.world}」不存在`);
+    if (bad.length) {
+      err(`事件「${k}」：${bad.join('；')}`);
+      continue;
+    }
+    const { need, enter, ...data } = ev;
+    EVENTS[k] = { ...data, d: data.d || '', f: data.f || '', rar: data.rar ?? 0 };
+    EVENT_CODE[k] = { need, enter };
+    count('events');
+  }
+
   /* ---- 敌人、首领 ---- / ---- Enemies, bosses ---- */
   for (const [k, e] of Object.entries(pack.enemies || {})) {
     if (clash(EN, k, '敌人')) continue;
@@ -118,6 +172,7 @@ export function applyMod(pack: ModPack): ModReport {
     if (!FACTIONS.includes(e.faction as never)) bad.push(`faction 只能是 ${FACTIONS.join(' / ')}`);
     if (!sprOk(e.spr)) bad.push(`像素图「${e.spr}」不存在`);
     if (!e.n) bad.push('缺名字 n');
+    if (e.world && !WORLDS[e.world]) bad.push(`世界「${e.world}」不存在`);
     for (const it of e.intents || []) if (!INTENTS[it.a]) bad.push(`不认识的招式「${it.a}」（可用：${Object.keys(INTENTS).join('、')}）`);
     if (bad.length) {
       err(`敌人「${k}」：${bad.join('；')}`);
@@ -125,6 +180,19 @@ export function applyMod(pack: ModPack): ModReport {
     }
     EN[k] = { tip: '', intro: null, ...e };
     count(e.boss ? 'bosses' : 'enemies');
+  }
+
+  /* ---- 敌人套 ---- / ---- Enemy sets ---- */
+  for (const [k, fs] of Object.entries(pack.foesets || {})) {
+    if (clash(FOESETS, k, '敌人套')) continue;
+    const miss = Object.entries(fs.map || {}).filter(([a, b]) => !EN[a] || !EN[b]).map(([a, b]) => `${a}→${b}`);
+    if (!fs.n || miss.length) {
+      err(`敌人套「${k}」：${!fs.n ? '缺名字 n；' : ''}${miss.length ? `这些替换里有不存在的敌人：${miss.join('、')}` : ''}`);
+      continue;
+    }
+    FOESETS[k] = { n: fs.n, map: { ...fs.map }, world: fs.world } as never;
+    TEXT.push(() => (((L.terms as any).foesets ||= {})[k] = fs.n));
+    count('foesets');
   }
 
   /* ---- 说话人 ---- / ---- Speakers ---- */
@@ -146,6 +214,8 @@ export function applyMod(pack: ModPack): ModReport {
     if (!d || !d.n || !d.title || !d.col || !(d.wall > 0) || !(d.gold >= 0)) bad.push('def 里要有 n、title、col、wall、gold');
     else if (!sprOk(d.portrait)) bad.push(`立绘「${d.portrait}」不存在`);
     if (d?.jump && !JUMP_STYLES.includes(d.jump)) bad.push(`jump 只能是 ${JUMP_STYLES.join(' / ')}`);
+    if (d?.world && !WORLDS[d.world]) bad.push(`世界「${d.world}」不存在（先在 worlds 里写）`);
+    if (h.awaken && (h.awaken.length !== 2 || h.awaken.some((a) => !a.id || !a.n || !a.d))) bad.push('awaken 要正好两个，每个有 id、n、d');
     if (!h.kits?.length) bad.push('至少要一套起手 kits');
     for (const kit of h.kits || []) for (const [c] of kit.cards || []) if (!ITEMS[c]) bad.push(`起手卡「${c}」不存在`);
     for (const p of h.paths || []) for (const c of p.cards) if (ITEMS[c]?.hero !== k) bad.push(`流派「${p.id}」里的「${c}」要是这个人物的专属卡（hero: '${k}'）`);
@@ -157,16 +227,28 @@ export function applyMod(pack: ModPack): ModReport {
     KITS[k] = h.kits;
     PATHS[k] = h.paths || [];
     if (!HERO_ORDER.includes(k)) HERO_ORDER.push(k);
-    if (h.story) ((L as any).heroStory ||= {})[k] = h.story;
+    if (h.sig) {
+      SIGS[k] = { ...h.sig.m };
+      Object.assign(HEROES[k], { sig: h.sig.n, sigD: h.sig.d });
+    }
+    if (h.awaken) AWAKEN[k] = h.awaken.map((a) => ({ id: a.id, m: { ...a.m } }));
+    if (h.hooks) HERO_HOOKS[k] = h.hooks;
+    if (h.stat) HERO_STATS[k] = h.stat;
+    TEXT.push(() => {
+      if (h.story) ((L as any).heroStory ||= {})[k] = h.story;
+      for (const a of h.awaken || []) ((L.heroes as any).awaken ||= {})[a.id] = { n: a.n, d: a.d };
+    });
     count('heroes');
   }
 
   /* ---- 公共剧情的补充 ---- / ---- Additions to the shared story ---- */
-  if (pack.story) deepMerge(L.story, pack.story);
+  if (pack.story) TEXT.push(() => deepMerge(baseStory(), pack.story));
 
   /* ---- 触发钩子（写代码的效果） ---- / ---- Trigger hooks (code-based effects) ---- */
   Object.assign(CARD_HOOKS, pack.hooks?.cards || {});
   Object.assign(RELIC_HOOKS, pack.hooks?.relics || {});
   Object.assign(TALENT_HOOKS, pack.hooks?.talents || {});
+  Object.assign(ENEMY_HOOKS, pack.hooks?.enemies || {});
+  reapplyModText();
   return R;
 }

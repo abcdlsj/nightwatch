@@ -17,7 +17,11 @@ export interface ItemDef {
   fx: Fx;
   kind?: Kind;
   hero?: string;
+  /** 只在这个模组世界里出现（见 src/game/world.ts）；不写就是原版 / only appears in this mod world (see src/game/world.ts); omitted means the base game */
+  world?: string;
   noPool?: number;
+  /** 卖不掉（诅咒卡这种），只能靠事件清掉 / cannot be sold (like curses); only an event can clear it */
+  noSell?: number;
   /** 离不开自己人物的机制，不当外乡卡卖给别人 / depends on its own hero's mechanics, so never sold to others as a foreign card */
   local?: number;
   passive?: number;
@@ -175,6 +179,8 @@ export interface RelicDef {
   /** 唯一，不可叠加 / unique, does not stack */
   u?: number;
   hero?: string;
+  /** 只在这个模组世界里出现（见 src/game/world.ts）；不写就是原版 / only appears in this mod world (see src/game/world.ts); omitted means the base game */
+  world?: string;
   /** 只作为「对路」选项出现，不进随机池 / only appears as an 'on-path' option, never in the random pool */
   fit?: number;
   /** 规则遗物：改玩法，不进普通遗物池，第 2、6 夜后三选一 / rule relic: changes how play works; not in the normal pool, offered three-choose-one after nights 2 and 6 */
@@ -189,6 +195,8 @@ export interface TalentDef {
   r: number;
   m: Mods;
   hero?: string;
+  /** 只在这个模组世界里出现（见 src/game/world.ts）；不写就是原版 / only appears in this mod world (see src/game/world.ts); omitted means the base game */
+  world?: string;
   fit?: number;
   n: string; say: string; d?: string;
 }
@@ -209,6 +217,8 @@ export interface EnemyDef {
   final?: number;
   /** 某个守夜人的隐藏首领（完整游戏线第 15 夜） / a watcher's hidden boss (full game line night 15) */
   hidden?: string;
+  /** 只在这个模组世界里出现（见 src/game/world.ts）；不写就是原版 / only appears in this mod world (see src/game/world.ts); omitted means the base game */
+  world?: string;
   intents?: Intent[];
   n: string; tip?: string; intro?: [string, string] | null;
 }
@@ -221,6 +231,10 @@ export interface EventDef {
   black?: number;
   /** 稀有度 0 普通 / 1 稀有 / 2 史诗 / 3 传说：越稀有越难遇到 / rarity 0 common / 1 rare / 2 epic / 3 legendary: the rarer, the less often it appears */
   rar: number;
+  /** 只在这个模组世界里出现（见 src/game/world.ts）；不写就是原版 / only appears in this mod world (see src/game/world.ts); omitted means the base game */
+  world?: string;
+  /** 只给这个人物出 / only offered to this hero */
+  hero?: string;
   n: string; d: string; f: string;
 }
 
@@ -235,6 +249,8 @@ export interface HeroDef {
   n: string; title: string; tag: string; desc: string; intro: string;
   /** 天性的名字和说明（语言包填） / the nature's name and text (filled from the locale) */
   sig?: string; sigD?: string;
+  /** 模组人物属于哪个世界：选了这个人，这一局就进那个世界 / which mod world this hero belongs to: picking them starts the run in that world */
+  world?: string;
 }
 
 export interface KitDef { cards: [string, number][]; gold?: number; /** 属于哪个流派（流派没解锁时这套起手也锁着） / which archetype it belongs to (the set is locked while the archetype is locked) */ path: string; n: string; d: string }

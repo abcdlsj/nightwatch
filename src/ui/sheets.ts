@@ -120,7 +120,7 @@ export function openSheet(src: SheetSrc) {
     mk(src.offer.price ? `${S.buy} <img class="ico" src="${spr('coin').url}" alt=""><b>${src.offer.price}</b>` : S.takeFree, 'gold', () => {
       if (sheetActions.buy(src.offer)) closeSheet();
     });
-  if (own && G.phase === 'prep')
+  if (own && G.phase === 'prep' && !ITEMS[c.key].noSell)
     mk(t('sheet.sellBtn', { n: sellValue(c) }), 'red', () => {
       sheetActions.sell(c);
       closeSheet();

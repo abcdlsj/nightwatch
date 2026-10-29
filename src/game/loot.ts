@@ -10,6 +10,7 @@ import { cardOpen, heroUnlocked, pathOf } from './unlocks';
 import { OMENS } from '../data/meta';
 import type { Tag } from '../data/types';
 import { mv } from './mods';
+import { inWorld } from './world';
 
 /* ---------------- 卡牌 ---------------- / ---------------- Cards ---------------- */
 export function rollAdj(key: string, force?: boolean, exclude?: string | null, maxTier?: number) {
@@ -80,7 +81,7 @@ export function rollItem(filter?: ItemFilter | null, cap: { maxT?: number; soft?
   for (const k in ITEMS) {
     const it = ITEMS[k];
     const fg = isForeign(k);
-    if (it.noPool || (fg ? !foreignOk(k) : !homeOk(k))) continue;
+    if (it.noPool || !inWorld(it, 'cards') || (fg ? !foreignOk(k) : !homeOk(k))) continue;
     if (filter && !filter(it)) continue;
     if (it.t === 2 && R < 2) continue;
     const w =
@@ -101,7 +102,7 @@ export function rollItem(filter?: ItemFilter | null, cap: { maxT?: number; soft?
     const f = (own * sh) / (1 - sh) / far;
     for (const p of pool) if (isForeign(p[0])) p[1] *= f;
   }
-  if (!pool.length) return pick(Object.keys(ITEMS).filter((k) => !ITEMS[k].noPool && !ITEMS[k].hero));
+  if (!pool.length) return pick(Object.keys(ITEMS).filter((k) => !ITEMS[k].noPool && !ITEMS[k].hero && inWorld(ITEMS[k], 'cards')));
   let t = rand() * pool.reduce((a, b) => a + b[1], 0);
   for (const [k, w] of pool) {
     t -= w;
@@ -157,7 +158,7 @@ export function rollWind(not: Tag | '' = ''): Tag | '' {
   const n: Partial<Record<Tag, number>> = {};
   for (const k in ITEMS) {
     const it = ITEMS[k];
-    if (it.noPool || (it.hero && it.hero !== G.hero) || !homeOk(k)) continue;
+    if (it.noPool || (it.hero && it.hero !== G.hero) || !homeOk(k) || !inWorld(it, 'cards')) continue;
     n[it.tag] = (n[it.tag] || 0) + 1;
   }
   const ts = (Object.keys(n) as Tag[]).filter((t) => n[t]! >= 4 && t !== not).sort();
@@ -198,7 +199,7 @@ export function rollGear(n: number, bonus?: number, maxTier?: number) {
   }
   return out;
 }
-const gearOk = (k: string) => !RELICS[k].fit && !RELICS[k].gem && !RELICS[k].rule && (!RELICS[k].hero || RELICS[k].hero === G.hero) && !(RELICS[k].u && G.relics.includes(k));
+const gearOk = (k: string) => inWorld(RELICS[k], 'relics') && !RELICS[k].fit && !RELICS[k].gem && !RELICS[k].rule && (!RELICS[k].hero || RELICS[k].hero === G.hero) && !(RELICS[k].u && G.relics.includes(k));
 /** 规则遗物三选一：第 2、6 夜守住之后（第 3、7 夜备战开头） / rule relics, three to choose from: after holding nights 2 and 6 (at the start of prep for nights 3 and 7) */
 export const RULE_NIGHTS = [3, 7];
 /** 规则遗物对不对路：用得上的权重 ×3（不对路的也可能出，给换打法留余地） / whether a rule relic suits the board: usable ones get ×3 weight (others can still show up, leaving room to pivot) */
@@ -213,7 +214,7 @@ const RULE_FIT: Record<string, () => boolean> = {
 };
 export function rollRule(n: number) {
   const out: string[] = [];
-  const pool = Object.keys(RELICS).filter((k) => RELICS[k].rule && !G.relics.includes(k));
+  const pool = Object.keys(RELICS).filter((k) => RELICS[k].rule && !G.relics.includes(k) && inWorld(RELICS[k], 'relics'));
   const w = (k: string) => (RULE_FIT[k] ? (RULE_FIT[k]() ? 3 : 1) : 2);
   while (out.length < n) {
     const p = pool.filter((k) => !out.includes(k));
@@ -236,7 +237,7 @@ export const gearPrice = (k: string) => [5, 10, 16, 24][RELICS[k].t] + Math.floo
 /* ---------------- 天赋 ---------------- / ---------------- Talents ---------------- */
 export function talentOk(id: string) {
   const T = TALENTS[id];
-  return !!T && !G.skills.includes(id) && (!T.hero || T.hero === G.hero);
+  return !!T && !G.skills.includes(id) && (!T.hero || T.hero === G.hero) && inWorld(T, 'talents');
 }
 
 export function rollTalents(n: number, bias?: string) {
@@ -294,7 +295,7 @@ export function fitRelic(have: string[], chance?: number) {
   if (rand() >= (chance == null ? FIT_CHANCE : chance)) return null;
   const p = Object.keys(RELICS).filter((k) => {
     const R0 = RELICS[k];
-    return R0.fit && RELIC_FIT[k]?.() && !have.includes(k) && !(R0.u && G.relics.includes(k));
+    return R0.fit && inWorld(R0, 'relics') && RELIC_FIT[k]?.() && !have.includes(k) && !(R0.u && G.relics.includes(k));
   });
   return p.length ? pick(p) : null;
 }

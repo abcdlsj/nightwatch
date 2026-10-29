@@ -42,6 +42,8 @@ import { cancelDrag } from './prep/drag';
 import { setDrawer, UI_drawer } from './prep/drawer';
 import { pickKit, pickOmen, endScreen, heroSelect, type KitOpts } from './screens';
 import { mastLv } from '../game/meta';
+import { curWorld } from '../game/world';
+import { enterWorld } from '../mod/enter';
 
 /** 网址里带 ?seed=123 时用固定种子（测试和复现问题用） / with ?seed=123 in the URL, use a fixed seed (for tests and reproducing bugs) */
 function seedFromUrl() {
@@ -57,11 +59,14 @@ export function newGame(hero: string, daily?: DailySpec) {
   reseed(G.seed);
   G.hero = daily ? daily.hero : hero || G.hero;
   const H = HEROES[G.hero];
+  /* 模组世界：剧情、改名先换好，下面抽首领、定敌人套都按这个世界来 / mod world: swap in its story and renames first, so the boss and enemy-set picks below follow this world */
+  enterWorld();
+  const W = curWorld();
 
   Object.assign(G, {
     heat: 0, run: freshRun(), round: 1, maxRound: NIGHTS, endless: false, lock: null, fightWave: null, gold: H.gold, wall: H.wall, wallMax: H.wall,
-    cards: [], relics: [], skills: [], bestChain: 0, secret: {}, foeSet: pick(Object.keys(FOESETS)), full: false, gems: {}, arc: 0,
-    omen: '', rot: null, wind2: '', daily: daily ? daily.day : '', dailyFight: 0, awaken: '',
+    cards: [], relics: [], skills: [], bestChain: 0, secret: {}, foeSet: W?.foeSet && FOESETS[W.foeSet] ? W.foeSet : pick(Object.keys(FOESETS).filter((k) => !FOESETS[k].world)), full: false, gems: {}, arc: 0,
+    omen: '', rot: null, wind2: '', daily: daily ? daily.day : '', dailyFight: 0, awaken: '', ws: {},
   });
   if (daily) {
     G.heat = daily.heat;
@@ -126,6 +131,7 @@ export function resumeSave() {
     heroSelect();
     return;
   }
+  enterWorld();
   /* 每日挑战打到一半退出：这一夜算失守，直接结算 / quit the daily mid-battle: that night counts as lost and the run ends */
   if (G.daily && G.dailyFight) {
     G.dailyFight = 0;
@@ -161,6 +167,8 @@ export function toPrep() {
   /* 第 15 夜（完整线）不再夜谈：隐藏首领前那段戏，或者安静的天亮 / night 15 (full line) has no night talk: either the scene before the hidden boss or a quiet dawn */
   const last = G.full && !G.endless && G.round === FULL_NIGHTS;
   G.prep = { step: 0, cur: null, doors: [], talk: G.round % 2 === 1 && !gem && !last, gem: gem && G.gems[gem] == null ? gem : undefined, rule: !G.endless && RULE_NIGHTS.includes(G.round), mason: (G.run?.intact || 0) >= intactNeed(), awaken: !G.endless && G.round >= AWAKEN_NIGHT && !G.awaken && !!AWAKEN[G.hero] };
+  /* 模组世界进到这一夜（盲注、塔层……），要在出怪之前 / the mod world enters this night (blinds, tower floors…), before spawns are rolled */
+  curWorld()?.night?.();
   G.nextWave = makeWave(G.round);
   clearCharges();
   for (const c of G.cards) {

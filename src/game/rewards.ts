@@ -7,7 +7,7 @@ export type RewardKey = 'wage' | 'eliteDown' | 'relicGold' | 'interest' | 'noBri
 export function nightRewards(was: number, wallLost: number): [RewardKey, number][] {
   const rows: [RewardKey, number][] = [['wage', 3 + Math.floor(Math.min(was, 9) / 2) - (heat(6) ? 1 : 0)]];
   if (was === 4) rows.push(['eliteDown', 4]);
-  const interest = Math.min(3 + mv('interest'), Math.floor(G.gold / 6));
+  const interest = Math.max(0, Math.min(3 + mv('interest'), Math.floor(G.gold / 6)));
   if (mv('winGold')) rows.push(['relicGold', mv('winGold')]);
   if (mv('regen')) G.wall = Math.min(G.wallMax, G.wall + mv('regen'));
   if (interest) rows.push(['interest', interest]);

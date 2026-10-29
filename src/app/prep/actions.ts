@@ -14,7 +14,7 @@ import { unlock, foundSecret, runMastLv, META } from '../../game/meta';
 import { freeCap, rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, steerOffers, rollItem, rollRule, wpick } from '../../game/loot';
 import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, trainCap, intactNeed, type Dest } from '../../game/prep';
 import { heat } from '../../game/state';
-import { recalcMods } from '../../game/mods';
+import { recalcMods, afford } from '../../game/mods';
 import { SFX } from '../../audio/sfx';
 import { buzz } from '../../audio/settings';
 import { FX } from '../../render/overlay';
@@ -27,6 +27,7 @@ import { prepStops } from './jumps';
 import { gemScene, talkScene } from '../../game/story';
 import { GEMS, gemCount, type Gem } from '../../game/plan';
 import { pickLine } from '../../game/text';
+import { EVENT_CODE, ws } from '../../game/world';
 
 /* ---------------- 进一站 ---------------- / ---------------- Entering a stop ---------------- */
 export function enterEvent(id: string) {
@@ -35,6 +36,13 @@ export function enterEvent(id: string) {
   const ev = EVENTS[id];
   const cur: PrepStop = { id, ev, mode: '' };
   const P = G.prep;
+  /* 模组事件：代码自己决定这一站长什么样 / mod events: their code decides what the stop looks like */
+  if (EVENT_CODE[id]) {
+    P.cur = cur;
+    EVENT_CODE[id].enter(cur, prepApi);
+    renderPrep();
+    return;
+  }
   /* 隐藏事件：师父的信 / 卡尔的剑 / hidden events: the master's letter / Karl's sword */
   if (id === 's_letter') {
     Object.assign(cur, {
@@ -238,7 +246,7 @@ function enterMore(id: string, cur: PrepStop) {
     choice(T.tutorHint, dmgCards().slice(0, 3).map((c) => {
       const a = rollRareAdj(c);
       return { card: c, label: `${ITEMS[c.key].n} → 【${ADJ[a].n}】`, sub: ADJ[a].d + t('prep.cost', { n: 5 }), act: () => {
-        if (G.gold < 5) {
+        if (!afford(5)) {
           toast(T.noGold);
           SFX.play('bad');
           return;
@@ -617,7 +625,7 @@ export function gainRelic(r: string, stay?: boolean) {
 
 /** 杂货铺买一件 / buy one item at the general store */
 export function buyGear(g: { k: string; price: number; sold: boolean }) {
-  if (G.gold < g.price) {
+  if (!afford(g.price)) {
     toast(L.ui.prep.noGold);
     restart($('#goldChip'), 'shake');
     SFX.play('bad');
@@ -670,7 +678,7 @@ export function acquire(of: Offer, dest: Dest): boolean {
 }
 /** 钱够不够（拖到棋盘上买之前先看一眼） / whether you can afford it (a quick check before dragging onto the board to buy) */
 export function canAfford(of: Offer) {
-  if (G.gold < of.price) {
+  if (!afford(of.price)) {
     toast(L.ui.prep.noGold);
     restart($('#goldChip'), 'shake');
     SFX.play('bad');
@@ -680,6 +688,12 @@ export function canAfford(of: Offer) {
 }
 
 export function sellCard(c: Card) {
+  /* 诅咒这种卖不掉，只能靠事件清 / curses and the like cannot be sold; only an event clears them */
+  if (ITEMS[c.key].noSell) {
+    toast(L.ui.prep.noSell);
+    SFX.play('bad');
+    return;
+  }
   const v = sellValue(c);
   G.gold += v;
   SFX.play('sell');
@@ -714,3 +728,39 @@ export function afterChange(placed?: Card) {
   updateHUD();
   if (placed && elOf(placed) && G.cards.includes(placed)) restart(elOf(placed), 'land');
 }
+
+/* ---------------- 给模组事件用的工具 ---------------- / ---------------- Tools for mod events ----------------
+ * 模组事件的 enter(cur, api) 收到的就是这个对象。cur.mode 决定这一站怎么显示：
+ * choice（cur.hint + cur.opts：{ card?, ico?, label, sub, act }）、reward（cur.text + cur.apply）、gift / pick（cur.offers）、
+ * shop（cur.offers + cur.refresh）、relic（用 api.relicChoice）、talent（cur.picks + cur.who + cur.intro）
+ * mod events' enter(cur, api) receives this object. cur.mode decides how the stop is shown: choice, reward, gift / pick, shop, relic, talent
+ */
+export const prepApi = {
+  G, ws, ITEMS, RELICS, TIERS, ADJ, L, t,
+  choice: (cur: PrepStop, hint: string, opts: any[]) => Object.assign(cur, { mode: 'choice', hint, opts }),
+  reward: (cur: PrepStop, text: string, apply: () => void) => Object.assign(cur, { mode: 'reward', text, apply }),
+  relicChoice, gainRelic, gainGold, finishStep, afterMerge, afterChange, upOpt, removeCard, acquireState,
+  makeOffer, rollGear, withFit, rollItem, rollTalents, lockedOffers, newCard, firstFit, stats, basePrice,
+  renderOwned, renderPrep, renderRelics, updateHUD, repaint, toast, elOf, restart, FX, SFX, rand, pick, shuffled,
+  /** 加一张卡到手里（有空位放空位，没空位返回 false） / add a card to your hand (into a free slot; false if there is none) */
+  addCard(key: string, tier = ITEMS[key].t, adj: string | null = null) {
+    const spot = firstFit(ITEMS[key].size);
+    if (!spot) return false;
+    const n = newCard(key, tier, adj);
+    n.loc = spot.z;
+    n.idx = spot.i;
+    G.cards.push(n);
+    afterMerge();
+    renderOwned();
+    return n;
+  },
+  heal(n: number) {
+    G.wall = Math.min(G.wallMax, G.wall + n);
+    updateHUD();
+  },
+  maxWall(n: number) {
+    G.wallMax = Math.max(5, G.wallMax + n);
+    G.wall = Math.min(G.wallMax, Math.max(1, G.wall + Math.max(0, n)));
+    updateHUD();
+  },
+};
