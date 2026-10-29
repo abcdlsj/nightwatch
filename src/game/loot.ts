@@ -84,7 +84,7 @@ export function rollItem(filter?: ItemFilter | null, cap: { maxT?: number; soft?
     if (filter && !filter(it)) continue;
     if (it.t === 2 && R < 2) continue;
     const w =
-      (it.size === 1 ? 4 : it.size === 2 ? 3 : R >= 4 ? 2.5 : 1.3) * (fg ? 1 : it.hero ? 1.4 : 1) * (G.wind === it.tag || G.wind2 === it.tag ? WIND_W : 1) *
+      (it.size === 1 ? 4 : it.size === 2 ? 3 : R >= 4 ? 2.5 : 1.3) * (fg ? 1 : it.hero ? 1.4 : R <= 2 ? 0.5 : 1) * (G.wind === it.tag || G.wind2 === it.tag ? WIND_W : 1) *
       (cap.soft !== undefined && it.t > cap.soft ? OVER_CAP_W ** (it.t - cap.soft) : 1);
     pool.push([k, w]);
   }
@@ -124,6 +124,19 @@ export function makeOffer(filter?: ItemFilter | null, opt: { black?: number | bo
   if (opt.free) price = 0;
   else price += (heat(3) ? 1 : 0) + mv('tax') + (isForeign(key) ? foreignTax() : 0);
   return { card: { key, tier, adj, size: ITEMS[key].size, dl: 0, hoard: 0 }, price, sold: false };
+}
+
+/** 开局前三夜的普通商店：至少一张是起手那个流派（本局主线）的卡，让第一夜就知道往哪走 / ordinary shops on the first three nights: at least one card from the opening archetype (this run's main line), so the direction is clear from night one */
+export const MAIN_NIGHTS = 3;
+export function steerOffers(offers: Offer[]): Offer[] {
+  if (G.round > MAIN_NIGHTS || !G.kitPath || G.endless) return offers;
+  const main = (k: string) => pathOf(k)?.[1].id === G.kitPath && ITEMS[k].hero === G.hero;
+  if (offers.some((o) => main(o.card.key))) return offers;
+  const pool = Object.keys(ITEMS).filter((k) => main(k) && !ITEMS[k].noPool && homeOk(k) && ITEMS[k].t <= shopCap());
+  if (!pool.length) return offers;
+  const defs = new Set(pool.map((k) => ITEMS[k]));
+  offers[offers.length - 1] = makeOffer((it) => defs.has(it));
+  return offers;
 }
 
 /** 锁住的卡原价出现在下一家店的第一格 / a locked card reappears at full price in the next shop's first slot */

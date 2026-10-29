@@ -10,7 +10,7 @@ import { clamp } from '../../core/util';
 import { G, type Card, type Offer, type PrepStop } from '../../game/state';
 import { stats, sellValue, basePrice, setCarry, firstFit, newCard } from '../../game/cards';
 import { unlock, foundSecret, runMastLv, META } from '../../game/meta';
-import { freeCap, rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, rollItem, rollRule, wpick } from '../../game/loot';
+import { freeCap, rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, steerOffers, rollItem, rollRule, wpick } from '../../game/loot';
 import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, trainCap, INTACT_N, type Dest } from '../../game/prep';
 import { heat } from '../../game/state';
 import { SFX } from '../../audio/sfx';
@@ -60,7 +60,8 @@ export function enterEvent(id: string) {
   if (ev.cat === 'shop') {
     cur.mode = 'shop';
     cur.refresh = 1;
-    cur.offers = lockedOffers([0, 1, 2].map(() => makeOffer(EVENT_FILTER[id], { black: ev.black })));
+    const offers = [0, 1, 2].map(() => makeOffer(EVENT_FILTER[id], { black: ev.black }));
+    cur.offers = lockedOffers(id === 'shop' ? steerOffers(offers) : offers);
   } else if (id === 'ambush') Object.assign(cur, { mode: 'ambush', foe: ambushFoe() });
   else if (id === 'chest') {
     cur.mode = 'gift';
