@@ -55,7 +55,7 @@ export function react(e: Enemy, a: number, src: Card, crit: boolean, w: Was, bur
   const k: Rx | null =
     w.frz && crit && !fire ? 'shatter' : w.frz && fire ? 'melt' : volt && w.burn ? 'overload' : fire && w.poi ? 'toxic' : volt && (w.slow || w.frz) ? 'super' : null;
   if (!k) return;
-  e.rxT = b.t + TUNE.rxCd;
+  e.rxT = b.t + (mv('rxQuick') ? 0.2 : TUNE.rxCd);
   const m = rxK(k),
     X = ex(e),
     Y = ey(e) - 5;
@@ -141,6 +141,8 @@ export function react(e: Enemy, a: number, src: Card, crit: boolean, w: Was, bur
 const forkT = new WeakMap<Card, number>();
 function afterReact(src: Card) {
   const b = bt();
+  /* 墨「调和」：打出反应的卡顺手充能 / Mo's Attunement: the reacting card gains charge */
+  if (mv('rxCharge')) chargeCard(src, mv('rxCharge'), null);
   /* 共振叉：打出反应那张卡的邻居充能（每张卡 0.3 秒最多一次） / Resonance Fork: charge the reacting card's neighbors (at most once per card every 0.3 s) */
   const fork = mv('t_resfork');
   if (fork)

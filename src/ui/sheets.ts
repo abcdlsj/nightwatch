@@ -169,11 +169,21 @@ export function talentText(id: string) {
   const T = TALENTS[id];
   return T.d || modText(T.m);
 }
+/** 天性和觉醒，放在天赋页最上面 / the nature and awakening, at the top of the talents page */
+export function sigRow() {
+  const H = HEROES[G.hero];
+  if (!H.sig) return '';
+  const A = G.awaken ? (L.heroes.awaken as Record<string, { n: string; d: string }>)[G.awaken] : null;
+  return `<div class="tlist hsig-l"><div class="trow" style="--gc:${H.col}"><img class="ricon" src="${icon(H.portrait).url}" alt=""><div><b>${H.sig}<small class="gt">${L.ui.heroes.sig}</small></b><span>${H.sigD}</span></div></div>${
+    A ? `<div class="trow" style="--gc:#ffd166"><img class="ricon" src="${icon('book:P').url}" alt=""><div><b>${A.n}<small class="gt">${L.ui.heroes.awaken}</small></b><span>${A.d}</span></div></div>` : ''
+  }</div>`;
+}
 export function openTree() {
   const H = HEROES[G.hero];
   const S = L.ui.sheet;
   SFX.play('ui');
   show(`<div class="sh" role="dialog" aria-label="${S.talents}"><h3>${t('sheet.talentsOf', { h: H.n })} <small class="spn">${t('sheet.talentsN', { n: G.skills.length })}</small></h3>
+   ${sigRow()}
    <p class="muted2">${S.talentsHow}</p>
    <div class="tlist">${
      G.skills.length

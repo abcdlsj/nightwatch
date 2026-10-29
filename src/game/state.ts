@@ -21,6 +21,9 @@ export interface Card {
   carry?: boolean;
   /** 星辉：星遥的跃迁事件给 C 位叠的层数，每层再乘一截 / starlight: stacks Li's leap event adds to the carry, each stacking another multiplier */
   star?: number;
+  /** 艾拉「老规矩」：在 vetAt 这一格连着守了几夜 / Ayla's Old Habits: how many nights in a row it has held slot vetAt */
+  vet?: number;
+  vetAt?: number;
   /** 卡面闪光动画的错开延迟（纯表现） / staggered delay for the card-face flash animation (cosmetic) */
   dl: string | number;
   /* ---- 战斗中 ---- / ---- In battle ---- */
@@ -151,6 +154,9 @@ export interface Prep {
   /** 这夜备战开头城防工匠来（墙完好攒满了） / the wall mason visits at the start of this prep (intact count is full) */
   mason?: boolean;
   masonDone?: boolean;
+  /** 这夜备战开头有觉醒二选一 / this prep opens with the awakening pick */
+  awaken?: boolean;
+  awakenDone?: boolean;
   rare?: number;
   fought?: boolean;
   wagers?: string[];
@@ -209,6 +215,8 @@ export interface GameState {
   windRelic: boolean;
   /** 本局种子：开局时定好，和 rng 的状态一起存档 / this run's seed: set at run start and saved alongside the rng state */
   seed: number;
+  /** 第 6 夜选的觉醒（没选是空串） / the awakening picked on night 6 ('' if none) */
+  awaken?: string;
   /** 每日挑战的日期（YYYY-MM-DD）；普通局是空串 / the daily challenge's date (YYYY-MM-DD); '' for a normal run */
   daily?: string;
   /** 每日挑战正在打第几夜（开战时记下，打完清掉；读档时还在就算中途退出） / the night the daily is fighting (set when a battle starts, cleared when it ends; still set on load means the player quit mid-battle) */

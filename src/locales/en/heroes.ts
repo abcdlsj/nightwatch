@@ -6,35 +6,45 @@ export default {
    "title": "Veteran Watcher",
    "tag": "【Weapon】 and 【Grow】",
    "desc": "Twenty years on the Wall. Single weapons that cut harder over time: Grow, crits, Execute. One order, and the cards beside them strike too.",
-   "intro": "I've stood on this Wall for twenty years. While it stands, so do I."
+   "intro": "I've stood on this Wall for twenty years. While it stands, so do I.",
+   "sig": "Old Habits",
+   "sigD": "A card held on the same slot gains +6% damage for each night it stays (up to +36%). Moving it starts over."
   },
   "mo": {
    "n": "Mo",
    "title": "Exiled Alchemist",
    "tag": "Elemental reactions",
    "desc": "A prodigy struck from the Academy roll; the ink blotted out her name, and \"Mo\" (ink) is all that's left. Thin Wall, deep pockets. Ice meets fire, poison on poison, lightning running wild: reactions multiply the damage.",
-   "intro": "The Academy threw me out for saying alchemy could light the sun. For now, I'll settle for lighting a few monsters."
+   "intro": "The Academy threw me out for saying alchemy could light the sun. For now, I'll settle for lighting a few monsters.",
+   "sig": "Attunement",
+   "sigD": "Reactions deal +40% damage, and the card that triggers one gains 10% charge."
   },
   "ying": {
    "n": "Ying",
    "title": "Lampwright's Apprentice",
    "tag": "Small cards in numbers",
    "desc": "The lampwright's apprentice, keeper of the city's lamps. No one uses her real name anymore; Master called her Ying (firefly), and the city followed. More small cards, more power: more lamps, more light; one spring winds them all; one spark lights the string.",
-   "intro": "Master said as long as one lamp still burns, the city hasn't lost. My job is to keep them burning."
+   "intro": "Master said as long as one lamp still burns, the city hasn't lost. My job is to keep them burning.",
+   "sig": "A Hall of Lamps",
+   "sigD": "Every small card on the board makes all small cards fire 3% faster."
   },
   "jun": {
    "n": "Shi Jun",
    "title": "Wallwright",
    "tag": "【Position】 and fortifications",
    "desc": "He laid half the bricks in this Wall; his is the thickest. It's all in the layout: cannon in the middle, crossbows on the ends, like beside like. Shields can even be thrown to hurt.",
-   "intro": "How to stack bricks, where to set cannon: I know it all. The Wall holds because every brick went in the right spot."
+   "intro": "How to stack bricks, where to set cannon: I know it all. The Wall holds because every brick went in the right spot.",
+   "sig": "Wall First",
+   "sigD": "All cards deal +3% damage per 10 max wall. Two intact nights bring the mason."
   },
   "li": {
    "n": "Xingyao",
    "title": "Stargazer",
    "tag": "Carry",
    "desc": "A star-keeper's apprentice. One main card; everything else serves it: charge, damage, sure crits, freeze-then-strike. Each Leap lights one more star for the main.",
-   "intro": "Every star in the sky has its place. Tonight, I only need the brightest."
+   "intro": "Every star in the sky has its place. Tonight, I only need the brightest.",
+   "sig": "Stars Around the Moon",
+   "sigD": "Each time a card beside the carry fires, the carry gains 5% charge."
   }
  },
  "kits": {
@@ -200,5 +210,17 @@ export default {
     "d": "Multi-shot volleys and meteor showers that blanket the field"
    }
   }
+ },
+ "awaken": {
+  "ayla_a": { "n": "Old Soldiers Never Die", "d": "Old Habits caps at +72% instead of +36%. The longer they hold, the harder they hit." },
+  "ayla_b": { "n": "Second Nature", "d": "Old Habits also speeds cards up: 4% faster per night held." },
+  "mo_a": { "n": "Transmutation", "d": "The reacting card gains another 15% charge (25% in all); reactions chain into reactions." },
+  "mo_b": { "n": "Philosopher", "d": "Reactions on the same enemy can happen every 0.2 s instead of 0.5 s." },
+  "ying_a": { "n": "A Thousand Lamps", "d": "A Hall of Lamps grows: 5% faster per small card." },
+  "ying_b": { "n": "Lantern Festival", "d": "Every small card also gives all small cards +5% damage." },
+  "jun_a": { "n": "Iron Fastness", "d": "Wall First doubles: +6% damage per 10 max wall." },
+  "jun_b": { "n": "Another Course", "d": "Each night held without losing a brick adds 3 max wall." },
+  "li_a": { "n": "Twin Stars", "d": "Cards beside the carry give it 10% charge when they fire." },
+  "li_b": { "n": "Pole Star", "d": "From tonight the carry deals ×1.08 more damage every night." }
  }
 };

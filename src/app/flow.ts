@@ -1,19 +1,19 @@
 /* 一局的流程：开局 → 备战 → 开战 → 战报 / 拦路结算 / 城破 → 黎明 → 无尽 / a run's flow: start → prep → battle → report / roadblock result / breach → dawn → endless */
 import { ITEMS, TIERS } from '../data/cards';
 import { EN, FOESETS } from '../data/enemies';
-import { HEROES } from '../data/heroes';
+import { HEROES, AWAKEN, AWAKEN_NIGHT } from '../data/heroes';
 import { RELICS } from '../data/relics';
 import { WAGERS, OMENS } from '../data/meta';
 import type { KitDef } from '../data/types';
 import { L, t } from '../i18n';
 import { pick, shuffled, reseed, newSeed, rng } from '../core/rng';
 import { G, freshRun, type PrepStop } from '../game/state';
-import { recalcMods } from '../game/mods';
+import { recalcMods, mv } from '../game/mods';
 import { boardCards } from '../game/cards';
 import { codexSweep, runWon, mastStart, nextBoss, markBoss, fullDone, nextArc } from '../game/meta';
 import { markPathWin, pathsOf, heroList, heroUnlocked } from '../game/unlocks';
 import { NIGHTS, FULL_NIGHTS, GEM_NIGHTS, nightKind, lastNight, finalBosses } from '../game/plan';
-import { rollDoors, hordeWave, ambushWave, ambushGold, placeKit, bets, STACK_GOLD, stackRelic, INTACT_N } from '../game/prep';
+import { rollDoors, hordeWave, ambushWave, ambushGold, placeKit, bets, STACK_GOLD, stackRelic, intactNeed } from '../game/prep';
 import { rollGear, withFit, rollWind, RULE_NIGHTS } from '../game/loot';
 import { nightInfo } from '../game/nights';
 import { nightRewards } from '../game/rewards';
@@ -61,7 +61,7 @@ export function newGame(hero: string, daily?: DailySpec) {
   Object.assign(G, {
     heat: 0, run: freshRun(), round: 1, maxRound: NIGHTS, endless: false, lock: null, fightWave: null, gold: H.gold, wall: H.wall, wallMax: H.wall,
     cards: [], relics: [], skills: [], bestChain: 0, secret: {}, foeSet: pick(Object.keys(FOESETS)), full: false, gems: {}, arc: 0,
-    omen: '', rot: null, wind2: '', daily: daily ? daily.day : '', dailyFight: 0,
+    omen: '', rot: null, wind2: '', daily: daily ? daily.day : '', dailyFight: 0, awaken: '',
   });
   if (daily) {
     G.heat = daily.heat;
@@ -160,7 +160,7 @@ export function toPrep() {
   /* 宝石夜不再另有夜谈（宝石的剧情就是这夜的夜谈） / gem nights have no separate night talk (the gem scene is that night's talk) */
   /* 第 15 夜（完整线）不再夜谈：隐藏首领前那段戏，或者安静的天亮 / night 15 (full line) has no night talk: either the scene before the hidden boss or a quiet dawn */
   const last = G.full && !G.endless && G.round === FULL_NIGHTS;
-  G.prep = { step: 0, cur: null, doors: [], talk: G.round % 2 === 1 && !gem && !last, gem: gem && G.gems[gem] == null ? gem : undefined, rule: !G.endless && RULE_NIGHTS.includes(G.round), mason: (G.run?.intact || 0) >= INTACT_N };
+  G.prep = { step: 0, cur: null, doors: [], talk: G.round % 2 === 1 && !gem && !last, gem: gem && G.gems[gem] == null ? gem : undefined, rule: !G.endless && RULE_NIGHTS.includes(G.round), mason: (G.run?.intact || 0) >= intactNeed(), awaken: !G.endless && G.round >= AWAKEN_NIGHT && !G.awaken && !!AWAKEN[G.hero] };
   G.nextWave = makeWave(G.round);
   clearCharges();
   for (const c of G.cards) {
@@ -298,7 +298,12 @@ function reportWin(b: Battle, was: number) {
   /* 墙完好：攒到 3 夜，下一夜备战开头城防工匠来 / intact wall: at 3 nights, the mason visits at the start of the next prep */
   if (b.wallLost === 0 && G.run) {
     G.run.intact = (G.run.intact || 0) + 1;
-    rows.push([T.intact, 0, 0, t('flow.intactN', { n: Math.min(G.run.intact, INTACT_N), m: INTACT_N })]);
+    /* 石钧觉醒「添砖」：墙完好一夜，上限 +3 / Jun's Another Course: each intact night adds max wall */
+    if (mv('intactWall')) {
+      G.wallMax += mv('intactWall');
+      G.wall += mv('intactWall');
+    }
+    rows.push([T.intact, 0, 0, t('flow.intactN', { n: Math.min(G.run.intact, intactNeed()), m: intactNeed() })]);
   }
   if (b.greed) rows.push([T.dropped, 0, b.greed]);
   rows.push(...wagerPay(b));

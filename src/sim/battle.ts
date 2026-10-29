@@ -9,7 +9,7 @@ import { L } from '../i18n';
 import { clamp } from '../core/util';
 import { G, type Wave } from '../game/state';
 import { mv, recalcMods } from '../game/mods';
-import { boardCards, neighbors, rightOf, maxAmmo, stats, finishQuests } from '../game/cards';
+import { boardCards, neighbors, rightOf, maxAmmo, stats, finishQuests, noteVets } from '../game/cards';
 import { unlock } from '../game/meta';
 import { synCount } from '../game/synergy';
 import { world, RANGE0, ex, ey } from './world';
@@ -280,6 +280,7 @@ export function settleWin() {
     if (b.kills >= 150) unlock('kills150');
     for (const c of G.cards) if (c.adj === 'golden') c.hoard++;
     for (const c of boardCards()) CARD_HOOKS[c.key]?.onWin?.(c);
+    noteVets();
   }
   const quests = b.ambush ? [] : finishQuests();
   resetCards();

@@ -161,6 +161,7 @@ export function heroSelect() {
       const hh = heatOf(k).max;
       return `<button class="hero" data-h="${k}" style="--hc:${H.col}"><img class="por" src="${spr(H.portrait).url}" alt=""><div class="hn"><b>${H.n}</b><small>${H.title}</small></div>
     <div class="htag">${H.tag}</div><div class="hstat"><span>${T.wall} <b>${H.wall}</b></span><span>${T.gold} <b>${H.gold}</b></span>${mastHtml(k)}${hh ? `<span>${t('heroes.heat', { h: hh })}</span>` : ''}</div><p>${H.desc}</p>
+    ${H.sig ? `<div class="hsig"><b>${L.ui.heroes.sig} · ${H.sig}</b><span>${H.sigD}</span></div>` : ''}
     ${pathsHtml(k)}
     <em>“${H.intro}”</em></button>`;
     })

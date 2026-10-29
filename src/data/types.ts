@@ -233,6 +233,8 @@ export interface HeroDef {
   /** 选人页展示的起手卡 [key, 品质, 格子] / the opening cards shown on hero select [key, tier, slots] */
   start: [string, number, number][];
   n: string; title: string; tag: string; desc: string; intro: string;
+  /** 天性的名字和说明（语言包填） / the nature's name and text (filled from the locale) */
+  sig?: string; sigD?: string;
 }
 
 export interface KitDef { cards: [string, number][]; gold?: number; /** 属于哪个流派（流派没解锁时这套起手也锁着） / which archetype it belongs to (the set is locked while the archetype is locked) */ path: string; n: string; d: string }

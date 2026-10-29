@@ -287,5 +287,11 @@ export const EVENTS: Record<string, EventDef> = {
   "cat": "free",
   "w": 0,
   "rar": 2
+ },
+ "awaken": {
+  "ico": "book:P",
+  "cat": "free",
+  "w": 0,
+  "rar": 3
  }
 } as unknown as Record<string, EventDef>;

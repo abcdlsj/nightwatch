@@ -5,6 +5,7 @@ import type { Mods } from '../data/types';
 import { G } from './state';
 import { synMods } from './synergy';
 import { OMENS } from '../data/meta';
+import { SIGS, AWAKEN } from '../data/heroes';
 
 export let M: Mods = {};
 
@@ -17,6 +18,10 @@ export function recalcMods() {
   for (const r of G.relics) add(RELICS[r].m);
   for (const s of G.skills) if (TALENTS[s]) add(TALENTS[s].m);
   add(synMods());
+  /* 天性和觉醒 / nature and awakening */
+  if (SIGS[G.hero]) add(SIGS[G.hero]);
+  const aw = G.awaken && AWAKEN[G.hero]?.find((a) => a.id === G.awaken);
+  if (aw) add(aw.m);
   const O = G.omen ? OMENS[G.omen] : null;
   if (O?.m) add(O.m);
   if (O?.wind && G.wind) add({ ['xtag_' + G.wind]: O.wind });

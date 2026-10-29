@@ -445,3 +445,42 @@ export const PATHS: Record<string, PathDef[]> = {
   ],
 };
 
+
+/** 天性：每个守夜人一条一直生效的规矩，决定这个人物怎么构筑（文字在语言包 heroes.*.sig） / Nature: one always-on rule per watcher that shapes how they build (text in locale heroes.*.sig)
+ *  ayla 老规矩：卡在同一格连着守几夜，伤害一夜比一夜高 / old habits: a card held on the same slot night after night hits harder each night
+ *  mo   调和：元素反应更狠，打出反应的卡顺手充能 / attunement: stronger reactions, and the reacting card gets charge
+ *  ying 满堂灯火：小卡越多，小卡越快 / a hall full of lamps: the more small cards, the faster they all go
+ *  jun  以墙为本：城墙上限越高伤害越高；墙完好两夜就攒满 / the wall comes first: higher max wall means more damage; two intact nights fill the mason
+ *  li   众星拱月：C 位两边的卡出手，给 C 位充能 / stars around the moon: cards beside the carry charge it when they fire */
+export const SIGS: Record<string, Record<string, number>> = {
+  ayla: { vet: 0.06, vetCap: 6 },
+  mo: { rx: 0.4, rxCharge: 0.1 },
+  ying: { smallHaste: 0.03 },
+  jun: { wallDmg: 0.03, intactFast: 1 },
+  li: { carryNb: 0.05 },
+};
+
+/** 觉醒：第 6 夜备战开头二选一，把天性往两个方向推（文字在语言包 heroes.awaken） / Awakening: a pick of two at the start of night 6's prep, pushing the nature in one of two directions (text in locale heroes.awaken) */
+export const AWAKEN: Record<string, { id: string; m: Record<string, number> }[]> = {
+  ayla: [
+    { id: 'ayla_a', m: { vetCap: 6 } },
+    { id: 'ayla_b', m: { vetCd: 0.04 } },
+  ],
+  mo: [
+    { id: 'mo_a', m: { rxCharge: 0.15 } },
+    { id: 'mo_b', m: { rxQuick: 1 } },
+  ],
+  ying: [
+    { id: 'ying_a', m: { smallHaste: 0.02 } },
+    { id: 'ying_b', m: { smallDmg: 0.05 } },
+  ],
+  jun: [
+    { id: 'jun_a', m: { wallDmg: 0.03 } },
+    { id: 'jun_b', m: { intactWall: 3 } },
+  ],
+  li: [
+    { id: 'li_a', m: { carryNb: 0.05 } },
+    { id: 'li_b', m: { carryGrow: 0.08 } },
+  ],
+};
+export const AWAKEN_NIGHT = 6;

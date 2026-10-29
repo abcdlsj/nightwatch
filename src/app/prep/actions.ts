@@ -2,6 +2,7 @@
 import type { Tag } from '../../data/types';
 import { ITEMS, ADJ, ADJ_NODMG, TIERS, UPS } from '../../data/cards';
 import { EVENTS } from '../../data/events';
+import { HEROES, AWAKEN } from '../../data/heroes';
 import { RELICS } from '../../data/relics';
 import { TALENTS } from '../../data/talents';
 import { L, t } from '../../i18n';
@@ -11,8 +12,9 @@ import { G, type Card, type Offer, type PrepStop } from '../../game/state';
 import { stats, sellValue, basePrice, setCarry, firstFit, newCard } from '../../game/cards';
 import { unlock, foundSecret, runMastLv, META } from '../../game/meta';
 import { freeCap, rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, steerOffers, rollItem, rollRule, wpick } from '../../game/loot';
-import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, trainCap, INTACT_N, type Dest } from '../../game/prep';
+import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, trainCap, intactNeed, type Dest } from '../../game/prep';
 import { heat } from '../../game/state';
+import { recalcMods } from '../../game/mods';
 import { SFX } from '../../audio/sfx';
 import { buzz } from '../../audio/settings';
 import { FX } from '../../render/overlay';
@@ -530,9 +532,9 @@ function upOpt(c: Card, done: () => void) {
 export function startMason() {
   const P = G.prep;
   const T = L.ui.prep;
-  const cur: PrepStop = { id: 'mason', ev: EVENTS.mason, mode: 'choice', hint: T.masonHint };
+  const cur: PrepStop = { id: 'mason', ev: EVENTS.mason, mode: 'choice', hint: t('prep.masonHint', { n: intactNeed() }) };
   const done = () => {
-    if (G.run) G.run.intact = Math.max(0, (G.run.intact || 0) - INTACT_N);
+    if (G.run) G.run.intact = Math.max(0, (G.run.intact || 0) - intactNeed());
     P.masonDone = true;
     P.cur = null;
     renderPrep();
@@ -552,6 +554,26 @@ export function startMason() {
       done();
     } },
   ];
+  P.cur = cur;
+}
+
+/** 觉醒：第 6 夜备战开头，天性二选一往哪边推；白给，不占一站 / awakening: at the start of night 6's prep, pick which way to push the nature; free, does not use up a stop */
+export function startAwaken() {
+  const P = G.prep;
+  const A = AWAKEN[G.hero] || [];
+  const N = L.heroes.awaken as Record<string, { n: string; d: string }>;
+  const cur: PrepStop = { id: 'awaken', ev: EVENTS.awaken, mode: 'choice', hint: t('prep.awakenHint', { s: HEROES[G.hero].sig || '' }) };
+  cur.opts = A.map((a) => ({ ico: HEROES[G.hero].portrait, label: N[a.id].n, sub: N[a.id].d, act: () => {
+    G.awaken = a.id;
+    recalcMods();
+    P.awakenDone = true;
+    P.cur = null;
+    SFX.play('merge');
+    toast(t('prep.awakened', { n: N[a.id].n }));
+    renderOwned();
+    renderPrep();
+    updateHUD();
+  } }));
   P.cur = cur;
 }
 
@@ -610,9 +632,10 @@ export function buyGear(g: { k: string; price: number; sold: boolean }) {
 export function finishStep() {
   const P = G.prep;
   /* 规则遗物、城防工匠是白给的一站，跳过也不占三站里的一站 / the rule pick and the mason are free stops; skipping them does not use up a stop */
-  if (P.cur?.id === 'rule' || P.cur?.id === 'mason') {
+  if (P.cur?.id === 'rule' || P.cur?.id === 'mason' || P.cur?.id === 'awaken') {
     if (P.cur.id === 'rule') P.ruleDone = true;
-    else P.masonDone = true;
+    else if (P.cur.id === 'mason') P.masonDone = true;
+    else P.awakenDone = true;
     P.cur = null;
     renderPrep();
     SFX.play('ui');

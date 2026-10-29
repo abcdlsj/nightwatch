@@ -193,6 +193,9 @@ function fire(c: Card, depth: number) {
   if (it.shieldGain) addShield(it.shieldGain * (1 + 0.4 * stepOf(c)));
   if (c.adj === 'sturdy') addShield(c.size * (c.tier + 1));
   emit('use', { c, depth });
+  /* 星遥「众星拱月」：C 位两边的卡出手，给 C 位充能 / Li's Stars Around the Moon: cards beside the carry charge it when they fire */
+  if (mv('carryNb') && !c.carry)
+    for (const n of nb) if (n.carry) chargeCard(n, mv('carryNb'), c);
   for (const n of nb) {
     if (n.adj !== 'echo' || n.frozen > 0) continue;
     later(0.12, () => {

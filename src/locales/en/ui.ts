@@ -41,6 +41,10 @@ export default {
 
   /** names of the damage-formula terms */
   stats: {
+    vet: 'Old Habits',
+    wallSig: 'Wall First',
+    smallSig: 'Festival',
+    poleStar: 'Pole Star',
     elem: 'Element',
     alch: 'Alchemy Manual',
     bonus: 'Bonus',
@@ -255,9 +259,11 @@ export default {
     brickUp: 'Pull {n} wall for one upgrade',
     brickUpSub: 'Pick one of three cards to upgrade one tier, no night cap',
     brickNone: 'No card left to upgrade',
-    masonHint: 'Three brick-perfect nights banked. The mason helps for free; it does not use up a stop',
+    masonHint: '{n} brick-perfect nights banked. The mason helps for free; it does not use up a stop',
     masonWallSub: 'Another course of stone on the wall',
     masonGold: 'Gold +{n}',
+    awakenHint: 'You reached the sixth night. Which way does your nature, {s}, grow? Pick one; it lasts the whole run and does not use up a stop',
+    awakened: 'Awakened: {n}',
     trainSub: 'Dmg {a}→{b}　CD {c}→{d}s',
     furnaceHint: 'Pick a card to throw in',
     sacrifice: 'Sacrifice {n}',
@@ -605,6 +611,8 @@ export default {
     mast: 'Mastery',
     mastNext: '{n} nights to go',
     mastLine: 'Mastery: +1 for each night held.',
+    sig: 'Nature',
+    awaken: 'Awakening',
     mastLv: 'Lv {n} {p}',
     codex: 'Exclusive card codex',
     locked: 'Locked',

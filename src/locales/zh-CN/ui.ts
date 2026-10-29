@@ -41,6 +41,10 @@ export default {
 
   /** 伤害公式里各项加成的名字 / names of the damage-formula terms */
   stats: {
+    vet: '老规矩',
+    wallSig: '以墙为本',
+    smallSig: '灯会',
+    poleStar: '北辰',
     elem: '元素',
     alch: '炼金手册',
     bonus: '加成',
@@ -255,9 +259,11 @@ export default {
     brickUp: '拆 {n} 点墙，换一次升级',
     brickUpSub: '三张卡里挑一张升一档，不限夜数',
     brickNone: '没有能再升的卡了',
-    masonHint: '墙攒够三夜没掉砖。工匠白帮你一次，不占今晚的三站',
+    masonHint: '墙攒够 {n} 夜没掉砖。工匠白帮你一次，不占今晚的三站',
     masonWallSub: '把墙再加厚一圈',
     masonGold: '金币 +{n}',
+    awakenHint: '守到第六夜。你的天性「{s}」往哪边长？二选一，这局一直生效；不占今晚的三站',
+    awakened: '觉醒：{n}',
     trainSub: '伤害 {a}→{b}　冷却 {c}→{d}s',
     furnaceHint: '挑一张卡扔进去',
     sacrifice: '献祭 {n}',
@@ -605,6 +611,8 @@ export default {
     mast: '熟练',
     mastNext: '差{n}夜',
     mastLine: '熟练：守住一夜 +1。',
+    sig: '天性',
+    awaken: '觉醒',
     mastLv: '{n}级{p}',
     codex: '专属卡图鉴',
     locked: '还没解锁',

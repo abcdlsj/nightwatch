@@ -222,7 +222,12 @@ export default {
  },
  "mason": {
   "n": "Wall Mason",
-  "d": "Three brick-perfect nights banked; the mason lends a hand",
+  "d": "Brick-perfect nights banked; the mason lends a hand",
   "f": "\"You held it so clean there's nothing for me to fix. Take something else.\""
+ },
+ "awaken": {
+  "n": "Awakening",
+  "d": "Night six: which way your nature grows",
+  "f": "No one who reaches the sixth night is who they were on the first."
  }
 };

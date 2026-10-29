@@ -6,6 +6,7 @@ import { vr } from '../core/rng';
 import { G, type Card, type CardSpec, type Zone } from './state';
 import { mv } from './mods';
 import { TUNE } from './tuning';
+import { AWAKEN_NIGHT } from '../data/heroes';
 
 let UID = 1;
 
@@ -198,6 +199,14 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
     const n = countKind('potion');
     if (n) pct.push([T.alch + '×' + n, 0.04 * n * mv('t_alch')]);
   }
+  /* 天性：老规矩、以墙为本、灯会 / natures: Old Habits, Wall First, Lantern Festival */
+  const vn = vetNights(c as Card);
+  if (vn && it.dmg > 0) pct.push([T.vet + '×' + vn, mv('vet') * vn]);
+  if (mv('wallDmg') && it.dmg > 0) {
+    const n = Math.floor(G.wallMax / 10);
+    if (n) pct.push([T.wallSig + '×' + n, mv('wallDmg') * n]);
+  }
+  if (mv('smallDmg') && it.size === 1 && it.dmg > 0 && c.loc === 'board') pct.push([T.smallSig + '×' + smallN(), mv('smallDmg') * smallN()]);
   mp('dmg', T.bonus);
   mp('tag_' + it.tag, T.bonus + '·' + L.terms.tags[it.tag]);
   mp('s' + it.size, T.bonus + '·' + T.size[it.size]);
@@ -241,6 +250,8 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
   };
   xm('xdmg', T.bonus);
   xm('xtag_' + it.tag, T.bonus + '·' + L.terms.tags[it.tag]);
+  /* 星遥觉醒「北辰」：C 位从觉醒那夜起每夜再乘一截 / Li's Pole Star: the carry multiplies again each night from the awakening on */
+  if (c.carry && mv('carryGrow')) xs.push([T.poleStar, (1 + mv('carryGrow')) ** Math.max(1, G.round - AWAKEN_NIGHT + 1)]);
   const mult = xs.reduce((m, x) => m * x[1], 1);
   const total = (base + flat) * Math.max(0.1, 1 + psum) * mult;
   let cd = it.cd * U.c[s];
@@ -255,11 +266,29 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
     if (j) spd += 0.06 * j * countKind('potion');
   }
   if (mv('t_last') && G.wall < G.wallMax * 0.35) spd += 0.25;
+  if (mv('smallHaste') && it.size === 1 && c.loc === 'board') spd += mv('smallHaste') * smallN();
+  if (mv('vetCd')) spd += mv('vetCd') * vn;
   spd = Math.max(0.3, spd + mv('spd') + fitSpd(c as Card));
   /* 军旗手：相邻的兵器卡暴击率加一截 / Standard-Bearer: adjacent weapon cards gain crit chance */
   let critNb = 0;
   if (it.kind === 'weapon' && c.loc === 'board') for (const n of c.nb || neighbors(c as Card)) critNb += (ITEMS[n.key].critNb || 0) * (1 + 0.5 * stepOf(n));
   return { base, flat, pct, psum, xs, mult, total, cd: Math.max(0.25, cd / spd), cdRaw: it.cd, crit: 0.05 + (a === 'precise' ? 0.2 : 0) + mv('crit') + critNb };
+}
+
+/** 老规矩：在这一格已经守了几夜，封顶看 vetCap / Old Habits: nights already held on this slot, capped by vetCap */
+export const vetNights = (c: Card) => (mv('vet') && c.loc === 'board' && c.vetAt === c.idx ? Math.min(mv('vetCap'), c.vet || 0) : 0);
+/** 棋盘上几张小卡 / small cards on the board */
+const smallN = () => boardCards().filter((o) => o.size === 1).length;
+/** 守住一夜：棋盘上每张卡记一笔在哪一格守的 / after holding a night, each board card notes which slot it held */
+export function noteVets() {
+  for (const c of boardCards()) {
+    if (c.vetAt === c.idx) c.vet = (c.vet || 0) + 1;
+    else {
+      c.vet = 1;
+      c.vetAt = c.idx;
+    }
+  }
+  for (const c of G.cards) if (c.loc !== 'board') c.vet = 0;
 }
 
 /** 占着棋盘正中（第 4、5 格） / occupies the board center (slots 4 and 5) */
