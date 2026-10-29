@@ -11,7 +11,7 @@ import { G, type Card, type Offer, type PrepStop } from '../../game/state';
 import { stats, sellValue, basePrice, setCarry, firstFit, newCard } from '../../game/cards';
 import { unlock, foundSecret, runMastLv, META } from '../../game/meta';
 import { freeCap, rollAdj, makeOffer, rollGear, gearPrice, withFit, rollTalents, lockedOffers, rollItem, rollRule, wpick } from '../../game/loot';
-import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, trainCap, type Dest } from '../../game/prep';
+import { EVENT_FILTER, rollDoors, acquireState, checkMerges, removeCard, gainRelicState, learnTalentState, ambushFoe, trainCap, INTACT_N, type Dest } from '../../game/prep';
 import { heat } from '../../game/state';
 import { SFX } from '../../audio/sfx';
 import { buzz } from '../../audio/settings';
@@ -337,6 +337,30 @@ function enterMore(id: string, cur: PrepStop) {
       SFX.play('merge');
       finishStep();
     } })));
+  else if (id === 'brickyard')
+    /* 拆的是眼下的墙，不是上限：墙厚的时候拿来换东西，墙薄了就别碰 / it takes current wall, not max: trade it while the wall is thick, leave it alone when thin */
+    choice(T.brickHint, [
+      { ico: 'chest', label: t('prep.brickGold', { n: 6, g: 9 }), sub: T.brickGoldSub, act: () => {
+        G.wall -= 6;
+        SFX.play('hurt');
+        gainGold(9);
+        updateHUD();
+        finishStep();
+      } },
+      { ico: 'anvil', label: t('prep.brickUp', { n: 10 }), sub: T.brickUpSub, act: () => {
+        const pool = shuffled(G.cards.filter((c) => c.tier < 3)).slice(0, 3);
+        if (!pool.length) {
+          toast(T.brickNone);
+          SFX.play('bad');
+          return;
+        }
+        G.wall -= 10;
+        SFX.play('hurt');
+        updateHUD();
+        choice(T.trainHint, pool.map((c) => upOpt(c, finishStep)));
+        renderPrep();
+      } },
+    ]);
   else if (id === 'oracle') relicChoice(cur, L.ui.prep.ruleHint, rollRule(3));
   else if (id === 'drill')
     choice(T.drillHint, dmgCards().filter((c) => c.loc === 'board').slice(0, 3).map((c) => ({ card: c, label: t('prep.makeCarry', { n: ITEMS[c.key].n }), sub: T.carrySub, act: () => {
@@ -478,6 +502,58 @@ export function gainGold(n: number) {
   FX.coins(r.left + r.width / 2, r.top + r.height / 2, Math.min(n, 8));
 }
 
+/** 一张卡升一档的选项（训练场、拆墙、城防工匠共用的样子） / a "upgrade this card one tier" option */
+function upOpt(c: Card, done: () => void) {
+  const nx = Object.assign({}, c, { tier: c.tier + 1 });
+  const a = stats(c, null),
+    b = stats(nx, null);
+  return {
+    card: c, label: ITEMS[c.key].n + L.ui.common.colon + TIERS[c.tier].n + ' → ' + TIERS[c.tier + 1].n,
+    sub: ITEMS[c.key].dmg ? t('prep.trainSub', { a: Math.round(a.total), b: Math.round(b.total), c: a.cd.toFixed(2), d: b.cd.toFixed(2) }) : UPS[ITEMS[c.key].up].t,
+    act: () => {
+      c.tier++;
+      repaint(c);
+      afterMerge();
+      renderOwned();
+      SFX.play('merge');
+      if (elOf(c)) {
+        FX.burstAt(elOf(c), TIERS[c.tier].c, 24);
+        restart(elOf(c), 'merge');
+      }
+      done();
+    },
+  };
+}
+
+/** 城防工匠：墙攒够三夜没掉砖，白来一次，不占三站里的一站 / the wall mason: free after three brick-perfect nights, and does not use up a stop */
+export function startMason() {
+  const P = G.prep;
+  const T = L.ui.prep;
+  const cur: PrepStop = { id: 'mason', ev: EVENTS.mason, mode: 'choice', hint: T.masonHint };
+  const done = () => {
+    if (G.run) G.run.intact = Math.max(0, (G.run.intact || 0) - INTACT_N);
+    P.masonDone = true;
+    P.cur = null;
+    renderPrep();
+    updateHUD();
+  };
+  const up = shuffled(G.cards.filter((c) => c.loc === 'board' && c.tier < 3)).slice(0, 2);
+  cur.opts = [
+    ...up.map((c) => upOpt(c, done)),
+    { ico: 'crenel', label: t('prep.wallUp', { n: 6 }), sub: T.masonWallSub, act: () => {
+      G.wallMax += 6;
+      G.wall += 6;
+      SFX.play('merge');
+      done();
+    } },
+    { ico: 'chest', label: t('prep.masonGold', { n: 8 }), sub: '', act: () => {
+      gainGold(8);
+      done();
+    } },
+  ];
+  P.cur = cur;
+}
+
 /** 规则遗物三选一：白给，不占三站里的一站 / rule-relic pick: free, and does not use up one of the three stops */
 export function startRule() {
   const P = G.prep;
@@ -532,6 +608,15 @@ export function buyGear(g: { k: string; price: number; sold: boolean }) {
 
 export function finishStep() {
   const P = G.prep;
+  /* 规则遗物、城防工匠是白给的一站，跳过也不占三站里的一站 / the rule pick and the mason are free stops; skipping them does not use up a stop */
+  if (P.cur?.id === 'rule' || P.cur?.id === 'mason') {
+    if (P.cur.id === 'rule') P.ruleDone = true;
+    else P.masonDone = true;
+    P.cur = null;
+    renderPrep();
+    SFX.play('ui');
+    return;
+  }
   P.step++;
   P.cur = null;
   if (P.step < 3) rollDoors();

@@ -214,5 +214,15 @@ export default {
   "n": "Star Lots",
   "d": "Draw three lots, change one rule",
   "f": "Three shakes of the cup. The lot that falls is blank."
+ },
+ "brickyard": {
+  "n": "Brick Buyer",
+  "d": "Pull bricks off the wall for gold, or for an upgrade",
+  "f": "The kiln owner says bricks from the wall beat bricks from the kiln."
+ },
+ "mason": {
+  "n": "Wall Mason",
+  "d": "Three brick-perfect nights banked; the mason lends a hand",
+  "f": "\"You held it so clean there's nothing for me to fix. Take something else.\""
  }
 };

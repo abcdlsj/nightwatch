@@ -107,6 +107,8 @@ export interface RunStats {
   wagers: number;
   maxCombo: number;
   got: string[];
+  /** 守住且没掉砖的夜数（累计），攒到 3 夜工匠来一次 / nights held without losing a brick; at 3 the mason visits */
+  intact?: number;
   /** 上一夜战报的快照，下一夜战报拿来对照 / a snapshot of last night's report, compared against in the next one */
   prevRep?: RepSnap;
   lastPure?: boolean;
@@ -144,6 +146,9 @@ export interface Prep {
   /** 这夜备战开头有规则遗物三选一 / this prep opens with a rule-relic pick */
   rule?: boolean;
   ruleDone?: boolean;
+  /** 这夜备战开头城防工匠来（墙完好攒满了） / the wall mason visits at the start of this prep (intact count is full) */
+  mason?: boolean;
+  masonDone?: boolean;
   rare?: number;
   fought?: boolean;
   wagers?: string[];

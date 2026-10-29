@@ -51,6 +51,8 @@ const EVENT_NEED: Record<string, () => boolean> = {
   scrap: () => G.cards.length >= 3,
   graft: () => G.cards.some((c) => c.adj) && G.cards.length >= 2,
   mirror: () => G.wallMax > 12 && G.cards.length > 0 && !!firstFit(1),
+  brickyard: () => G.wall > 14,
+  mason: () => false,
   oracle: () => Object.keys(RELICS).some((k) => RELICS[k].rule && !G.relics.includes(k)),
   /* 隐藏事件不进随机池，只由下面的 SECRET_DOORS 塞进来 / hidden events stay out of the random pool and are only inserted by SECRET_DOORS below */
   s_letter: () => false,
@@ -136,6 +138,8 @@ export const bets = (): string[] => {
   return Array.isArray(w) ? w : w ? [w] : [];
 };
 /** 叠了几个加码时的额外奖励：叠 2 个多给金币，叠 3 个再给一件好遗物 / extra reward for stacking: 2 gives bonus gold, 3 also a good relic */
+/** 墙完好攒几夜换一次城防工匠 / intact nights needed for one mason visit */
+export const INTACT_N = 3;
 export const STACK_GOLD = [0, 0, 4, 6];
 export const stackRelic = (n: number) => n >= 3;
 

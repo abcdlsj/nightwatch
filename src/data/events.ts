@@ -274,5 +274,18 @@ export const EVENTS: Record<string, EventDef> = {
   "minR": 2,
   "rar": 3,
   "w": 0.12
+ },
+ "brickyard": {
+  "ico": "crenel",
+  "cat": "misc",
+  "minR": 2,
+  "rar": 1,
+  "w": 0.7
+ },
+ "mason": {
+  "ico": "mason",
+  "cat": "free",
+  "w": 0,
+  "rar": 2
  }
 } as unknown as Record<string, EventDef>;
