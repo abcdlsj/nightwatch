@@ -67,3 +67,8 @@
 .dboard td:nth-child(2){max-width:9em;overflow:hidden;text-overflow:ellipsis}
 .dboard tr.won td:nth-child(4){color:#ffe79a}
 .dboard tr.me td{background:rgba(255,209,102,.14);color:#ffe79a}
+/* 标题页按钮：每日挑战和开始游戏一样宽，其余四个两两一排，设置放右上角 / title buttons: daily as wide as start, the other four in a 2×2 grid, settings in the top-right corner */
+.scr .t-daily{width:100%;padding:10px 14px;box-shadow:0 4px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,209,102,.45);color:#ffe79a}
+.t-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.t-grid .btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:17px;padding:10px 8px}
+.t-gear{position:absolute;top:calc(12px + var(--sat));right:12px;width:44px;height:44px;padding:0}

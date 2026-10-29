@@ -41,8 +41,9 @@ export function titleScreen() {
   <div class="rules">${(T.rules as string[]).map((r, i) => `<div><i>${i + 1}</i><span>${r}</span></div>`).join('')}</div>
   ${sv && HEROES[sv.hero] ? `<button class="btn gold big" id="contBtn">${t('title.cont', { h: HEROES[sv.hero].n, r: sv.round })}</button>` : ''}
   <button class="btn ${sv ? 'alt' : 'red'} big" id="startBtn">${sv ? T.newRun : T.start}</button>
-  <button class="btn alt" id="dailyBtn">${L.ui.daily.btn}</button>
-  <div class="tbtns"><button class="btn alt" id="achBtn">${t('title.ach', { n: achCount(), max: ACH.length })}${META.heatMax ? t('title.heat', { h: META.heatMax }) : ''}</button><button class="btn alt" id="cdxBtn">${T.codex}</button><button class="btn alt" id="hisBtn">${T.history}</button><button class="btn alt" id="wsBtn">${T.workshop}</button><button class="btn alt" id="sndBtn" style="flex:none" aria-label="${L.ui.settings.title}">⚙</button></div></div>`;
+  <button class="btn alt t-daily" id="dailyBtn">${L.ui.daily.btn}</button>
+  <div class="t-grid"><button class="btn alt" id="achBtn">${t('title.ach', { n: achCount(), max: ACH.length })}${META.heatMax ? t('title.heat', { h: META.heatMax }) : ''}</button><button class="btn alt" id="cdxBtn">${T.codex}</button><button class="btn alt" id="hisBtn">${T.history}</button><button class="btn alt" id="wsBtn">${T.workshop}</button></div>
+  <button class="btn alt t-gear" id="sndBtn" aria-label="${L.ui.settings.title}">⚙</button></div>`;
   sc.hidden = false;
   $('#startBtn').onclick = () => {
     SFX.ensure();
