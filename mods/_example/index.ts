@@ -13,8 +13,8 @@ const pack: ModPack = {
   desc: '水门底下摆渡的苇，和从芦苇荡里走出来的东西。',
 
   /* ---------------- 像素图：字母见 src/data/art/palette.ts，'.' 是透明 ----------------
-   * 卡牌 16×16，立绘 32×32，首领 32~48。图的名字要和卡牌、人物立绘、敌人的 spr 对上
-   * ---------------- Sprites: letters in src/data/art/palette.ts; '.' is transparent ---------------- / cards are 16×16, portraits 32×32, bosses 32–48. Sprite names must match the cards', portraits' and enemies' spr fields
+   * 卡牌 16×16，立绘 32×32，敌人 16 / 24 / 32 / 48 四档（精英 32、首领 48）。图的名字要和卡牌、人物立绘、敌人的 spr 对上。画风约定见 docs/modding.md「画风约定」
+   * ---------------- Sprites: letters in src/data/art/palette.ts; '.' is transparent ---------------- / cards are 16×16, portraits 32×32, enemies in four sizes 16 / 24 / 32 / 48 (elites 32, bosses 48). Sprite names must match the cards', portraits' and enemies' spr fields. Style rules: see 「画风约定」 in docs/modding.md
    */
   sprites: {
     p_wei: [

@@ -12,7 +12,7 @@
 #preview .ph b{font-size:18px;font-weight:400}
 #pvList{display:flex;flex-wrap:wrap;gap:4px;max-height:58px;overflow:hidden}
 .pv{display:inline-flex;align-items:center;gap:2px;background:rgba(255,255,255,.07);border-radius:6px;padding:1px 6px 1px 1px;font-family:var(--px);font-size:13px}
-.pv img{width:24px;height:24px;image-rendering:pixelated}
+.pv img{width:32px;height:32px;image-rendering:pixelated}
 .pv.elite{background:rgba(226,71,59,.35);box-shadow:inset 0 0 0 2px rgba(255,120,100,.5)}
 #pvNote{font-size:var(--fs-body);color:#ffc3b8;line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 #pvNote:empty{display:none}

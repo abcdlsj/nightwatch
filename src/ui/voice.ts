@@ -14,20 +14,21 @@ import { $, restart } from './dom';
 
 const VO = { q: [] as { who: string; t: string; pri: number }[], until: 0, last: 0, timer: 0 as any };
 
-export function voiceOf(who: string) {
+/** box：头像框的 CSS 边长，敌人图按它取整数倍 / box: the portrait slot's CSS size; enemy sprites take an integer scale from it */
+export function voiceOf(who: string, box = 32) {
   if (who === 'hero') {
     const H = HEROES[G.hero];
-    return { n: H.n, img: spr(H.portrait).url, c: H.col };
+    return { n: H.n, img: spr(H.portrait).fit(box), c: H.col };
   }
   if (VOICES[who]) {
     const v = VOICES[who];
-    return { n: v.n, img: spr(v.img).url, c: v.c };
+    return { n: v.n, img: spr(v.img).fit(box), c: v.c };
   }
   if (EN[who]) {
     const d = EN[who];
-    return { n: d.n, img: spr(d.spr).url, c: d.col || '#ff8a80' };
+    return { n: d.n, img: spr(d.spr).fit(box), c: d.col || '#ff8a80' };
   }
-  return { n: '', img: spr('lantern').url, c: '#fff' };
+  return { n: '', img: spr('lantern').fit(box), c: '#fff' };
 }
 
 /** pri：3=剧情/首领（必播，可插队）2=新敌人/重要事件 1=随机反应（空闲时才播） / pri: 3 = story/boss (always plays, can cut in), 2 = new enemy/important event, 1 = random reaction (only when idle) */
@@ -86,6 +87,6 @@ export function foeCard(type: string, firstEver: boolean) {
   el.style.top = (bb && !bb.hidden ? bb.offsetHeight + 16 : 8) + 'px';
   const T = L.ui.battle;
   const fac = (L.terms.factions as Record<string, string>)[d.faction];
-  el.innerHTML = `<img src="${spr(d.spr).url}" alt=""><div><small>${firstEver ? T.firstMeet : T.metAgain}${fac ? ' · ' + fac : ''}</small><b>${d.n}</b><p>${d.tip}</p></div>`;
+  el.innerHTML = `<img src="${spr(d.spr).fit(48)}" alt=""><div><small>${firstEver ? T.firstMeet : T.metAgain}${fac ? ' · ' + fac : ''}</small><b>${d.n}</b><p>${d.tip}</p></div>`;
   restart(el, 'show');
 }

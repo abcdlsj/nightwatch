@@ -110,25 +110,26 @@ class Cv:
 # 元素色做点缀，让同元素的卡像一家：刃=银 w/g/s/d，火=橙红 Y/y/o/R/r，冰=青 w/C/c/b，
 # 电=黄 Y/y + 闪电，机=木 N/n/m 或黄铜 Y/y/N，毒=绿 l/G/t（配一点紫 P/p）。
 # 物件尽量占满 14×14，留 1px 给描边；同类卡轮廓要有区别（瓶子有圆瓶/锥瓶/方瓶/滴管/钟罩……）。
+# 刀剑类刃身至少 3 格宽（亮边 + 刃 + 暗脊），每把一个记忆点（叶形、火星、豁口、烧红……），手机卡面上才认得出。
 CARDS = {
     # ---------------- 刃（银）
-    'dagger': (  # 飞刀
+    'dagger': (  # 飞刀（苦无，叶形刃、缠绳柄、圆环尾）
         '................',
         '..............w.',
-        '.............wg.',
-        '............wgs.',
-        '...........wgs..',
-        '..........wgs...',
-        '.........wgs....',
-        '........wgs.....',
-        '.......dsd......',
-        '......Nn........',
-        '.....Nn.........',
+        '............wws.',
+        '..........wwgs..',
+        '.........wwggs..',
+        '........wwggs...',
+        '.......wwgggs...',
+        '.......wgggs....',
+        '......wgggs.....',
+        '......wgss......',
+        '.....Nn.s.......',
         '....Nn..........',
-        '.yyNn...........',
-        'y..N............',
-        'y..N............',
-        '.NN.............',
+        '...Nn...........',
+        'yyyN............',
+        'y.y.............',
+        'yyy.............',
     ),
     'xbow': (  # 连弩
         '................',
@@ -346,41 +347,41 @@ CARDS = {
         'yNNNNNNNNNNNNNNn',
         '................',
     ),
-    'honeblade': (  # 磨砺之刃
-        '................',
-        '.......Y........',
-        '..w...YwY.......',
-        '..sgw..Y........',
-        '...sgw..........',
-        '....sgw.........',
-        '.....sgw........',
-        '......sgw.......',
-        '.......sgw..y...',
-        '........sgwY....',
-        '.........sYN....',
-        '.........N.nN...',
-        '........n...nN..',
-        '.............nN.',
-        '..............y.',
-        '................',
-    ),
-    'vetblade': (  # 老兵之刃
-        '................',
-        '..............w.',
-        '.............wg.',
-        '............w.s.',
-        '...........wgs..',
-        '..........wgs...',
-        '.........w.s....',
-        '........wgs.....',
-        '.......wgs......',
-        '...y..wgs.......',
-        '....Ygds........',
-        '....wY..........',
-        '...gw.N.........',
-        '..wg...n........',
-        '.yg.............',
+    'honeblade': (  # 磨砺之刃（宽直刃，刃尖迸火星）
+        '...........Y.Yw.',
+        '...............Y',
+        '............www.',
+        '...........wwgs.',
+        '..........wwgss.',
+        '.........wwgss..',
+        '........wwgss...',
+        '.......wwgss....',
+        '....yNwwgss.....',
+        '.....yNgss......',
+        '......yNs.......',
+        '.......yN.......',
+        '....Nn..........',
+        '...Nn...........',
+        '..Nn............',
         '.y..............',
+    ),
+    'vetblade': (  # 老兵之刃（最宽的刃，豁口、金色大护手）
+        '................',
+        '............www.',
+        '...........wggg.',
+        '..........wgggs.',
+        '.........wgggss.',
+        '........wggggs..',
+        '.......wwgggs...',
+        '..Yy..wwgggs....',
+        '...Yywwgggs.....',
+        '....Yygggs......',
+        '.....Yy.s.......',
+        '......Yy........',
+        '.......Yy.......',
+        '...Nn...........',
+        '..Nn............',
+        '.Y..............',
     ),
     'javelin': (  # 标枪手
         '...........wg...',
@@ -599,23 +600,23 @@ CARDS = {
         '................',
         '................',
     ),
-    'emberblade': (  # 烬刃
-        '................',
-        '.g..........Y...',
-        '..gs........o...',
-        '..ogs...........',
-        '..Yogs..........',
-        '...Yogs.........',
-        '....Yogs........',
-        '.....Yogs.......',
-        '......Yogs.y....',
-        '........ogY.....',
-        '.y.......NnN....',
-        '.o......n..nN...',
-        '............nN..',
-        '.............y..',
-        '................',
-        '................',
+    'emberblade': (  # 烬刃（烧红的刃，刃口亮黄、脊暗红）
+        '.........Y..o...',
+        '..........o.....',
+        '............YYY.',
+        '.......o...YYoR.',
+        '......Y...YYoRR.',
+        '.........YYoRR..',
+        '........YYoRR...',
+        '.......YYoRR....',
+        '....dsYYoRR.....',
+        '.....dsoRR......',
+        '......dsR.......',
+        '.......ds.......',
+        '....mx..........',
+        '...mx...........',
+        '..mx............',
+        '.o..............',
     ),
     'brand': (  # 烙铁
         '................',
@@ -2152,23 +2153,23 @@ CARDS = {
         '................',
         '................',
     ),
-    'pike': (  # 长枪阵
-        '........w.......',
-        '.......wwg......',
-        '...w...gws...w..',
-        '..wwg...d...wwg.',
-        '..gws..RRr..gws.',
-        '...d...rNr...d..',
-        '..RRr...N...RRr.',
-        '..rNr...N...rNr.',
-        '...N....N....N..',
-        '...N....N....N..',
-        '...N....N....N..',
-        '...N....N....N..',
-        '...N....N....N..',
-        '...N....N....N..',
-        '...N....N....N..',
-        '...n....n....n..',
+    'pike': (  # 长枪阵（占满画面，和其他卡图一样重）
+        '.......wg.......',
+        '......wwgs......',
+        '..wg..wggs..wg..',
+        '.wwgs..gs..wwgs.',
+        '.wggs.RRrr.wggs.',
+        '..gs..rNnr..gs..',
+        '.RRrr..Nn..RRrr.',
+        '.rNnr..Nn..rNnr.',
+        '..Nn...Nn...Nn..',
+        '..Nn...Nn...Nn..',
+        '..Nn...Nn...Nn..',
+        '..Nn...Nn...Nn..',
+        '..Nn...Nn...Nn..',
+        '..Nn...Nn...Nn..',
+        '..Nn...Nn...Nn..',
+        '..nm...nm...nm..',
     ),
     'tower': (  # 角楼弩
         '.........NN.....',
@@ -2369,22 +2370,22 @@ CARDS = {
         '.Nn.Nn.Nn.Nn.Nn.',
         '.Nn.Nn.Nn.Nn.Nn.',
     ),
-    'caltrop': (  # 铁蒺藜
+    'caltrop': (  # 铁蒺藜（占满画面，和其他卡图一样重）
         '................',
-        '....w...........',
-        '..w.g.g.........',
-        '...ggg.....w....',
-        '...gss...w.g.g..',
-        '...sdd....ggg...',
-        '..s...d...gss...',
-        '..........sdd...',
-        '.........s...d..',
         '......w.........',
-        '....w.g.g.......',
-        '.....ggg........',
-        '.....gss........',
-        '.....sdd........',
-        '....s...d.......',
+        '......wg........',
+        '.w....wg....g...',
+        '..wg..wgs..gs...',
+        '...wggwgsgss....',
+        '....ggwwgss.....',
+        '..wgggwgssdddd..',
+        '....ggsgsdd.....',
+        '...gss.sd.dd....',
+        '..gs...sd..dd...',
+        '.gs....sd...ds..',
+        '.......sd.......',
+        '.......sd.....w.',
+        '..............sd',
         '................',
     ),
     'watchtower': (  # 望楼
@@ -2622,22 +2623,22 @@ CARDS = {
         '.cbd............',
         '.bd.............',
     ),
-    'stardust': (  # 星屑
+    'stardust': (  # 星屑（占满画面，和其他卡图一样重）
         '................',
-        '........y.......',
-        '.....Y......Y...',
-        '.....Y.....Ywy..',
-        '....YYy.....y...',
-        '...YYwyy........',
-        '....yyN.........',
-        '.....N.....Y..y.',
-        '.y...N..y..Y....',
-        '..........YYy...',
-        '.........YYwyy..',
-        '....Y.....yyN...',
-        '...Ywy.....N....',
-        '....y......N....',
-        '........y.......',
+        '.......Y........',
+        '.......Y........',
+        '......YwY.......',
+        '..YYYYwwwYYYY...',
+        '....yYwwwYy.....',
+        '.....yYwYy...y..',
+        '.....Yy.yY..YwY.',
+        '....Yy...yY..y..',
+        '....y.....y.....',
+        '...........Y....',
+        '..y.......YwY...',
+        '.YwY.......Y....',
+        '..y.....y.......',
+        '................',
         '................',
     ),
     'starfire': (  # 流星雨
@@ -3304,9 +3305,12 @@ def portraits():
 
 
 # ---------------------------------------------------------------- 配角立绘 32×32：剧情里和守夜人说话的人
-def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', shade='F', eyes='open', age=0, beard=None, extra=None):
+def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', shade='F', eyes='open', age=0, beard=None, extra=None,
+           face='oval', brow=None, mouth='flat', nose='dot', mark=None):
     """配角通用的半身像。style：short 短发 / long 长发 / bun 发髻 / bald 光头 / cap 布帽 / hood 兜帽 / helm 头盔 / scarf 头巾；
-    eyes：open / closed（瞎了或闭着）/ glasses；age：0 年轻 1 中年 2 老；beard：胡子颜色；extra(c) 再画点别的"""
+    eyes：open / round 圆眼 / narrow 细眼 / squint 眯眼笑 / closed（瞎了或闭着）/ glasses；age：0 年轻 1 中年 2 老；beard：胡子颜色；
+    脸各不相同，别让配角共用一张脸：face：oval / round 圆脸 / long 长脸 / square 方下巴；brow：None / flat / thick 浓眉 / angry 横眉 / worried 八字眉 / arched 弯眉；
+    mouth：flat / smile / grin 露齿 / gap 缺门牙 / frown / small / open；nose：dot / long / broad / none；mark：freckles 雀斑 / mole 痣 / scar 疤 / dirt 灰；extra(c) 再画点别的"""
     c = Cv(32, 32)
     if style == 'long': c.ell(16, 13, 10.5, 11, hair); c.poly([(5.5, 13), (26.5, 13), (27, 27), (5, 27)], hair)
     elif style in ('short', 'bun', 'scarf'): c.ell(16, 12, 9.5, 10, hair)
@@ -3314,7 +3318,9 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
     c.poly([(2, 32), (4, 25), (10, 21), (22, 21), (28, 25), (30, 32)], cloth)
     c.poly([(11, 21), (21, 21), (19, 28), (13, 28)], cloth2)
     c.rect(13, 18, 18, 22, shade)
-    c.ell(16, 13.5 if age < 2 else 14, 6.6, 7.6, skin)
+    rx, ry = {'oval': (6.6, 7.6), 'round': (7.3, 7.1), 'long': (6.0, 8.3), 'square': (6.9, 7.4)}[face]
+    c.ell(16, 13.5 if age < 2 else 14, rx, ry, skin)
+    if face == 'square': c.rect(11, 17, 21, 20, skin)
     for y in range(6, 23):
         for x in range(18, 24):
             if c.get(x, y) == skin and (x - 16) > 3: c.px(x, y, shade)
@@ -3332,18 +3338,42 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
         c.ell(16, 8, 8.5, 6.5, 's'); c.rect(8, 8, 24, 10, 's'); c.line(8, 10, 24, 10, 'd', 1, True); c.line(16, 2, 16, 9, 'g', 1, True)
     if eyes == 'closed':
         c.line(11, 13, 13, 13, 'k', 1, True); c.line(18, 13, 20, 13, 'k', 1, True)
+    elif eyes == 'narrow':
+        c.line(11, 13, 13, 13, 'k', 1, True); c.line(18, 13, 20, 13, 'k', 1, True); c.px(12, 12, 'k', True); c.px(19, 12, 'k', True)
+    elif eyes == 'squint':
+        for x0 in (11, 18): c.px(x0, 13, 'k', True); c.px(x0 + 1, 12, 'k', True); c.px(x0 + 2, 13, 'k', True)
+    elif eyes == 'round':
+        for x0 in (11, 18): c.rect(x0, 11, x0 + 2, 13, 'k', True); c.px(x0, 11, 'w', True); c.px(x0 + 1, 12, 'w', True)
     else:
         c.rect(11, 12, 13, 13, 'k', True); c.px(12, 12, 'w', True); c.rect(18, 12, 20, 13, 'k', True); c.px(19, 12, 'w', True)
         if eyes == 'glasses': c.rect(10, 11, 14, 14, 'g'); c.rect(17, 11, 21, 14, 'g'); c.rect(11, 12, 13, 13, 'k', True); c.rect(18, 12, 20, 13, 'k', True); c.px(12, 12, 'C', True); c.px(19, 12, 'C', True); c.line(14, 12, 17, 12, 'g', 1, True)
     if age >= 1: c.line(11, 14, 12, 14, shade, 1, True); c.line(19, 14, 20, 14, shade, 1, True)
     if age >= 2: c.px(10, 16, shade, True); c.px(21, 16, shade, True); c.line(14, 20, 18, 20, shade, 1, True)
-    c.px(16, 15, shade, True); c.px(16, 16, shade, True)
-    c.line(15, 18, 17, 18, 'r', 1, True)
+    if brow == 'flat': c.line(11, 10, 13, 10, 'k', 1, True); c.line(18, 10, 20, 10, 'k', 1, True)
+    elif brow == 'thick': c.rect(10, 9, 13, 10, hair if hair not in 'wg' else 's', True); c.rect(18, 9, 21, 10, hair if hair not in 'wg' else 's', True)
+    elif brow == 'angry': c.line(10, 9, 13, 10, 'k', 1, True); c.line(18, 10, 21, 9, 'k', 1, True)
+    elif brow == 'worried': c.line(10, 10, 13, 9, 'k', 1, True); c.line(18, 9, 21, 10, 'k', 1, True)
+    elif brow == 'arched': c.px(10, 10, 'k', True); c.line(11, 9, 12, 9, 'k', 1, True); c.px(13, 10, 'k', True); c.px(18, 10, 'k', True); c.line(19, 9, 20, 9, 'k', 1, True); c.px(21, 10, 'k', True)
+    if nose == 'long': c.line(16, 13, 16, 16, shade, 1, True); c.px(15, 16, shade, True)
+    elif nose == 'broad': c.px(16, 15, shade, True); c.line(15, 16, 17, 16, shade, 1, True)
+    elif nose == 'dot': c.px(16, 15, shade, True); c.px(16, 16, shade, True)
+    if mouth == 'smile': c.line(15, 18, 17, 18, 'r', 1, True); c.px(14, 17, 'r', True); c.px(18, 17, 'r', True)
+    elif mouth in ('grin', 'gap'): c.rect(15, 18, 17, 19, 'e', True); c.line(15, 18, 17, 18, 'w', 1, True); c.px(14, 17, 'r', True); c.px(18, 17, 'r', True)
+    elif mouth == 'frown': c.line(15, 18, 17, 18, 'r', 1, True); c.px(14, 19, 'r', True); c.px(18, 19, 'r', True)
+    elif mouth == 'small': c.px(16, 18, 'r', True)
+    elif mouth == 'open': c.rect(15, 18, 17, 19, 'e', True); c.line(15, 18, 17, 18, 'k', 1, True)
+    else: c.line(15, 18, 17, 18, 'r', 1, True)
+    if mouth == 'gap': c.px(16, 18, 'k', True)
+    if mark == 'freckles':
+        for x, y in ((11, 15), (13, 16), (19, 16), (21, 15)): c.px(x, y, shade, True)
+    elif mark == 'mole': c.px(19, 17, 'k', True)
+    elif mark == 'scar': c.line(19, 10, 21, 15, 'r', 1, True)
+    elif mark == 'dirt': c.px(11, 16, 's', True); c.px(12, 16, 's', True); c.px(20, 15, 's', True)
     if beard:
         for x in range(10, 23):
             for y in range(16, 23):
                 if c.get(x, y) in (skin, shade) and (y >= 18 or x <= 10 or x >= 22): c.px(x, y, beard, True)
-        c.line(14, 18, 18, 18, 'r', 1, True)
+        if mouth == 'flat': c.line(14, 18, 18, 18, 'r', 1, True)
     if extra: extra(c)
     return c.done(hl=HLP)
 
@@ -3351,42 +3381,42 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
 def cast():
     P = {}
     # 艾拉那边
-    P['p_karl'] = person(hair='y', hl='Y', style='short', cloth='p', cloth2='P', age=1, beard='N',            # 卡尔：金发络腮胡，紫披风，额上一道旧疤
+    P['p_karl'] = person(hair='y', hl='Y', style='short', cloth='p', cloth2='P', age=1, beard='N', face='square', brow='angry', eyes='narrow',            # 卡尔：金发络腮胡，紫披风，额上一道旧疤
                          extra=lambda c: (c.line(13, 8, 15, 10, 'r', 1, True), c.ell(5.5, 25, 4.5, 3.2, 'g'), c.ell(26.5, 25, 4.5, 3.2, 'g')))
-    P['p_xiaoman'] = person(hair='n', hl='N', style='scarf', cloth='b', cloth2='c',                          # 小满：十三岁，扎头巾，背着水罐
+    P['p_xiaoman'] = person(hair='n', hl='N', style='scarf', cloth='b', cloth2='c', face='round', eyes='round', mouth='smile', nose='none', mark='freckles',                          # 小满：十三岁，扎头巾，背着水罐
                             extra=lambda c: (c.px(11, 15, 'o', True), c.px(20, 15, 'o', True), c.rect(24, 24, 28, 30, 'N'), c.rect(25, 23, 27, 23, 'n')))
-    P['p_chu'] = person(hair='w', hl='w', style='bald', cloth='d', cloth2='s', eyes='closed', age=2, beard='w',  # 老褚：瞎了的老队长，白胡子，旧军服
+    P['p_chu'] = person(hair='w', hl='w', style='bald', cloth='d', cloth2='s', eyes='closed', age=2, beard='w', face='long', nose='long',  # 老褚：瞎了的老队长，白胡子，旧军服
                         extra=lambda c: (c.px(8, 26, 'y', True), c.px(9, 26, 'y', True), c.line(11, 11, 13, 11, 'w', 1, True), c.line(18, 11, 20, 11, 'w', 1, True)))
     # 墨那边
-    P['p_suyan'] = person(hair='a', hl='A', style='bun', cloth='g', cloth2='w', eyes='glasses',               # 苏砚：学院的研究员，盘发，灰白学袍
+    P['p_suyan'] = person(hair='a', hl='A', style='bun', cloth='g', cloth2='w', eyes='glasses', face='long', mouth='small', brow='arched',               # 苏砚：学院的研究员，盘发，灰白学袍
                           extra=lambda c: (c.line(20, 2, 24, 0, 'y', 1, True), c.px(14, 24, 'P', True), c.px(18, 24, 'P', True)))
-    P['p_shen'] = person(hair='s', hl='g', style='bun', cloth='b', cloth2='c', age=2, skin='f', shade='F',     # 老沈：墨的娘，染坊老板娘，靛蓝的手
+    P['p_shen'] = person(hair='b', hl='c', style='scarf', cloth='t', cloth2='C', age=2, skin='f', shade='F', face='round', eyes='squint', mouth='grin',     # 老沈：墨的娘，染坊老板娘，靛蓝的手
                          extra=lambda c: (c.rect(5, 28, 9, 31, 'b'), c.rect(23, 28, 27, 31, 'b'), c.px(6, 29, 'c', True)))
     # 萤那边
-    P['p_qin'] = person(hair='g', hl='w', style='cap', cloth='n', cloth2='N', eyes='glasses', age=2, beard='g',  # 秦师父：灯匠，老花镜，皮围裙
+    P['p_qin'] = person(hair='g', hl='w', style='cap', cloth='n', cloth2='N', eyes='glasses', age=2, beard='g', nose='long', brow='thick',  # 秦师父：灯匠，老花镜，皮围裙
                         extra=lambda c: (c.rect(24, 24, 28, 29, 'd'), c.rect(25, 25, 27, 28, 'Y', True)))
-    P['p_ahe'] = person(hair='x', hl='m', style='short', cloth='G', cloth2='l',                              # 阿禾：卖灯油的小伙子，挑着油桶
+    P['p_ahe'] = person(hair='x', hl='m', style='short', cloth='G', cloth2='l', face='long', eyes='narrow', brow='thick', mouth='grin',                              # 阿禾：卖灯油的小伙子，挑着油桶
                         extra=lambda c: (c.line(2, 22, 30, 22, 'n', 1), c.rect(1, 23, 4, 28, 'N'), c.rect(28, 23, 31, 28, 'N')))
-    P['p_douzi'] = person(hair='a', hl='A', style='short', cloth='R', cloth2='o',                            # 豆子：萤教做纸灯的孩子，缺了门牙
+    P['p_douzi'] = person(hair='a', hl='A', style='short', cloth='R', cloth2='o', face='round', eyes='round', mouth='gap', nose='none',                            # 豆子：萤教做纸灯的孩子，缺了门牙
                           extra=lambda c: (c.px(11, 15, 'o', True), c.px(20, 15, 'o', True), c.px(16, 18, 'k', True), c.rect(4, 24, 8, 29, 'y'), c.px(6, 26, 'Y', True)))
     # 钧那边
-    P['p_oldshi'] = person(hair='x', hl='m', style='scarf', cloth='g', cloth2='n', age=2, beard='s',          # 老石：钧的爹，砌了一辈子墙，雾一样淡
+    P['p_oldshi'] = person(hair='x', hl='m', style='scarf', cloth='g', cloth2='n', age=2, beard='s', face='long', eyes='squint', brow='worried', nose='broad',          # 老石：钧的爹，砌了一辈子墙，雾一样淡
                            extra=lambda c: [c.px(x, y, '.') for y in range(26, 32) for x in range(0, 32) if (x + y) % 3 == 0])
-    P['p_guizhi'] = person(hair='a', hl='A', style='bun', cloth='R', cloth2='y', age=1,                       # 桂枝：钧的媳妇，面摊老板娘
+    P['p_guizhi'] = person(hair='a', hl='A', style='bun', cloth='P', cloth2='y', age=1, brow='arched', mouth='smile', mark='mole',                       # 桂枝：钧的媳妇，面摊老板娘
                            extra=lambda c: (c.ell(16, 2.5, 3.5, 2.6, 'a'), c.line(13, 1, 19, 4, 'y', 1, True)))
-    P['p_shitou'] = person(hair='x', hl='m', style='short', cloth='N', cloth2='n',                           # 石头：钧的儿子，九岁，手里一块砖
+    P['p_shitou'] = person(hair='x', hl='m', style='short', cloth='N', cloth2='n', face='round', brow='angry', mouth='frown', mark='dirt',                           # 石头：钧的儿子，九岁，手里一块砖
                            extra=lambda c: (c.px(11, 15, 'o', True), c.px(20, 15, 'o', True), c.rect(23, 25, 28, 28, 'r'), c.line(23, 26, 28, 26, 'e', 1, True)))
-    P['p_hans'] = person(hair='g', hl='w', style='helm', cloth='s', cloth2='g', age=2, beard='g',             # 汉斯：死了三年的老兵，盔是旧的
+    P['p_hans'] = person(hair='g', hl='w', style='helm', cloth='s', cloth2='g', age=2, beard='g', face='square', eyes='narrow', mark='scar',             # 汉斯：死了三年的老兵，盔是旧的
                          extra=lambda c: (c.px(12, 12, 'C', True), c.px(19, 12, 'C', True)))
     # 璃那边
-    P['p_popo'] = person(hair='w', hl='w', style='bun', cloth='d', cloth2='b', eyes='closed', age=2,         # 婆婆：老守星人，眼睛快看不见了
+    P['p_popo'] = person(hair='w', hl='w', style='bun', cloth='d', cloth2='b', eyes='closed', age=2, face='round', mouth='smile', nose='broad',         # 婆婆：老守星人，眼睛快看不见了
                          extra=lambda c: (c.px(5, 27, 'Y', True), c.px(26, 28, 'Y', True), c.line(19, 0, 22, 3, 'Y', 1, True)))
-    P['p_lifa'] = person(hair='g', hl='w', style='hood', cloth='d', cloth2='s', age=1, beard='g',            # 璃的爹：往北走了的人，兜帽上落满雪
+    P['p_lifa'] = person(hair='g', hl='w', style='hood', cloth='m', cloth2='n', age=1, beard='N', face='long', brow='worried', eyes='narrow',            # 璃的爹：往北走了的人，兜帽上落满雪
                          extra=lambda c: (c.px(8, 6, 'w', True), c.px(23, 5, 'w', True), c.px(13, 2, 'w', True), c.px(26, 12, 'w', True)))
     return P
 
 
-# ---------------------------------------------------------------- 敌人 16×16（大型 20/24，首领 32）
+# ---------------------------------------------------------------- 敌人 16×16（大型 24，精英 32，首领 48）
 def mirror(c, cx=None):
     """把左半边镜像到右半边（对称生物用）。"""
     cx = cx if cx is not None else c.w // 2
@@ -3395,6 +3425,12 @@ def mirror(c, cx=None):
             v = c.g[y][x]; xx = c.w - 1 - x
             if v != '.': c.g[y][xx] = v
             if (x, y) in c.lock: c.lock.add((xx, y))
+
+
+def pad(rows, size):
+    """补透明边到 size×size（左右居中、底对齐，脚下位置不变）。敌人只用 16 / 24 / 32 / 48 四档，放进 UI 框时都能取整数倍。"""
+    h, w = len(rows), len(rows[0]); l = (size - w) // 2
+    return ['.' * size] * (size - h) + ['.' * l + r + '.' * (size - w - l) for r in rows]
 
 
 def enemies():
@@ -3423,14 +3459,14 @@ def enemies():
 
     c = Cv(12, 12); c.ell(6, 4.5, 3, 2.6, 'l'); c.ell(6, 8.5, 3.4, 2.4, 'G'); c.px(5, 4, 'R', True); c.px(7, 4, 'R', True)
     c.line(2, 7, 0, 6, 'k', 1, True); c.line(10, 7, 11, 6, 'k', 1, True); c.line(3, 10, 1, 11, 'k', 1, True); c.line(9, 10, 10, 11, 'k', 1, True)
-    E['mini'] = c.done()
+    E['mini'] = pad(c.done(), 16)
 
     c = Cv(20, 20); c.poly([(3, 7), (7, 5), (13, 5), (17, 7), (18, 14), (15, 18), (5, 18), (2, 14)], 'g'); c.ell(10, 5, 4.5, 3.8, 'g')
     c.ell(2.5, 12, 2.5, 3.2, 's'); c.ell(17.5, 12, 2.5, 3.2, 's'); c.rect(5, 17, 8, 19, 's'); c.rect(12, 17, 15, 19, 's')
     c.rect(7, 4, 8, 5, 'Y', True); c.rect(12, 4, 13, 5, 'Y', True); c.line(8, 8, 12, 8, 'd', 1, True)
     c.line(6, 10, 9, 14, 'd', 1, True); c.line(13, 11, 15, 15, 'd', 1, True); c.px(10, 12, 'Y', True)
     for x, y in ((4, 7), (5, 7), (14, 6), (11, 2), (16, 16)): c.px(x, y, 'G', True)
-    E['golem'] = c.done()
+    E['golem'] = pad(c.done(), 24)
 
     c = Cv(24, 24); c.poly([(5, 10), (19, 10), (22, 23), (2, 23)], 'p')
     c.poly([(7, 9), (17, 9), (18, 20), (6, 20)], 'd'); c.ell(4.5, 10.5, 3.5, 2.8, 's'); c.ell(19.5, 10.5, 3.5, 2.8, 's')
@@ -3508,10 +3544,10 @@ def enemies():
 def frost_enemies():
     E = {}
     # 冰螨：一团带冰刺的小虫
-    c = Cv(); c.ell(8, 10.5, 6, 4.5, 'c'); c.ell(8, 9, 4.5, 3, 'C')
-    for x, y in ((4, 5), (8, 3), (12, 5)): c.poly([(x - 1.5, y + 4), (x, y), (x + 1.5, y + 4)], 'w')
-    c.rect(5, 9, 6, 10, 'k', True); c.rect(10, 9, 11, 10, 'k', True); c.px(5, 9, 'w', True); c.px(10, 9, 'w', True)
-    for x in (3, 6, 10, 13): c.line(x, 14, x - (1 if x < 8 else -1), 15, 'b', 1)
+    c = Cv(); c.ell(8, 10.5, 6.5, 4, 'g'); c.ell(8, 9.5, 5, 2.6, 'w')
+    for x, y in ((4, 5), (8, 3), (12, 5)): c.poly([(x - 1.5, y + 4), (x, y), (x + 1.5, y + 4)], 'C')
+    c.rect(5, 9, 6, 10, 'k', True); c.rect(10, 9, 11, 10, 'k', True); c.px(5, 9, 'R', True); c.px(10, 9, 'R', True)
+    for x in (3, 6, 10, 13): c.line(x, 14, x - (1 if x < 8 else -1), 15, 's', 1)
     E['f_mite'] = c.done()
     # 雪鸮：白色大眼猫头鹰，张开翅膀
     c = Cv(); c.poly([(7, 7), (0, 4), (0, 9), (2, 12), (7, 12)], 'g'); c.line(1, 6, 1, 10, 'w', 1); mirror(c)
@@ -3519,9 +3555,9 @@ def frost_enemies():
     c.ell(6, 6.5, 1.6, 1.6, 'Y', True); c.ell(10, 6.5, 1.6, 1.6, 'Y', True); c.px(6, 6, 'k', True); c.px(10, 6, 'k', True)
     c.poly([(7, 8), (9, 8), (8, 10)], 'o'); c.px(6, 11, 'g'); c.px(10, 11, 'g'); c.px(8, 12, 'g')
     E['f_owl'] = c.done()
-    # 冻尸：结了冰的死人，蓝皮肤、肩上冰棱
+    # 冻尸：结了冰的死人，蓝皮肤、破烂的旧衣、肩上冰棱
     c = Cv(); c.ell(8, 4.5, 3.6, 3.4, 'c'); c.rect(6, 5, 7, 6, 'k', True); c.rect(9, 5, 10, 6, 'k', True); c.px(6, 5, 'C', True); c.px(9, 5, 'C', True)
-    c.line(7, 8, 9, 8, 'd', 1, True); c.rect(4, 9, 12, 13, 'b'); c.line(6, 10, 10, 10, 's', 1, True)
+    c.line(7, 8, 9, 8, 'd', 1, True); c.rect(4, 9, 12, 13, 'm'); c.line(6, 10, 10, 10, 'n', 1, True); c.px(5, 13, '.'); c.px(9, 13, '.'); c.px(11, 12, 'x', True)
     c.poly([(3, 9), (2, 5), (5, 9)], 'C'); c.poly([(13, 9), (14, 4), (11, 9)], 'C'); c.line(3, 10, 2, 13, 'c', 1); c.line(13, 10, 14, 13, 'c', 1)
     c.line(6, 14, 5, 15, 'c', 1); c.line(10, 14, 11, 15, 'c', 1)
     E['f_husk'] = c.done()
@@ -3533,7 +3569,7 @@ def frost_enemies():
     # 冰碴：卵里孵出来的小东西
     c = Cv(12, 12); c.poly([(2, 10), (4, 4), (6, 1), (8, 4), (10, 10)], 'C'); c.px(5, 6, 'k', True); c.px(7, 6, 'k', True)
     c.line(4, 8, 7, 8, 'b', 1, True); c.line(3, 10, 2, 11, 'c', 1); c.line(9, 10, 10, 11, 'c', 1)
-    E['f_chip'] = c.done()
+    E['f_chip'] = pad(c.done(), 16)
     # 雪人：大块头，白毛、冰角，撞墙会冻住你的卡
     c = Cv(20, 20); c.poly([(3, 8), (6, 5), (14, 5), (17, 8), (18, 15), (15, 19), (5, 19), (2, 15)], 'w'); c.ell(10, 6, 5, 4.2, 'w')
     c.poly([(5, 4), (3, 0), (7, 3)], 'C'); c.poly([(15, 4), (17, 0), (13, 3)], 'C')
@@ -3541,16 +3577,16 @@ def frost_enemies():
     c.line(8, 9, 12, 9, 'b', 1, True); c.px(9, 10, 'w', True); c.px(11, 10, 'w', True)
     c.ell(2.5, 12, 2.4, 3.4, 'g'); c.ell(17.5, 12, 2.4, 3.4, 'g'); c.rect(5, 18, 8, 19, 'g'); c.rect(12, 18, 15, 19, 'g')
     for x, y in ((6, 12), (13, 14), (9, 16), (11, 11)): c.px(x, y, 'g', True)
-    E['f_yeti'] = c.done()
+    E['f_yeti'] = pad(c.done(), 24)
     # 冰墙卫：举着一面冰盾
     c = Cv(); c.ell(8, 3.5, 3, 2.8, 's'); c.rect(5, 3, 11, 4, 's'); c.line(6, 3, 10, 3, 'C', 1, True)
     c.line(14, 0, 14, 15, 'g', 1); c.poly([(13, 0), (15, 0), (14, 2)], 'C')
     c.poly([(2, 6), (12, 6), (12, 12), (7, 16), (2, 12)], 'C'); c.poly([(4, 8), (10, 8), (10, 11), (7, 14), (4, 11)], 'c')
     c.line(5, 9, 7, 11, 'w', 1, True); c.rect(4, 15, 5, 15, 'd'); c.rect(9, 15, 10, 15, 'd')
     E['f_warden'] = c.done()
-    # 霜巫：深蓝兜帽，法杖顶着一颗冰珠，会给附近的怪回血
-    c = Cv(); c.poly([(4, 15), (5, 5), (8, 1), (11, 5), (12, 15)], 'b'); c.ell(8, 6, 2.5, 2.2, 'k', True)
-    c.px(7, 6, 'C', True); c.px(9, 6, 'C', True); c.rect(6, 10, 10, 11, 'c'); c.line(13, 3, 13, 15, 'g', 1)
+    # 霜巫：紫兜帽（霜潮主色是冰蓝，施法的三个各用一个副色：霜巫紫、法师白、祭司金），法杖顶着一颗冰珠，会给附近的怪回血
+    c = Cv(); c.poly([(4, 15), (5, 5), (8, 1), (11, 5), (12, 15)], 'p'); c.ell(8, 6, 2.5, 2.2, 'k', True)
+    c.px(7, 6, 'C', True); c.px(9, 6, 'C', True); c.rect(6, 10, 10, 11, 'P'); c.line(13, 3, 13, 15, 'g', 1)
     c.ell(13, 2, 1.8, 1.8, 'C'); c.px(13, 2, 'w', True); c.line(3, 7, 1, 5, 'w', 1); c.px(1, 4, 'C')
     E['f_witch'] = c.done()
     # 号角手：吹着骨号，催队伍快走
@@ -3558,9 +3594,9 @@ def frost_enemies():
     c.px(7, 4, 'b', True); c.px(9, 4, 'b', True); c.rect(5, 7, 11, 12, 'd'); c.line(6, 9, 10, 9, 's', 1, True)
     c.poly([(9, 6), (15, 3), (16, 6), (10, 8)], 'N'); c.px(15, 4, 'w', True); c.rect(5, 13, 6, 15, 'd'); c.rect(10, 13, 11, 15, 'd')
     E['f_horn'] = c.done()
-    # 冰雷甲虫：背着一颗冰雷，死了会炸
-    c = Cv(); c.ell(8, 11, 6, 3.5, 'b'); c.ell(8, 10, 5, 2.5, 'c'); c.line(8, 8, 8, 13, 'd', 1, True)
-    c.ell(3, 11, 2, 1.6, 'd'); c.px(2, 11, 'C', True)
+    # 冰雷甲虫：深紫硬壳、高背，背着一颗冰雷，死了会炸
+    c = Cv(); c.ell(8, 10.5, 6, 4.5, 'a'); c.ell(8, 9.5, 5, 3.2, 'A'); c.line(8, 7, 8, 13, 'a', 1, True)
+    c.ell(3, 11, 2, 1.6, 'a'); c.px(2, 11, 'C', True); c.line(1, 10, 0, 8, 'g', 1)
     c.ell(9, 5.5, 3, 3, 'C'); c.px(8, 4, 'w', True); c.line(10, 3, 12, 1, 'N', 1); c.px(13, 0, 'Y', True); c.px(12, 0, 'o', True)
     for x in (4, 8, 12): c.px(x, 14, 'd'); c.px(x, 15, 'd')
     E['f_beetle'] = c.done()
@@ -3569,10 +3605,10 @@ def frost_enemies():
     c.line(4, 5, 7, 4, 'g', 1, True); c.line(9, 9, 12, 8, 'g', 1, True); c.line(5, 11, 8, 11, 'g', 1, True)
     c.rect(6, 6, 6, 7, 'b', True); c.rect(10, 6, 10, 7, 'b', True)
     E['f_wisp'] = c.done()
-    # 冰棺祭司：戴冰冠的祭司，让冻尸站起来
-    c = Cv(); c.poly([(3, 15), (5, 5), (8, 2), (11, 5), (13, 15)], 'd'); c.ell(8, 6, 2.4, 2.4, 'c'); c.px(7, 6, 'w', True); c.px(9, 6, 'w', True)
-    for x in (6, 8, 10): c.poly([(x - 1, 3), (x, 0), (x + 1, 3)], 'C')
-    c.rect(5, 10, 11, 10, 'C'); c.line(14, 3, 14, 15, 'x', 1); c.rect(13, 1, 15, 4, 'C'); c.px(14, 2, 'b', True)
+    # 冰棺祭司：白袍金冠的祭司，让冻尸站起来
+    c = Cv(); c.poly([(3, 15), (5, 5), (8, 2), (11, 5), (13, 15)], 'g'); c.ell(8, 6, 2.4, 2.4, 'c'); c.px(7, 6, 'w', True); c.px(9, 6, 'w', True)
+    for x in (6, 8, 10): c.poly([(x - 1, 3), (x, 0), (x + 1, 3)], 'Y')
+    c.rect(5, 10, 11, 10, 'y'); c.line(8, 11, 8, 14, 'y', 1, True); c.line(14, 3, 14, 15, 'x', 1); c.rect(13, 1, 15, 4, 'C'); c.px(14, 2, 'b', True)
     E['f_priest'] = c.done()
     # 冰山雪橇：一整块冰拖着走，里面冻着一队冻尸
     c = Cv(24, 24); c.poly([(3, 18), (4, 7), (9, 2), (16, 3), (21, 8), (21, 18)], 'C'); c.poly([(6, 16), (7, 9), (11, 6), (16, 7), (18, 11), (18, 16)], 'c')
@@ -3593,12 +3629,47 @@ def frost_enemies():
     return E
 
 
+class Big(Cv):
+    """按 k 倍坐标重新栅格化的画布：图元（矩形、椭圆、多边形、线）在大画布上重画，边缘是新的像素而不是放大的方块；单点细节画成 k 倍小块。
+    用来把 32 格的设计改成 48 格首领，不是把小图整体放大。"""
+    def __init__(s, w, h, k):
+        super().__init__(round(w * k), round(h * k)); s.k = k
+
+    raw = False
+
+    def px(s, x, y, c, lock=False):
+        if s.raw: return Cv.px(s, x, y, c, lock)
+        k = s.k; x0, y0 = int(round(x * k)), int(round(y * k))
+        for yy in range(y0, max(y0 + 1, int(round((y + 1) * k)))):
+            for xx in range(x0, max(x0 + 1, int(round((x + 1) * k)))): Cv.px(s, xx, yy, c, lock)
+
+    def rect(s, x0, y0, x1, y1, c, lock=False):
+        k = s.k
+        for y in range(int(round(y0 * k)), int(round((y1 + 1) * k))):
+            for x in range(int(round(x0 * k)), int(round((x1 + 1) * k))): Cv.px(s, x, y, c, lock)
+
+    def _raw(s, f, *a):
+        s.raw = True
+        try: f(s, *a)
+        finally: s.raw = False
+
+    def ell(s, cx, cy, rx, ry, c, lock=False):
+        k = s.k; s._raw(Cv.ell, (cx + 0.5) * k - 0.5, (cy + 0.5) * k - 0.5, rx * k, ry * k, c, lock)
+
+    def poly(s, pts, c, lock=False):
+        k = s.k; s._raw(Cv.poly, [(x * k, y * k) for x, y in pts], c, lock)
+
+    def line(s, x0, y0, x1, y1, c, t=1, lock=False):
+        k = s.k; f = lambda v: (v + 0.5) * k - 0.5
+        s._raw(Cv.line, f(x0), f(y0), f(x1), f(y1), c, max(1, round(t * k)) if t > 1 else t, lock)
+
+
 # ---------------------------------------------------------------- 首领与精英：比小怪大一圈，细节更多
-# 战场分辨率调高后小怪 16 格显得小，首领和精英单独画大图（精英 30、骑士 32、深渊之眼和母巢 48），不再把 16 格小怪放大两倍充数。
+# 战场分辨率调高后小怪 16 格显得小，首领和精英单独画大图（精英 30 补边到 32，首领一律 48），不再把 16 格小怪放大两倍充数。
 def big_foes():
     E = {}
-    # 暗影骑士：角盔红眼、紫披风、左手塔盾、右手竖着大剑
-    c = Cv(32, 32)
+    # 暗影骑士：角盔红眼、紫披风、左手塔盾、右手竖着大剑。和其他首领一样 48 格：按 32 格的设计在 48 格上重新栅格化
+    c = Big(32, 32, 1.5)
     c.poly([(8, 10), (24, 10), (28, 31), (4, 31)], 'p'); c.line(7, 16, 5, 30, 'P', 1); c.line(25, 16, 27, 30, 'e', 1)
     c.rect(11, 23, 14, 29, 's'); c.rect(18, 23, 21, 29, 's'); c.rect(10, 29, 14, 30, 'd'); c.rect(18, 29, 22, 30, 'd')
     c.px(12, 25, 'g', True); c.px(19, 25, 'g', True)
@@ -3668,7 +3739,7 @@ def big_foes():
     c.line(26, 18, 26, 22, 'n', 1); c.poly([(24, 3), (29, 3), (29, 15), (24, 18)], 'g'); c.line(25, 4, 25, 16, 'w', 1, True); c.px(28, 8, 'k', True)
     for y in range(18, 29, 2): c.px(3 + (y // 2) % 2, y, 's')
     c.ell(3.5, 28, 1.6, 1.4, 's')
-    E['e_brute'] = c.done()
+    E['e_brute'] = pad(c.done(), 32)
 
     # 山岩巨像：一座会走的石山，身上嵌着发光的矿脉，头顶长着苔藓
     c = Cv(30, 30)
@@ -3681,7 +3752,7 @@ def big_foes():
     c.px(15, 15, 'o', True)
     for x, y in ((10, 2), (11, 1), (13, 1), (17, 1), (19, 2), (20, 3), (6, 8), (24, 9)): c.px(x, y, 'G', True)
     c.px(12, 2, 'l', True); c.px(18, 2, 'l', True)
-    E['e_golem'] = c.done()
+    E['e_golem'] = pad(c.done(), 32)
 
     # 白骨主教：高冠骨面，紫袍拖地，手里骨杖挂着灯
     c = Cv(30, 30)
@@ -3693,7 +3764,7 @@ def big_foes():
     c.ell(7, 16, 2.6, 2.2, 'p'); c.ell(23, 16, 2.6, 2.2, 'p'); c.line(8, 18, 5, 22, 'p', 2); c.rect(4, 22, 5, 23, 'w')
     c.line(26, 3, 26, 29, 'w', 1); c.ell(26, 3, 2.2, 2.2, 'w'); c.rect(25, 3, 25, 3, 'k', True); c.px(27, 3, 'k', True)
     c.line(24, 7, 22, 9, 'g', 1); c.rect(21, 9, 23, 12, 'l'); c.px(22, 10, 'Y', True)
-    E['e_lich'] = c.done()
+    E['e_lich'] = pad(c.done(), 32)
 
     # 霜狼王：灰白大狼，背上冰棱，嘴里呵着冷气
     c = Cv(30, 30)
@@ -3708,7 +3779,7 @@ def big_foes():
     for x in (5, 16): c.rect(x, 27, x + 3, 28, 's')
     c.line(6, 17, 19, 17, 'w', 1, True); c.line(7, 13, 17, 13, 's', 1, True)
     for x, y in ((29, 17), (27, 18), (29, 20)): c.px(x, y, 'C', True)
-    E['e_wolf'] = c.done()
+    E['e_wolf'] = pad(c.done(), 32)
 
     # 老雪人：比城门还高的雪人，脸上插着两根冰柱，一身冰甲
     c = Cv(30, 30)
@@ -3720,7 +3791,7 @@ def big_foes():
     c.ell(3, 17, 3, 5, 'g'); c.ell(27, 17, 3, 5, 'g'); c.rect(7, 27, 12, 29, 'g'); c.rect(18, 27, 23, 29, 'g')
     for x, y in ((6, 13), (24, 13), (10, 25), (20, 24)): c.px(x, y, 'g', True)
     for x in (1, 4, 26, 29): c.px(x, 22, 'C', True)
-    E['e_yeti'] = c.done()
+    E['e_yeti'] = pad(c.done(), 32)
 
     # 冰棺主祭：戴冰冠的高个祭司，背后立着一口冰棺
     c = Cv(30, 30)
@@ -3732,7 +3803,7 @@ def big_foes():
     for x in (13, 17, 21): c.poly([(x - 1.5, 7), (x, 1 if x == 17 else 3), (x + 1.5, 7)], 'C')
     c.line(27, 3, 27, 29, 'x', 1); c.rect(25, 1, 29, 5, 'C'); c.px(27, 3, 'b', True); c.px(26, 2, 'w', True)
     c.ell(23, 17, 2.4, 2, 'd')
-    E['e_priest'] = c.done()
+    E['e_priest'] = pad(c.done(), 32)
 
     # 哑钟：晨钟城丢了七百年的大吕。铜钟生满铜绿，钟口朝下，裂了一道缝漏出一点光；钟舌是一截白骨，两根断锁链垂到地上
     c = Cv(48, 48)
@@ -3978,7 +4049,7 @@ def write_ts(path):
     A = card_art(); P = {**portraits(), **enemies(), **relic_icons(), **event_icons()}
     for k, rows in {**A, **P}.items():
         assert all(len(r) == len(rows[0]) for r in rows), k
-    out = ['/* 像素美术（由 tools/pixelgen.py 生成，勿手改）：卡牌图标 16×16、人物立绘 32×32、敌人与首领大图 */',
+    out = ['/* 像素美术（由 tools/pixelgen.py 生成，勿手改）：卡牌图标 16×16、人物立绘 32×32、敌人与首领大图 / Pixel art (generated by tools/pixelgen.py, do not edit): card icons 16×16, hero portraits 32×32, enemy and boss art */',
            'export const EXTRA_PAL: Record<string, string> = ' + json.dumps(EXTRA_PAL) + ';',
            'export const SHAPES: Record<string, string[]> = ' + json.dumps(relic_templates(), ensure_ascii=False) + ';']
     # 保留文件里已有、但这里没有生成的图（有些图是别处加进来的），只覆盖同名的

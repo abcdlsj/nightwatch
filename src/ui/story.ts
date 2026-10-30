@@ -20,10 +20,10 @@ export function playStory(pages: Page[], mode: Mode, done?: () => void) {
     full = '';
   const S = L.ui.story;
   const who = (p: Page) => {
-    if (p.who === 'narr') return { n: S.narr, img: spr('lantern').url, c: '#9fb3ba' };
-    if (p.who === 'knight') return { n: S.knight, img: spr('knight').url, c: '#c79bff' };
-    if (p.who === 'eye') return { n: S.eye, img: spr('eye').url, c: '#ff6b5b' };
-    return voiceOf(p.who || 'narr');
+    if (p.who === 'narr') return { n: S.narr, img: spr('lantern').fit(64), c: '#9fb3ba' };
+    if (p.who === 'knight') return { n: S.knight, img: spr('knight').fit(64), c: '#c79bff' };
+    if (p.who === 'eye') return { n: S.eye, img: spr('eye').fit(64), c: '#ff6b5b' };
+    return voiceOf(p.who || 'narr', 64);
   };
   /* 背景整屏画一次，翻页只换前景 / the full-screen backdrop is drawn once; paging only swaps the foreground */
   ov.hidden = false;

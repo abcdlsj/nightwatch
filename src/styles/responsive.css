@@ -7,7 +7,7 @@
   .ptitle{font-size:18px}.ev-head{padding:5px 8px}.ev-head img{width:32px;height:32px}.ev-head b{font-size:17px}
   .rd-t{font-size:28px}.ready .muted{display:none}
   .opt em{display:none}.tl p{padding:4px 8px}
-  .ifoe span{display:none}.ifoe{grid-template-rows:auto}.ifoe img{grid-row:auto;width:22px;height:22px}.ready{gap:5px}
+  .ifoe span{display:none}.ifoe{grid-template-rows:auto}.ifoe{grid-template-columns:16px auto 1fr}.ifoe img{grid-row:auto;width:16px;height:16px}.ready{gap:5px}
 }
 #prep.talking #preview{display:none}
 @media (prefers-reduced-motion: reduce){
