@@ -171,17 +171,18 @@ export function bestHand(cards: Card[], opt: { four?: boolean; smear?: boolean }
 }
 
 /* ================================================================ 盲注和底注 / Blinds and antes */
-const RULES: Record<string, { n: string; d: string }> = {
+/* from：最早第几夜才会抽到。照原作，狠的首领盲要等底注往后才出；第一个首领盲只抽不拆牌型的 / from: the earliest night a rule can be drawn. As in the original, the harsh boss blinds wait for a later ante; the first boss blind only draws rules that leave your hand intact */
+const RULES: Record<string, { n: string; d: string; from?: number }> = {
   hook: { n: '钩子', d: '每 7 秒，随机两张卡的充能被钩走' },
-  club: { n: '梅花', d: '梅花牌被削弱：不计分' },
-  goad: { n: '尖刺', d: '黑桃牌被削弱：不计分' },
-  head: { n: '头颅', d: '红桃牌被削弱：不计分' },
-  window: { n: '窗户', d: '方片牌被削弱：不计分' },
-  plant: { n: '植物', d: '人头牌被削弱：不计分' },
-  flint: { n: '燧石', d: '牌型的筹码和倍率减半' },
-  arm: { n: '手臂', d: '这一夜牌型降一级' },
-  psychic: { n: '灵媒', d: '计分的牌不到 5 张，伤害减半' },
-  wall: { n: '墙', d: '敌人血量 ×1.6' },
+  club: { n: '梅花', d: '梅花牌被削弱：不计分', from: 6 },
+  goad: { n: '尖刺', d: '黑桃牌被削弱：不计分', from: 6 },
+  head: { n: '头颅', d: '红桃牌被削弱：不计分', from: 6 },
+  window: { n: '窗户', d: '方片牌被削弱：不计分', from: 6 },
+  plant: { n: '植物', d: '人头牌被削弱：不计分', from: 6 },
+  flint: { n: '燧石', d: '牌型的筹码和倍率减半', from: 6 },
+  arm: { n: '手臂', d: '这一夜牌型降一级', from: 6 },
+  psychic: { n: '灵媒', d: '计分的牌不到 5 张，伤害减半', from: 6 },
+  wall: { n: '墙', d: '敌人血量 ×1.6', from: 6 },
   wheel: { n: '轮子', d: '每 6 秒，随机一张卡翻面 3 秒' },
   house: { n: '房子', d: '开战头 4 秒，所有卡都扣着' },
   manacle: { n: '手铐', d: '最右边那张卡，开战后 15 秒才能动' },
@@ -584,7 +585,7 @@ const pack: ModPack = {
         const bl = blind();
         let m = hpMul();
         if (bl.rule === 'wall') m *= 1.6;
-        if (G.hero === 'dk_plasma') m *= 1.5;
+        if (G.hero === 'dk_plasma') m *= 1.7;
         if (type === 'dl_vessel') m *= 1.8;
         return m * (1 - mv('dl_hiero'));
       },
@@ -689,7 +690,7 @@ const pack: ModPack = {
       night: () => {
         const bl = blind();
         if (bl.kind === 'boss' && G.round !== 9 && ws().ruleFor !== G.round) {
-          ws().rule = pick(Object.keys(RULES));
+          ws().rule = pick(Object.keys(RULES).filter((k) => (RULES[k].from ?? 0) <= G.round));
           ws().ruleFor = G.round;
         }
       },
