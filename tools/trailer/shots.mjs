@@ -101,6 +101,15 @@ const SHOTS = {
     await stage(pg, 'cracker', 2);
     await record(pg, 'doors', 3);
   },
+  /** 工坊：从标题页点开，展示怎么加模组和已装的模组 / workshop: opened from the title screen, showing how to add mods and which are installed */
+  async workshop(pg) {
+    /* 官方模组还没装进游戏，「装了 0 个模组」那栏藏掉，只留怎么做模组 / the official mods aren't installed yet, so hide the '0 mods installed' list and keep only how to make one */
+    await pg.addStyleTag({ content: '.sh .hs-h,.sh .tlist{display:none!important}' });
+    const at = await center(pg, '#wsBtn');
+    await record(pg, 'workshop', 4, async (i, t) => {
+      if (i === 6) await pg.mouse.click(at.x, at.y);
+    });
+  },
   /** 标题画面，做结尾标版底图 / the title screen, as the end-slate background */
   async title(pg) {
     /* 只留标志和标语，按钮和规则列表藏掉，下面空出来放字 / keep only the logo and tagline; hide buttons and rules so the lower half is free for text */

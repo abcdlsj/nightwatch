@@ -35,6 +35,7 @@ const EDL = [
   ['volt', 2.6, 1],
   ['cracker', 2.7, 1],
   ['boss', 0.4, 8, 'nights'],
+  ['workshop', 0.6, 6, 'mod'],
   ['title', 0.5, 14, 'end'],
 ];
 
@@ -47,6 +48,7 @@ const CAPS = {
   chain: { big: '连锁触发', pos: 'top' },
   grow: { big: '越打越强', pos: 'top' },
   nights: { big: '撑过九个长夜', pos: 'bottom' },
+  mod: { big: '自己写模组', small: '人物 · 卡牌 · 首领 · 剧情', pos: 'mid' },
   end: { big: '打开网页就能玩', small: '竖屏像素 · 自动战斗构筑', pos: 'end' },
 };
 
@@ -66,7 +68,7 @@ async function renderCaps(url) {
       document.body.innerHTML = '';
       document.documentElement.style.background = 'transparent';
       document.body.style.cssText = 'margin:0;background:transparent;width:100vw;height:100vh;position:relative;overflow:hidden';
-      const top = { top: '9%', bottom: '70%', end: '62%' }[c.pos];
+      const top = { top: '9%', mid: '30%', bottom: '70%', end: '62%' }[c.pos];
       const box = document.createElement('div');
       box.style.cssText = `position:absolute;left:0;right:0;top:${top};display:flex;flex-direction:column;align-items:center;gap:10px;font-family:var(--zh)`;
       box.innerHTML =
