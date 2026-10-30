@@ -19,9 +19,11 @@ registerSW(__BUILD_ID__);
 initPlatform()
   .catch((e) => console.error('平台初始化失败，退回网页存储', e))
   .then(async () => {
-    /* 语言：设置里选过就用选的，默认中文 / language: use the one chosen in settings, Chinese by default */
+    /* 语言：设置里选过就用选的；没选过时独立站看系统首选语言（中文出中文，其余出英文），其他版本默认中文
+     * language: use the one chosen in settings; otherwise the standalone site follows the system's preferred language (Chinese for zh, English for anything else) and other builds default to Chinese */
     const [{ setLocale }, { store, KEYS }] = await Promise.all([import('./i18n'), import('./platform/storage')]);
-    const code = store.get(KEYS.lang);
+    const sys = (navigator.languages?.[0] || navigator.language || '').toLowerCase();
+    const code = store.get(KEYS.lang) || (__AUTO_LANG__ && sys && !sys.startsWith('zh') ? 'en' : null);
     if (code && code !== 'zh-CN') await setLocale(code).catch((e) => console.error('语言包加载失败', e));
   })
   .then(() => import('./app/boot'));
