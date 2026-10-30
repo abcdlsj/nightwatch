@@ -1,0 +1,20 @@
+/* ---------- 电脑宽屏：左栏备战，右栏是原来那一列（html.wide 由 boot.ts 按窗口大小切换） ---------- / ---------- Desktop wide screens: prep on the left, the original column on the right (html.wide is toggled by boot.ts from the window size) ---------- */
+html.wide #app{max-width:none;width:calc(var(--side) + var(--core) + 30px);display:grid;grid-template-columns:var(--side) var(--core);
+  grid-template-rows:auto minmax(0,1fr) auto auto auto;column-gap:14px;row-gap:7px}
+html.wide #top{grid-column:2;grid-row:1}
+html.wide #stage{grid-column:2;grid-row:2}
+html.wide #stashRow{grid-column:2;grid-row:3}
+html.wide #boardRow{grid-column:2;grid-row:4}
+html.wide #actions{grid-column:2;grid-row:5}
+html.wide #app>#prep{grid-column:1;grid-row:1/-1;position:relative;inset:auto;min-height:0;border-radius:14px;padding:12px;
+  background:rgba(8,14,18,.55);box-shadow:inset 0 0 0 3px rgba(0,0,0,.35),0 4px 0 rgba(0,0,0,.4)}
+/* 开战后左栏不收起，只留今晚敌情 / once battle starts the left column stays, showing only tonight's enemies */
+html.wide #app>#prep[hidden]{display:flex;align-self:start}
+html.wide #app>#prep[hidden] #pbody{display:none}
+html.wide #pvList{max-height:none}
+html.wide #pvNote{-webkit-line-clamp:unset}
+/* 备战时右边也画着城墙 / the wall is drawn on the right during prep too */
+html.wide #field{display:block!important}
+/* 弹层改成居中弹窗 / sheets become centered dialogs */
+html.wide #sheet{align-items:center;padding:24px}
+html.wide .sh{max-width:480px;max-height:min(86vh,760px);border-radius:18px;padding-bottom:16px}

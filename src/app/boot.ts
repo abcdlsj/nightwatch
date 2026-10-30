@@ -92,8 +92,28 @@ on('ach', (a: { n: string; d: string }) => {
 });
 
 /* ---------- 布局：卡宽跟屏幕走 ---------- / ---------- Layout: card width follows the screen ---------- */
+/* 电脑宽屏：左栏放备战（商店、事件、夜谈），右栏是原来那一列，随屏幕高度放宽；手机（竖屏、横屏）都进不了这个模式
+ * desktop wide screens: prep (shop, events, talks) moves to a left column and the original column sits on the right, widening with the screen height; phones (portrait or landscape) never enter this mode */
+const WIDE = matchMedia('(min-width: 960px) and (min-height: 600px) and (min-aspect-ratio: 5/4)');
+/** 切换宽屏布局，返回右栏宽度（不是宽屏返回 0） / toggle the wide layout and return the core column width (0 when not wide) */
+function applyWide() {
+  const root = document.documentElement;
+  const prep = $('#prep');
+  root.classList.toggle('wide', WIDE.matches);
+  if (!WIDE.matches) {
+    if (prep.parentElement !== $('#stage')) $('#stage').insertBefore(prep, $('#report'));
+    return 0;
+  }
+  const core = Math.round(clamp(innerHeight * 0.5, 440, 560));
+  root.style.setProperty('--core', core + 'px');
+  root.style.setProperty('--side', Math.round(clamp(innerWidth - core - 60, 360, 480)) + 'px');
+  if (prep.parentElement !== $('#app')) $('#app').prepend(prep);
+  return core;
+}
+
 function layout() {
-  const avail = Math.min(440, innerWidth) - 16 - 8;
+  const core = applyWide();
+  const avail = core ? core - 8 : Math.min(440, innerWidth) - 16 - 8;
   LAYOUT.cw = Math.floor(avail / 8);
   /* 用 #app 实际可用高度（已扣掉刘海和底部横条），不用 innerHeight / use #app's actual usable height (already excluding the notch and home bar), not innerHeight */
   const vh = $('#app').clientHeight || innerHeight;
@@ -181,7 +201,8 @@ function loop(now: number) {
     paintBossbar();
     if (B && B.shield > 0) updateHUD();
   }
-  if (G.phase === 'battle' || G.phase === 'report' || G.phase === 'over') drawField(dtR * (G.phase === 'battle' ? G.speed : 1));
+  /* 宽屏备战时商店在左栏，右边照样画着城墙 / in wide prep the shop sits in the left column, so keep drawing the wall on the right */
+  if (G.phase === 'battle' || G.phase === 'report' || G.phase === 'over' || (G.phase === 'prep' && WIDE.matches)) drawField(dtR * (G.phase === 'battle' ? G.speed : 1));
   FX.draw(dtR);
   requestAnimationFrame(loop);
 }
