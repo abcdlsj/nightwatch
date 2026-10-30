@@ -15,12 +15,12 @@ const BPM = 132;
 const BEAT = 60 / BPM;
 const SONG = 'battle';
 
-/* 剪辑表：[镜头, 从镜头第几秒开始, 占几拍, 字幕?]；字幕在这一段开头出现 / edit list: [shot, start second within the shot, length in beats, caption?]; the caption appears at the start of the segment */
+/* 剪辑表：[镜头, 从镜头第几秒开始, 占几拍, 字幕?, 播放倍速?]；字幕在这一段开头出现 / edit list: [shot, start second within the shot, length in beats, caption?, playback speed?]; the caption appears at the start of the segment */
 const EDL = [
   ['horde', 0.0, 4],
   ['horde', 1.8, 4, 'hook'],
-  ['place', 0.45, 8, 'place'],
-  ['merge', 0.25, 12, 'merge'],
+  ['place', 0.45, 6, 'place', 1.33],
+  ['merge', 0.25, 9, 'merge', 1.33],
   ['doors', 0.6, 4, 'doors'],
   ['fire', 0.2, 2, 'chain'],
   ['volt', 0.3, 2],
@@ -143,14 +143,16 @@ async function main() {
     const list = [];
     const cues = [];
     let at = 0;
-    EDL.forEach(([shot, from, beats, cap], i) => {
+    EDL.forEach(([shot, from, beats, cap, speed = 1], i) => {
       const dur = beats * BEAT;
+      /* 倍速播放时，这一段吃掉的镜头长度 / with a playback speed, how much of the shot this segment consumes */
+      const src = dur * speed;
       const dir = join(OUT, 'clips', shot);
       if (!existsSync(dir)) throw new Error(`缺镜头 ${shot}，先跑 shots.mjs / missing shot ${shot}, run shots.mjs first`);
       const out = join(segDir, String(i).padStart(2, '0') + '.mp4');
       const inputs = ['-framerate', String(FPS), '-start_number', String(Math.round(from * FPS)), '-i', join(dir, '%05d.png')];
       /* 镜头不够长就停在最后一帧 / if the shot runs out, hold its last frame */
-      let vf = `[0:v]scale=${W}:${H}:flags=neighbor,tpad=stop_mode=clone:stop_duration=${dur},trim=duration=${dur.toFixed(4)},setpts=PTS-STARTPTS`;
+      let vf = `[0:v]scale=${W}:${H}:flags=neighbor,tpad=stop_mode=clone:stop_duration=${src},trim=duration=${src.toFixed(4)},setpts=(PTS-STARTPTS)/${speed}`;
       if (shot === 'title') vf += `,fade=t=in:st=0:d=0.4`;
       /* 首领只露剪影：上方 45% 压暗去色，下沿渐隐 / show the boss only as a silhouette: darken and desaturate the top 45%, fading out at its lower edge */
       if (shot === 'boss') vf += `,split[a][b];[b]crop=iw:ih*0.45:0:0,eq=brightness=-0.5:contrast=0.35:saturation=0,format=rgba,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='255*clip((0.95*H-Y)/(0.35*H),0,1)'[t];[a][t]overlay=0:0`;
@@ -163,7 +165,7 @@ async function main() {
       ff([...inputs, '-filter_complex', vf, '-map', '[v]', '-r', String(FPS), '-t', dur.toFixed(4), '-c:v', 'libx264', '-preset', 'medium', '-crf', '16', out]);
       list.push(`file '${join(process.cwd(), out)}'`);
       const log = JSON.parse(readFileSync(join(dir, 'sfx.json'), 'utf8'));
-      for (const [t, k, p] of log) if (t >= from && t < from + dur) cues.push([+(at + t - from).toFixed(3), k, p]);
+      for (const [t, k, p] of log) if (t >= from && t < from + src) cues.push([+(at + (t - from) / speed).toFixed(3), k, p]);
       at += dur;
     });
     /* 结尾标版落一声收尾 / one closing sting on the end slate */
