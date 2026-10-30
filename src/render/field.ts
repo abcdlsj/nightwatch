@@ -451,7 +451,7 @@ function drawBattle(x: CanvasRenderingContext2D, W: number) {
         hh = Math.max(1, Math.round(sp.h * k));
       x.globalAlpha = 1;
       x.drawImage(sp.cv, 0, 0, sp.w, hh, px, py + h - hh * sc, w, hh * sc);
-    } else x.drawImage(sp.cv, px, py, w, h);
+    } else x.drawImage(sp.rim, px - sc, py - sc, w + 2 * sc, h + 2 * sc);
     x.globalAlpha = 1;
     if (e.armorB) {
       x.fillStyle = '#41a6f6';

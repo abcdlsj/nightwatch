@@ -36,12 +36,36 @@ function upURL(cv: HTMLCanvasElement, s: number) {
   x.drawImage(cv, 0, 0, c2.width, c2.height);
   return c2.toDataURL();
 }
+/** 放进 box×box 的槽位：整数倍放大、居中、四周补透明，导出 4 倍图（CSS 显示 box 像素时每格正好 n 像素，不会宽窄不一）
+ * fit into a box×box slot: integer upscale, centered, transparent padding, exported at 4× (shown at box CSS px, each cell is exactly n px, never uneven) */
+function fitURL(cv: HTMLCanvasElement, n: number, box: number) {
+  const c2 = document.createElement('canvas');
+  c2.width = c2.height = box * 4;
+  const x = c2.getContext('2d')!;
+  x.imageSmoothingEnabled = false;
+  x.drawImage(cv, Math.floor((box - cv.width * n) / 2) * 4, Math.floor((box - cv.height * n) / 2) * 4, cv.width * n * 4, cv.height * n * 4);
+  return c2.toDataURL();
+}
+/** 战场亮边：剪影外再加 1px，描边和夜色地面同色时轮廓也能浮出来 / battlefield rim: one more pixel around the silhouette, so outlines still read when they match the night-dark ground */
+const RIM = '#464e6e';
+function mkRim(rows: string[]) {
+  const sil = mk(rows, RIM);
+  const cv = document.createElement('canvas');
+  cv.width = sil.width + 2;
+  cv.height = sil.height + 2;
+  const x = cv.getContext('2d')!;
+  for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2]]) x.drawImage(sil, dx, dy);
+  x.drawImage(mk(rows), 1, 1);
+  return cv;
+}
 
 export class Sprite {
   private _cv?: HTMLCanvasElement;
   private _white?: HTMLCanvasElement;
   private _ice?: HTMLCanvasElement;
   private _url?: string;
+  private _rim?: HTMLCanvasElement;
+  private _fit: Record<number, string> = {};
   constructor(private rows: string[]) {}
   get cv() {
     return (this._cv ||= mk(this.rows));
@@ -54,8 +78,19 @@ export class Sprite {
   get ice() {
     return (this._ice ||= mk(this.rows, '#8fe3ff'));
   }
+  /** 带 1px 亮边的战场图，比原图四周各大 1 格 / battlefield sprite with a 1px rim, one cell larger on every side */
+  get rim() {
+    return (this._rim ||= mkRim(this.rows));
+  }
   get url() {
     return (this._url ||= upURL(this.cv, 4));
+  }
+  /** 尺寸不一的图放进同一种框（敌人、语音头像）：按整数倍放大；框比图还小就退回普通缩放
+   * sprites of mixed sizes in one kind of box (enemies, voice portraits): integer upscale; if the box is smaller than the sprite, fall back to plain scaling */
+  fit(box: number) {
+    const n = Math.floor(box / Math.max(this.w, this.h));
+    if (n < 1) return this.url;
+    return (this._fit[box] ||= fitURL(this.cv, n, box));
   }
   get w() {
     return Math.max(...this.rows.map((r) => r.length));

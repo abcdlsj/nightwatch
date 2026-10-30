@@ -45,7 +45,7 @@ export function renderPreview() {
   $('#pvList').innerHTML = Object.keys(cnt)
     .map((k) => {
       const d = EN[k];
-      return `<span class="pv${d.elite || d.boss ? ' elite' : ''}"><img src="${spr(d.spr).url}" alt="">${d.elite || d.boss ? d.n : '×' + cnt[k]}</span>`;
+      return `<span class="pv${d.elite || d.boss ? ' elite' : ''}"><img src="${spr(d.spr).fit(32)}" alt="">${d.elite || d.boss ? d.n : '×' + cnt[k]}</span>`;
     })
     .join('');
   const ds = Object.keys(cnt).map((k) => EN[k]);
@@ -409,7 +409,7 @@ function lockBtn(o: HTMLElement, of: Offer, cur: PrepStop | null) {
 
 function ambushHtml(cur: PrepStop) {
   const d = EN[cur.foe];
-  return `<div class="amb"><img src="${spr(d.spr).url}" alt=""><div><b>${d.n}</b><p>${d.tip}</p><p>${d.intents!.map((it) => '【' + it.n + '】' + it.d).join('<br>')}</p></div></div>
+  return `<div class="amb"><img src="${spr(d.spr).fit(56)}" alt=""><div><b>${d.n}</b><p>${d.tip}</p><p>${d.intents!.map((it) => '【' + it.n + '】' + it.d).join('<br>')}</p></div></div>
   <div class="ev-hint">${t('prep.ambushHint', { n: ambushGold() })}</div>`;
 }
 
@@ -557,7 +557,7 @@ function readyHtml() {
       .join('')}${nextLine()}${ks
       .map((k) => {
         const d = EN[k];
-        return `<div class="ifoe${d.boss || d.elite ? ' elite' : ''}"><img src="${spr(d.spr).url}" alt=""><b>${d.n}</b><small>${d.boss ? T.boss : d.elite ? T.elite : '×' + cnt[k]}</small><span>${d.tip || T.minion}</span></div>`;
+        return `<div class="ifoe${d.boss || d.elite ? ' elite' : ''}"><img src="${spr(d.spr).fit(32)}" alt=""><b>${d.n}</b><small>${d.boss ? T.boss : d.elite ? T.elite : '×' + cnt[k]}</small><span>${d.tip || T.minion}</span></div>`;
       })
       .join('')}</div>
     ${warn.length ? `<div class="iwarn">${warn.map((w) => `<span>${w}</span>`).join('')}</div>` : ''}

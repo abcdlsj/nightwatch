@@ -23,7 +23,7 @@
 .rp-dl.up{color:#9bf0b8}.rp-dl.down{color:#ff8a7a}.rp-dl.new{color:#ffd166;font-family:var(--zh);font-size:12px}
 .rp-gone{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:12px;color:var(--muted);padding:2px 2px 0}
 .rp-gone span{display:flex;align-items:center;gap:3px;font-family:var(--px)}
-.rp-gone img{width:18px;height:18px;image-rendering:pixelated}
+.rp-gone img{width:16px;height:16px;image-rendering:pixelated}
 .rp-legend{text-align:right;font-size:var(--fs-small);color:var(--muted);margin-bottom:-2px}
 .rp-meta b small{font-size:var(--fs-small);margin-left:2px;color:var(--muted)}
 /* 战报分页：按卡牌 / 今夜来源 / 整局来源 / report tabs: by card / tonight by source / run by source */
@@ -41,5 +41,5 @@
 .rs-row b small{color:var(--muted);font-size:var(--fs-small);margin-left:4px;font-weight:400}
 .rs-cards{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:-2px;font-family:var(--body);font-size:var(--fs-body);color:#9fb3ba}
 .rs-cards span{display:flex;align-items:center;gap:3px}
-.rs-cards img{width:18px;height:18px;image-rendering:pixelated}
+.rs-cards img{width:16px;height:16px;image-rendering:pixelated}
 .dmgsrc small{color:var(--muted);font-size:12px;align-self:center}

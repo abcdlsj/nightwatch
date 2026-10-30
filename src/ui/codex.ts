@@ -78,7 +78,7 @@ function openRunDetail(i: number) {
   h.rl.forEach((r) => {
     if (RELICS[r]) rl[r] = (rl[r] || 0) + 1;
   });
-  const sh = sheetOpen(`<div class="sh cdx-sh" role="dialog" aria-label="${T.thisRun}"><div class="sh-top">${He ? `<img class="ricon big" src="${spr(He.portrait).url}" alt="" style="--gc:${He.col}">` : ''}
+  const sh = sheetOpen(`<div class="sh cdx-sh" role="dialog" aria-label="${T.thisRun}"><div class="sh-top">${He ? `<img class="ricon big" src="${spr(He.portrait).fit(48)}" alt="" style="--gc:${He.col}">` : ''}
     <div><h3 style="color:${h.w ? '#ffe79a' : '#ff8a80'}">${hResult(h)}</h3><div class="tags"><span class="tag">${He ? He.n + ' · ' + He.title : '?'}</span></div></div></div>
     <div class="rules res">${rows.map((r) => `<div><span>${r[0]}</span><i style="margin-left:auto">${r[1]}</i></div>`).join('')}</div>
     <div class="hs-h">${T.lastBoard}</div><div class="cdx hs-board"></div>
@@ -255,7 +255,7 @@ function cxFoes() {
         ? `<div class="hs-h">${n} <small>${ks.filter(foeSeen).length} / ${ks.length}</small></div><div class="cdx">${ks
             .map((k) => {
               const ok = foeSeen(k);
-              return `<button class="cdx-i cx-foe${ok ? '' : ' lock'}" data-k="${k}"${ok ? '' : ' disabled'}><img src="${spr(EN[k].spr).url}" alt=""><span>${ok ? EN[k].n : L.ui.codex.unknown3}</span></button>`;
+              return `<button class="cdx-i cx-foe${ok ? '' : ' lock'}" data-k="${k}"${ok ? '' : ' disabled'}><img src="${spr(EN[k].spr).fit(48)}" alt=""><span>${ok ? EN[k].n : L.ui.codex.unknown3}</span></button>`;
             })
             .join('')}</div>`
         : '';
@@ -275,7 +275,7 @@ function cxFoe(k: string) {
   if (d.armor) rows.push([T.armor, d.armor]);
   rows.push([T.seenKilled, `${seen ? t('codex.seenRuns', { n: seen }) : '—'} / ${t('codex.killedN', { n: kl })}`]);
   const fac = (L.terms.factions as Record<string, string>)[d.faction];
-  sheetOpen(`<div class="sh" role="dialog" aria-label="${d.n}"><div class="sh-top"><img class="ricon big cx-big" src="${spr(d.spr).url}" alt="" style="--gc:${d.col || '#888'}">
+  sheetOpen(`<div class="sh" role="dialog" aria-label="${d.n}"><div class="sh-top"><img class="ricon big cx-big" src="${spr(d.spr).fit(48)}" alt="" style="--gc:${d.col || '#888'}">
     <div><h3 style="color:${d.col || '#fff'}">${d.n}</h3><div class="tags"><span class="tag">${(L.meta.foeGroups as string[])[foeGroup(k)]}</span>${fac && foeGroup(k) > 1 ? `<span class="tag">${fac}</span>` : ''}</div></div></div>
     ${d.tip ? `<p>${d.tip}</p>` : `<p class="muted2">${d.small ? T.smallFoe : T.minion}</p>`}
     <div class="rules res">${rows.map((r) => `<div><span>${r[0]}</span><i style="margin-left:auto">${r[1]}</i></div>`).join('')}</div>
