@@ -43,8 +43,25 @@ export function fitStandalone() {
 /** 只在正式构建的网页版里注册（开发服务器和原生壳都不需要）；被嵌进 iframe（如 B站 Toy）时也不注册，缓存交给宿主
  * / register only in production web builds (neither the dev server nor native needs it); skip inside iframes (e.g. Bilibili Toy), the host owns caching */
 export function registerSW(version: string) {
-  if (isNative() || !import.meta.env.PROD || !('serviceWorker' in navigator) || window.top !== window) return;
+  if (isNative() || !import.meta.env.PROD || !('serviceWorker' in navigator)) return;
+  if (window.top !== window) return unregisterOwnSW();
   addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=' + encodeURIComponent(version)).catch(() => {}));
+}
+
+/** 以前在 iframe 里注册过的离线缓存：注销掉，并删掉 nightwatch-* 缓存，免得断网兜底时拿到宿主外壳页。
+ * 只注销我们注册的那个（地址带 ?v=），宿主自己注册的不碰
+ * offline cache registered inside an iframe by older builds: unregister it and delete nightwatch-* caches so the offline fallback never serves the host's shell page.
+ * Only the registration we made (its URL carries ?v=) is removed; anything the host registers itself is left alone */
+function unregisterOwnSW() {
+  navigator.serviceWorker
+    .getRegistrations()
+    .then((rs) => Promise.all(rs.filter((r) => /\/sw\.js\?v=/.test(r.active?.scriptURL || r.waiting?.scriptURL || r.installing?.scriptURL || '')).map((r) => r.unregister())))
+    .catch(() => {});
+  if ('caches' in self)
+    caches
+      .keys()
+      .then((ks) => Promise.all(ks.filter((k) => k.startsWith('nightwatch-')).map((k) => caches.delete(k))))
+      .catch(() => {});
 }
 
 /** iOS Safari 浏览器里（还没装到主屏）：提示「分享 → 添加到主屏幕」 / in the iOS Safari browser (not yet installed): hint 'Share → Add to Home Screen' */
