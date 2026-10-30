@@ -22,8 +22,8 @@ import { finalBosses, lastNight, jumpNights, nightKind } from '../../src/game/pl
 import { curWorld, ws } from '../../src/game/world';
 import { enterWorld } from '../../src/mod/enter';
 import { applyMod } from '../../src/mod/apply';
-import spire from '../../mods/spire';
-import deal, { bestHand, ctx as dealCtx } from '../../mods/midnight-deal';
+import spire from '../../mods/official/spire';
+import deal, { bestHand, ctx as dealCtx } from '../../mods/official/midnight-deal';
 
 /** 把仓库里的两个模组世界也装上（MODS=1 时跑它们的人物） / also load the repo's two mod worlds (their heroes run with MODS=1) */
 let modsOn = false;

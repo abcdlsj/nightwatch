@@ -11,7 +11,7 @@
 - 写代码的效果：卡牌、遗物、天赋在战斗里触发的钩子。
 - 一整个自己的世界：自己的敌人套、首领、事件、规则和剧情，选了你的人物就进这个世界，原版的局一点不受影响。
 
-仓库里带了两个完整的世界模组，可以照着改：`mods/spire/`（杀戮尖塔：铁甲战士和静默猎手、力量、格挡、诅咒卡、尼奥和篝火）和 `mods/midnight-deal/`（子夜牌局：牌型、星宿、盲注、赊账）。这两个模组还在调优，暂时没装进游戏（`src/mod/load.ts` 里排除了），测试和平衡机器人会直接引用它们。
+仓库里带了两个完整的世界模组，可以照着改：`mods/official/spire/`（杀戮尖塔：铁甲战士和静默猎手、力量、格挡、诅咒卡、尼奥和篝火）和 `mods/official/midnight-deal/`（子夜牌局：牌型、星宿、盲注、赊账）。这两个是官方模组，还在调优，默认不装进游戏（要装就删掉 `src/mod/load.ts` 里那条 official 排除），测试和平衡机器人会直接引用它们。官方模组多套一层目录，引游戏代码写 `../../../src/...`。
 
 暂时不支持在网页里上传模组。
 
@@ -437,7 +437,7 @@ worlds: {
 foesets: { spire: { n: '尖塔里的怪物', world: 'spire', map: { slime: 'sts_acid_s', knight: 'sts_lagavulin', a_brute: 'sts_nob' } } },
 ```
 
-**备战事件**写 `enter(cur, api)`，用 `api` 里现成的几种样子：`api.choice(cur, 提示, 选项)`（选项是 `{ ico 或 card, label, sub, act }`）、`api.reward(cur, 文字, 拿到时做什么)`、`api.relicChoice(cur, 提示, 遗物)`，也可以直接改 `cur.mode = 'pick'` 配 `cur.offers`。做完一站调 `api.finishStep()`。`need()` 返回这扇门现在能不能出。例子见 `mods/spire/index.ts` 的石脸、篝火、配对游戏、清卡人。
+**备战事件**写 `enter(cur, api)`，用 `api` 里现成的几种样子：`api.choice(cur, 提示, 选项)`（选项是 `{ ico 或 card, label, sub, act }`）、`api.reward(cur, 文字, 拿到时做什么)`、`api.relicChoice(cur, 提示, 遗物)`，也可以直接改 `cur.mode = 'pick'` 配 `cur.offers`。做完一站调 `api.finishStep()`。`need()` 返回这扇门现在能不能出。例子见 `mods/official/spire/index.ts` 的石脸、篝火、配对游戏、清卡人。
 
 **首领招式**：`intents: { sts_kindle: (e, v, k) => {} }`，和 `src/sim/enemies.ts` 的招式表并列，首领的 `intents` 里就能用；招式里可以调原版的招式（`INTENTS.barrage(e, 6)`）。
 

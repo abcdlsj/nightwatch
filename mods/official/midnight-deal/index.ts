@@ -9,22 +9,22 @@
  * Number inflation: enemy HP follows the original's ante score curve (300 on night 1, 50 000 on night 8…); you keep up only by stacking multipliers.
  * The heroes are two decks: the Red Deck (hands, suits) and the Plasma Deck (chips and mult balanced, then multiplied). Story text is in story.ts; sprites are generated into sprites.ts by art.py.
  */
-import type { ModPack, ModEvent } from '../../src/mod/types';
-import type { Enemy } from '../../src/sim/types';
-import type { Card, CardSpec, Offer } from '../../src/game/state';
-import type { ItemDef, Tag, Fx } from '../../src/data/types';
-import { G } from '../../src/game/state';
-import { ITEMS, UPS } from '../../src/data/cards';
-import { mv } from '../../src/game/mods';
-import { boardCards, stepOf, sellValue } from '../../src/game/cards';
-import { B, bt, later } from '../../src/sim/battle';
-import { damageWall } from '../../src/sim/enemies';
-import { hpScale } from '../../src/sim/waves';
-import { view } from '../../src/sim/view';
-import { world, ex, ey } from '../../src/sim/world';
-import { rand, pick, shuffled } from '../../src/core/rng';
-import { fmt } from '../../src/core/util';
-import { ws } from '../../src/game/world';
+import type { ModPack, ModEvent } from '../../../src/mod/types';
+import type { Enemy } from '../../../src/sim/types';
+import type { Card, CardSpec, Offer } from '../../../src/game/state';
+import type { ItemDef, Tag, Fx } from '../../../src/data/types';
+import { G } from '../../../src/game/state';
+import { ITEMS, UPS } from '../../../src/data/cards';
+import { mv } from '../../../src/game/mods';
+import { boardCards, stepOf, sellValue } from '../../../src/game/cards';
+import { B, bt, later } from '../../../src/sim/battle';
+import { damageWall } from '../../../src/sim/enemies';
+import { hpScale } from '../../../src/sim/waves';
+import { view } from '../../../src/sim/view';
+import { world, ex, ey } from '../../../src/sim/world';
+import { rand, pick, shuffled } from '../../../src/core/rng';
+import { fmt } from '../../../src/core/util';
+import { ws } from '../../../src/game/world';
 import sprites from './sprites';
 import { worldStory, redStory, plasmaStory } from './story';
 

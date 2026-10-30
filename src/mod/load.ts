@@ -7,9 +7,14 @@ import { applyMod, reapplyModText } from './apply';
 import { enterWorld, restoreRenames } from './enter';
 import { beforeLocale, afterLocale } from '../i18n';
 
-/* 杀戮尖塔和小丑牌两个模组还在调优，先不装进游戏；测试和机器人照样直接引用 / the Spire and Balatro mods are still being tuned, so they stay out of the game for now; tests and the bot still import them directly */
+/* 官方模组放在 mods/official/ 下（杀戮尖塔、小丑牌），调优好之前不装进游戏：要装就把 found 里那条 official 排除删掉（glob 只认字面量，没法拿变量开关）。测试和平衡机器人照样直接引用 / official mods live under mods/official/ (Slay the Spire, Balatro) and stay out of the game until tuned: to install them, delete the official exclusion in found (glob only takes literals, so a variable can't toggle it). Tests and the balance bot still import them directly */
 const found = import.meta.glob<{ default: ModPack }>(
-  ['../../mods/*/index.ts', '!../../mods/_*/index.ts', '!../../mods/spire/index.ts', '!../../mods/midnight-deal/index.ts'],
+  [
+    '../../mods/*/index.ts',
+    '../../mods/official/*/index.ts',
+    '!../../mods/_*/index.ts',
+    '!../../mods/official/*/index.ts', // 官方模组先不装 / official mods not installed yet
+  ],
   { eager: true },
 );
 

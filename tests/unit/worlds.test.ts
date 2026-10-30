@@ -15,8 +15,8 @@ import { rollItem } from '../../src/game/loot';
 import { applyMod } from '../../src/mod/apply';
 import { enterWorld } from '../../src/mod/enter';
 import { curWorld } from '../../src/game/world';
-import spire from '../../mods/spire';
-import deal, { bestHand, ctx, hpMul } from '../../mods/midnight-deal';
+import spire from '../../mods/official/spire';
+import deal, { bestHand, ctx, hpMul } from '../../mods/official/midnight-deal';
 import { newCard, stats } from '../../src/game/cards';
 
 const MODS = [deal, spire];

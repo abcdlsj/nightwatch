@@ -9,23 +9,23 @@
  * Strength makes every hit of every attack card hurt more; Block is wall shield; energy becomes charge; curses work just by being held.
  * Story text is in story.ts; sprites are generated into sprites.ts by art.py.
  */
-import type { ModPack, ModEvent } from '../../src/mod/types';
-import type { Card } from '../../src/game/state';
-import type { Enemy } from '../../src/sim/types';
-import { G } from '../../src/game/state';
-import { ITEMS } from '../../src/data/cards';
-import { RELICS } from '../../src/data/relics';
-import { mv } from '../../src/game/mods';
-import { boardCards, stepOf, stats } from '../../src/game/cards';
-import { B, bt, later, front, near, targets } from '../../src/sim/battle';
-import { hurt, chargeCard, addShield, reload } from '../../src/sim/combat';
-import { damageWall, spawn, INTENTS } from '../../src/sim/enemies';
-import { view } from '../../src/sim/view';
-import { world, K, ex, ey } from '../../src/sim/world';
-import { rand, pick, shuffled } from '../../src/core/rng';
+import type { ModPack, ModEvent } from '../../../src/mod/types';
+import type { Card } from '../../../src/game/state';
+import type { Enemy } from '../../../src/sim/types';
+import { G } from '../../../src/game/state';
+import { ITEMS } from '../../../src/data/cards';
+import { RELICS } from '../../../src/data/relics';
+import { mv } from '../../../src/game/mods';
+import { boardCards, stepOf, stats } from '../../../src/game/cards';
+import { B, bt, later, front, near, targets } from '../../../src/sim/battle';
+import { hurt, chargeCard, addShield, reload } from '../../../src/sim/combat';
+import { damageWall, spawn, INTENTS } from '../../../src/sim/enemies';
+import { view } from '../../../src/sim/view';
+import { world, K, ex, ey } from '../../../src/sim/world';
+import { rand, pick, shuffled } from '../../../src/core/rng';
 import sprites from './sprites';
 import { worldStory, ironcladStory, silentStory } from './story';
-import { ws } from '../../src/game/world';
+import { ws } from '../../../src/game/world';
 
 const W = 'spire';
 const inBattle = () => !!B && !B.over && G.phase === 'battle';
