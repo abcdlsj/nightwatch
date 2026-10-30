@@ -2,7 +2,7 @@
 export default {
  "shop": {
   "n": "Wandering Merchant",
-  "d": "Sells three random cards",
+  "d": "Three random cards for sale. Pick what you like",
   "f": "\"I sell everything but regret.\""
  },
  "smith": {
