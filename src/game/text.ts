@@ -15,7 +15,9 @@ export const cardName = (c: { key: string; tier: number }) => {
 /** 修正项列表 → 带颜色的说明（好的绿、坏的红） / modifier list → colored descriptions (green for good, red for bad) */
 export function modText(m: Mods) {
   const ML = L.terms.mods as Record<string, string>;
+  /* 天性、觉醒这类专属修正项没有通用说明（在选人页和天赋页另有文字），合计里跳过 / hero-specific keys such as natures and awakenings have no generic label (they are described on the hero and talent pages), so skip them in totals */
   return Object.keys(m)
+    .filter((k) => MODL[k])
     .map((k) => {
       const [p, inv] = MODL[k];
       const l = ML[k];

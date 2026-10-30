@@ -28,7 +28,9 @@
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0f1c20; --panel:#1c2a30; } }
 :root[data-theme="dark"]{ --bg:#0f1c20; --panel:#1c2a30; }
 *,*::before,*::after{box-sizing:border-box}
-html{height:100%;background:var(--bg);scroll-padding-top:var(--sat)}
+/* 美术是暗色的：按钮等原生控件也按暗色配色画，嵌进浅色页面（如 B站 Toy 的 iframe）时默认文字才不会变成黑色
+ * the art is dark: draw native controls such as buttons in the dark scheme too, so their default text doesn't turn black when embedded in a light page (e.g. the Bilibili Toy iframe) */
+html{height:100%;background:var(--bg);scroll-padding-top:var(--sat);color-scheme:dark}
 body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--zh);overflow:hidden;
   user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 button{font-family:inherit}
