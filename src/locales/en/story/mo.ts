@@ -171,13 +171,13 @@ export default {
           title: 'Dye Works Door', who: 'shen',
           lines: [
             ['shen', 'Don\'t just stand there. In.'],
-            ['shen', 'That robe of yours has a hole burned in the cuff. Off with it. I\'ll mend it.'],
+            ['shen', 'That robe of yours has a hole burned in the cuff. Hand it here. Your mother will mend it.'],
             ['hero', 'No need. Lab coats are meant to be...'],
-            ['shen', 'Off.'],
+            ['shen', 'Hand it over.'],
           ],
-          q: 'Her hand is already out.',
+          q: 'Her hand is already out for the robe.',
           ans: [
-            { cat: 'atk', t: 'After you mend it, I\'m back on the Wall. Busy night.', re: 'Then off with it, quick. Mended first, then go.' },
+            { cat: 'atk', t: 'After you mend it, I\'m back on the Wall. Busy night.', re: 'Then hand it over, quick. Mended first, then go.' },
             { cat: 'def', t: '...Fine. Make it sturdy.', re: 'When has my mending ever not been sturdy?' },
             { cat: 'eco', t: 'How much per mend? I\'m earning now.', re: 'Your mother\'s handiwork? Can you afford it? ...Sit. Have some soup.' },
           ],
