@@ -7,7 +7,9 @@ import { spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 
-export const OUT = '.local/trailer';
+/** TRAILER_LANG=en 用英文界面录，素材另放 .local/trailer/en/ / TRAILER_LANG=en records the English UI into .local/trailer/en/ */
+export const LANG = process.env.TRAILER_LANG || '';
+export const OUT = LANG ? `.local/trailer/${LANG}` : '.local/trailer';
 export const FPS = 30;
 /** 432×768 CSS 像素 × 2.5 = 1080×1920 / 432×768 CSS px × 2.5 = 1080×1920 */
 export const VIEW = { width: 432, height: 768 };
@@ -23,7 +25,8 @@ export async function devServer() {
 }
 
 /** 本地存档：人物全解锁、关掉小提示和统计、去掉「添加到主屏幕」提示 / local save: all heroes unlocked, tips and stats off, no add-to-home-screen hint */
-function initSave() {
+function initSave(lang) {
+  if (lang) localStorage.setItem('chain-lang', lang);
   localStorage.setItem('chain-meta-v1', JSON.stringify({ heroes: { ayla: 1, mo: 1, ying: 1, jun: 1, li: 1 }, runs: 12, wins: 3 }));
   localStorage.setItem('chain-settings', JSON.stringify({ tips: false, stats: false }));
   localStorage.setItem('nw-ios-hint', '1');
@@ -46,7 +49,7 @@ export async function openGame({ seed = 7, audio = false } = {}) {
   const ctx = await browser.newContext({ viewport: VIEW, deviceScaleFactor: DPR });
   const pg = await ctx.newPage();
   pg.on('pageerror', (e) => console.error('pageerror', String(e)));
-  await pg.addInitScript(initSave);
+  await pg.addInitScript(initSave, LANG);
   if (!audio) await pg.clock.install({ time: 0 });
   await pg.goto(srv.url + '?seed=' + seed);
   for (let i = 0; i < 100 && !(await pg.evaluate(() => !!window.__game)); i++) await pg.waitForTimeout(100);

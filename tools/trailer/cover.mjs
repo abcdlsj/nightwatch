@@ -2,16 +2,18 @@
  * 用法：node tools/trailer/cover.mjs [镜头 帧号]（默认 blade 60）。输出到 .local/trailer/bili/
  * Upload covers: game-font type over a battle frame, in 16:9 and 3:4. Run shots.mjs first.
  * Usage: node tools/trailer/cover.mjs [shot frame] (default blade 60). Output goes to .local/trailer/bili/
+ * 英文推特封面：TRAILER_LANG=en 先跑 shots.mjs blade，再同样跑本脚本，输出到 .local/trailer/en/x/
+ * English X/Twitter cover: run shots.mjs blade with TRAILER_LANG=en, then this script the same way; output goes to .local/trailer/en/x/
  */
 import { chromium } from 'playwright';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { devServer, OUT } from './lib.mjs';
+import { devServer, OUT, LANG } from './lib.mjs';
 
 const [shot = 'blade', frame = '60'] = process.argv.slice(2);
 const png = (p) => 'data:image/png;base64,' + readFileSync(p).toString('base64');
 const shotImg = png(join(OUT, 'clips', shot, String(+frame).padStart(5, '0') + '.png'));
-const dir = join(OUT, 'bili');
+const dir = join(OUT, LANG === 'en' ? 'x' : 'bili');
 mkdirSync(dir, { recursive: true });
 
 /* 字少、字大：封面在列表里只有指甲盖大，一眼要看清是什么游戏、有什么爽点 / few words, big type: in the feed a cover is thumbnail-sized, so the genre and the hook must read at a glance */
@@ -30,6 +32,7 @@ body{background:#0f1c20;overflow:hidden;font-family:var(--zh)}
 .tags{display:flex;gap:14px;flex-wrap:wrap}
 .tags i{font-style:normal;color:#0f1c20;background:#ffd166;padding:6px 14px 9px;box-shadow:0 0 0 4px #0f1c20}
 .tags i.g{background:#7ae582}
+.logo.lat{gap:0;font-family:'Silkscreen',monospace;letter-spacing:4px}
 .boom{position:absolute;font-family:'PixNum','Pixelify Sans',var(--zh);color:#ffe066;text-shadow:0 6px 0 #b3261e,0 0 30px rgba(255,90,40,.9);transform:rotate(-8deg);z-index:6}
 `;
 
@@ -60,10 +63,25 @@ const LAYOUTS = {
   },
 };
 
+/* 推特信息流里单图按 16:9 显示，只出这一张 / X shows a single image at 16:9 in the feed, so only this one */
+const LAYOUTS_EN = {
+  'cover-16x9': {
+    w: 1920, h: 1080,
+    html: `<div class="cv" style="width:1920px;height:1080px">
+      <img class="shot" src="${shotImg}" style="left:110px;top:40px;height:1000px;transform:rotate(-3deg)">
+      <div class="boom" style="left:430px;top:70px;font-size:110px">Streak 21!</div>
+      <div style="position:absolute;left:800px;top:250px;display:flex;flex-direction:column;gap:40px">
+        <div class="logo lat" style="font-size:150px;flex-direction:column;line-height:1.05"><span>NIGHT</span><span>WATCH</span></div>
+        <div><div class="hook" style="font-size:66px">Place, merge, <b>chain explode</b></div></div>
+        <div class="tags" style="font-size:40px"><i>Pixel deckbuilder</i><i>Auto-battler</i><i class="g">Play in browser</i><i class="g">Mod support</i></div>
+      </div></div>`,
+  },
+};
+
 const srv = await devServer();
 const b = await chromium.launch();
 try {
-  for (const [name, L] of Object.entries(LAYOUTS)) {
+  for (const [name, L] of Object.entries(LANG === 'en' ? LAYOUTS_EN : LAYOUTS)) {
     const pg = await b.newPage({ viewport: { width: L.w, height: L.h } });
     /* 开在游戏页面上，好用它的 @font-face 和 --zh 变量 / open on the game page to reuse its @font-face rules and the --zh variable */
     await pg.goto(srv.url);
