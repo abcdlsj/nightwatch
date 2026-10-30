@@ -11,7 +11,7 @@
 - 写代码的效果：卡牌、遗物、天赋在战斗里触发的钩子。
 - 一整个自己的世界：自己的敌人套、首领、事件、规则和剧情，选了你的人物就进这个世界，原版的局一点不受影响。
 
-仓库里带了两个完整的世界模组，可以照着改：`mods/spire/`（倒悬塔：力量、护盾、诅咒卡、石脸和篝火）和 `mods/midnight-deal/`（子夜牌局：牌型、星宿、盲注、赊账）。
+仓库里带了两个完整的世界模组，可以照着改：`mods/spire/`（杀戮尖塔：铁甲战士和静默猎手、力量、格挡、诅咒卡、尼奥和篝火）和 `mods/midnight-deal/`（子夜牌局：牌型、星宿、盲注、赊账）。
 
 暂时不支持在网页里上传模组。
 
@@ -400,9 +400,9 @@ hooks: {
 ```ts
 worlds: {
   spire: {
-    n: '倒悬塔',
+    n: '尖塔',
     foeSet: 'spire',                         // 固定用哪套敌人（下面 foesets 里的）
-    firstDoors: ['sp_face', 'shop', 'field'], // 第一夜第一站的门
+    firstDoors: ['sts_neow', 'shop', 'field'], // 第一夜第一站的门
     noEvents: ['spring', 'job'],             // 这个世界里不出的原版事件
     base: { relics: false },                 // 原版的通用卡 / 遗物 / 天赋 / 事件还出不出（默认都出）
     rename: { relics: { gem_red: { n: '红钥匙' } }, events: { shop: { n: '斗篷商人' } } },  // 给原版东西换名字、图标
@@ -422,18 +422,18 @@ worlds: {
 **敌人套**按角色把原版小怪换掉，第四夜的骑士（`knight`）、拦路精英（`a_brute`、`a_golem`、`a_lich`）、宝箱怪（`mimic`）也能换：
 
 ```ts
-foesets: { spire: { n: '塔里的东西', world: 'spire', map: { slime: 'sp_acid', knight: 'sp_rustknight', a_brute: 'sp_nob' } } },
+foesets: { spire: { n: '尖塔里的怪物', world: 'spire', map: { slime: 'sts_acid_s', knight: 'sts_lagavulin', a_brute: 'sts_nob' } } },
 ```
 
 **备战事件**写 `enter(cur, api)`，用 `api` 里现成的几种样子：`api.choice(cur, 提示, 选项)`（选项是 `{ ico 或 card, label, sub, act }`）、`api.reward(cur, 文字, 拿到时做什么)`、`api.relicChoice(cur, 提示, 遗物)`，也可以直接改 `cur.mode = 'pick'` 配 `cur.offers`。做完一站调 `api.finishStep()`。`need()` 返回这扇门现在能不能出。例子见 `mods/spire/index.ts` 的石脸、篝火、配对游戏、清卡人。
 
-**首领招式**：`intents: { sp_kindle: (e, v, k) => {} }`，和 `src/sim/enemies.ts` 的招式表并列，首领的 `intents` 里就能用；招式里可以调原版的招式（`INTENTS.barrage(e, 6)`）。
+**首领招式**：`intents: { sts_kindle: (e, v, k) => {} }`，和 `src/sim/enemies.ts` 的招式表并列，首领的 `intents` 里就能用；招式里可以调原版的招式（`INTENTS.barrage(e, 6)`）。
 
-**敌人钩子**（`hooks.enemies`）：`spawn(e)` 出场、`step(e, dt)` 每帧、`hurt(e, 伤害, 上下文)` 返回改过的伤害（返回 0 就是没打着）、`die(e)` 倒下、`on.事件(e, 上下文)` 战斗事件。自己的状态放 `e.m`，`e.holdT` 秒内不动。倒悬塔的锈甲骑士（睡着、挨够了醒）、泥王（半血裂成两半）、塔心（每秒最多掉 3%）都是这么写的。
+**敌人钩子**（`hooks.enemies`）：`spawn(e)` 出场、`step(e, dt)` 每帧、`hurt(e, 伤害, 上下文)` 返回改过的伤害（返回 0 就是没打着）、`die(e)` 倒下、`on.事件(e, 上下文)` 战斗事件。自己的状态放 `e.m`，`e.holdT` 秒内不动。尖塔的乐加维林（睡着、挨够了醒）、史莱姆老大（半血分裂）、腐化之心（每秒最多掉 3%）都是这么写的。
 
-**换色图**：`sprites: { sp_crow: { from: 'bat', swap: { p: 'd', P: 's' }, flip: 1 } }` 拿已有的图换颜色、镜像，不用重画。
+**换色图**：`sprites: { sts_crow: { from: 'bat', swap: { p: 'd', P: 's' }, flip: 1 } }` 拿已有的图换颜色、镜像，不用重画。
 
-**天性和觉醒**：人物写 `sig: { n, d, m }`（一直生效的修正项）和 `awaken: [两个 { id, n, d, m }]`（第 6 夜二选一）；`hooks`、`stat` 是这个人物自己的战斗钩子和数值钩子（赤誓的力量、青棘的飞刀）。
+**天性和觉醒**：人物写 `sig: { n, d, m }`（一直生效的修正项）和 `awaken: [两个 { id, n, d, m }]`（第 6 夜二选一）；`hooks`、`stat` 是这个人物自己的战斗钩子和数值钩子（静默猎手的小刀）；世界也有 `stat`（尖塔里所有输出卡都吃力量）。
 
 **自己的修正项**：`mods: { strWall: { n: '城墙每挨一下，力量 +1' } }` 登记之后，遗物、天赋、天性的 `m` 里就能写这个键，钩子里用 `mv('strWall')` 读。`show`：0 显示数值、1 百分比、2 只显示说明（默认）、3 独立乘区；`inv: 1` 表示越小越好。
 
@@ -444,4 +444,4 @@ foesets: { spire: { n: '塔里的东西', world: 'spire', map: { slime: 'sp_acid
 - 标题页「工坊」：列出加载了哪些模组、各加了多少东西、哪些条目写错被跳过。
 - 浏览器控制台：每个有错的模组打一条警告。
 - `npm run check`：类型检查、测试、构建。`tests/unit/mods.test.ts` 会检查示例模组；可以照着加一条检查你自己的模组。
-- 平衡：`MODS=1 HERO=chishi,qingji RUNS=20 npm run balance` 让机器人用模组世界的人物整局跑；`npm run bench` 跑原版各流派的成型阵容（见 `docs/balance.md`），可以在 `tests/balance/builds.ts` 里加一套你的人物阵容一起比。
+- 平衡：`MODS=1 HERO=ironclad,silent RUNS=20 npm run balance` 让机器人用模组世界的人物整局跑；`npm run bench` 跑原版各流派的成型阵容（见 `docs/balance.md`），可以在 `tests/balance/builds.ts` 里加一套你的人物阵容一起比。

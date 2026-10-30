@@ -215,8 +215,8 @@ function prep(focus: Focus) {
     rollDoors();
     const rich = G.gold >= 14;
     /* 墙掉了四成以上先去补 / if the wall has lost 40% or more, repair first */
-    const hurt = G.wall < G.wallMax * 0.6 ? ['spring', 'camp', 'sp_campfire'] : [];
-    const pref = [...hurt, ...SHOP_FOR[focus], ...(rich ? ['black', 'grocer'] : []), 'shop', 'giant', 'altar', 'field', 'manual', 'train', 'grocer', 'chest', 'parcel', 'black', 'armory', 'forge', 'storm', 'smith', 'frostshop', 'apothecary', 'job', 'bank', 'dl_planet', 'sp_campfire'];
+    const hurt = G.wall < G.wallMax * 0.6 ? ['spring', 'camp', 'sts_campfire'] : [];
+    const pref = [...hurt, ...SHOP_FOR[focus], ...(rich ? ['black', 'grocer'] : []), 'shop', 'giant', 'altar', 'field', 'manual', 'train', 'grocer', 'chest', 'parcel', 'black', 'armory', 'forge', 'storm', 'smith', 'frostshop', 'apothecary', 'job', 'bank', 'dl_planet', 'sts_campfire'];
     /* 不在偏好表里的门（机器人不会处理）排最后 / doors not in the preference table (which the bot cannot handle) come last */
     const rank = (id: string) => (pref.includes(id) ? pref.indexOf(id) : 999);
     const d = G.prep.doors.slice().sort((a, b) => rank(a) - rank(b))[0];
@@ -255,7 +255,7 @@ function prep(focus: Focus) {
     else if (d === 'manual') buyFrom([0, 1].map(() => makeOffer((it) => it.hero === G.hero && it.t >= Math.min(1, freeCap()), { free: 1 })), focus, true);
     else if (d === 'job') G.gold += 3;
     /* 模组世界里的两个常见事件 / two common mod-world events */
-    else if (d === 'sp_campfire') {
+    else if (d === 'sts_campfire') {
       const c = G.cards.filter((x) => x.tier < 2 && x.loc === 'board').sort((a, b) => cardScore(b, focus) - cardScore(a, focus))[0];
       if (hurt.length || !c) G.wall = Math.min(G.wallMax, G.wall + Math.round(G.wallMax * 0.3));
       else {

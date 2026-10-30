@@ -20,7 +20,7 @@ import deal, { bestHand } from '../../mods/midnight-deal';
 import { newCard } from '../../src/game/cards';
 
 const MODS = [deal, spire];
-const HERO_LIST = ['chishi', 'qingji', 'choujue', 'zhangfang'];
+const HERO_LIST = ['ironclad', 'silent', 'choujue', 'zhangfang'];
 
 beforeAll(() => {
   initLocale();
@@ -58,7 +58,7 @@ describe('模组世界', () => {
     expect(curWorld()).toBeNull();
     for (let i = 0; i < 200; i++) expect(ITEMS[rollItem()].world).toBeUndefined();
     expect(finalBosses().some((k) => EN[k].world)).toBe(false);
-    newRun('chishi', 0, 1);
+    newRun('ironclad', 0, 1);
     expect(curWorld()!.id).toBe('spire');
     expect(finalBosses().every((k) => EN[k].world === 'spire')).toBe(true);
     for (let i = 0; i < 200; i++) {
@@ -66,15 +66,16 @@ describe('模组世界', () => {
       expect(!it.hero || HEROES[it.hero].world === 'spire').toBe(true);
       expect(!it.world || it.world === 'spire').toBe(true);
     }
-    expect(hiddenBoss('chishi')).toBe('sp_heart');
-    expect((L.story as any).nights[0].title).toContain('塔脚');
+    expect(hiddenBoss('ironclad')).toBe('sts_heart');
+    expect(hiddenBoss('silent')).toBe('sts_heart2');
+    expect((L.story as any).nights[0].title).toContain('底层');
     newRun('zhangfang', 0, 1);
     expect(curWorld()!.id).toBe('deal');
     for (let i = 0; i < 200; i++) expect(ITEMS[rollItem()].world).not.toBe('spire');
     expect(finalBosses().every((k) => EN[k].world === 'deal')).toBe(true);
     expect((L.story as any).nights[0].title).toContain('小盲');
     newRun('ayla', 0, 1);
-    expect((L.story as any).nights[0].title).not.toContain('塔脚');
+    expect((L.story as any).nights[0].title).not.toContain('底层');
     expect((L.story as any).nights[0].title).not.toContain('小盲');
   });
 
@@ -97,9 +98,9 @@ describe('模组世界', () => {
   });
 
   it('第四夜的精英和各个首领都打得起来，不报错', () => {
-    for (const [h, boss] of [['chishi', 'sp_rustknight'], ['chishi', 'sp_heart'], ['zhangfang', 'dl_dealer'], ['choujue', 'dl_house']])
+    for (const [h, boss] of [['ironclad', 'sts_lagavulin'], ['silent', 'sts_heart'], ['zhangfang', 'dl_dealer'], ['choujue', 'dl_house']])
       expect(['win', 'lose']).toContain((newRun(h, 0, 3), night(9, boss)));
-    for (const h of ['chishi', 'choujue']) for (const boss of (newRun(h, 0, 3), finalBosses())) {
+    for (const h of ['ironclad', 'choujue']) for (const boss of (newRun(h, 0, 3), finalBosses())) {
       newRun(h, 0, 3);
       const r = night(9, boss);
       expect(['win', 'lose']).toContain(r);
