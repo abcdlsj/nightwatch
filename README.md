@@ -4,6 +4,10 @@
 
 竖屏像素风自动战斗构筑卡牌游戏：在 8 格棋盘上摆卡、合成升品质、靠相邻协同与连锁触发，守住城墙撑过九个长夜。
 
+<a href="docs/media/trailer.mp4?raw=true"><img src="docs/media/trailer-poster.jpg" alt="宣传片" width="270"></a>
+
+[▶ 观看宣传片（31 秒）](docs/media/trailer.mp4?raw=true)
+
 同一份构建产物可发布为网页（Vercel），也可装进 Capacitor 原生壳上架 iOS / Android。
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fabcdlsj%2Fnightwatch&project-name=nightwatch&repository-name=nightwatch)
@@ -61,8 +65,8 @@ tests/
   unit/               语言包完整性、分层约束、无界面战斗模拟（vitest）
   e2e/                冒烟测试和关键界面截图（Playwright）
 mods/                 模组（每个子目录一个；_example 是示例，不加载）
-tools/                像素图生成、字体子集化、缺字检查、图标生成
-docs/                 模组教程、平衡说明、字体授权
+tools/                像素图生成、字体子集化、缺字检查、图标生成；trailer/ 录制和剪辑宣传片
+docs/                 模组教程、平衡说明、字体授权；media/ 是宣传片
 ```
 
 ## 分层

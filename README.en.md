@@ -4,6 +4,10 @@
 
 A portrait-mode pixel-art auto-battler deckbuilder: place cards on an 8-slot board, merge them to higher tiers, and lean on adjacency synergies and chain triggers to hold the wall through nine long nights.
 
+<a href="docs/media/trailer.mp4?raw=true"><img src="docs/media/trailer-poster.jpg" alt="Trailer" width="270"></a>
+
+[▶ Watch the trailer (31s)](docs/media/trailer.mp4?raw=true)
+
 The same build ships as a web game (Vercel) or inside a Capacitor native shell for iOS / Android.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fabcdlsj%2Fnightwatch&project-name=nightwatch&repository-name=nightwatch)
@@ -61,8 +65,8 @@ tests/
   unit/               locale completeness, layer boundaries, headless combat sim (vitest)
   e2e/                smoke test and key-screen screenshots (Playwright)
 mods/                 mods (one per subdirectory; _example is a sample and is not loaded)
-tools/                pixel art generation, font subsetting, missing-glyph checks, icon generation
-docs/                 modding guide, balance notes, font licenses
+tools/                pixel art generation, font subsetting, missing-glyph checks, icon generation; trailer/ records and edits the trailer
+docs/                 modding guide, balance notes, font licenses; media/ holds the trailer
 ```
 
 ## Layering
