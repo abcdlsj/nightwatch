@@ -10,7 +10,7 @@ import { cardOpen, heroUnlocked, pathOf } from './unlocks';
 import { OMENS } from '../data/meta';
 import type { Tag } from '../data/types';
 import { mv } from './mods';
-import { inWorld } from './world';
+import { inWorld, curWorld } from './world';
 
 /* ---------------- 卡牌 ---------------- / ---------------- Cards ---------------- */
 export function rollAdj(key: string, force?: boolean, exclude?: string | null, maxTier?: number) {
@@ -86,7 +86,7 @@ export function rollItem(filter?: ItemFilter | null, cap: { maxT?: number; soft?
     if (it.t === 2 && R < 2) continue;
     const w =
       (it.size === 1 ? 4 : it.size === 2 ? 3 : R >= 4 ? 2.5 : 1.3) * (fg ? 1 : it.hero ? 1.4 : R <= 2 ? 0.5 : 1) * (G.wind === it.tag || G.wind2 === it.tag ? WIND_W : 1) *
-      (cap.soft !== undefined && it.t > cap.soft ? OVER_CAP_W ** (it.t - cap.soft) : 1);
+      (cap.soft !== undefined && it.t > cap.soft ? OVER_CAP_W ** (it.t - cap.soft) : 1) * (it.poolW ?? 1);
     pool.push([k, w]);
   }
   if (cap.maxT !== undefined && pool.length) {
@@ -124,7 +124,9 @@ export function makeOffer(filter?: ItemFilter | null, opt: { black?: number | bo
   if (opt.black) price = Math.round(price * 1.5);
   if (opt.free) price = 0;
   else price += (heat(3) ? 1 : 0) + mv('tax') + (isForeign(key) ? foreignTax() : 0);
-  return { card: { key, tier, adj, size: ITEMS[key].size, dl: 0, hoard: 0 }, price, sold: false };
+  const of: Offer = { card: { key, tier, adj, size: ITEMS[key].size, dl: 0, hoard: 0 }, price, sold: false };
+  curWorld()?.offer?.(of);
+  return of;
 }
 
 /** 开局前三夜的普通商店：至少一张是起手那个流派（本局主线）的卡，让第一夜就知道往哪走 / ordinary shops on the first three nights: at least one card from the opening archetype (this run's main line), so the direction is clear from night one */

@@ -87,3 +87,16 @@
 .hsig b{font-weight:400;font-size:14px;color:var(--hc,#ffd166)}
 .hsig span{font-size:13px;line-height:1.4}
 .hsig-l{margin-bottom:8px}
+/* 模组世界的卡面角标：版本、增强、计分（子夜牌局） / mod-world card badges: edition, enhancement, scoring (Midnight Deal) */
+.card .wb{display:contents}
+.card .mk{position:absolute;left:-5px;bottom:-6px;height:15px;padding:0 3px;border-radius:4px;font-size:11px;line-height:15px;color:#1a1c2c;z-index:3;box-shadow:0 2px 0 rgba(0,0,0,.4);background:#f4f4f4}
+.card .mk.en{left:auto;right:-5px;bottom:auto;top:12px}
+.card .mk.foil{background:#73eff7}.card .mk.holo{background:#ff8fb8}.card .mk.poly{background:linear-gradient(90deg,#ff6b6b,#fee761,#73eff7,#c58cff)}.card .mk.neg{background:#1a1c2c;color:#f4f4f4}
+.card .mk.off{background:#566c86;color:#f4f4f4}
+.card .ov{position:absolute;inset:2px;border-radius:6px;pointer-events:none;z-index:1}
+.card .ov.foil{background:linear-gradient(120deg,transparent 25%,rgba(115,239,247,.45) 48%,transparent 70%);background-size:200% 100%;animation:ovsh 2.4s linear infinite}
+.card .ov.holo{background:repeating-linear-gradient(45deg,rgba(255,143,184,.28) 0 3px,transparent 3px 7px)}
+.card .ov.poly{background:linear-gradient(135deg,rgba(255,107,107,.3),rgba(254,231,97,.3),rgba(115,239,247,.3),rgba(197,140,255,.3));background-size:300% 300%;animation:ovsh 3s linear infinite}
+.card .ov.neg{background:#fff;mix-blend-mode:difference;opacity:.85}
+.card .sc{position:absolute;left:50%;top:-6px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#fee761;box-shadow:0 0 0 2px #1a1c2c,0 0 6px #fee761;z-index:3}
+@keyframes ovsh{0%{background-position:0 0}100%{background-position:200% 0}}

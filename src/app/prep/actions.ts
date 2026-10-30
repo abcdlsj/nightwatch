@@ -743,10 +743,11 @@ export const prepApi = {
   makeOffer, rollGear, withFit, rollItem, rollTalents, lockedOffers, newCard, firstFit, stats, basePrice,
   renderOwned, renderPrep, renderRelics, updateHUD, repaint, toast, elOf, restart, FX, SFX, rand, pick, shuffled,
   /** 加一张卡到手里（有空位放空位，没空位返回 false） / add a card to your hand (into a free slot; false if there is none) */
-  addCard(key: string, tier = ITEMS[key].t, adj: string | null = null) {
+  addCard(key: string, tier = ITEMS[key].t, adj: string | null = null, mk?: Record<string, any>) {
     const spot = firstFit(ITEMS[key].size);
     if (!spot) return false;
     const n = newCard(key, tier, adj);
+    if (mk) n.mk = { ...mk };
     n.loc = spot.z;
     n.idx = spot.i;
     G.cards.push(n);

@@ -24,8 +24,8 @@ export interface Card {
   /** 艾拉「老规矩」：在 vetAt 这一格连着守了几夜 / Ayla's Old Habits: how many nights in a row it has held slot vetAt */
   vet?: number;
   vetAt?: number;
-  /** 花色：模组可以给单张卡另记一个元素（只给模组规则读，不改卡本身的元素） / suit: a mod may note another element on one card (read only by mod rules; the card's own element is unchanged) */
-  suit?: string;
+  /** 模组给单张卡记的东西（花色、版本、增强……），跟着存档走，合成时两张的合在一起 / per-card notes a mod keeps (suit, edition, enhancement…), saved with the run and combined when two cards merge */
+  mk?: Record<string, any>;
   /** 卡面闪光动画的错开延迟（纯表现） / staggered delay for the card-face flash animation (cosmetic) */
   dl: string | number;
   /* ---- 战斗中 ---- / ---- In battle ---- */
@@ -76,6 +76,8 @@ export interface CardSpec {
   size: number;
   dl?: number | string;
   hoard?: number;
+  /** 同 Card.mk / same as Card.mk */
+  mk?: Record<string, any>;
 }
 export interface Offer {
   card: CardSpec;

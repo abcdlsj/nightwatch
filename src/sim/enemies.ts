@@ -18,16 +18,17 @@ import { hurt } from './combat';
 import { frenzy } from './combo';
 import type { Enemy } from './types';
 import type { Card } from '../game/state';
-import { ENEMY_HOOKS } from '../game/world';
+import { ENEMY_HOOKS, curWorld } from '../game/world';
 
 const wg = (k: string) => !!B && B.wagers.includes(k);
 
 export function spawn(type: string, x?: number | null, y?: number | null): Enemy {
   const b = bt();
   const d = EN[type];
-  const sc = d.fixed
+  let sc = d.fixed
     ? fixedScale(d.hidden ? G.round - TUNE.hiddenEase : G.round) * (d.boss ? TUNE.bossHp : 1)
     : hpScale(G.round) * (G.round === 1 ? 0.5 : G.round === 2 ? 0.6 : 0.7) * (heat(1) ? 1.15 : 1) * (heat(2) && (d.boss || d.elite) ? 1.25 : 1) * (wg('iron') ? 1.3 : 1);
+  sc *= curWorld()?.hp?.(type, d) ?? 1;
   const e: Enemy = {
     d, type, x: x != null ? x : rnd(0.08, 0.92), y: y != null ? y : -0.04, x0: 0, hp: d.hp * sc, maxHp: d.hp * sc, armor: d.armor, shield: 0,
     slowT: 0, slowA: 0, burnT: 0, burnD: 0, burnSrc: null, burnTick: 0, poisonT: 0, poisonD: 0, poisonSrc: null, poisonTick: 0, frzT: 0, frzN: 0, vulnT: 0, vulnA: 0,

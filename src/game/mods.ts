@@ -6,6 +6,7 @@ import { G } from './state';
 import { synMods } from './synergy';
 import { OMENS } from '../data/meta';
 import { SIGS, AWAKEN } from '../data/heroes';
+import { curWorld } from './world';
 
 export let M: Mods = {};
 
@@ -25,6 +26,8 @@ export function recalcMods() {
   const O = G.omen ? OMENS[G.omen] : null;
   if (O?.m) add(O.m);
   if (O?.wind && G.wind) add({ ['xtag_' + G.wind]: O.wind });
+  const wm = curWorld()?.mods?.();
+  if (wm) add(wm);
   M = m;
 }
 

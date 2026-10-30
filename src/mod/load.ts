@@ -7,7 +7,11 @@ import { applyMod, reapplyModText } from './apply';
 import { enterWorld, restoreRenames } from './enter';
 import { beforeLocale, afterLocale } from '../i18n';
 
-const found = import.meta.glob<{ default: ModPack }>(['../../mods/*/index.ts', '!../../mods/_*/index.ts'], { eager: true });
+/* 杀戮尖塔和小丑牌两个模组还在调优，先不装进游戏；测试和机器人照样直接引用 / the Spire and Balatro mods are still being tuned, so they stay out of the game for now; tests and the bot still import them directly */
+const found = import.meta.glob<{ default: ModPack }>(
+  ['../../mods/*/index.ts', '!../../mods/_*/index.ts', '!../../mods/spire/index.ts', '!../../mods/midnight-deal/index.ts'],
+  { eager: true },
+);
 
 /** 加载结果（工坊页显示） / load result (shown on the Workshop page) */
 export const MOD_REPORTS: ModReport[] = [];

@@ -4,9 +4,9 @@
  * Mod worlds: a mod can bring a whole world of its own (opening, enemy set, bosses, events, shop cards, story, battle rules). A hero with def.world starts their runs in that world; base heroes' runs are untouched. This holds the world registry and the checks used everywhere; rules code (sim/, app/) only asks here whether something may appear this run.
  */
 import { HEROES } from '../data/heroes';
-import type { Card } from './state';
+import type { Card, CardSpec, Offer } from './state';
 import { G } from './state';
-import type { ItemDef } from '../data/types';
+import type { ItemDef, EnemyDef } from '../data/types';
 
 export type Hook = (x: Record<string, any>) => void;
 /** 改一张卡的数值：返回要加的固定伤害、百分比加成、独立乘区、攻速 / adjust one card's numbers: return flat damage, percentage bonuses, independent multipliers and attack speed to add */
@@ -36,6 +36,16 @@ export interface WorldDef {
   night?: () => void;
   /** 备战页「今晚情报」里多写一行（返回 HTML） / an extra line in prep's 'tonight' intel (returns HTML) */
   note?: () => string;
+  /** 敌人血量再乘多少（数值膨胀的世界用：血量跟着这个世界自己的曲线涨） / an extra multiplier on enemy HP (for worlds with their own number inflation curve) */
+  hp?: (type: string, d: EnemyDef) => number;
+  /** 卡面上多画的角标（返回 HTML，比如版本、增强） / an extra badge on the card face (returns HTML, e.g. edition or enhancement) */
+  badge?: (c: CardSpec | Card) => string;
+  /** 卡面右下的小数字换成这个（不返回就照常） / replaces the small number at the card's bottom-right (return nothing to keep the default) */
+  num?: (c: Card) => string | void;
+  /** 店里或白送的卡刚摇出来时改一改（比如加版本） / adjust a freshly rolled shop or free offer (e.g. add an edition) */
+  offer?: (of: Offer) => void;
+  /** 这个世界额外给的修正项（比如手里的小丑卡带来的），每次重算修正项时加上 / extra modifiers from this world (e.g. from jokers held), added whenever modifiers are recalculated */
+  mods?: () => Record<string, number>;
 }
 
 export const WORLDS: Record<string, WorldDef> = {};

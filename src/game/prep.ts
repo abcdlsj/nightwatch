@@ -223,6 +223,7 @@ export function acquireState(of: Offer, dest: Dest): { ok: true; card: Card } | 
     G.lock = null;
   }
   const c = newCard(of.card.key, of.card.tier, of.card.adj);
+  if (of.card.mk) c.mk = { ...of.card.mk };
   G.cards.push(c);
   if (dest === 'merge') {
     c.loc = 'temp';
@@ -266,6 +267,7 @@ export function checkMerges(): Card[] {
       t.qp = Math.max(t.qp || 0, a.qp || 0);
       if (a.carry) t.carry = true;
       t.star = Math.max(t.star || 0, a.star || 0);
+      if (a.mk) t.mk = { ...a.mk, ...t.mk };
       removeCard(a);
       t.tier++;
       if (t.loc === 'temp') {

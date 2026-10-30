@@ -1,4 +1,4 @@
-/* 模组世界：倒悬塔、子夜牌局能加载、两个世界互不串门，每个人物都能打完前几夜，首领能打 / Mod worlds: the Spire and Midnight Deal load cleanly, worlds stay apart, every hero clears the first nights, and bosses can be fought */
+/* 模组世界：杀戮尖塔、小丑牌能加载、两个世界互不串门，每个人物都能打完前几夜，首领能打 / Mod worlds: Slay the Spire and Balatro load cleanly, worlds stay apart, every hero clears the first nights, and bosses can be fought */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { initLocale, L } from '../../src/i18n';
 import { reseed } from '../../src/core/rng';
@@ -16,11 +16,11 @@ import { applyMod } from '../../src/mod/apply';
 import { enterWorld } from '../../src/mod/enter';
 import { curWorld } from '../../src/game/world';
 import spire from '../../mods/spire';
-import deal, { bestHand } from '../../mods/midnight-deal';
-import { newCard } from '../../src/game/cards';
+import deal, { bestHand, ctx, hpMul } from '../../mods/midnight-deal';
+import { newCard, stats } from '../../src/game/cards';
 
 const MODS = [deal, spire];
-const HERO_LIST = ['ironclad', 'silent', 'choujue', 'zhangfang'];
+const HERO_LIST = ['ironclad', 'silent', 'dk_red', 'dk_plasma'];
 
 beforeAll(() => {
   initLocale();
@@ -69,7 +69,7 @@ describe('模组世界', () => {
     expect(hiddenBoss('ironclad')).toBe('sts_heart');
     expect(hiddenBoss('silent')).toBe('sts_heart2');
     expect((L.story as any).nights[0].title).toContain('底层');
-    newRun('zhangfang', 0, 1);
+    newRun('dk_plasma', 0, 1);
     expect(curWorld()!.id).toBe('deal');
     for (let i = 0; i < 200; i++) expect(ITEMS[rollItem()].world).not.toBe('spire');
     expect(finalBosses().every((k) => EN[k].world === 'deal')).toBe(true);
@@ -87,20 +87,37 @@ describe('模组世界', () => {
       }
     });
 
-  it('牌型：按元素凑，鬼牌当任何元素', () => {
-    newRun('choujue', 0, 1);
+  it('牌型：按点数和花色凑，只有凑进去的牌计分', () => {
+    newRun('dk_red', 0, 1);
     const mk = (ks: string[]) => ks.map((k) => newCard(k, ITEMS[k].t));
-    expect(bestHand(mk(['dl_juggle', 'dl_pins']))).toBe('high');
-    expect(bestHand(mk(['dl_juggle', 'dl_grin']))).toBe('pair');
-    expect(bestHand(mk(['dl_juggle', 'dl_whip', 'dl_flushjoker', 'dl_grin']))).toBe('four');
-    expect(bestHand(mk(['dl_pins', 'dl_juggle', 'dl_twitch', 'dl_collector']))).toBe('straight');
-    expect(bestHand(mk(['dl_juggle', 'dl_whip', 'dl_finale', 'dl_flushjoker', 'dl_grin']))).toBe('sflush');
+    expect(bestHand(mk(['pc_s2', 'pc_h9'])).id).toBe('high');
+    const p = bestHand(mk(['pc_s9', 'pc_h9', 'pc_c3']));
+    expect(p.id).toBe('pair');
+    expect(p.scoring.length).toBe(2);
+    expect(bestHand(mk(['pc_s9', 'pc_h9', 'pc_c3', 'pc_d3'])).id).toBe('two');
+    expect(bestHand(mk(['pc_sa', 'pc_h2', 'pc_c3', 'pc_d4', 'pc_s5'])).id).toBe('straight');
+    expect(bestHand(mk(['pc_h2', 'pc_h7', 'pc_h9', 'pc_hj', 'pc_hk', 'pc_s9'])).id).toBe('flush');
+    expect(bestHand(mk(['pc_h9', 'pc_ht', 'pc_hj', 'pc_hq', 'pc_hk'])).id).toBe('sflush');
+    expect(bestHand(mk(['pc_s9', 'pc_h9', 'pc_c9', 'pc_d4', 'pc_s4'])).id).toBe('full');
+    expect(bestHand(mk(['pc_h2', 'pc_h7', 'pc_h9', 'pc_hj', 'pc_s9']), { four: true }).id).toBe('flush');
+  });
+
+  it('计分：筹码 × 倍率，小丑在背包里也算，敌人血量跟着底注涨', () => {
+    newRun('dk_red', 0, 1);
+    const x = ctx();
+    expect(x.hand.id).toBe('pair');
+    expect(x.scoring.size).toBe(2);
+    expect(x.jokers.map((j) => j.key)).toEqual(['jk_jolly']);
+    const k = G.cards.find((c) => c.key === 'pc_hk')!;
+    /* (10 筹码 + 对子 10) × (对子 2 + 红色牌组 4 + 开心小丑 8) = 280 / (10 + 10) × (2 + 4 + 8) = 280 */
+    expect(Math.round(stats(k, null).total)).toBe(280);
+    expect(hpMul(9) / hpMul(1)).toBeGreaterThan(8);
   });
 
   it('第四夜的精英和各个首领都打得起来，不报错', () => {
-    for (const [h, boss] of [['ironclad', 'sts_lagavulin'], ['silent', 'sts_heart'], ['zhangfang', 'dl_dealer'], ['choujue', 'dl_house']])
+    for (const [h, boss] of [['ironclad', 'sts_lagavulin'], ['silent', 'sts_heart'], ['dk_plasma', 'dl_tooth'], ['dk_red', 'dl_naneinf']])
       expect(['win', 'lose']).toContain((newRun(h, 0, 3), night(9, boss)));
-    for (const h of ['ironclad', 'choujue']) for (const boss of (newRun(h, 0, 3), finalBosses())) {
+    for (const h of ['ironclad', 'dk_red']) for (const boss of (newRun(h, 0, 3), finalBosses())) {
       newRun(h, 0, 3);
       const r = night(9, boss);
       expect(['win', 'lose']).toContain(r);

@@ -20,6 +20,8 @@ export interface ItemDef {
   /** 只在这个模组世界里出现（见 src/game/world.ts）；不写就是原版 / only appears in this mod world (see src/game/world.ts); omitted means the base game */
   world?: string;
   noPool?: number;
+  /** 进卡池的权重再乘多少（默认 1；一个模组有很多张同类卡时调小） / extra weight in the card pool (default 1; lower it when a mod has many similar cards) */
+  poolW?: number;
   /** 卖不掉（诅咒卡这种），只能靠事件清掉 / cannot be sold (like curses); only an event can clear it */
   noSell?: number;
   /** 离不开自己人物的机制，不当外乡卡卖给别人 / depends on its own hero's mechanics, so never sold to others as a foreign card */

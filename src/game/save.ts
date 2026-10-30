@@ -17,7 +17,7 @@ export interface SaveData {
   /** 旧版（8 夜）存档里的首领 / the boss in old-version (8-night) saves */
   boss8?: string;
   endless: boolean; lock: Offer | null;
-  cards: { key: string; tier: number; adj: string | null; loc: any; idx: number; hoard: number; grow: number; qp: number; carry?: boolean; star?: number; vet?: number; vetAt?: number; suit?: string }[];
+  cards: { key: string; tier: number; adj: string | null; loc: any; idx: number; hoard: number; grow: number; qp: number; carry?: boolean; star?: number; vet?: number; vetAt?: number; mk?: Record<string, any> }[];
   secret?: Record<string, number>;
   wind?: string; windRelic?: boolean;
   wind2?: string; omen?: string; rot?: { off: string; gh: string; gp: string } | null;
@@ -37,7 +37,7 @@ export function saveGame(rngState = rng.state) {
     hero: G.hero, round: G.round, gold: G.gold, wall: G.wall, wallMax: G.wallMax, relics: G.relics, skills: G.skills, foeSet: G.foeSet,
     bestChain: G.bestChain, heat: G.heat || 0, run: G.run, boss9: G.boss9, boss12: G.boss12, full: G.full, gems: G.gems, arc: G.arc, kitPath: G.kitPath,
     endless: !!G.endless, lock: G.lock || null,
-    cards: G.cards.map((c) => ({ key: c.key, tier: c.tier, adj: c.adj, loc: c.loc, idx: c.idx, hoard: c.hoard, grow: c.grow || 0, qp: c.qp || 0, carry: c.carry || undefined, star: c.star || undefined, vet: c.vet || undefined, vetAt: c.vet ? c.vetAt : undefined, suit: c.suit || undefined })),
+    cards: G.cards.map((c) => ({ key: c.key, tier: c.tier, adj: c.adj, loc: c.loc, idx: c.idx, hoard: c.hoard, grow: c.grow || 0, qp: c.qp || 0, carry: c.carry || undefined, star: c.star || undefined, vet: c.vet || undefined, vetAt: c.vet ? c.vetAt : undefined, mk: c.mk && Object.keys(c.mk).length ? c.mk : undefined })),
     secret: G.secret, seed: G.seed, rng: rngState, wind: G.wind, windRelic: G.windRelic,
     wind2: G.wind2 || '', omen: G.omen || '', rot: G.rot || null,
     daily: G.daily || undefined, dailyFight: G.dailyFight || undefined, awaken: G.awaken || undefined, ws: G.ws,
@@ -74,7 +74,7 @@ export function restoreSave(s: SaveData | null): boolean {
     c.star = d.star || 0;
     c.vet = d.vet || 0;
     c.vetAt = d.vetAt ?? -1;
-    if (d.suit) c.suit = d.suit;
+    if (d.mk) c.mk = { ...d.mk };
     G.cards.push(c);
   }
   /* 上一夜战报的快照里也可能有改了名或删掉的卡 / last night's report snapshot may also hold renamed or removed cards */

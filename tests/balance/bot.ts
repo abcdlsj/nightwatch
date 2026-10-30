@@ -23,7 +23,7 @@ import { curWorld, ws } from '../../src/game/world';
 import { enterWorld } from '../../src/mod/enter';
 import { applyMod } from '../../src/mod/apply';
 import spire from '../../mods/spire';
-import deal, { bestHand } from '../../mods/midnight-deal';
+import deal, { bestHand, ctx as dealCtx } from '../../mods/midnight-deal';
 
 /** 把仓库里的两个模组世界也装上（MODS=1 时跑它们的人物） / also load the repo's two mod worlds (their heroes run with MODS=1) */
 let modsOn = false;
@@ -58,6 +58,7 @@ export function cardScore(c: Card, focus: Focus) {
 
 /** 把最值钱的卡排上棋盘（按单格价值从高到低塞满 8 格），其余进背包，背包放不下就卖 / arrange the most valuable cards on the board (fill all 8 slots by per-slot value, highest first); the rest go to the bag, and sell when the bag is full */
 function arrange(focus: Focus) {
+  if (curWorld()?.id === 'deal') return arrangeDeal();
   const all = G.cards.slice().sort((a, b) => cardScore(b, focus) * b.size - cardScore(a, focus) * a.size);
   for (const c of all) {
     c.loc = null;
@@ -102,6 +103,87 @@ function arrange(focus: Focus) {
   recalcMods();
 }
 
+/* ---------------- 小丑牌世界：凑牌型、小丑放背包 / the Balatro world: make hands, jokers in the bag ---------------- */
+const isPC = (k: string) => k.startsWith('pc_');
+const isJK = (k: string) => k.startsWith('jk_');
+const jokerWorth = (key: string, tier: number) => 40 + 25 * ITEMS[key].t + 20 * tier;
+/** 棋盘：凑成最大牌型的牌在前，小丑先进背包（背包满了上棋盘），剩下的卖掉 / board: the best hand first; jokers go to the bag (overflow to the board); the rest are sold */
+function arrangeDeal() {
+  for (const c of G.cards) {
+    c.loc = null;
+    c.idx = -1;
+  }
+  const pcs = G.cards.filter((c) => isPC(c.key));
+  const best = bestHand(pcs).scoring;
+  const rest = pcs.filter((c) => !best.includes(c)).sort((a, b) => ITEMS[b.key].dmg * (b.tier + 1) - ITEMS[a.key].dmg * (a.tier + 1));
+  const jks = G.cards.filter((c) => isJK(c.key)).sort((a, b) => jokerWorth(b.key, b.tier) - jokerWorth(a.key, a.tier));
+  const other = G.cards.filter((c) => !isPC(c.key) && !isJK(c.key));
+  let s = 0;
+  let x = 0;
+  const put = (c: Card, z: 'board' | 'stash') => {
+    c.loc = z;
+    c.idx = z === 'board' ? x : s;
+    if (z === 'board') x += c.size;
+    else s += c.size;
+  };
+  for (const c of best) put(c, 'board');
+  for (const j of jks) {
+    if (s + 1 <= zoneN('stash')) put(j, 'stash');
+    else if (x + 1 <= 8) put(j, 'board');
+  }
+  for (const c of [...rest, ...other]) if (x + c.size <= 8) put(c, 'board');
+  for (const c of G.cards.slice())
+    if (!c.loc) {
+      G.gold += sellValue(c);
+      removeCard(c);
+    }
+  recalcMods();
+}
+/** 一张扑克牌值多少：让牌型变大最值钱，能合成其次 / a playing card's worth: making the hand bigger matters most, merging next */
+function pcWorth(key: string, tier: number) {
+  const pcs = G.cards.filter((c) => isPC(c.key));
+  const now = bestHand(pcs).id;
+  const tmp = { key, tier, id: -1, loc: 'board', idx: 0 } as unknown as Card;
+  const after = bestHand([...pcs, tmp]).id;
+  const H = ['high', 'pair', 'two', 'three', 'straight', 'flush', 'full', 'four', 'sflush', 'five', 'fhouse', 'ffive'];
+  if (H.indexOf(after) > H.indexOf(now)) return 50 + 10 * (H.indexOf(after) - H.indexOf(now));
+  if (G.cards.some((c) => c.key === key && c.tier === tier)) return 30;
+  return pcs.length < 5 ? 15 : 3;
+}
+function dealWorth(of: Offer) {
+  const k = of.card.key;
+  if (isJK(k)) {
+    const n = G.cards.filter((c) => isJK(c.key)).length;
+    const dup = G.cards.some((c) => c.key === k && c.tier === of.card.tier);
+    return n >= 5 && !dup ? jokerWorth(k, of.card.tier) - Math.min(...G.cards.filter((c) => isJK(c.key)).map((c) => jokerWorth(c.key, c.tier))) : jokerWorth(k, of.card.tier) + (dup ? 20 : 0);
+  }
+  if (isPC(k)) return pcWorth(k, of.card.tier);
+  return 0;
+}
+function buyDeal(offers: Offer[], free: boolean) {
+  for (const of of offers.slice().sort((a, b) => dealWorth(b) - dealWorth(a))) {
+    if (of.sold || (!free && of.price > G.gold) || dealWorth(of) < 12) continue;
+    let r = acquireState(of, null);
+    if (!r.ok && r.why === 'full') {
+      const w = G.cards.filter((c) => !isJK(c.key) || G.cards.filter((o) => isJK(o.key)).length > 5).sort((a, b) => (isJK(a.key) ? jokerWorth(a.key, a.tier) : pcWorth(a.key, a.tier)) - (isJK(b.key) ? jokerWorth(b.key, b.tier) : pcWorth(b.key, b.tier)))[0];
+      if (w) {
+        G.gold += sellValue(w);
+        removeCard(w);
+        r = acquireState(of, null);
+      }
+    }
+    if (!r.ok) continue;
+    checkMerges();
+    arrangeDeal();
+    if (free) return;
+  }
+}
+const lvUpHand = (id: string, n = 1) => {
+  const lv = (ws().lv ||= {});
+  lv[id] = (lv[id] || 1) + n;
+  ws().lvV = (ws().lvV || 0) + 1;
+};
+
 function offerWorth(of: Offer, focus: Focus) {
   const tmp = { ...of.card, loc: 'board', nb: [], grow: 0, stk: 0, mom: 0 } as unknown as Card;
   const dup = G.cards.some((c) => c.key === of.card.key && c.tier === of.card.tier);
@@ -110,6 +192,7 @@ function offerWorth(of: Offer, focus: Focus) {
 
 /** 买得起、值得买就买：能合成的、棋盘还有空位的、比最弱那张好的 / buy when affordable and worthwhile: mergeable, with a free board slot, or better than the weakest card */
 function buyFrom(offers: Offer[], focus: Focus, free: boolean) {
+  if (curWorld()?.id === 'deal') return buyDeal(offers, free);
   for (let guard = 0; guard < 4; guard++) {
     const board = G.cards.filter((c) => c.loc === 'board');
     const used = board.reduce((s2, c) => s2 + c.size, 0);
@@ -216,7 +299,7 @@ function prep(focus: Focus) {
     const rich = G.gold >= 14;
     /* 墙掉了四成以上先去补 / if the wall has lost 40% or more, repair first */
     const hurt = G.wall < G.wallMax * 0.6 ? ['spring', 'camp', 'sts_campfire'] : [];
-    const pref = [...hurt, ...SHOP_FOR[focus], ...(rich ? ['black', 'grocer'] : []), 'shop', 'giant', 'altar', 'field', 'manual', 'train', 'grocer', 'chest', 'parcel', 'black', 'armory', 'forge', 'storm', 'smith', 'frostshop', 'apothecary', 'job', 'bank', 'dl_planet', 'sts_campfire'];
+    const pref = [...hurt, ...SHOP_FOR[focus], ...(rich ? ['black', 'grocer', 'dl_voucher'] : []), 'shop', 'dl_buffoon', 'dl_standard', 'dl_celestial', 'dl_spectral', 'giant', 'altar', 'field', 'manual', 'train', 'grocer', 'chest', 'parcel', 'black', 'armory', 'forge', 'storm', 'smith', 'frostshop', 'apothecary', 'job', 'bank', 'dl_planet', 'sts_campfire'];
     /* 不在偏好表里的门（机器人不会处理）排最后 / doors not in the preference table (which the bot cannot handle) come last */
     const rank = (id: string) => (pref.includes(id) ? pref.indexOf(id) : 999);
     const d = G.prep.doors.slice().sort((a, b) => rank(a) - rank(b))[0];
@@ -262,10 +345,25 @@ function prep(focus: Focus) {
         c.tier++;
         checkMerges();
       }
-    } else if (d === 'dl_planet') {
-      const lv = (ws().lv ||= {});
-      const h = bestHand();
-      lv[h] = (lv[h] || 1) + 1;
+    } else if (d === 'dl_celestial') {
+      lvUpHand(dealCtx().hand.id);
+      ws().planets = (ws().planets || 0) + 1;
+    } else if (d === 'dl_buffoon') {
+      const price = G.round === 1 ? 0 : 4;
+      if (G.gold >= price) {
+        G.gold -= price;
+        buyFrom([0, 1].map(() => makeOffer((it) => !!it.passive, { free: 1 })), focus, true);
+      }
+    } else if (d === 'dl_standard') buyFrom([0, 1, 2].map(() => makeOffer((it) => it.kind === 'weapon' && !it.passive, { free: 1 })), focus, true);
+    else if (d === 'dl_spectral') {
+      for (const h of ['high', 'pair', 'two', 'three', 'straight', 'flush', 'full', 'four', 'sflush']) lvUpHand(h);
+    } else if (d === 'dl_voucher') {
+      for (const k of ['dl_v_overstock', 'dl_v_telescope'])
+        if (G.gold >= 10 && !G.relics.includes(k)) {
+          G.gold -= 10;
+          gainRelicState(k);
+          break;
+        }
     }
     else if (d === 'bank') G.gold += Math.max(2, Math.min(10, Math.round(G.gold * 0.3)));
     arrange(focus);
@@ -284,6 +382,7 @@ export interface NightLog {
   topShare: number;
   board: string;
   gold: number;
+  deal?: string;
 }
 export interface RunLog {
   hero: string;
@@ -313,6 +412,10 @@ function battle(r: number): NightLog {
     topCard: top ? top.key + '@' + top.tier : '-', topShare: top ? Math.round((top.bDmg / tot) * 100) : 0,
     board: G.cards.filter((c) => c.loc === 'board').map((c) => `${c.key}@${c.tier}:${Math.round(c.bDmg)}`).join(' '), gold: G.gold,
   };
+  if (curWorld()?.id === 'deal') {
+    const x = dealCtx();
+    log.deal = `${x.hand.id}Lv${x.hand.lv} 计分${x.scoring.size} 小丑[${x.jokers.map((j) => j.key + (j.mk?.ed ? '/' + j.mk.ed : '')).join(',')}] 背包[${G.cards.filter((c) => c.loc === 'stash').map((c) => c.key).join(',')}]`;
+  }
   if (b.result === 'win') {
     settleWin();
     const gold = nightRewards(r, b.wallLost).reduce((s, x) => s + x[1], 0);

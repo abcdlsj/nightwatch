@@ -1,7 +1,8 @@
 /* 卡牌的 DOM：卡面、棋盘/背包里的位置、卡面数字 / card DOM: the face, its board/bag position, the face numbers */
 import { ITEMS, ADJ, TIERS, TAGC } from '../data/cards';
 import { t } from '../i18n';
-import { pct } from '../core/util';
+import { pct, fmt } from '../core/util';
+import { curWorld } from '../game/world';
 import { G, type Card, type CardSpec, type Zone } from '../game/state';
 import { recalcMods } from '../game/mods';
 import { cardName } from '../game/text';
@@ -35,6 +36,8 @@ const NUM_TEXT: Record<string, (c: Card) => string> = {
 
 export function numText(c: Card) {
   const it = ITEMS[c.key];
+  const wn = curWorld()?.num?.(c);
+  if (wn != null) return wn;
   if (NUM_TEXT[c.key]) return NUM_TEXT[c.key](c);
   if (it.charge) return '+' + Math.round(chargeAmt(c) * 100) + '%';
   if (it.buff) return '+50%';
@@ -46,14 +49,14 @@ export function numText(c: Card) {
   if (it.auraNb) return '+' + Math.round(it.auraNb * 100) + '%';
   if (it.shieldGain) return t('card.shield', { n: Math.round(it.shieldGain * (1 + 0.4 * stepOf(c))) });
   const v = Math.round(stats(c, null).total);
-  return v >= 10000 ? (v / 1000).toFixed(1) + 'k' : String(v);
+  return v >= 10000 && v < 1e6 ? (v / 1000).toFixed(1) + 'k' : fmt(v);
 }
 
 function cardHTML(c: CardSpec) {
   const it = ITEMS[c.key];
   const ad = c.adj ? ADJ[c.adj] : null;
   const nm = cardName(c);
-  return `<div class="inner" style="--dl:${c.dl || 0}s"><div class="face"><div class="band"></div><div class="nm${nm.length > (c.size > 1 ? 5 : 3) ? ' long' : ''}">${nm}</div><img class="spr" src="${spr(c.key + (ad?.tag ? '@' + ad.tag : '')).url}" alt="${it.n}" draggable="false"><div class="num"></div>${it.ammo != null ? '<div class="am"></div>' : ''}<div class="cdv"></div><div class="holo"></div><div class="flash"></div></div><div class="tb">${[...TIERS[c.tier].n][0]}</div>${ad ? `<div class="adj">${ad.ch}</div>` : ''}${(c as Card).carry ? `<div class="cw" title="${t('card.carry')}">C</div>` : ''}</div>`;
+  return `<div class="inner" style="--dl:${c.dl || 0}s"><div class="face"><div class="band"></div><div class="nm${nm.length > (c.size > 1 ? 5 : 3) ? ' long' : ''}">${nm}</div><img class="spr" src="${spr(c.key + (ad?.tag ? '@' + ad.tag : '')).url}" alt="${it.n}" draggable="false"><div class="num"></div>${it.ammo != null ? '<div class="am"></div>' : ''}<div class="cdv"></div><div class="holo"></div><div class="flash"></div></div><div class="tb">${[...TIERS[c.tier].n][0]}</div>${ad ? `<div class="adj">${ad.ch}</div>` : ''}${(c as Card).carry ? `<div class="cw" title="${t('card.carry')}">C</div>` : ''}<div class="wb">${curWorld()?.badge?.(c) || ''}</div></div>`;
 }
 
 export function paintCard(el: HTMLElement, c: CardSpec | Card, extra?: string) {
@@ -79,6 +82,12 @@ export function setNum(el: HTMLElement | undefined, c: Card) {
   if (!n) return;
   const s = numText(c);
   n.textContent = s;
+  const W = curWorld();
+  if (W?.badge) {
+    const wb = el!.querySelector('.wb');
+    const h = W.badge(c);
+    if (wb && wb.innerHTML !== h) wb.innerHTML = h;
+  }
   n.classList.toggle('txt', /[^\x00-\x7f]/.test(s));
 }
 
