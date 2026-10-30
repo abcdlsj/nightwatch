@@ -40,9 +40,10 @@ export function fitStandalone() {
   });
 }
 
-/** 只在正式构建的网页版里注册（开发服务器和原生壳都不需要） / register only in production web builds (neither the dev server nor native needs it) */
+/** 只在正式构建的网页版里注册（开发服务器和原生壳都不需要）；被嵌进 iframe（如 B站 Toy）时也不注册，缓存交给宿主
+ * / register only in production web builds (neither the dev server nor native needs it); skip inside iframes (e.g. Bilibili Toy), the host owns caching */
 export function registerSW(version: string) {
-  if (isNative() || !import.meta.env.PROD || !('serviceWorker' in navigator)) return;
+  if (isNative() || !import.meta.env.PROD || !('serviceWorker' in navigator) || window.top !== window) return;
   addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=' + encodeURIComponent(version)).catch(() => {}));
 }
 
