@@ -46,18 +46,26 @@ function fitURL(cv: HTMLCanvasElement, n: number, box: number) {
   x.drawImage(cv, Math.floor((box - cv.width * n) / 2) * 4, Math.floor((box - cv.height * n) / 2) * 4, cv.width * n * 4, cv.height * n * 4);
   return c2.toDataURL();
 }
-/** 战场亮边：剪影外再加 1px，描边和夜色地面同色时轮廓也能浮出来 / battlefield rim: one more pixel around the silhouette, so outlines still read when they match the night-dark ground */
-const RIM = '#464e6e';
+/** 战场亮边：剪影外再加 1px，描边和夜色地面同色时轮廓也能浮出来。
+ * 亮边跟着月光走：左上受光一侧亮，右下背光一侧暗，和右下方的投影是同一个光源。
+ * battlefield rim: one more pixel around the silhouette, so outlines still read when they match the night-dark ground.
+ * The rim follows the moonlight: brighter on the lit upper-left, darker on the lower-right, the same light that casts the shadow. */
+const RIM_LIT = '#6a7398',
+  RIM_DIM = '#3a4060';
 function mkRim(rows: string[]) {
-  const sil = mk(rows, RIM);
+  const dim = mk(rows, RIM_DIM),
+    lit = mk(rows, RIM_LIT);
   const cv = document.createElement('canvas');
-  cv.width = sil.width + 2;
-  cv.height = sil.height + 2;
+  cv.width = dim.width + 2;
+  cv.height = dim.height + 2;
   const x = cv.getContext('2d')!;
-  for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2]]) x.drawImage(sil, dx, dy);
+  for (const [dx, dy] of [[2, 1], [1, 2]]) x.drawImage(dim, dx, dy);
+  for (const [dx, dy] of [[0, 1], [1, 0]]) x.drawImage(lit, dx, dy);
   x.drawImage(mk(rows), 1, 1);
   return cv;
 }
+/** 投影色：比最暗的地面再暗一级 / shadow color: one step darker than the darkest ground */
+const SHADOW = '#06060d';
 
 export class Sprite {
   private _cv?: HTMLCanvasElement;
@@ -65,6 +73,7 @@ export class Sprite {
   private _ice?: HTMLCanvasElement;
   private _url?: string;
   private _rim?: HTMLCanvasElement;
+  private _shadow?: HTMLCanvasElement;
   private _fit: Record<number, string> = {};
   constructor(private rows: string[]) {}
   get cv() {
@@ -81,6 +90,10 @@ export class Sprite {
   /** 带 1px 亮边的战场图，比原图四周各大 1 格 / battlefield sprite with a 1px rim, one cell larger on every side */
   get rim() {
     return (this._rim ||= mkRim(this.rows));
+  }
+  /** 纯色剪影，给地上的投影用 / solid silhouette for the cast shadow on the ground */
+  get shadow() {
+    return (this._shadow ||= mk(this.rows, SHADOW));
   }
   get url() {
     return (this._url ||= upURL(this.cv, 4));
