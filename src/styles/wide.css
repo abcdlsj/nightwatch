@@ -6,7 +6,7 @@ html.wide #stage{grid-column:2;grid-row:2}
 html.wide #stashRow{grid-column:2;grid-row:3}
 html.wide #boardRow{grid-column:2;grid-row:4}
 html.wide #actions{grid-column:2;grid-row:5}
-html.wide #app>#prep{grid-column:1;grid-row:1/-1;position:relative;inset:auto;min-height:0;border-radius:14px;padding:12px;
+html.wide #app>#prep{grid-column:1;grid-row:1/-1;position:relative;inset:auto;min-height:0;border-radius:3px;padding:12px;
   background:rgba(8,14,18,.55);box-shadow:inset 0 0 0 3px rgba(0,0,0,.35),0 4px 0 rgba(0,0,0,.4)}
 /* 开战后左栏不收起，只留今晚敌情 / once battle starts the left column stays, showing only tonight's enemies */
 html.wide #app>#prep[hidden]{display:flex;align-self:start}
@@ -17,4 +17,4 @@ html.wide #pvNote{-webkit-line-clamp:unset}
 html.wide #field{display:block!important}
 /* 弹层改成居中弹窗 / sheets become centered dialogs */
 html.wide #sheet{align-items:center;padding:24px}
-html.wide .sh{max-width:480px;max-height:min(86vh,760px);border-radius:18px;padding-bottom:16px}
+html.wide .sh{max-width:480px;max-height:min(86vh,760px);border-radius:3px;padding-bottom:16px}

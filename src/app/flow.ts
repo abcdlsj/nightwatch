@@ -25,7 +25,7 @@ import { B, startBattle as simStart, settleWin, clearBattle, setOnEnd } from '..
 import { world } from '../sim/world';
 import type { Battle } from '../sim/types';
 import { setScene } from '../render/background';
-import { F, resizeField, clearFieldFx, clientToFieldX } from '../render/field';
+import { F, resizeField, clearFieldFx, clientToFieldX, curtain, dawn, breach } from '../render/field';
 import { FX } from '../render/overlay';
 import { SFX } from '../audio/sfx';
 import { $, restart } from '../ui/dom';
@@ -243,7 +243,8 @@ export function startBattle() {
   const nk = nightKind(G.round);
   const hard = amb || nk === 'boss' || nk === 'hidden';
   banner(amb ? t('battle.ambushTitle', { n: bd!.n }) : nightInfo(G.round).title, hard ? '#ff6b5b' : nk === 'elite' ? '#ffb37a' : '#fff');
-  SFX.play(hard || nk === 'elite' ? 'intent' : 'ui');
+  SFX.play(hard || nk === 'elite' ? 'intent' : 'bell');
+  curtain();
   simStart({ wave, ambush: amb, wagers: amb ? [] : bets(), beats: amb ? [] : nightInfo(G.round).beats });
   updateHUD();
 }
@@ -276,6 +277,8 @@ function winBattle(b: Battle) {
   G.phase = 'report';
   $('#bossbar').hidden = true;
   SFX.play('win');
+  clearCenter();
+  dawn();
   say('hero', L.story.barks.win, 2);
   showQuests(settleWin());
   clearCharges();
@@ -371,6 +374,9 @@ function loseBattle(b: Battle) {
   if (G.run) G.run.kills += b.kills;
   G.phase = 'over';
   SFX.play('lose');
+  SFX.play('hurt');
+  clearCenter();
+  breach();
   G.bestChain = Math.max(G.bestChain, b.maxChain);
   banner(pickFall(), '#ff6b5b');
   setTimeout(() => playLose(() => endScreen(false)), 1400);

@@ -9,6 +9,7 @@ import { fmt } from '../core/util';
 import { RM } from '../platform/env';
 import { SETTINGS } from '../platform/settings';
 import { G } from '../game/state';
+import { nightKind } from '../game/plan';
 import { B, phased, rising } from '../sim/battle';
 import { world, K, ex, ey, WALLY } from '../sim/world';
 import type { Enemy } from '../sim/types';
@@ -37,7 +38,14 @@ export const F = {
   rings: [] as Ring[],
   bolts: [] as Bolt[],
   ground: null as HTMLCanvasElement | null,
+  /** 这张地面是按哪一夜、哪个主题画的（换夜要重画） / which night and theme this ground was drawn for (redrawn when the night changes) */
+  groundR: 0,
+  themeK: '',
   marks: [] as Mark[],
+  /** 开战的幕布（1→0）、天亮（0→1）、城破 / the opening curtain (1→0), dawn (0→1), the breach */
+  curtain: 0,
+  dawn: -1,
+  broken: false,
 };
 
 /** 命中停顿：只把真实时间扣下来不喂给模拟，模拟仍按定步长走，结果和种子无关 / hit-stop: withholds wall-clock time from the sim; the sim still runs in fixed steps, so results never depend on it */
@@ -80,6 +88,23 @@ export function clearFieldFx() {
   F.rings = [];
   F.bolts = [];
   F.marks = [];
+  F.dawn = -1;
+  F.broken = false;
+}
+/** 开战：黑幕从上往下揭开，敌人从北边的黑里露出来 / battle start: a black curtain lifts from the top down, enemies revealed out of the northern dark */
+export function curtain() {
+  F.curtain = RM ? 0 : 1;
+}
+/** 守住：天边一点点亮起来 / held: the horizon slowly brightens */
+export function dawn() {
+  F.dawn = 0;
+}
+/** 城破：墙塌掉几段，砖块往外崩 / breach: sections of the wall collapse, bricks bursting outward */
+export function breach() {
+  F.broken = true;
+  shake(6);
+  const wy = WALLY();
+  for (let i = 0; i < 90; i++) part(vr() * world.W, wy + vrnd(-2, 5), vrnd(-40, 40), -vrnd(30, 110), vrnd(0.5, 1.1), vr() < 0.5 ? '#7d6a5a' : vr() < 0.5 ? '#9c8670' : '#2a2130', vr() < 0.4 ? 2 : 1);
 }
 
 /** 战场坐标 → 页面坐标（金币飞向顶栏用） / battlefield coordinates → page coordinates (for gold flying to the top bar) */
@@ -94,54 +119,177 @@ export function clientToFieldX(el: Element) {
   return (r.left + r.width / 2 - fr.left) / F.s;
 }
 
-/** 地面色阶：北冷南暖，相邻两级差得很小，网点才不会读成棋盘格 / ground ramp: cool north, warm south; neighbouring steps are close so the screen never reads as a checkerboard */
-const GROUND: [number, number, number][] = [[10, 11, 22], [13, 14, 26], [16, 16, 29], [20, 19, 31], [24, 22, 33], [27, 24, 34]];
+/** 每夜的战场主题：地面色阶、远山、北边裂隙的光、空中飘的东西。前几夜萤火，中段落灰，后几夜和首领夜发红、飘火星，霜潮下雪
+ * per-night battlefield theme: ground ramp, distant ridge, the rift glow in the north, what drifts in the air.
+ * Early nights have fireflies, middle nights ash, late and boss nights turn red with embers, Frost Tide snows */
+interface Theme { ramp: [number, number, number][]; tuft: string; ridge: string; ridgeHi: string; rift: string; amb: 'fly' | 'ash' | 'ember' | 'snow' }
+const THEMES: Record<string, Theme> = {
+  early: { ramp: [[10, 11, 22], [13, 14, 26], [16, 16, 29], [20, 19, 31], [24, 22, 33], [27, 24, 34]], tuft: '#2f5a48', ridge: '#07070f', ridgeHi: '#1c1c33', rift: '#5d275d', amb: 'fly' },
+  mid: { ramp: [[9, 11, 24], [12, 14, 29], [15, 17, 33], [18, 20, 36], [22, 23, 38], [25, 26, 40]], tuft: '#2a4a4a', ridge: '#06070f', ridgeHi: '#1a1f38', rift: '#29366f', amb: 'ash' },
+  late: { ramp: [[12, 8, 20], [16, 10, 24], [20, 12, 27], [25, 14, 30], [30, 16, 32], [34, 18, 34]], tuft: '#4a2a3a', ridge: '#0a0510', ridgeHi: '#2a1226', rift: '#b13e53', amb: 'ember' },
+  boss: { ramp: [[16, 6, 16], [21, 8, 19], [26, 10, 22], [31, 12, 25], [36, 14, 27], [40, 16, 29]], tuft: '#5a2430', ridge: '#0c0408', ridgeHi: '#3a1020', rift: '#e43b44', amb: 'ember' },
+  frost: { ramp: [[10, 14, 26], [13, 18, 32], [16, 22, 37], [20, 27, 42], [25, 32, 47], [30, 37, 52]], tuft: '#3a5a6a', ridge: '#070a14', ridgeHi: '#2a3a58', rift: '#41a6f6', amb: 'snow' },
+};
+function themeKey() {
+  if (G.foeSet === 'frost') return 'frost';
+  if (nightKind(G.round) === 'boss') return 'boss';
+  return G.round >= 7 ? 'late' : G.round >= 4 ? 'mid' : 'early';
+}
+const theme = () => THEMES[F.themeK] || THEMES.early;
+const toU32 = ([r, g, b]: [number, number, number]) => (255 << 24) | (b << 16) | (g << 8) | r;
 
-/** 地面：一次画好缓存，固定种子保证每次一样 / ground: draw once and cache, with a fixed seed so it looks the same every time */
+/** 地面：一次画好缓存，按夜数换主题；固定种子保证同一夜每次一样 / ground: drawn once and cached, themed per night; a fixed seed keeps a given night identical every time */
 function buildGround() {
   const W = world.W,
     H = world.H;
+  F.themeK = themeKey();
+  F.groundR = G.round;
+  const T = theme();
   const c = document.createElement('canvas');
   c.width = W;
   c.height = H;
   const x = c.getContext('2d')!;
-  /* 夜色地面：几级相近的色阶加 Bayer 网点，不用平滑渐变；北边偏冷紫，靠城墙一侧偏暖
-   * night ground: a few closely spaced tones with a Bayer screen instead of a smooth gradient; cool violet to the north, warmer toward the wall */
+  /* 夜色地面：几级相近的色阶加 Bayer 网点，不用平滑渐变；北边偏冷，靠城墙一侧偏暖
+   * night ground: a few closely spaced tones with a Bayer screen instead of a smooth gradient; cooler to the north, warmer toward the wall */
   const id = x.createImageData(W, H),
     px32 = new Uint32Array(id.data.buffer);
-  const tones = GROUND.map(([r, g, b]) => (255 << 24) | (b << 16) | (g << 8) | r);
+  const tones = T.ramp.map(toU32);
   for (let iy = 0; iy < H; iy++) {
     const v = (iy / Math.max(1, H - 1)) * (tones.length - 1);
     for (let ix = 0; ix < W; ix++) px32[iy * W + ix] = tones[Math.min(tones.length - 1, Math.floor(v + bayer(ix, iy)))];
   }
   x.putImageData(id, 0, 0);
-  let s = 7;
+  let s = 7 + G.round * 97;
   const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
-  for (let i = 0; i < (W * H) / 30; i++) {
-    const px = Math.floor(r() * W),
-      py = Math.floor(r() * H);
-    const a = (0.03 + (py / H) * 0.07).toFixed(3);
-    x.fillStyle = r() < 0.5 ? `rgba(255,255,255,${a})` : `rgba(120,170,140,${a})`;
-    x.fillRect(px, py, 1, 1);
+  const px = (col: string, X: number, Y: number, w = 1, h = 1) => {
+    x.fillStyle = col;
+    x.fillRect(Math.round(X), Math.round(Y), w, h);
+  };
+  const wy = H - 7;
+  /* 碎石：亮顶暗底，两三格大 / rocks: lit top, dark base, two or three cells */
+  for (let i = 0; i < W / 10; i++) {
+    const X = Math.floor(r() * W),
+      Y = Math.floor(H * 0.12 + r() * (wy - H * 0.12 - 12)),
+      w = 2 + Math.floor(r() * 2);
+    px('#05060c', X + 1, Y + 1, w, 2);
+    px('#2c2c40', X, Y, w, 2);
+    px('#4a4c66', X, Y, w - 1, 1);
   }
+  /* 草丛 / grass tufts */
   for (let i = 0; i < W / 5; i++) {
-    const px = Math.floor(r() * W),
-      py = Math.floor(H * 0.3 + r() * H * 0.62);
-    x.fillStyle = `rgba(70,120,90,${(0.15 + (py / H) * 0.25).toFixed(3)})`;
-    x.fillRect(px, py, 1, 2);
-    x.fillRect(px + 2, py + 1, 1, 1);
-    x.fillRect(px - 1, py + 1, 1, 1);
+    const X = Math.floor(r() * W),
+      Y = Math.floor(H * 0.25 + r() * (wy - H * 0.25 - 4));
+    px(T.tuft, X, Y, 1, 2);
+    px(T.tuft, X + 2, Y + 1);
+    px(T.tuft, X - 1, Y + 1);
   }
-  for (let i = 0; i < W / 9; i++) {
-    const px = Math.floor(r() * W),
-      py = Math.floor(H * 0.2 + r() * H * 0.7);
-    x.fillStyle = 'rgba(148,176,194,.16)';
-    x.fillRect(px, py, 2, 1);
-    x.fillStyle = 'rgba(0,0,0,.3)';
-    x.fillRect(px, py + 1, 2, 1);
+  /* 零星白骨 / scattered bones */
+  for (let i = 0; i < W / 30; i++) {
+    const X = Math.floor(r() * W),
+      Y = Math.floor(H * 0.3 + r() * (wy - H * 0.35));
+    px('#94b0c2', X, Y, 2, 1);
+    px('#566c86', X + 2, Y);
   }
-  for (let i = 0; i < 8; i++) ditherRect(x, 0, i * 2, W, 2, '#05060c', 0.55 * (1 - i / 8));
+  /* 两边的枯树：只放在边上，不挡战场中间 / dead trees: only along the edges, never in the middle of the fight */
+  for (let i = 0; i < 4; i++) {
+    const X = i % 2 ? W - 3 - Math.floor(r() * W * 0.1) : 2 + Math.floor(r() * W * 0.1),
+      Y = Math.floor(H * 0.2 + r() * H * 0.55),
+      h = 7 + Math.floor(r() * 6);
+    px('#05060c', X + 1, Y + 1, 3, 1);
+    px('#1a1420', X, Y - h, 1, h + 1);
+    for (let b = 0; b < 3; b++) {
+      const by = Y - h + 1 + b * 2 + Math.floor(r() * 2),
+        d = b % 2 ? 1 : -1,
+        l = 1 + Math.floor(r() * 3);
+      for (let k = 1; k <= l; k++) px('#1a1420', X + d * k, by - Math.floor(k / 2));
+    }
+  }
+  /* 北边远山和裂隙：天边一道锯齿剪影，正中透出一点裂隙的光 / the distant ridge and the rift: a jagged silhouette on the horizon, the rift's glow showing through in the middle */
+  const ridgeH = Math.max(10, Math.round(H * 0.05));
+  for (let gy = 0; gy < ridgeH + 6; gy += 2) ditherRect(x, 0, gy, W, 2, '#05060c', 0.85 * (1 - gy / (ridgeH + 6)));
+  {
+    const cx = W / 2,
+      rw = W * 0.22;
+    for (let k = 0; k < 6; k++) {
+      const a = 0.5 * (1 - k / 6);
+      ditherRect(x, Math.round(cx - rw * (1 - k / 7)), k * 2, Math.round(2 * rw * (1 - k / 7)), 2, T.rift, a);
+    }
+  }
+  let h = ridgeH * 0.6;
+  for (let X = 0; X < W; X++) {
+    h += (r() - 0.5) * 2.2;
+    h = Math.max(ridgeH * 0.25, Math.min(ridgeH, h));
+    const top = Math.round(h * (0.75 + 0.25 * Math.abs(Math.sin(X * 0.07))));
+    px(T.ridge, X, top, 1, ridgeH + 2 - top);
+    if (r() < 0.5) px(T.ridgeHi, X, top);
+  }
+  /* 拒马：城墙前一排削尖的木桩，中间留出几个口子 / chevaux-de-frise: a row of sharpened stakes in front of the wall, with a few gaps */
+  const sy = wy - 9;
+  for (let X = 3; X < W - 3; X += 7) {
+    if (r() < 0.22) continue;
+    px('#05060c', X + 2, sy + 5, 4, 1);
+    for (let k = 0; k < 5; k++) {
+      px('#5a3a28', X + k, sy + 4 - k);
+      px('#5a3a28', X + 4 - k, sy + 4 - k);
+    }
+    px('#c2a080', X, sy + 4);
+    px('#c2a080', X + 4, sy);
+    px('#8a5a40', X + 2, sy + 2);
+  }
   F.ground = c;
+}
+
+/** 空中飘的：萤火、落灰、火星、雪，各自有自己的轨迹，不受重力 / things drifting in the air: fireflies, ash, embers, snow, each on its own path, no gravity */
+interface Mote { x: number; y: number; vx: number; vy: number; life: number; max: number; col: string; ph: number }
+const motes: Mote[] = [];
+function drawAmbient(x: CanvasRenderingContext2D, dt: number) {
+  const W = world.W,
+    H = world.H,
+    T = theme();
+  const want = T.amb === 'snow' ? 70 : T.amb === 'ember' ? 30 : 18;
+  if (!RM && motes.length < want && vr() < (T.amb === 'snow' ? 0.9 : 0.35)) {
+    if (T.amb === 'snow') motes.push({ x: vr() * W, y: -2, vx: vrnd(-3, 3), vy: vrnd(7, 14), life: 9, max: 9, col: vr() < 0.7 ? '#f4f4f4' : '#94b0c2', ph: vr() * 6 });
+    else if (T.amb === 'ember') motes.push({ x: vr() * W, y: H - 8 - vr() * H * 0.3, vx: vrnd(-4, 4), vy: -vrnd(6, 14), life: vrnd(2, 4), max: 4, col: vr() < 0.5 ? '#ef7d57' : '#ffcd75', ph: vr() * 6 });
+    else if (T.amb === 'ash') motes.push({ x: vr() * W, y: -2, vx: vrnd(2, 6), vy: vrnd(3, 7), life: 10, max: 10, col: vr() < 0.6 ? '#566c86' : '#94b0c2', ph: vr() * 6 });
+    else motes.push({ x: vr() * W, y: H * 0.2 + vr() * H * 0.6, vx: vrnd(-3, 3), vy: vrnd(-3, 3), life: vrnd(3, 6), max: 6, col: vr() < 0.6 ? '#a7f070' : '#fee761', ph: vr() * 6 });
+  }
+  for (const m of motes) {
+    m.life -= dt;
+    m.ph += dt;
+    m.x += (m.vx + Math.sin(m.ph * 1.7) * (T.amb === 'snow' ? 4 : 2)) * dt;
+    m.y += m.vy * dt;
+    const ix = Math.round(m.x),
+      iy = Math.round(m.y);
+    /* 萤火一明一暗；别的到了寿命末尾用网点稀疏掉 / fireflies pulse; the rest thin out with the dot screen near the end of their life */
+    const a = T.amb === 'fly' ? 0.5 + 0.5 * Math.sin(m.ph * 3) : Math.min(1, m.life / 1.2);
+    if (!dotOn(ix, iy, a)) continue;
+    x.fillStyle = m.col;
+    x.fillRect(ix, iy, 1, 1);
+  }
+  for (let i = motes.length - 1; i >= 0; i--) if (motes[i].life <= 0 || motes[i].y > H || motes[i].y < -4) motes.splice(i, 1);
+}
+
+/** 城墙上的火把：火苗跳动，墙前地上照出一小团暖光 / torches on the wall: flickering flames and a small warm pool of light on the ground in front */
+function drawTorches(x: CanvasRenderingContext2D, now: number) {
+  const W = world.W,
+    wy = WALLY();
+  for (let tx = 14, i = 0; tx < W - 6; tx += 30, i++) {
+    const fl = 0.5 + 0.5 * Math.sin(now / 90 + i * 2.1) * Math.sin(now / 37 + i);
+    for (let k = 0; k < 4; k++) {
+      const rw = 22 - k * 5,
+        rh = 5 - k;
+      ditherRect(x, tx - rw / 2, wy - 3 - rh, rw, rh, k < 2 ? '#5a3a28' : '#8a5a40', (0.18 + 0.08 * fl) * (1 + k * 0.4));
+    }
+    x.fillStyle = '#3a2418';
+    x.fillRect(tx, wy - 4, 1, 4);
+    const h = 2 + Math.round(fl * 2);
+    x.fillStyle = '#b13e53';
+    x.fillRect(tx - 1, wy - 4 - h + 1, 3, h - 1);
+    x.fillStyle = '#ef7d57';
+    x.fillRect(tx, wy - 4 - h, 1, h);
+    x.fillStyle = '#fee761';
+    x.fillRect(tx, wy - 5, 1, 1);
+  }
 }
 
 /* ---------------- 特效（给 SimView 用） ---------------- / ---------------- Effects (for SimView) ---------------- */
@@ -368,6 +516,7 @@ export function drawField(dt: number) {
   F.shake = Math.max(0, F.shake - dt * 18);
   x.fillStyle = '#0a0c14';
   x.fillRect(-4, -4, W + 8, H + 8);
+  if (!F.ground || F.groundR !== G.round || F.themeK !== themeKey()) buildGround();
   if (F.ground) x.drawImage(F.ground, 0, 0);
   for (const m of F.marks) {
     m.life -= dt;
@@ -390,12 +539,31 @@ export function drawField(dt: number) {
       x.fillStyle = '#9c8670';
       x.fillRect(bx + 1, wy + 1 + r * 3, 7, 1);
     }
-  for (let bx = 0; bx < W; bx += 6) {
+  /* 垛口：受光一侧亮一格，背光一侧暗一格，脚下一道阴影 / merlons: one lit cell on the lit side, one dark cell on the shaded side, a shadow line at the foot */
+  x.fillStyle = '#05060c';
+  x.fillRect(0, wy - 1, W, 1);
+  for (let bx = 1; bx < W; bx += 8) {
     x.fillStyle = '#7d6a5a';
-    x.fillRect(bx, wy - 2, 4, 2);
-    x.fillStyle = '#2a2130';
-    x.fillRect(bx, wy - 3, 4, 1);
+    x.fillRect(bx, wy - 3, 5, 3);
+    x.fillStyle = '#9c8670';
+    x.fillRect(bx, wy - 3, 5, 1);
+    x.fillRect(bx, wy - 3, 1, 3);
+    x.fillStyle = '#4a3c3a';
+    x.fillRect(bx + 4, wy - 2, 1, 2);
   }
+  drawTorches(x, performance.now());
+  if (F.broken)
+    /* 塌掉的几段：垛口没了，墙身露出黑洞 / collapsed sections: merlons gone, black holes in the wall */
+    for (let k = 0; k < 4; k++) {
+      const gx = Math.round(((k + 0.5) / 4) * W + Math.sin(k * 7.3) * 12),
+        gw = 9 + ((k * 5) % 7);
+      x.fillStyle = '#05060c';
+      x.fillRect(gx - gw / 2, wy - 3, gw, 6);
+      x.fillStyle = '#2a2130';
+      x.fillRect(gx - gw / 2 - 1, wy + 3, gw + 2, 2);
+      x.fillStyle = '#7d6a5a';
+      for (let j = 0; j < gw; j += 3) x.fillRect(gx - gw / 2 + j, wy + 2 - (j % 2), 2, 1);
+    }
   if (F.wallFlash > 0) {
     ditherRect(x, 0, wy - 3, W, 10, '#e43b44', F.wallFlash * 1.4);
     F.wallFlash -= dt;
@@ -454,6 +622,28 @@ export function drawField(dt: number) {
     x.fillRect(ix, iy, p.sz, p.sz);
   }
   F.parts = F.parts.filter((p) => p.life > 0);
+  drawAmbient(x, dt);
+  /* 天亮：北边天际先泛起暖色，慢慢往下铺 / dawn: warm light first rises on the northern horizon, then spreads downward */
+  if (F.dawn >= 0) {
+    F.dawn = Math.min(1, F.dawn + dt / 2.2);
+    const reach = Math.round(H * 0.3 * F.dawn);
+    for (let yy = 0; yy < reach; yy += 2) {
+      const k = 1 - yy / Math.max(1, reach);
+      ditherRect(x, 0, yy, W, 2, k > 0.7 ? '#ffcd75' : k > 0.35 ? '#ef7d57' : '#5d275d', 0.28 * k * F.dawn);
+    }
+  }
+  /* 开战的幕布：先是一片黑，从城墙往北一点点看清，黑幕的下沿是一条网点过渡
+   * the opening curtain: all dark at first, sight reaching from the wall northward; the curtain's lower edge is a dotted transition band */
+  if (F.curtain > 0) {
+    F.curtain = Math.max(0, F.curtain - dt / 1.1);
+    const k = F.curtain * (2 - F.curtain);
+    const cover = Math.round((H + 18) * k) - 18;
+    if (cover > 0) {
+      x.fillStyle = '#05060c';
+      x.fillRect(0, 0, W, cover);
+    }
+    for (let i = 0; i < 6; i++) ditherRect(x, 0, cover + i * 3, W, 3, '#05060c', 1 - (i + 1) / 7);
+  }
   for (const n of F.nums) {
     n.life -= dt;
     const age = (n.max || 0.8) - n.life;

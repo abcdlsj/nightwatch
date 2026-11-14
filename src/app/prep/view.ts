@@ -6,6 +6,7 @@ import { RELICS } from '../../data/relics';
 import { TALENTS, TCAT } from '../../data/talents';
 import { WAGERS, SYN, SYN2, OMENS } from '../../data/meta';
 import { pathsOf } from '../../game/unlocks';
+import { META } from '../../game/meta';
 import { THREATS } from '../../data/threats';
 import { nextSeg } from '../../game/threats';
 import { L, t } from '../../i18n';
@@ -34,6 +35,8 @@ import { startRule, startMason, startAwaken, enterEvent, finishStep, startTalk, 
 import { startAmbush } from '../flow';
 import { startJump, prepStops } from './jumps';
 
+/** 头一回玩、还在前两夜 / a first-time player still in the first two nights */
+const fresh = () => !META.runs && G.round <= 2 && !G.endless;
 const fitTag = () => `<small class="gt fit">${L.ui.prep.fit}</small>`;
 
 /* ---------------- 今晚预告 ---------------- / ---------------- Tonight's forecast ---------------- */
@@ -53,7 +56,8 @@ export function renderPreview() {
   const tough = ds.filter((d) => d.tip).sort((a, b) => b.hp * (1 + b.armor) - a.hp * (1 + a.armor))[0];
   /* 敌情：主力带说明，其余只写名字 / threats: the main one with its description, the rest by name only */
   const th = w.threats || [];
-  const nx = nextSeg(G.round);
+  /* 第一局的前两夜少说点：后面几夜的敌情先不列，等玩家站稳了再给 / the first run's first two nights say less: later nights' threats wait until the player has found their feet */
+  const nx = fresh() ? null : nextSeg(G.round);
   const thLine =
     (th.length ? `<b>${t('prep.threats', { s: th.map((k, i) => (i ? THREATS[k].n : `${THREATS[k].n}${L.ui.common.lp}${THREATS[k].d}${L.ui.common.rp}`)).join(' · ') })}</b><br>` : '') +
     (nx ? `<b class="next">${t('prep.threatsNext', { a: nx.from, b: nx.to, s: nx.ids.map((k) => THREATS[k].n).join(' · ') })}</b><br>` : '');
@@ -98,7 +102,8 @@ export function renderSyn() {
   }
   synPrev = n;
   if (!el) return;
-  const ts = (Object.keys(n) as Tag[]).sort((a, b) => n[b]! - n[a]!);
+  /* 第一局前两夜：羁绊条只列凑到两张以上的元素，单张的不占地方 / the first run's first two nights: the synergy bar only lists elements with two or more cards */
+  const ts = (Object.keys(n) as Tag[]).filter((tg) => !fresh() || n[tg]! >= 2 || synLevel(tg, n[tg]!) > 0).sort((a, b) => n[b]! - n[a]!);
   /* 风向一直挂着，提醒这局往哪边凑 / the wind chip stays up as a reminder of which way this run leans */
   const wind = G.wind
     ? `<span class="sy-l">${L.ui.prep.wind}</span>` + [G.wind, G.wind2].filter((w): w is Tag => !!w).map((w) => `<span class="sy on wind" style="--tagc:${TAGC[w]}">${L.terms.tags[w]}</span>`).join('')

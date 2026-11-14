@@ -7,7 +7,7 @@
 .logo span:nth-child(2){animation-delay:.25s;color:#ffd166;text-shadow:0 6px 0 #8a5a12,0 10px 0 rgba(0,0,0,.5)}
 .logo span:nth-child(3){animation-delay:.5s}
 .logo-sub{font-family:var(--px);letter-spacing:4px;color:#ffe3b0;font-size:16px;text-shadow:0 2px 0 rgba(0,0,0,.6)}
-.rules{background:rgba(10,16,22,.75);border-radius:14px;padding:14px 16px;box-shadow:0 4px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.07);
+.rules{background:rgba(10,16,22,.75);border-radius:3px;padding:14px 16px;box-shadow:0 4px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.07);
   display:flex;flex-direction:column;gap:8px;text-align:left;font-size:16px;line-height:1.45;width:100%}
 .rules div{display:flex;gap:8px}
 .rules i{font-style:normal;color:#ffd166;font-family:var(--px)}

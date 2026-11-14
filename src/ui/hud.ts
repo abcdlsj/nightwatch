@@ -75,6 +75,8 @@ export function renderRelics(fresh?: unknown) {
 export function toast(msg: string) {
   const el = $('#toast');
   el.textContent = msg;
+  /* 备战时顶上是今晚的标题，提示条改到下沿 / during prep the night's title sits at the top, so the toast moves to the bottom edge */
+  el.classList.toggle('low', G.phase !== 'battle');
   restart(el, 'show');
 }
 /* 战场正中一次只讲一件事：连招报名、大字横幅排队轮流出，不叠在一起
@@ -157,16 +159,19 @@ function nextTip(first?: boolean) {
     tipEl!.className = '';
     return;
   }
+  /* 战报、结局页上不弹提示（会盖住标题或「收下」），等回到备战再说 / no tips over the report or ending (they would cover the title or the collect button); wait until prep */
+  if (G.phase === 'report' || G.phase === 'over') {
+    tipEl!.className = '';
+    tipT = setTimeout(() => nextTip(true), 800);
+    return;
+  }
   const [l, h, ms] = TIPQ[0];
   tipEl!.innerHTML = `<small>${l}</small><p>${h}</p>`;
   tipEl!.className = '';
   /* 首领血条和「下一招」在顶上时，气泡挪到它下面，别挡住 / when the boss bar and 'next move' sit up top, move tooltips below them so they are not covered */
   const bar = $('#bossbar');
   /* 战报和结局页的标题在最上面：气泡改到棋盘上方，别压住标题 / the report and ending titles sit at the top: put the bubble just above the board so it never covers them */
-  if (G.phase === 'report' || G.phase === 'over' || G.phase === 'title') {
-    const st = $('#stage').getBoundingClientRect();
-    tipEl!.style.top = `${Math.max(60, st.bottom - 84)}px`;
-  } else tipEl!.style.top = bar.hidden ? '' : `${bar.getBoundingClientRect().bottom + 6}px`;
+  tipEl!.style.top = bar.hidden ? '' : `${bar.getBoundingClientRect().bottom + 6}px`;
   void tipEl!.offsetWidth;
   tipEl!.className = 'show';
   tipT = setTimeout(() => nextTip(), ms);
