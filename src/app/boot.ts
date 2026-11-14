@@ -12,7 +12,7 @@ import { B, simStep } from '../sim/battle';
 import { setView } from '../sim/view';
 import { makeWave } from '../sim/waves';
 import { initBackground, onScene } from '../render/background';
-import { initField, drawField } from '../render/field';
+import { initField, drawField, HS } from '../render/field';
 import { initOverlay, FX } from '../render/overlay';
 import { spr } from '../render/sprites';
 import { SFX, initSfx } from '../audio/sfx';
@@ -180,7 +180,13 @@ let lastT = performance.now();
 function loop(now: number) {
   const dtR = Math.min(0.05, (now - lastT) / 1000);
   lastT = now;
-  if (G.phase === 'battle' && B && !B.over) {
+  /* 命中停顿：这几十毫秒不推进模拟、战场也定格 / hit-stop: for these few dozen ms neither the sim nor the battlefield moves */
+  let held = false;
+  if (HS.t > 0 && G.phase === 'battle') {
+    HS.t -= dtR;
+    held = true;
+  }
+  if (G.phase === 'battle' && B && !B.over && !held) {
     let sm = 1;
     if (B.slowT > 0) {
       B.slowT -= dtR;
@@ -202,7 +208,7 @@ function loop(now: number) {
     if (B && B.shield > 0) updateHUD();
   }
   /* 宽屏备战时商店在左栏，右边照样画着城墙 / in wide prep the shop sits in the left column, so keep drawing the wall on the right */
-  if (G.phase === 'battle' || G.phase === 'report' || G.phase === 'over' || (G.phase === 'prep' && WIDE.matches)) drawField(dtR * (G.phase === 'battle' ? G.speed : 1));
+  if (G.phase === 'battle' || G.phase === 'report' || G.phase === 'over' || (G.phase === 'prep' && WIDE.matches)) drawField(held ? 0 : dtR * (G.phase === 'battle' ? G.speed : 1));
   FX.draw(dtR);
   requestAnimationFrame(loop);
 }

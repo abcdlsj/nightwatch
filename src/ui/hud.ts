@@ -77,11 +77,43 @@ export function toast(msg: string) {
   el.textContent = msg;
   restart(el, 'show');
 }
+/* 战场正中一次只讲一件事：连招报名、大字横幅排队轮流出，不叠在一起
+ * the middle of the battlefield says one thing at a time: combo call-outs and banners queue up instead of stacking */
+let centerUntil = 0;
+const BQ: [string, string | undefined][] = [];
+let bqT: ReturnType<typeof setTimeout> | null = null;
+export function holdCenter(ms: number) {
+  centerUntil = Math.max(centerUntil, performance.now() + ms);
+}
 export function banner(msg: string, col?: string) {
+  if (BQ.length < 2) BQ.push([msg, col]);
+  pumpBanner();
+}
+function pumpBanner() {
+  if (bqT) return;
+  const wait = centerUntil - performance.now();
+  if (wait > 0) {
+    bqT = setTimeout(() => {
+      bqT = null;
+      pumpBanner();
+    }, wait + 30);
+    return;
+  }
+  const it = BQ.shift();
+  if (!it) return;
   const b = $('#banner');
-  b.textContent = msg;
-  b.style.color = col || '#fff';
+  b.textContent = it[0];
+  b.style.color = it[1] || '#fff';
   restart(b, 'show');
+  holdCenter(1000);
+  if (BQ.length) pumpBanner();
+}
+/** 换场景时清掉还没出的横幅 / drop queued banners when the scene changes */
+export function clearCenter() {
+  BQ.length = 0;
+  centerUntil = 0;
+  if (bqT) clearTimeout(bqT);
+  bqT = null;
 }
 
 /* ---------- 提示气泡：一次性的新手提示 + 点顶栏看说明 ---------- / ---------- Tooltips: one-off tutorial hints + tap the top bar for help ---------- */
@@ -110,6 +142,13 @@ export function showTip(label: string, html: string, ms?: number, now?: boolean)
   TIPQ.push([label, html, ms || 5200]);
   if (!tipT) nextTip(true);
 }
+/** 回标题页时把没看完的提示收掉，不留在别的界面上 / on returning to the title screen, put away unfinished tips so they never linger on another screen */
+export function hideTips() {
+  TIPQ.length = 0;
+  if (tipT) clearTimeout(tipT);
+  tipT = null;
+  if (tipEl) tipEl.className = '';
+}
 function nextTip(first?: boolean) {
   if (tipT) clearTimeout(tipT);
   tipT = null;
@@ -123,7 +162,11 @@ function nextTip(first?: boolean) {
   tipEl!.className = '';
   /* 首领血条和「下一招」在顶上时，气泡挪到它下面，别挡住 / when the boss bar and 'next move' sit up top, move tooltips below them so they are not covered */
   const bar = $('#bossbar');
-  tipEl!.style.top = bar.hidden ? '' : `${bar.getBoundingClientRect().bottom + 6}px`;
+  /* 战报和结局页的标题在最上面：气泡改到棋盘上方，别压住标题 / the report and ending titles sit at the top: put the bubble just above the board so it never covers them */
+  if (G.phase === 'report' || G.phase === 'over' || G.phase === 'title') {
+    const st = $('#stage').getBoundingClientRect();
+    tipEl!.style.top = `${Math.max(60, st.bottom - 84)}px`;
+  } else tipEl!.style.top = bar.hidden ? '' : `${bar.getBoundingClientRect().bottom + 6}px`;
   void tipEl!.offsetWidth;
   tipEl!.className = 'show';
   tipT = setTimeout(() => nextTip(), ms);

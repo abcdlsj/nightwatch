@@ -11,9 +11,10 @@ import * as field from '../render/field';
 import { FX } from '../render/overlay';
 import { $, restart } from './dom';
 import { elOf, setAmmo, setNum } from './card-view';
-import { updateHUD, toast, banner, tipOnce } from './hud';
+import { updateHUD, toast, banner, tipOnce, holdCenter } from './hud';
 import { say, foeCard } from './voice';
 import { COMBO } from '../data/combos';
+import { ITEMS } from '../data/cards';
 
 let chainT = 0;
 
@@ -37,7 +38,10 @@ export const domView: SimView = {
     const [cx, cy] = field.toClient(x, y);
     FX.coins(cx, cy, n);
   },
-  cardFx: (c, cls) => restart(elOf(c), cls),
+  cardFx(c, cls) {
+    restart(elOf(c), cls);
+    if (cls === 'pop' && c.ox != null) field.muzzle(c.ox, ITEMS[c.key]?.tag || null);
+  },
   cardFlag: (c, flag, on) => elOf(c)?.classList.toggle(flag, on),
   cardAmmo: setAmmo,
   cardNum: (c: Card) => setNum(elOf(c), c),
@@ -63,6 +67,7 @@ export const domView: SimView = {
     const cols = ['#c38cff', '#c38cff', '#ff95dc', '#ffd166', '#ff8a5b', '#ff5a5a'];
     el.style.setProperty('--cc', cols[Math.min(cols.length - 1, Math.floor(n / 2))]);
     el.innerHTML = t('battle.chain', { n });
+    SFX.play('chain', n);
     const now = performance.now();
     if (now - chainT > 90) {
       restart(el, 'show');
@@ -91,6 +96,8 @@ export const domView: SimView = {
     el.classList.toggle('first', firstEver);
     el.innerHTML = `<small>${firstEver ? L.ui.combo.newFound : L.ui.combo.again}</small><b>${T.n}</b><span>${T.d}</span>`;
     restart(el, 'show');
+    holdCenter(2200);
+    field.hitstop(firstEver ? 0.16 : 0.08);
     SFX.play(firstEver ? 'win' : 'intent');
     buzz(firstEver ? [20, 40, 20] : 15);
   },

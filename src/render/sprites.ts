@@ -95,6 +95,16 @@ export class Sprite {
   get shadow() {
     return (this._shadow ||= mk(this.rows, SHADOW));
   }
+  private _pix?: [number, number, string][];
+  /** 每个不透明像素的位置和颜色（敌人死亡时碎成像素块用） / every opaque pixel's position and color (enemies shatter into these on death) */
+  get pix() {
+    if (!this._pix) {
+      const out: [number, number, string][] = [];
+      this.rows.forEach((r, j) => [...r].forEach((c, i) => c !== '.' && out.push([i, j, PAL[c] || '#f0f'])));
+      this._pix = out;
+    }
+    return this._pix;
+  }
   get url() {
     return (this._url ||= upURL(this.cv, 4));
   }

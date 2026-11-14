@@ -17,7 +17,11 @@ import { bayer, dotOn, ditherRect, drawDithered, crispText } from './dither';
 import { $ } from '../ui/dom';
 
 interface Part { x: number; y: number; vx: number; vy: number; life: number; max: number; col: string; sz: number }
-interface Num { x: number; y: number; str: string; col: string; s: number; life: number }
+interface Num { x: number; y: number; str: string; col: string; s: number; life: number; max?: number; e?: Enemy; v?: number; pop?: number; crit?: boolean }
+/** 地上的焦痕：敌人碎掉的地方留一小块暗斑，慢慢褪掉 / scorch marks: a small dark blot where an enemy shattered, fading slowly */
+interface Mark { x: number; y: number; w: number; life: number; max: number }
+/** 只在画面上的受击反应：击退几格，慢慢回位（不改模拟里的位置） / render-only hit reaction: knocked back a few cells, easing back (the sim position never changes) */
+const KB = new WeakMap<Enemy, number>();
 interface Ring { x: number; y: number; r0: number; r1: number; col: string; life: number; max: number }
 interface Bolt { segs: number[][]; col: string; life: number; max: number }
 
@@ -33,7 +37,18 @@ export const F = {
   rings: [] as Ring[],
   bolts: [] as Bolt[],
   ground: null as HTMLCanvasElement | null,
+  marks: [] as Mark[],
 };
+
+/** 命中停顿：只把真实时间扣下来不喂给模拟，模拟仍按定步长走，结果和种子无关 / hit-stop: withholds wall-clock time from the sim; the sim still runs in fixed steps, so results never depend on it */
+export const HS = { t: 0, last: 0 };
+export function hitstop(sec: number) {
+  if (RM || !SETTINGS.shake || G.speed > 2) return;
+  const now = performance.now();
+  if (now - HS.last < 400) return;
+  HS.last = now;
+  HS.t = Math.max(HS.t, sec);
+}
 
 export function initField() {
   F.cv = $('#field') as HTMLCanvasElement;
@@ -64,6 +79,7 @@ export function clearFieldFx() {
   F.nums = [];
   F.rings = [];
   F.bolts = [];
+  F.marks = [];
 }
 
 /** 战场坐标 → 页面坐标（金币飞向顶栏用） / battlefield coordinates → page coordinates (for gold flying to the top bar) */
@@ -137,12 +153,36 @@ export function num(x: number, y: number, str: string, col: string, s: number) {
   if (F.nums.length > 70) F.nums.shift();
   F.nums.push({ x, y, str, col, s, life: 0.8 });
 }
-/** 伤害飘字：暴击和持续伤害都显示；同屏多了以后普通伤害只抽一部分显示 / damage numbers: crits and damage-over-time always show; once many are on screen, only a sample of normal hits shows */
+/** 伤害飘字。同一个敌人 0.25 秒内的同色伤害合成一个数往上加，不再叠成一团；
+ * 普通命中小号、淡色、很快消失；暴击大号黄色、弹一下；同屏太多时普通命中直接不显示
+ * damage numbers. Same-colored damage on one enemy within 0.25 s merges into one rising total instead of piling up;
+ * normal hits are small, pale and short-lived; crits are big, yellow and pop; when the screen is busy, normal hits are skipped */
 export function dmgNum(e: Enemy, a: number, crit: boolean, kind: 'burn' | 'poison' | null) {
   if (!SETTINGS.nums) return;
-  const big = crit || a >= 150;
-  if (crit || kind || F.nums.length < 28 || (e.d.boss || e.d.elite ? vr() < 0.25 : vr() < 0.5))
-    num(ex(e) + vrnd(-7, 7), ey(e) - 10 - vrnd(0, 5), fmt(a) + (crit ? '!' : ''), kind === 'poison' ? '#7ddc5f' : kind === 'burn' ? '#ef7d57' : crit ? '#fee761' : '#ffffff', big ? 2 : 1);
+  const col = kind === 'poison' ? '#7ddc5f' : kind === 'burn' ? '#ef7d57' : crit ? '#fee761' : '#c7cfdd';
+  const m = F.nums.find((n) => n.e === e && n.col === col && n.max! - n.life < 0.25);
+  if (m) {
+    m.v! += a;
+    m.str = fmt(m.v!) + (m.crit ? '!' : '');
+    if (m.v! >= 150) m.s = 2;
+    m.pop = 0.1;
+    m.life = m.max!;
+    return;
+  }
+  if (!crit && F.nums.length >= 22) return;
+  if (F.nums.length > 60) F.nums.shift();
+  const life = crit ? 0.95 : kind ? 0.7 : 0.55;
+  const str = fmt(a) + (crit ? '!' : ''),
+    sz = crit || a >= 150 ? 2 : 1;
+  /* 和已有的数字撞在一起就往上让一行，最多让三次 / if it collides with a number already up, step up a row, at most three times */
+  const nx = ex(e) + vrnd(-5, 5);
+  let ny = ey(e) - 12 - vrnd(0, 4);
+  for (let k = 0; k < 3; k++) {
+    const hitN = F.nums.find((n) => Math.abs(n.y - ny) < 7 * Math.max(n.s, sz) && Math.abs(n.x - nx) < ((n.str.length + str.length) * 5 * Math.max(n.s, sz)) / 2);
+    if (!hitN) break;
+    ny = hitN.y - 7 * Math.max(hitN.s, sz);
+  }
+  F.nums.push({ x: nx, y: ny, str, col, s: sz, life, max: life, e, v: a, pop: crit ? 0.16 : 0, crit });
 }
 export function ring(x: number, y: number, r0: number, r1: number, col: string, life: number) {
   F.rings.push({ x, y, r0, r1, col, life, max: life });
@@ -179,8 +219,12 @@ const HITC: Record<string, [string, string]> = {
   blade: ['#ffffff', '#dfe6ee'], fire: ['#ffcd75', '#ef7d57'], ice: ['#c2f4ff', '#73eff7'],
   volt: ['#fee761', '#ffffff'], mech: ['#ffd166', '#c28a4d'], poison: ['#a7f070', '#7ddc5f'],
 };
-export function hit(x: number, y: number, tag: string | null, crit: boolean, kill: boolean) {
+export function hit(x: number, y: number, tag: string | null, crit: boolean, kill: boolean, e?: Enemy) {
   const [c0, c1] = HITC[tag || ''] || ['#ffffff', '#ffffff'];
+  if (e && !e.d.boss && !e.d.fixed) KB.set(e, Math.max(KB.get(e) || 0, crit ? 3 : 1.5));
+  if (e && kill) shatter(e);
+  if (e && kill && (e.d.boss || e.d.elite)) hitstop(0.12);
+  else if (e && crit && kill) hitstop(0.05);
   const k = (crit ? 1.6 : 1) * (kill ? 1.5 : 1);
   const n = Math.round(4 * k);
   switch (tag) {
@@ -226,6 +270,37 @@ export function hit(x: number, y: number, tag: string | null, crit: boolean, kil
     const a = (i / 8) * 6.28;
     part(x, y, Math.cos(a) * 70, Math.sin(a) * 70, 0.22, c0, 1);
   }
+}
+/** 敌人死亡：整张图碎成自己的像素块往外迸，地上留一块焦痕 / enemy death: the sprite breaks into its own pixels flying outward, leaving a scorch mark on the ground */
+function shatter(e: Enemy) {
+  const sp = spr(e.sprK || e.d.spr),
+    sc = e.d.sc;
+  const cx = ex(e),
+    feet = ey(e);
+  const left = cx - (sp.w * sc) / 2,
+    top = feet - sp.h * sc;
+  const px = sp.pix;
+  /* 大图只取一部分像素，粒子总数压在 60 以内 / big sprites use a subset so particles stay under 60 */
+  const step = Math.max(1, Math.ceil(px.length / 60));
+  for (let i = 0; i < px.length; i += step) {
+    const [ix, iy, col] = px[i];
+    const x0 = left + ix * sc,
+      y0 = top + iy * sc;
+    const dx = x0 - cx,
+      dy = y0 - (feet - (sp.h * sc) / 2);
+    const d = Math.hypot(dx, dy) || 1;
+    const sp2 = vrnd(25, 60);
+    part(x0, y0, (dx / d) * sp2 + vrnd(-8, 8), (dy / d) * sp2 - vrnd(20, 45), vrnd(0.3, 0.55), col, Math.max(1, Math.round(sc * step > 1 ? sc * 1.5 : sc)));
+  }
+  if (F.marks.length > 30) F.marks.shift();
+  F.marks.push({ x: cx, y: feet, w: Math.max(4, Math.round(sp.w * sc * 0.6)), life: 2.2, max: 2.2 });
+}
+/** 卡牌出手：城墙底边冒一下枪口火光，元素色的火星往上窜 / card fires: a muzzle flash at the bottom edge, element-colored sparks shooting upward */
+export function muzzle(x0: number, tag: string | null) {
+  const [c0, c1] = HITC[tag || ''] || ['#ffffff', '#dfe6ee'];
+  const y0 = world.H - 2;
+  ring(x0, y0, 1, 6, c0, 0.14);
+  for (let i = 0; i < 5; i++) part(x0 + vrnd(-2, 2), y0, vrnd(-14, 14), -vrnd(50, 110), vrnd(0.12, 0.22), i % 2 ? c0 : c1, i === 0 ? 2 : 1);
 }
 export const shake = (n: number) => {
   F.shake = Math.max(F.shake, n);
@@ -294,6 +369,11 @@ export function drawField(dt: number) {
   x.fillStyle = '#0a0c14';
   x.fillRect(-4, -4, W + 8, H + 8);
   if (F.ground) x.drawImage(F.ground, 0, 0);
+  for (const m of F.marks) {
+    m.life -= dt;
+    ditherRect(x, Math.round(m.x - m.w / 2), Math.round(m.y) - 1, m.w, 2, '#05060c', 0.7 * Math.min(1, m.life / m.max * 2));
+  }
+  F.marks = F.marks.filter((m) => m.life > 0);
   /* 危险区：敌人逼近城墙时泛红 / danger zone: tints red as enemies approach the wall */
   let danger = 0;
   if (B) for (const e of B.en) if (e.y > 0.72) danger = Math.max(danger, (e.y - 0.72) / 0.28);
@@ -376,9 +456,15 @@ export function drawField(dt: number) {
   F.parts = F.parts.filter((p) => p.life > 0);
   for (const n of F.nums) {
     n.life -= dt;
-    n.y -= (n.life > 0.5 ? 28 : 6) * dt;
-    if (n.life < 0.2 && Math.floor(n.life * 30) % 2) continue;
-    if (isDigits(n.str)) drawNum(x, n.str, n.x, n.y, n.col, n.s);
+    const age = (n.max || 0.8) - n.life;
+    n.y -= (age < 0.25 ? 30 : 5) * dt;
+    if (n.pop) n.pop = Math.max(0, n.pop - dt);
+    /* 收尾用网点稀疏掉，不再一闪一闪 / fade out by thinning with the dot screen instead of blinking */
+    if (n.life < 0.18 && !dotOn(Math.round(n.x), Math.round(n.y), n.life / 0.18)) continue;
+    /* 暴击和合并刚涨的时候放大一档、抖一格 / crits and freshly merged totals draw one size up with a 1-cell jitter */
+    const s = n.s + (n.pop && n.crit ? 1 : 0),
+      jx = n.pop ? Math.round(vrnd(-1, 1)) : 0;
+    if (isDigits(n.str)) drawNum(x, n.str, n.x + jx, n.y, n.col, s);
     else drawWord(x, n.str, n.x, n.y, n.col);
   }
   F.nums = F.nums.filter((n) => n.life > 0);
@@ -453,8 +539,10 @@ function drawBattle(x: CanvasRenderingContext2D, W: number) {
     if (e.d.raise && e.y > 0) pcircle(x, ex(e), ey(e) - 5, 50 * K(), '#b77cff', (0.1 + 0.06 * Math.sin(now * 3 + e.ph)) * 2.4);
     if (e.d.rage && e.hp < e.maxHp * 0.5 && vr() < 0.3) part(ex(e) + vrnd(-4, 4), ey(e) - vrnd(4, 10), 0, -vrnd(10, 25), 0.3, '#e43b44', 1);
     if (e.d.bomb && vr() < 0.3) part(ex(e) + 3, ey(e) - 11, vrnd(-6, 6), -vrnd(5, 15), 0.25, vr() < 0.5 ? '#fee761' : '#ef7d57', 1);
+    const kb = KB.get(e) || 0;
+    if (kb > 0) KB.set(e, kb < 0.2 ? 0 : kb * 0.8);
     const px = Math.round(ex(e) - w / 2),
-      py = Math.round(ey(e) - h + bob);
+      py = Math.round(ey(e) - h + bob - kb);
     if (e.d.boss) {
       const a = 0.25 + 0.15 * Math.sin(now * 5);
       pcircle(x, px + w / 2, py + h / 2, w * 0.7, '#e43b44', a * 1.8);
@@ -464,6 +552,14 @@ function drawBattle(x: CanvasRenderingContext2D, W: number) {
       const k = Math.max(0.1, (now - e.bornT) / 0.5),
         hh = Math.max(1, Math.round(sp.h * k));
       x.drawImage(sp.cv, 0, 0, sp.w, hh, px, py + h - hh * sc, w, hh * sc);
+    } else if (fade >= 1 && !e.d.fixed && !e.d.zig && e.type !== 'slime' && e.type !== 'mini' && sp.h >= 6) {
+      /* 走路：脚下几行左右错一格，两帧交替，图不用重画 / walking: the bottom rows shift one cell left and right on alternate frames, no redrawn art needed */
+      const legs = Math.max(2, Math.round(sp.h / 4)) + 1,
+        rh = sp.h + 2,
+        top = rh - legs,
+        st = Math.floor(now * 6 + e.ph * 3) % 2 ? sc : -sc;
+      x.drawImage(sp.rim, 0, 0, sp.w + 2, top, px - sc, py - sc, w + 2 * sc, top * sc);
+      x.drawImage(sp.rim, 0, top, sp.w + 2, legs, px - sc + st, py - sc + top * sc, w + 2 * sc, legs * sc);
     } else drawDithered(x, sp.rim, px - sc, py - sc, w + 2 * sc, h + 2 * sc, fade);
     if (e.armorB) {
       x.fillStyle = '#41a6f6';

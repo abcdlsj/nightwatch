@@ -821,7 +821,7 @@ export function hurt(e: Enemy, amt: number, src: Card | null, crit: boolean, o: 
   if (src && !tick && !o.rx && !e.dead && e.hp > 0) react(e, a, src, crit, w0, !!o.burn);
   /* 窑心：【火】命中有 50% 冻住 0.5 秒（下一下火就能融化） / Kiln Heart: 【fire】 hits have a 50% chance to freeze for 0.5 s (so the next fire hit can melt) */
   if (src && !tick && !o.rx && !e.dead && e.hp > 0 && ITEMS[src.key].tag === 'fire' && mv('t_kiln') && rand() < 0.5) freeze(e, 0.5, src);
-  view.hit(ex(e), ey(e) - 5, o.burnTick ? 'fire' : o.poisonTick ? 'poison' : src ? ITEMS[src.key].tag : null, crit, e.hp <= 0);
+  view.hit(ex(e), ey(e) - 5, o.burnTick ? 'fire' : o.poisonTick ? 'poison' : src ? ITEMS[src.key].tag : null, crit, e.hp <= 0, e);
   if (e.hp <= 0) kill(e, src);
 }
 

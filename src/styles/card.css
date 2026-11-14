@@ -13,7 +13,7 @@
 .card.s3 .spr{width:48px;height:48px;margin-top:0}
 .card .num{position:absolute;left:0;right:0;bottom:3px;text-align:center;font-family:'PixNum','Silkscreen','Pixelify Sans',ui-monospace,monospace;font-weight:700;font-size:15px;color:var(--cink);line-height:1;letter-spacing:.5px}
 .card .num.txt{font-family:var(--zh);font-weight:400;font-size:13px;bottom:4px}/* 「装填」「齐奏」这类字，跟卡名一个字体 / words like 'Reload' and 'Chorus' use the same font as card names */
-.card .cdv{position:absolute;left:0;right:0;top:8px;bottom:0;background:rgba(24,14,40,.5);transform-origin:top;transform:scaleY(var(--s,0))}
+.card .cdv{position:absolute;left:0;right:0;top:8px;bottom:0;background:rgba(24,14,40,.34);border-bottom:2px solid rgba(255,255,255,.55);transform-origin:top;transform:scaleY(var(--s,0))}
 .card .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 .card .holo{position:absolute;inset:0;pointer-events:none}
 .card.t3 .holo{background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.6) 44%,rgba(200,150,255,.4) 50%,transparent 62%);
@@ -26,8 +26,14 @@
 .card.rare .adj{box-shadow:0 2px 0 rgba(0,0,0,.55),inset 0 0 0 2px #1b1224,0 0 8px var(--ac)}
 .card .adj{position:absolute;bottom:-7px;right:-6px;min-width:21px;height:21px;padding:0 3px;border-radius:6px;background:var(--ac);color:#1b1224;
   font-size:14px;line-height:21px;text-align:center;box-shadow:0 2px 0 rgba(0,0,0,.55),inset 0 0 0 2px #1b1224;z-index:2}
-.card.pop{animation:pop .24s ease-out}
-.card.pop .flash{animation:flash .24s ease-out}
+/* 出手：卡往上一顶、白闪、外圈一道元素色的光往外散（看得出是哪张卡在打） / firing: the card kicks up, flashes white, and an element-colored ring spreads out, so you can see which card is shooting */
+.card.pop{animation:fireK .26s cubic-bezier(.2,1.5,.45,1)}
+.card.pop .flash{animation:fireF .26s ease-out}
+.card.pop::after{content:'';position:absolute;inset:-3px;border:3px solid var(--tagc,#fff);border-radius:10px;pointer-events:none;animation:fireR .3s ease-out forwards}
+@keyframes fireK{0%{transform:none}30%{transform:translateY(-7px) scale(1.05)}100%{transform:none}}
+@keyframes fireF{0%{opacity:.7}100%{opacity:0}}
+@keyframes fireR{0%{opacity:1;transform:scale(.96)}100%{opacity:0;transform:scale(1.14,1.1)}}
+@media (prefers-reduced-motion:reduce){.card.pop{animation:none}.card.pop::after{animation:none;opacity:0}}
 .card.land{animation:land .32s ease-out}
 .card.lifted{opacity:.25}
 .card .am{position:absolute;right:2px;bottom:24px;z-index:3;font-size:11px;line-height:1;padding:1px 3px;border-radius:3px;background:#1a1c2cdd;color:#ffd166;font-weight:700;pointer-events:none}

@@ -5,9 +5,10 @@
 .bark b{display:block;font-weight:400;font-size:13px;color:var(--vc,#fff)}
 .bark p{margin:1px 0 0;font-family:var(--body);font-size:var(--fs-body);line-height:1.4;color:#f1ece0}
 .bark.foe{left:auto;right:8px;flex-direction:row-reverse;text-align:right;box-shadow:0 3px 0 rgba(0,0,0,.5),inset -3px 0 0 var(--vc,#fff)}
-.bark.sub{left:0;right:0;max-width:none;width:auto;justify-content:center;border-radius:0;top:38%;bottom:auto;padding:8px 18px;
+/* 旁白像电影字幕一样压在战场下沿，不占正中（正中留给连招和横幅） / narration sits at the bottom edge like a film subtitle, leaving the middle to combos and banners */
+.bark.sub{left:0;right:0;max-width:none;width:auto;justify-content:center;border-radius:0;bottom:46px;padding:6px 18px;
   background:linear-gradient(90deg,transparent,rgba(8,6,14,.82) 20%,rgba(8,6,14,.82) 80%,transparent);box-shadow:none}
-.bark.sub p{font-family:var(--body);font-size:18px;color:#e6dcc4;text-align:center;letter-spacing:1px}
+.bark.sub p{font-family:var(--body);font-size:16px;color:#e6dcc4;text-align:center;letter-spacing:1px}
 .bark.show{animation:barkA var(--dur,2600ms) ease-out forwards}
 @keyframes barkA{0%{opacity:0;transform:translateY(8px)}7%{opacity:1;transform:none}88%{opacity:1}100%{opacity:0}}
 #foeCard{position:absolute;right:8px;top:8px;width:220px;display:flex;gap:8px;align-items:center;pointer-events:none;z-index:8;opacity:0;

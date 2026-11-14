@@ -17,6 +17,7 @@ import { setScene } from '../render/background';
 import { spr } from '../render/sprites';
 import { SFX } from '../audio/sfx';
 import { $ } from '../ui/dom';
+import { hideTips } from '../ui/hud';
 import { openSettings } from '../ui/settings';
 import { openAch } from '../ui/sheets';
 import { loseNote, runSrcBlock } from '../ui/report';
@@ -34,6 +35,7 @@ export function titleScreen() {
   const sc = $('#screen');
   const T = L.ui.title;
   setScene('title');
+  hideTips();
   /* 回到标题页就不在每日挑战里了（继续存档时会从存档读回来） / back on the title screen we're no longer in a daily (continuing a save reads it back) */
   G.daily = '';
   const sv = loadSave();

@@ -16,7 +16,7 @@ export interface SimView {
   bolt(pts: [number, number][], col: string, life: number, straight?: boolean): void;
   boom(x: number, y: number, r: number, col: string): void;
   /** 命中迸溅：tag 是出手卡的元素（灼烧、中毒跳伤按火、毒算） / hit sparks: tag is the firing card's element (burn and poison ticks count as fire and poison) */
-  hit(x: number, y: number, tag: string | null, crit: boolean, kill: boolean): void;
+  hit(x: number, y: number, tag: string | null, crit: boolean, kill: boolean, e?: Enemy): void;
   shake(n: number): void;
   wallFlash(): void;
   coins(x: number, y: number, n: number): void;

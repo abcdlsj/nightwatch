@@ -30,7 +30,7 @@ import { FX } from '../render/overlay';
 import { SFX } from '../audio/sfx';
 import { $, restart } from '../ui/dom';
 import { elOf, renderOwned, repaint, clearCardEls, clearCharges } from '../ui/card-view';
-import { updateHUD, renderRelics, toast, banner, resetGoldBump } from '../ui/hud';
+import { updateHUD, renderRelics, toast, banner, resetGoldBump, clearCenter } from '../ui/hud';
 import { say, clearVO } from '../ui/voice';
 import { closeSheet } from '../ui/sheets';
 import { playPrologue, playWin, playLose, playNoDawn, playQuiet, playTrueWin, playHiddenPre } from '../ui/story';
@@ -228,6 +228,7 @@ export function startBattle() {
     saveGame();
   }
   clearVO();
+  clearCenter();
   clearFieldFx();
   $('#prep').hidden = true;
   $('#report').hidden = true;
@@ -395,6 +396,7 @@ function ambushEnd() {
   clearCharges();
   G.fightWave = null;
   clearVO();
+  clearCenter();
   setScene('shop');
   $('#bossbar').hidden = true;
   F.cv.style.display = 'none';
