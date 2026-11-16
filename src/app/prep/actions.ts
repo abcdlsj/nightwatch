@@ -493,7 +493,8 @@ export function endTalk(cur: PrepStop) {
       G.firstPrep = false;
       if (G.round === 1 && takeTutorial(META.runs > 0)) setTimeout(playTutorial, 300);
       setTimeout(() => toast(t('prep.foeSetToast', { n: (L.terms.foesets as Record<string, string>)[G.foeSet] })), 700);
-      if (G.wind) setTimeout(() => toast(t('prep.windToast', { t: L.terms.tags[G.wind as Tag] })), 3200);
+      /* 第一局的前两夜风向先不提（备战页上也不挂），第三夜起照常 / the first run's first two nights skip the wind (it isn't on the prep screen either); from night three it works as usual */
+      if (G.wind && (META.runs || G.round > 2 || G.endless)) setTimeout(() => toast(t('prep.windToast', { t: L.terms.tags[G.wind as Tag] })), 3200);
     }
   } else finishStep();
 }

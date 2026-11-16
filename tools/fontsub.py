@@ -6,9 +6,7 @@ ROOT=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 SRC=os.path.join(ROOT,'tools','.fontsrc'); OUT=os.path.join(ROOT,'public','fonts')
 RAW='https://raw.githubusercontent.com/google/fonts/main/ofl/'
 FONTS={  # 输出名: (源路径, 收录范围)
-  'zcool.woff2':('zcoolqingkehuangyou/ZCOOLQingKeHuangYou-Regular.ttf','all'),
   'pixelify.woff2':('pixelifysans/PixelifySans%5Bwght%5D.ttf','latin'),
-  'silkscreen-bold.woff2':('silkscreen/Silkscreen-Bold.ttf','latin'),
   'fusion.woff2':('npm:@fontsource/fusion-pixel-12px-proportional-sc@5.3.0:files/fusion-pixel-12px-proportional-sc-latin-400-normal.woff2','all'),
 }
 def fetch(path,dst):

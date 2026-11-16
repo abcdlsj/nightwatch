@@ -1,45 +1,45 @@
 /* ---------- 战报 ---------- / ---------- Battle report ---------- */
 #report{background:rgba(10,14,20,.8);justify-content:flex-start}
-.rp-title{font-size:26px;text-align:center;text-shadow:0 3px 0 rgba(0,0,0,.5)}
+.rp-title{font-size:var(--t-xl);text-align:center;text-shadow:0 3px 0 rgba(0,0,0,.5)}
 .rp-title.win{color:#9bf0b8}
 .rp-list{display:flex;flex-direction:column;gap:3px;overflow:auto;min-height:0;flex:1}
-.rp-row{display:grid;grid-template-columns:34px 44px 1fr auto;align-items:center;gap:6px;font-size:14px;opacity:0;animation:rowIn .3s ease-out forwards}
+.rp-row{display:grid;grid-template-columns:34px 44px 1fr auto;align-items:center;gap:6px;font-size:var(--t-b);opacity:0;animation:rowIn .3s ease-out forwards}
 .rp-row img{width:32px;height:32px;image-rendering:pixelated}
 .rp-row .bar{height:9px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
 .rp-row .bar i{display:block;height:100%;background:var(--tagc);width:0;transition:width .6s cubic-bezier(.2,.9,.3,1)}
-.rp-row b{font-family:var(--px);font-size:15px;text-align:right;min-width:62px}
-.rp-row b small{color:var(--muted);font-size:var(--fs-small);margin-left:3px;font-weight:400}
-.rp-src{grid-column:2/-1;margin-top:-3px;font-family:var(--body);font-size:var(--fs-body);line-height:1.3;color:#9fb3ba}
-.rp-row b em{font-style:normal;font-family:var(--zh);font-size:13px;color:#8ff0c8}
-.rp-meta{text-align:center;font-size:14px;color:var(--muted)}
+.rp-row b{font-family:var(--px);font-size:var(--t-b);text-align:right;min-width:62px}
+.rp-row b small{color:var(--muted);font-size:var(--t-s);margin-left:3px;font-weight:400}
+.rp-src{grid-column:2/-1;margin-top:-3px;font-family:var(--body);font-size:var(--t-b);line-height:1.3;color:#9fb3ba}
+.rp-row b em{font-style:normal;font-family:var(--zh);font-size:var(--t-s);color:#8ff0c8}
+.rp-meta{text-align:center;font-size:var(--t-b);color:var(--muted)}
 .rp-meta b{font-family:var(--px);color:#e0c8ff}
 .rp-cash{background:rgba(0,0,0,.3);border-radius:3px;padding:6px 10px;display:flex;flex-direction:column;gap:3px}
-.cash-row{display:flex;justify-content:space-between;font-size:15px;opacity:0;animation:rowIn .25s ease-out forwards}
+.cash-row{display:flex;justify-content:space-between;font-size:var(--t-b);opacity:0;animation:rowIn .25s ease-out forwards}
 .cash-row b{font-family:var(--px);color:#ffd166}
-.cash-row.total{border-top:2px dashed rgba(255,255,255,.15);padding-top:4px;font-size:18px}
+.cash-row.total{border-top:2px dashed rgba(255,255,255,.15);padding-top:4px;font-size:var(--t-m)}
 #report.vs .rp-row{grid-template-columns:34px 44px 1fr auto 46px}
-.rp-dl{font-style:normal;font-family:var(--px);font-size:12px;line-height:1.1;text-align:right;color:var(--muted);display:flex;flex-direction:column;align-items:flex-end}
-.rp-dl small{font-size:var(--fs-small);opacity:.75}
-.rp-dl.up{color:#9bf0b8}.rp-dl.down{color:#ff8a7a}.rp-dl.new{color:#ffd166;font-family:var(--zh);font-size:12px}
-.rp-gone{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:12px;color:var(--muted);padding:2px 2px 0}
+.rp-dl{font-style:normal;font-family:var(--px);font-size:var(--t-s);line-height:1.1;text-align:right;color:var(--muted);display:flex;flex-direction:column;align-items:flex-end}
+.rp-dl small{font-size:var(--t-s);opacity:.75}
+.rp-dl.up{color:#9bf0b8}.rp-dl.down{color:#ff8a7a}.rp-dl.new{color:#ffd166;font-family:var(--zh);font-size:var(--t-s)}
+.rp-gone{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:var(--t-s);color:var(--muted);padding:2px 2px 0}
 .rp-gone span{display:flex;align-items:center;gap:3px;font-family:var(--px)}
 .rp-gone img{width:16px;height:16px;image-rendering:pixelated}
-.rp-legend{text-align:right;font-size:var(--fs-small);color:var(--muted);margin-bottom:-2px}
-.rp-meta b small{font-size:var(--fs-small);margin-left:2px;color:var(--muted)}
+.rp-legend{text-align:right;font-size:var(--t-s);color:var(--muted);margin-bottom:-2px}
+.rp-meta b small{font-size:var(--t-s);margin-left:2px;color:var(--muted)}
 /* 战报分页：按卡牌 / 今夜来源 / 整局来源 / report tabs: by card / tonight by source / run by source */
 .rp-tabs{display:flex;gap:4px;justify-content:center}
-.rp-tabs button{font-family:var(--zh);font-size:13px;color:var(--muted);background:rgba(255,255,255,.06);border:0;border-radius:3px;padding:4px 10px;cursor:pointer}
+.rp-tabs button{font-family:var(--zh);font-size:var(--t-s);color:var(--muted);background:rgba(255,255,255,.06);border:0;border-radius:3px;padding:4px 10px;cursor:pointer}
 .rp-tabs button.on{color:#1a1c2c;background:#ffd166}
 #report [data-for][hidden]{display:none}
-.rs-total{text-align:center;font-size:13px;color:var(--muted)}
-.rs-total b{font-family:var(--px);color:#ffd166;font-size:15px}
-.rs-row{display:grid;grid-template-columns:minmax(84px,auto) 1fr auto;align-items:center;gap:6px;font-size:14px;opacity:0;animation:rowIn .3s ease-out forwards;padding:1px 0}
+.rs-total{text-align:center;font-size:var(--t-s);color:var(--muted)}
+.rs-total b{font-family:var(--px);color:#ffd166;font-size:var(--t-b)}
+.rs-row{display:grid;grid-template-columns:minmax(84px,auto) 1fr auto;align-items:center;gap:6px;font-size:var(--t-b);opacity:0;animation:rowIn .3s ease-out forwards;padding:1px 0}
 .rs-row>span{color:var(--tagc);white-space:nowrap}
 .rs-row .bar{height:9px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
 .rs-row .bar i{display:block;height:100%;background:var(--tagc);width:0;transition:width .6s cubic-bezier(.2,.9,.3,1)}
-.rs-row b{font-family:var(--px);font-size:15px;text-align:right;min-width:62px}
-.rs-row b small{color:var(--muted);font-size:var(--fs-small);margin-left:4px;font-weight:400}
-.rs-cards{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:-2px;font-family:var(--body);font-size:var(--fs-body);color:#9fb3ba}
+.rs-row b{font-family:var(--px);font-size:var(--t-b);text-align:right;min-width:62px}
+.rs-row b small{color:var(--muted);font-size:var(--t-s);margin-left:4px;font-weight:400}
+.rs-cards{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:-2px;font-family:var(--body);font-size:var(--t-b);color:#9fb3ba}
 .rs-cards span{display:flex;align-items:center;gap:3px}
 .rs-cards img{width:16px;height:16px;image-rendering:pixelated}
-.dmgsrc small{color:var(--muted);font-size:12px;align-self:center}
+.dmgsrc small{color:var(--muted);font-size:var(--t-s);align-self:center}

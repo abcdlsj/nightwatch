@@ -155,7 +155,7 @@ export function heroSelect() {
   const T = L.ui.heroes;
   setScene('title');
   G.daily = '';
-  sc.innerHTML = `<div class="scr"><button class="btn alt sm hs-back" id="hsBack">‹ ${T.back}</button><h1 style="font-size:32px">${T.title}</h1><div class="heroes">${heroList()
+  sc.innerHTML = `<div class="scr"><button class="btn alt sm hs-back" id="hsBack">‹ ${T.back}</button><h1 style="font-size:var(--t-xl)">${T.title}</h1><div class="heroes">${heroList()
     .map((k) => {
       const H = HEROES[k];
       if (!heroUnlocked(k))
@@ -233,7 +233,7 @@ function bindVariants(hero: string) {
 export function pickOmen(ids: string[], done: (k: string) => void) {
   const sc = $('#screen');
   const T = L.ui.kits;
-  sc.innerHTML = `<div class="scr"><h1 style="font-size:28px">${T.omenTitle}</h1><div class="logo-sub">${T.omenSub}</div>
+  sc.innerHTML = `<div class="scr"><h1 style="font-size:var(--t-xl)">${T.omenTitle}</h1><div class="logo-sub">${T.omenSub}</div>
   <div class="kits">${ids.map((k, i) => `<button class="kit omen" data-i="${i}"><div><b>${OMENS[k].n}</b><span>${OMENS[k].d}</span></div></button>`).join('')}</div></div>`;
   sc.hidden = false;
   sc.querySelectorAll<HTMLElement>('.kit').forEach(
@@ -265,7 +265,7 @@ export function pickKit(done: (k: KitDef, o: KitOpts) => void) {
   setScene('title');
   /* 每日挑战：难度定死，不出完整线、异象、轮换 / daily: fixed difficulty, no full line, omens or rotation */
   const daily = !!G.daily;
-  sc.innerHTML = `<div class="scr">${daily ? '' : fullBox(G.hero) + variantBoxes(G.hero)}<img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="font-size:28px">${T.title}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
+  sc.innerHTML = `<div class="scr">${daily ? '' : fullBox(G.hero) + variantBoxes(G.hero)}<img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="font-size:var(--t-xl)">${T.title}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
   ${daily ? `<div class="logo-sub">${L.ui.daily.title} · ${G.daily} · ${G.heat ? t('heroes.heat', { h: G.heat }) : L.ui.daily.normal}</div>` : heatBar(G.hero)}
   <div class="kits">${list
     .map((k, i) => {

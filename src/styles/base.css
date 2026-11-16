@@ -1,23 +1,23 @@
 /* 字体放在自己站上（public/fonts，由 tools/fontsub.py 子集化，只收游戏里用到的字）；加载完之前先用系统字体 / fonts are self-hosted (public/fonts, subset by tools/fontsub.py to only the glyphs the game uses); fall back to system fonts until loaded */
-@font-face{font-family:'ZCOOL QingKe HuangYou';src:url(/fonts/zcool.woff2) format('woff2');font-display:swap}
 @font-face{font-family:'Pixelify Sans';src:url(/fonts/pixelify.woff2) format('woff2');font-weight:400 700;font-display:swap}
-@font-face{font-family:'Silkscreen';src:url(/fonts/silkscreen-bold.woff2) format('woff2');font-weight:700;font-display:swap}
-/* 缝合像素 12px：小字正文用；数字统一用它（别的像素字体里 2、3、8 太像） / Fusion Pixel 12px: used for small body text and all digits (2, 3 and 8 look too similar in the other pixel fonts) */
+/* 字体只有两套：缝合像素 12px 管全部汉字、数字和正文；Pixelify Sans 只管标题里的拉丁字母。字号见 ui/type.ts（按物理像素取整）
+ * only two typefaces: Fusion Pixel 12px for every CJK glyph, all digits and body text; Pixelify Sans only for Latin letters in display text. Sizes live in ui/type.ts (snapped to device pixels) */
 @font-face{font-family:'Fusion Pixel';src:url(/fonts/fusion.woff2) format('woff2');font-display:swap}
-/* 数字：缩到八成，跟旁边的汉字一样高；声明整段字重，免得浏览器给像素字硬加粗 / digits: shrunk to 80% to match the height of adjacent characters; declare the whole range's weight so browsers do not fake-bold the pixel font */
-@font-face{font-family:'PixNum';src:url(/fonts/fusion.woff2) format('woff2');unicode-range:U+0030-0039;font-weight:100 900;size-adjust:80%;font-display:swap}
+/* 数字：标题里也用缝合像素画（Pixelify 的 2、3、8 太像）；声明整段字重，免得浏览器给像素字硬加粗 / digits: drawn in Fusion Pixel even in display text (Pixelify's 2, 3 and 8 look alike); declare the whole weight range so browsers never fake-bold the pixel font */
+@font-face{font-family:'PixNum';src:url(/fonts/fusion.woff2) format('woff2');unicode-range:U+0030-0039;font-weight:100 900;font-display:swap}
 /* 箭头、音符：标题字体里没有，iOS 回退系统字体时会显示成空白，统一用缝合像素画 / arrows and note symbols: missing from the title font and blank when iOS falls back to system fonts, so draw them with Fusion Pixel */
 @font-face{font-family:'PixSym';src:url(/fonts/fusion.woff2) format('woff2');unicode-range:U+2190-21FF,U+2660-267F;font-weight:100 900;font-display:swap}
 :root{
   --bg:#0f1c20; --panel:#1c2a30; --panel2:#25363d; --edge:#3a525c; --ink:#fbf7ee; --muted:#9fb3ba;
   --red:#e2473b; --blue:#2c8fe0; --gold:#f2a93b; --green:#35a86b; --purple:#8e5bd8;
   --card:#f0e4c7; --cink:#2a2130;
-  --zh:'PixNum','PixSym','ZCOOL QingKe HuangYou','PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans CJK SC',sans-serif;
-  --px:'PixNum','PixSym','Pixelify Sans','ZCOOL QingKe HuangYou','Noto Sans CJK SC',ui-monospace,monospace;
+  --zh:'PixNum','PixSym','Pixelify Sans','Fusion Pixel','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif;
+  --px:var(--zh);
   --body:'Fusion Pixel','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif;
   --cw:46px; --ch:90px;
-  /* 说明文字字号：设置里的「大字」整体调大 / body text sizes: the Large text setting scales them up */
-  --fs-body:14px; --fs-small:12px;
+  /* 字号的默认值，ui/type.ts 启动时按 DPR 改写 / default type sizes, rewritten per DPR by ui/type.ts at boot */
+  --t-s:12px; --t-b:12px; --t-m:18px; --t-l:24px; --t-xl:24px; --t-h1:36px; --t-h2:48px; --t-h3:60px; --t-h4:84px;
+  --fs-body:var(--t-b); --fs-small:var(--t-s);
   /* 安全区（刘海、灵动岛、底部横条）。测试时可以用 ?safe=上,下 覆盖 / safe area (notch, Dynamic Island, home bar). Override in testing with ?safe=top,bottom */
   --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
   box-sizing:border-box;
@@ -31,7 +31,7 @@
 /* 美术是暗色的：按钮等原生控件也按暗色配色画，嵌进浅色页面（如 B站 Toy 的 iframe）时默认文字才不会变成黑色
  * the art is dark: draw native controls such as buttons in the dark scheme too, so their default text doesn't turn black when embedded in a light page (e.g. the Bilibili Toy iframe) */
 html{height:100%;background:var(--bg);scroll-padding-top:var(--sat);color-scheme:dark}
-body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--zh);overflow:hidden;
+body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--zh);overflow:hidden;font-synthesis:none;-webkit-font-smoothing:none;
   user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 button{font-family:inherit}
 em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 / italic pixel fonts blur, so never italicize */
@@ -40,17 +40,15 @@ em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 / italic pixel
   background:repeating-linear-gradient(to bottom,rgba(0,0,0,.07) 0 1px,transparent 1px 3px),
              radial-gradient(ellipse at center,transparent 62%,rgba(0,0,0,.5) 100%)}
 html.no-crt #crt{display:none}
-html.big{--fs-body:16px; --fs-small:13px}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
 
 #app{position:relative;z-index:1;max-width:440px;height:100%;margin:0 auto;display:flex;flex-direction:column;gap:7px;padding:8px}
 /* 英文：标题字体换成带拉丁字母的像素字 / English: use a pixel font with Latin glyphs for display text */
-html[lang=en]{--zh:'PixNum','PixSym','Pixelify Sans','ZCOOL QingKe HuangYou',sans-serif}
-html[lang=en] .logo{flex-direction:column;align-items:center;gap:0;font-size:58px}
+html[lang=en] .logo{flex-direction:column;align-items:center;gap:0;font-size:var(--t-h3)}
 html[lang=en] .logo + .logo-sub{display:none}
 /* 英文卡名长：卡面上最多折两行 / English card names are long: wrap to at most two lines on the card face */
-html[lang=en] .card .nm,html[lang=en] .card .nm.long{white-space:normal;font-size:10px;letter-spacing:-.3px;line-height:1.05;max-height:2.15em;overflow:hidden;-webkit-hyphens:auto;hyphens:auto;overflow-wrap:anywhere;padding:0 1px}
-html[lang=en] .scr h1{font-size:min(30px,8vw)!important}
+html[lang=en] .card .nm,html[lang=en] .card .nm.long{white-space:normal;font-size:var(--t-s);letter-spacing:-.3px;line-height:1.05;max-height:2.15em;overflow:hidden;-webkit-hyphens:auto;hyphens:auto;overflow-wrap:anywhere;padding:0 1px}
+html[lang=en] .scr h1{font-size:var(--t-xl)!important}
 html[lang=en] .rp-row{grid-template-columns:34px 96px 1fr auto}
 html[lang=en] #report.vs .rp-row{grid-template-columns:34px 96px 1fr auto 46px}
-html[lang=en] .rp-row span{font-size:12px;line-height:1.1}
+html[lang=en] .rp-row span{font-size:var(--t-s);line-height:1.1}

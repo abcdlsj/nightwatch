@@ -192,6 +192,8 @@ export default {
     wall: 'If the wall falls, the run is over.',
     low: 'Field more damage cards next night, or look for relics and talents that repair the wall.',
     s_karl: 'The two swords were forged from the same iron.',
+    synFirst: 'Synergy: enough cards of one element on the board buff the whole team. A lit chip up top means it is active.',
+    wagerFirst: 'Wagers make tonight harder for a bigger reward. Skip them, or stack several.',
     rx: 'Reactions: Fire on frozen = Melt. Crit on frozen = Shatter. Volt on burning = Overload. Fire on poisoned = Toxic Burst. Volt on slowed = Superconduct.',
   },
 

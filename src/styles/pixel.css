@@ -2,16 +2,28 @@
  * 圆角压到 2~3px，外面一圈 2px 深色描边，上沿一道受光的亮线，下沿一道暗线，底下一块硬投影；和战场的月光方向一致（光从上来）
  * corners pressed down to 2–3px, a 2px dark outline, a lit line along the top edge and a dark one along the bottom, a hard drop shadow; the light comes from above, as on the battlefield */
 :root{--pxo:#0b0d16;--pxhi:rgba(255,255,255,.2);--pxlo:rgba(0,0,0,.32)}
-.btn{box-shadow:0 0 0 2px var(--pxo),inset 0 2px 0 var(--pxhi),inset 0 -3px 0 var(--pxlo),0 4px 0 2px rgba(0,0,0,.5);transition:transform .06s,box-shadow .06s,filter .15s}
-.btn:active{transform:translateY(3px);box-shadow:0 0 0 2px var(--pxo),inset 0 2px 0 var(--pxlo),0 1px 0 2px rgba(0,0,0,.5)}
-.chip{box-shadow:0 0 0 2px var(--pxo),inset 0 2px 0 rgba(255,255,255,.08),0 3px 0 2px rgba(0,0,0,.45)}
-.offer{box-shadow:0 0 0 2px var(--pxo),inset 0 2px 0 rgba(255,255,255,.07),0 4px 0 2px rgba(0,0,0,.4)}
-.door{box-shadow:0 0 0 2px var(--pxo),inset 5px 0 0 var(--cc),inset 0 2px 0 rgba(255,255,255,.07),0 4px 0 2px rgba(0,0,0,.45)}
-.door:active{box-shadow:0 0 0 2px var(--pxo),inset 5px 0 0 var(--cc),0 1px 0 2px rgba(0,0,0,.45)}
-#preview{box-shadow:0 0 0 2px var(--pxo),inset 0 2px 0 rgba(255,255,255,.05)}
-#foeCard{box-shadow:0 0 0 2px var(--pxo),inset 0 0 0 2px var(--fc,#ff8a80),0 3px 0 2px rgba(0,0,0,.45)}
-.bark:not(.sub){box-shadow:0 0 0 2px var(--pxo),inset 3px 0 0 var(--vc,#fff),0 3px 0 2px rgba(0,0,0,.45)}
-.bark.foe{box-shadow:0 0 0 2px var(--pxo),inset -3px 0 0 var(--vc,#fff),0 3px 0 2px rgba(0,0,0,.45)}
-#tipBub{box-shadow:0 0 0 2px var(--pxo),inset 0 0 0 2px #c8901e,0 4px 0 2px rgba(0,0,0,.5)}
-#toast{box-shadow:0 0 0 2px var(--pxo),inset 0 2px 0 rgba(255,255,255,.08),0 3px 0 2px rgba(0,0,0,.45)}
+.btn{box-shadow:inset 0 2px 0 var(--pxhi),inset 0 -3px 0 var(--pxlo),0 4px 0 2px rgba(0,0,0,.5);transition:transform .06s,box-shadow .06s,filter .15s}
+.btn:active{transform:translateY(3px);box-shadow:inset 0 2px 0 var(--pxlo),0 1px 0 2px rgba(0,0,0,.5)}
+.chip{box-shadow:inset 0 2px 0 rgba(255,255,255,.08),0 3px 0 2px rgba(0,0,0,.45)}
+.offer{box-shadow:inset 0 2px 0 rgba(255,255,255,.07),0 4px 0 2px rgba(0,0,0,.4)}
+.door{box-shadow:inset 5px 0 0 var(--cc),inset 0 2px 0 rgba(255,255,255,.07),0 4px 0 2px rgba(0,0,0,.45)}
+.door:active{box-shadow:inset 5px 0 0 var(--cc),0 1px 0 2px rgba(0,0,0,.45)}
+#preview{box-shadow:inset 0 2px 0 rgba(255,255,255,.05)}
+#foeCard{box-shadow:inset 0 0 0 2px var(--fc,#ff8a80),0 3px 0 2px rgba(0,0,0,.45)}
+.bark:not(.sub){box-shadow:inset 3px 0 0 var(--vc,#fff),0 3px 0 2px rgba(0,0,0,.45)}
+.bark.foe{box-shadow:inset -3px 0 0 var(--vc,#fff),0 3px 0 2px rgba(0,0,0,.45)}
+#tipBub{box-shadow:inset 0 0 0 2px #c8901e,0 4px 0 2px rgba(0,0,0,.5)}
+#toast{box-shadow:inset 0 2px 0 rgba(255,255,255,.08),0 3px 0 2px rgba(0,0,0,.45)}
+
+/* 九宫格像素边框：一张 6×6 的小图切成九块，四角各缺一格像素（台阶角），边是 2px 深色；
+ * 按钮、顶栏、商店卡位、门、提示、面板都用同一张，替掉原来的圆角 + 外描边。背景只铺到边框里面，缺掉的角透出底下的画面
+ * 9-slice pixel frame: one 6×6 image cut into nine pieces, each corner missing one pixel (a stepped corner), 2px dark edges;
+ * buttons, the top bar, shop slots, doors, tips and panels all share it, replacing the old rounded corners and outer outline. The background stops inside the frame, so the missing corners show what is underneath */
+:root{--frame:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%230b0d16' d='M1 0h4v1H1zM0 1h6v4H0zM1 5h4v1H1z'/%3E%3C/svg%3E")}
+.btn,.chip,.offer,.door,#preview,#toast,#tipBub,.kit,.wg,.hero,#foeCard,.bark:not(.sub),.sh{border:2px solid var(--pxo);border-image:var(--frame) 2 / 2px;background-clip:padding-box;border-radius:0}
+.sh{border-bottom:0}
+/* 底栏和顶栏一样钉死高度（41px，换字体换边框之前的高度）：战场高度由它们决定，战场尺寸会进模拟
+ * the bottom bar is pinned like the top bar (41px, its height before the font and frame change): they set the battlefield height, which feeds the sim */
+#actions{height:41px;flex:none}
+#actions .btn{padding-top:0;padding-bottom:0;display:flex;align-items:center;justify-content:center}
 #toast.low{top:auto;bottom:12px}

@@ -26,13 +26,13 @@ body{background:#0f1c20;overflow:hidden;font-family:var(--zh)}
 .logo{display:flex;gap:6px;line-height:1;color:#fff}
 .logo span{text-shadow:0 10px 0 #7a1f1a,0 18px 0 rgba(0,0,0,.55)}
 .logo span:nth-child(2){color:#ffd166;text-shadow:0 10px 0 #8a5a12,0 18px 0 rgba(0,0,0,.55)}
-.en{font-family:'Silkscreen',monospace;color:#ff8a5b;letter-spacing:6px}
+.en{font-family:'Pixelify Sans',monospace;color:#ff8a5b;letter-spacing:6px}
 .hook{color:#fff;background:#d7263d;padding:10px 22px 14px;box-shadow:0 0 0 5px #0f1c20,8px 8px 0 5px #0f1c20;transform:rotate(-2deg);display:inline-block}
 .hook b{color:#ffe066}
 .tags{display:flex;gap:14px;flex-wrap:wrap}
 .tags i{font-style:normal;color:#0f1c20;background:#ffd166;padding:6px 14px 9px;box-shadow:0 0 0 4px #0f1c20}
 .tags i.g{background:#7ae582}
-.logo.lat{gap:0;font-family:'Silkscreen',monospace;letter-spacing:4px}
+.logo.lat{gap:0;font-family:'Pixelify Sans',monospace;letter-spacing:4px}
 .boom{position:absolute;font-family:'PixNum','Pixelify Sans',var(--zh);color:#ffe066;text-shadow:0 6px 0 #b3261e,0 0 30px rgba(255,90,40,.9);transform:rotate(-8deg);z-index:6}
 `;
 

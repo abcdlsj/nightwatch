@@ -4042,6 +4042,118 @@ def event_icons():
     c.rect(2, 14, 14, 15, 'd'); c.px(8, 0, 'g'); E['furnace'] = c.done()
     return E
 
+# ---------------------------------------------------------------- 敌人走路帧：每种体型两帧，命名「图名~w1」「图名~w2」
+# 不另外手画，按体型从原图挪像素得到，颜色、描边都是原图里的，不会出调色板外的颜色。
+# 腿（legs）：脚下几行按身体中线分左右，w1 抬左脚、w2 抬右脚（抬起的那条腿收短一格），身子不动
+# 跳（hop）：w1 压扁（去掉中间一行、往两边撑开一格），w2 拉长（中间一行复制一遍）
+# 飞（flap）：两侧的翅膀 w1 往上一格、w2 往下一格，身体不动
+# 飘（float）：最下面三行一行往左、一行往右摆，w1 / w2 方向相反
+# 车（roll）：轮子以上的车身 w1 往下颠一格，w2 往右晃一格
+# 首领和固定不动的精英不走路，不生成。模组加的敌人没有这两帧时，游戏里照旧用「脚下几行左右错一格」顶替。
+GAIT = {
+    'legs': ['skel', 'bug', 'shaman', 'shieldb', 'drummer', 'bomber', 'necro', 'berserker', 'golem', 'f_mite', 'f_husk', 'f_yeti', 'f_warden',
+             'f_witch', 'f_horn', 'f_beetle', 'f_priest', 'f_wolf', 'f_mage', 'e_brute', 'e_golem', 'e_lich', 'e_wolf', 'e_yeti', 'e_priest'],
+    'hop': ['slime', 'mini', 'f_chip', 'f_egg', 'chest_m', 'mimic', 'f_shell'],
+    'flap': ['bat', 'f_owl', 'f_crow'],
+    'float': ['ghost', 'f_wisp'],
+    'roll': ['siege', 'catapult', 'f_sled', 'f_ballista'],
+}
+
+
+def _box(g):
+    pts = [(x, y) for y, r in enumerate(g) for x, c in enumerate(r) if c != '.']
+    xs = [p[0] for p in pts]; ys = [p[1] for p in pts]
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def _shift(g, cells, dx, dy):
+    """把 cells 这些格子整体挪 (dx, dy)：先全部擦掉再按新位置画回去，画出界的丢掉"""
+    h, w = len(g), len(g[0]); src = {(x, y): g[y][x] for x, y in cells if g[y][x] != '.'}
+    for x, y in src: g[y][x] = '.'
+    for (x, y), c in src.items():
+        if 0 <= x + dx < w and 0 <= y + dy < h: g[y + dy][x + dx] = c
+
+
+def gait_frames(rows, kind):
+    w, h = len(rows[0]), len(rows)
+    x0, y0, x1, y1 = _box(rows)
+    bh = y1 - y0 + 1
+    out = []
+    for k in (0, 1):
+        g = [list(r) for r in rows]
+        if kind == 'legs':
+            feet = max(2, round(bh / 5))
+            fy = y1 - feet + 1
+            foot = [(x, y) for y in range(fy, y1 + 1) for x in range(w) if g[y][x] != '.']
+            # 认腿：最下面一行里最宽的两段是两只脚；脚下区里离某只脚不超过 1 格的列算这条腿（垂到地上的武器、尾巴不算）
+            # finding legs: the two widest runs on the bottom row are the feet; feet-zone columns within 1 cell of a foot belong to that leg (weapons or tails touching the ground don't)
+            runs, x = [], 0
+            while x < w:
+                if g[y1][x] != '.':
+                    s0 = x
+                    while x < w and g[y1][x] != '.': x += 1
+                    runs.append((s0, x - 1))
+                else: x += 1
+            fc = sorted({p[0] for p in foot})
+            if len(runs) >= 2:
+                legs = sorted(sorted(runs, key=lambda r: r[0] - r[1])[:2])
+                dist = lambda x, r: max(r[0] - x, x - r[1], 0)
+                me, other = legs[k], legs[1 - k]
+                cols = [x for x in fc if dist(x, me) <= 1 and dist(x, me) < dist(x, other)]
+            else:
+                cx = sum(p[0] for p in foot) / len(foot)
+                cols = [x for x in fc if (x < cx if k == 0 else x >= cx)]
+            # 抬起的那条腿去掉最上面一行、往上收一格（腿弯起来），身子一格不动 / the lifted leg drops its top row and tucks up one cell (the knee bends); the body never moves
+            for x in cols:
+                col = [g[y][x] for y in range(fy + 1, y1 + 1)]
+                for i, y in enumerate(range(fy, y1)): g[y][x] = col[i]
+                g[y1][x] = '.'
+        elif kind == 'hop':
+            mid = y0 + bh // 2
+            if k == 0:
+                del g[mid]; g.insert(0, ['.'] * w)
+                cx = (x0 + x1) // 2
+                for y in range(h):
+                    r = g[y]
+                    left = r[:cx]; right = r[cx:]
+                    if left and left[0] == '.': left = left[1:] + [left[-1] if left[-1] != '.' else '.']
+                    if right and right[-1] == '.': right = [right[0] if right[0] != '.' else '.'] + right[:-1]
+                    g[y] = (left + right)[:w]
+            else:
+                if y0 > 0:
+                    g.insert(mid, list(g[mid])); del g[0]
+        elif kind == 'flap':
+            core = (x1 - x0 + 1) * 0.3
+            wing = [(x, y) for y in range(h) for x in range(w) if g[y][x] != '.' and (x < x0 + core or x > x1 - core)]
+            _shift(g, wing, 0, -1 if k == 0 else 1)
+        elif kind == 'float':
+            for i, y in enumerate(range(y1 - 2, y1 + 1)):
+                d = (1 if (i + k) % 2 else -1)
+                _shift(g, [(x, y) for x in range(w)], d, 0)
+        elif kind == 'roll':
+            wy = y1 - max(2, round(bh / 4)) + 1
+            body = [(x, y) for y in range(0, wy) for x in range(w)]
+            _shift(g, body, 0, 1) if k == 0 else _shift(g, body, 1, 0)
+        out.append([''.join(r) for r in g])
+    return out
+
+
+def hand_rows(root):
+    """hand.ts 里手画的图（有几种霜潮敌人画在那边），读出来一起补帧"""
+    import re
+    txt = open(os.path.join(root, 'src', 'data', 'art', 'hand.ts'), encoding='utf-8').read()
+    return {m.group(1): re.findall(r'"([^"]*)"', m.group(2)) for m in re.finditer(r'"(\w+)": \[([^\]]*)\]', txt)}
+
+
+def walk_frames(sprites):
+    F = {}
+    for kind, keys in GAIT.items():
+        for k in keys:
+            assert k in sprites, k
+            a, b = gait_frames(sprites[k], kind)
+            F[k + '~w1'], F[k + '~w2'] = a, b
+    return F
+
 SPRITES_HEAD = 'export const SPRITES: Record<string, string[]> = '
 
 
@@ -4059,6 +4171,8 @@ def write_ts(path):
         i = txt.find(SPRITES_HEAD)
         if i >= 0: old = json.loads(txt[i + len(SPRITES_HEAD):txt.rindex(';')])
     merged = {**old, **A, **P}
+    root = os.path.join(os.path.dirname(path), '..', '..', '..')
+    merged.update(walk_frames({**hand_rows(root), **merged}))
     out.append(SPRITES_HEAD + json.dumps(merged, indent=0, ensure_ascii=False) + ';')
     open(path, 'w', encoding='utf-8').write('\n'.join(out) + '\n')
     return A, P

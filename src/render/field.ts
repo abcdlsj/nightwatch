@@ -12,7 +12,10 @@ import { nightKind } from '../game/plan';
 import { B, phased, rising } from '../sim/battle';
 import { world, K, ex, ey, WALLY } from '../sim/world';
 import type { Enemy } from '../sim/types';
-import { spr } from './sprites';
+import { spr, hasSpr } from './sprites';
+
+/** 跳着走的体型（pixelgen 的 GAIT.hop）：帧跟着跳的节奏换 / hopping body types (GAIT.hop in pixelgen): frames follow the hop */
+const GAIT_HOP = new Set(['slime', 'mini', 'f_chip', 'f_egg', 'chest_m', 'mimic', 'f_shell']);
 import { bayer, dotOn, ditherRect, drawDithered, crispText } from './dither';
 import type { Sprite } from './sprites';
 import { $ } from '../ui/dom';
@@ -758,13 +761,27 @@ function drawBattle(x: CanvasRenderingContext2D, W: number) {
     castShadow(x, sp.shadow, sp.w, sp.h, e.d.sc, ex(e), Math.round(ey(e)) - 1);
   }
   for (const e of list) {
-    const sp = spr(e.sprK || e.d.spr),
-      sc = e.d.sc,
+    const sc = e.d.sc;
+    const base = e.sprK || e.d.spr;
+    let bob = Math.round(Math.abs(Math.sin(now * 7 + e.ph)) * -1);
+    if (e.type === 'slime' || e.type === 'mini' || GAIT_HOP.has(base)) bob = Math.round(Math.abs(Math.sin(now * 6 + e.ph)) * -2);
+    if (e.d.zig) bob = Math.round(Math.sin(now * 14 + e.ph));
+    /* 走路帧（pixelgen 按体型补的「~w1」「~w2」）：w1 → 原图 → w2 → 原图 一步一换；
+     * 跳的那几种落地时压扁、蹦起时拉长，跟着上下跳的节奏走。有帧的就不再整体上下颠
+     * walk frames ('~w1' / '~w2', added per body type by pixelgen): w1 → base → w2 → base, one per step;
+     * hoppers squash on landing and stretch in the air, in time with the hop. Sprites with frames no longer bob as a whole */
+    let fk = '';
+    if (!calm() && !e.d.fixed && hasSpr(base + '~w1')) {
+      if (e.type === 'slime' || e.type === 'mini' || GAIT_HOP.has(base)) fk = bob === 0 ? '~w1' : bob <= -2 ? '~w2' : '';
+      else {
+        const st = Math.floor(now * (e.d.zig ? 10 : 7) + e.ph * 3) & 3;
+        fk = st === 0 ? '~w1' : st === 2 ? '~w2' : '';
+        if (!e.d.zig) bob = 0;
+      }
+    }
+    const sp = fk ? spr(base + fk) : spr(base),
       w = sp.w * sc,
       h = sp.h * sc;
-    let bob = Math.round(Math.abs(Math.sin(now * 7 + e.ph)) * -1);
-    if (e.type === 'slime' || e.type === 'mini') bob = Math.round(Math.abs(Math.sin(now * 6 + e.ph)) * -2);
-    if (e.d.zig) bob = Math.round(Math.sin(now * 14 + e.ph));
     const age = now - (e.bornT || 0);
     let fade = 1;
     if (age < 0.4 && !e.d.fixed) fade = Math.max(0.15, age / 0.4);
@@ -785,8 +802,8 @@ function drawBattle(x: CanvasRenderingContext2D, W: number) {
       const k = Math.max(0.1, (now - e.bornT) / 0.5),
         hh = Math.max(1, Math.round(sp.h * k));
       x.drawImage(sp.cv, 0, 0, sp.w, hh, px, py + h - hh * sc, w, hh * sc);
-    } else if (fade >= 1 && !e.d.fixed && !e.d.zig && e.type !== 'slime' && e.type !== 'mini' && sp.h >= 6) {
-      /* 走路：脚下几行左右错一格，两帧交替，图不用重画 / walking: the bottom rows shift one cell left and right on alternate frames, no redrawn art needed */
+    } else if (!fk && !hasSpr(base + '~w1') && !calm() && fade >= 1 && !e.d.fixed && !e.d.zig && e.type !== 'slime' && e.type !== 'mini' && sp.h >= 6) {
+      /* 没有走路帧的图（模组加的敌人）：脚下几行左右错一格顶替 / sprites without walk frames (mod enemies): shift the bottom rows one cell left and right instead */
       const legs = Math.max(2, Math.round(sp.h / 4)) + 1,
         rh = sp.h + 2,
         top = rh - legs,

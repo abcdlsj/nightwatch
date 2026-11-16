@@ -1,20 +1,20 @@
 /* ---------- 起手 / 商店锁卡 / 拦路 ---------- / ---------- Opening / shop locking / roadblock ---------- */
-.cat-fight{--cc:#ff7a5c}.door.cat-fight{box-shadow:0 4px 0 rgba(0,0,0,.5),inset 5px 0 0 var(--cc),0 0 12px rgba(255,122,92,.35)}
-.offer .lockb{position:absolute;top:4px;right:4px;width:26px;height:26px;border:0;border-radius:3px;background:rgba(0,0,0,.35);color:#9fb3ba;font-size:14px;line-height:26px;padding:0;cursor:pointer}
+.cat-fight{--cc:#ff7a5c}.door.cat-fight{box-shadow:0 4px 0 rgba(0,0,0,.5),inset 5px 0 0 var(--cc),0 0 0 2px rgba(255,122,92,.35)}
+.offer .lockb{position:absolute;top:4px;right:4px;width:26px;height:26px;border:0;border-radius:3px;background:rgba(0,0,0,.35);color:#9fb3ba;font-size:var(--t-b);line-height:26px;padding:0;cursor:pointer}
 .offer .lockb.on{background:#ffd166;color:#1a1c2c}
 .offer.locked{box-shadow:inset 0 0 0 2px #ffd166}
 .kits{display:flex;flex-direction:column;gap:10px;width:100%;max-width:380px}
 .kit{display:flex;align-items:center;gap:12px;text-align:left;color:#fff;border:0;border-radius:3px;padding:10px 12px;background:var(--panel2);box-shadow:0 4px 0 rgba(0,0,0,.5),inset 5px 0 0 var(--hc);cursor:pointer}
 .kit .kc{display:flex;gap:4px;flex:none}.kit .kc img{width:38px;height:38px;image-rendering:pixelated;background:rgba(0,0,0,.28);border-radius:3px;padding:3px}
-.kit b{display:block;font-size:17px}.kit span{display:block;font-size:var(--fs-body);color:#c5d2d6;line-height:1.4}
+.kit b{display:block;font-size:var(--t-m)}.kit span{display:block;font-size:var(--t-b);color:#c5d2d6;line-height:1.4}
 .amb{display:flex;gap:12px;align-items:center;background:var(--panel2);border-radius:3px;padding:10px 12px}
 .amb img{width:64px;height:64px;image-rendering:pixelated;flex:none;background:rgba(0,0,0,.3);border-radius:3px;padding:4px}
-.amb b{font-size:18px;color:#ff9e7a}.amb p{margin:4px 0 0;font-size:var(--fs-body);line-height:1.45;color:#c5d2d6}
+.amb b{font-size:var(--t-m);color:#ff9e7a}.amb p{margin:4px 0 0;font-size:var(--t-b);line-height:1.45;color:#c5d2d6}
 
 /* ---------- 隐藏事件 ---------- / ---------- Hidden events ---------- */
-.sletter{font-size:var(--fs-body);line-height:1.7;text-align:left;color:#e8dcc0;margin-bottom:10px}
+.sletter{font-size:var(--t-b);line-height:1.7;text-align:left;color:#e8dcc0;margin-bottom:10px}
 .sletter span{display:block;text-align:right}
-.nstar{position:fixed;top:calc(7% + var(--sat));right:16%;width:4px;height:4px;background:#fff7d0;box-shadow:0 0 6px 2px #ffe79a;pointer-events:none;animation:nstar 3s ease-in-out infinite}
+.nstar{position:fixed;top:calc(7% + var(--sat));right:16%;width:4px;height:4px;background:#fff7d0;box-shadow:0 0 0 4px #ffe79a;pointer-events:none;animation:nstar 3s ease-in-out infinite}
 @keyframes nstar{50%{opacity:.5}}
 
 /* ---------- 人物解锁 / 流派 ---------- / ---------- Hero unlocks / archetypes ---------- */
@@ -22,9 +22,9 @@
 .hero.locked .por{filter:brightness(.4)}
 .hpaths{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
 .scr>.hpaths{justify-content:center}
-.hpaths span{font-size:12px;padding:2px 7px;border-radius:3px;background:rgba(255,255,255,.06);color:#7d8d93}
+.hpaths span{font-size:var(--t-s);padding:2px 7px;border-radius:3px;background:rgba(255,255,255,.06);color:#7d8d93}
 .hpaths span.on{background:rgba(255,209,102,.16);color:#ffe79a}
-.hpaths small{margin-left:4px;font-size:var(--fs-small);opacity:.8}
+.hpaths small{margin-left:4px;font-size:var(--t-s);opacity:.8}
 
 /* ---------- 设置 ---------- / ---------- Settings ---------- */
 .set-row{width:100%;display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer}
@@ -34,28 +34,28 @@
 .tog.on{background:#3c7a52}.tog.on::after{left:21px;background:#e8fff0}
 
 /* ---------- C 位 ---------- / ---------- Carry ---------- */
-.card.carry .inner{box-shadow:0 0 0 2px #ffd166,0 0 10px rgba(255,209,102,.55)}
-.card .cw{position:absolute;right:-5px;top:-7px;width:17px;height:17px;border-radius:2px;background:#ffd166;color:#1a1c2c;font-size:12px;line-height:17px;text-align:center;box-shadow:0 2px 0 rgba(0,0,0,.4);z-index:3}
+.card.carry .inner{box-shadow:0 0 0 2px #ffd166,0 0 0 2px rgba(255,209,102,.55)}
+.card .cw{position:absolute;right:-5px;top:-7px;width:17px;height:17px;border-radius:2px;background:#ffd166;color:#1a1c2c;font-size:var(--t-s);line-height:17px;text-align:center;box-shadow:0 2px 0 rgba(0,0,0,.4);z-index:3}
 /* iOS Safari：装到主屏的提示 / iOS Safari: the add-to-home-screen hint */
-.ioshint{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:2px dashed var(--edge);border-radius:3px;background:rgba(15,28,32,.7);color:var(--muted);font-family:var(--body);font-size:var(--fs-body);line-height:1.5;text-align:left}
+.ioshint{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:2px dashed var(--edge);border-radius:3px;background:rgba(15,28,32,.7);color:var(--muted);font-family:var(--body);font-size:var(--t-b);line-height:1.5;text-align:left}
 .ioshint span{flex:1}
 .ioshint .btn{flex:none;min-width:32px}
 /* 起手页顶上：完整游戏线 / top of the opening page: full game line */
 .fullbox{display:flex;align-items:center;gap:10px;width:100%;max-width:380px;padding:8px 12px;border-radius:3px;background:rgba(10,16,22,.75);box-shadow:inset 0 0 0 2px rgba(255,209,102,.25);text-align:left;cursor:pointer}
-.fullbox.on{box-shadow:inset 0 0 0 2px #ffd166,0 0 16px rgba(255,209,102,.25)}
+.fullbox.on{box-shadow:inset 0 0 0 2px #ffd166,0 0 0 2px rgba(255,209,102,.25)}
 .fullbox input{appearance:none;-webkit-appearance:none;flex:none;width:22px;height:22px;margin:0;border:2px solid #ffd166;border-radius:2px;background:transparent}
 .fullbox input:checked{background:#ffd166;box-shadow:inset 0 0 0 3px #1c2a30}
 .fullbox span{display:flex;flex-direction:column}
-.fullbox b{font-weight:400;font-size:17px;color:#ffd166}
-.fullbox small{font-family:var(--body);font-size:var(--fs-body);line-height:1.45;color:#c9bda8}
+.fullbox b{font-weight:400;font-size:var(--t-m);color:#ffd166}
+.fullbox small{font-family:var(--body);font-size:var(--t-b);line-height:1.45;color:#c9bda8}
 .newheat.full{box-shadow:inset 0 0 0 2px #ffd166}
 /* 宝石剧情的标题 / the gem scene's title */
-.ptitle.gemt{color:var(--gemc);text-shadow:0 0 10px color-mix(in srgb,var(--gemc) 45%,transparent)}
+.ptitle.gemt{color:var(--gemc);text-shadow:0 2px 0 #1a1c2c}
 .fullbox.locked{opacity:.55;cursor:default}
 .kit.omen{min-height:72px}
 #pvNote .omen{color:#d0a6ff}
 /* 每日挑战和排行榜 / daily challenge and leaderboard */
-.daily-rules{margin:8px 0;font-size:14px}
+.daily-rules{margin:8px 0;font-size:var(--t-b)}
 .daily-end .sh-btns{margin-top:6px}
 .daily-send{display:flex;gap:8px;margin:8px 0;align-items:center}
 .daily-send input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--edge);border-radius:3px;background:rgba(0,0,0,.35);color:var(--ink);font:16px var(--body);user-select:text;-webkit-user-select:text}
@@ -70,26 +70,26 @@
 /* 标题页按钮：每日挑战和开始游戏一样宽，其余四个两两一排，设置放右上角 / title buttons: daily as wide as start, the other four in a 2×2 grid, settings in the top-right corner */
 .scr .t-daily{width:100%;padding:10px 14px;box-shadow:0 4px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,209,102,.45);color:#ffe79a}
 .t-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
-.t-grid .btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:17px;padding:10px 8px}
+.t-grid .btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:var(--t-m);padding:10px 8px}
 .t-gear{position:absolute;top:calc(12px + var(--sat));right:12px;width:44px;height:44px;padding:0}
-.wg-sum{font-size:13px;color:#ffd166;text-align:center;min-height:1.2em}
+.wg-sum{font-size:var(--t-s);color:#ffd166;text-align:center;min-height:1.2em}
 /* 连招谱：第一次打出组合时报名字 / combo book: name announced the first time a combo happens */
 #discover{position:absolute;left:8px;right:8px;top:24%;text-align:center;pointer-events:none;opacity:0;z-index:6;display:flex;flex-direction:column;align-items:center;gap:2px;--dc:#fff}
-#discover small{font-size:13px;color:#ffe79a;letter-spacing:2px}
-#discover b{font-weight:400;font-size:38px;color:var(--dc);text-shadow:0 4px 0 rgba(0,0,0,.6),0 0 18px var(--dc)}
-#discover span{font-size:14px;color:#fff;background:rgba(0,0,0,.55);padding:2px 10px;border-radius:3px}
-#discover.first b{font-size:46px}
+#discover small{font-size:var(--t-s);color:#ffe79a;letter-spacing:2px}
+#discover b{font-weight:400;font-size:var(--t-h1);color:var(--dc);text-shadow:0 4px 0 rgba(0,0,0,.6),-2px 0 0 var(--dc),2px 0 0 var(--dc),0 -2px 0 var(--dc)}
+#discover span{font-size:var(--t-b);color:#fff;background:rgba(0,0,0,.55);padding:2px 10px;border-radius:3px}
+#discover.first b{font-size:var(--t-h2)}
 #discover.show{animation:discA 2.2s ease-out forwards}
 @keyframes discA{0%{opacity:0;transform:scale(1.6)}12%{opacity:1;transform:scale(1)}80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:translateY(-10px)}}
 html.calm #discover.show{animation:discF 2.2s linear forwards}@keyframes discF{0%,85%{opacity:1}100%{opacity:0}}
 /* 天性 / hero nature */
 .hsig{grid-column:1/-1;display:flex;flex-direction:column;gap:2px;text-align:left;margin:6px 0 2px;padding:6px 9px;border-radius:3px;background:rgba(0,0,0,.28);box-shadow:inset 0 0 0 1px var(--hc,#ffd166)}
-.hsig b{font-weight:400;font-size:14px;color:var(--hc,#ffd166)}
-.hsig span{font-size:13px;line-height:1.4}
+.hsig b{font-weight:400;font-size:var(--t-b);color:var(--hc,#ffd166)}
+.hsig span{font-size:var(--t-s);line-height:1.4}
 .hsig-l{margin-bottom:8px}
 /* 模组世界的卡面角标：版本、增强、计分（子夜牌局） / mod-world card badges: edition, enhancement, scoring (Midnight Deal) */
 .card .wb{display:contents}
-.card .mk{position:absolute;left:-5px;bottom:-6px;height:15px;padding:0 3px;border-radius:2px;font-size:11px;line-height:15px;color:#1a1c2c;z-index:3;box-shadow:0 2px 0 rgba(0,0,0,.4);background:#f4f4f4}
+.card .mk{position:absolute;left:-5px;bottom:-6px;height:15px;padding:0 3px;border-radius:2px;font-size:var(--t-s);line-height:15px;color:#1a1c2c;z-index:3;box-shadow:0 2px 0 rgba(0,0,0,.4);background:#f4f4f4}
 .card .mk.en{left:auto;right:-5px;bottom:auto;top:12px}
 .card .mk.foil{background:#73eff7}.card .mk.holo{background:#ff8fb8}.card .mk.poly{background:linear-gradient(90deg,#ff6b6b,#fee761,#73eff7,#c58cff)}.card .mk.neg{background:#1a1c2c;color:#f4f4f4}
 .card .mk.off{background:#566c86;color:#f4f4f4}
@@ -98,5 +98,5 @@ html.calm #discover.show{animation:discF 2.2s linear forwards}@keyframes discF{0
 .card .ov.holo{background:repeating-linear-gradient(45deg,rgba(255,143,184,.28) 0 3px,transparent 3px 7px)}
 .card .ov.poly{background:linear-gradient(135deg,rgba(255,107,107,.3),rgba(254,231,97,.3),rgba(115,239,247,.3),rgba(197,140,255,.3));background-size:300% 300%;animation:ovsh 3s linear infinite}
 .card .ov.neg{background:#fff;mix-blend-mode:difference;opacity:.85}
-.card .sc{position:absolute;left:50%;top:-6px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#fee761;box-shadow:0 0 0 2px #1a1c2c,0 0 6px #fee761;z-index:3}
+.card .sc{position:absolute;left:50%;top:-6px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#fee761;box-shadow:0 0 0 2px #1a1c2c,0 0 0 2px #fee761;z-index:3}
 @keyframes ovsh{0%{background-position:0 0}100%{background-position:200% 0}}

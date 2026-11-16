@@ -163,13 +163,30 @@ function nextTip(first?: boolean) {
     tipT = setTimeout(() => nextTip(true), 800);
     return;
   }
+  /* 战斗中：提示和喊话共用战场下沿那一格，排在敌人介绍卡一档，喊话等它讲完 / in battle: tips share the bottom slot with shouts, ranked with enemy cards; shouts wait for it */
+  const fight = G.phase === 'battle';
+  if (fight && laneWait(LANE.foe) > 0) {
+    tipEl!.className = '';
+    tipT = setTimeout(() => nextTip(true), laneWait(LANE.foe) + 40);
+    return;
+  }
   const [l, h, ms] = TIPQ[0];
   tipEl!.innerHTML = `<small>${l}</small><p>${h}</p>`;
   tipEl!.className = '';
-  /* 首领血条和「下一招」在顶上时，气泡挪到它下面，别挡住 / when the boss bar and 'next move' sit up top, move tooltips below them so they are not covered */
-  const bar = $('#bossbar');
-  /* 战报和结局页的标题在最上面：气泡改到棋盘上方，别压住标题 / the report and ending titles sit at the top: put the bubble just above the board so it never covers them */
-  tipEl!.style.top = bar.hidden ? '' : `${bar.getBoundingClientRect().bottom + 6}px`;
+  if (fight) {
+    /* 北边是敌人进场的地方，提示不放顶上，压在卡牌上方 / the north is where enemies come in, so the tip sits just above the cards instead of at the top */
+    const st = $('#stage').getBoundingClientRect();
+    tipEl!.style.top = `${Math.max(60, st.bottom - 52 - tipEl!.offsetHeight)}px`;
+    laneTake(LANE.foe, ms);
+  } else if (G.phase === 'prep') {
+    /* 备战：顶上是今晚标题和敌情，气泡放到下沿提示条上方 / prep: the night title and threats sit at the top, so the bubble goes above the bottom toast */
+    const st = $('#stage').getBoundingClientRect();
+    tipEl!.style.top = `${Math.max(60, st.bottom - 76 - tipEl!.offsetHeight)}px`;
+  } else {
+    /* 首领血条和「下一招」在顶上时，气泡挪到它下面，别挡住 / when the boss bar and 'next move' sit up top, move tooltips below them so they are not covered */
+    const bar = $('#bossbar');
+    tipEl!.style.top = bar.hidden ? '' : `${bar.getBoundingClientRect().bottom + 6}px`;
+  }
   void tipEl!.offsetWidth;
   tipEl!.className = 'show';
   tipT = setTimeout(() => nextTip(), ms);

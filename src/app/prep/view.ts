@@ -37,6 +37,12 @@ import { startJump, prepStops } from './jumps';
 
 /** 头一回玩、还在前两夜 / a first-time player still in the first two nights */
 const fresh = () => !META.runs && G.round <= 2 && !G.endless;
+/* 第一夜信息渐显：头一回玩的前两夜，备战页只留敌情和商店；风向、羁绊、加码在第一次用得上的时候才露面，露面时带一句说明（新手提示，只说一次）
+ * first-night progressive reveal: in a first-timer's first two nights the prep screen keeps only threats and the shop;
+ * wind, synergy and wagers appear the first time they matter, with a one-line explanation (a one-off tip) */
+const showWind = () => !fresh();
+const showSyn = (n: ReturnType<typeof synCount>) => !fresh() || Object.values(n).some((v) => v! >= 2);
+const showWagers = () => !fresh() || G.round >= 2;
 const fitTag = () => `<small class="gt fit">${L.ui.prep.fit}</small>`;
 
 /* ---------------- 今晚预告 ---------------- / ---------------- Tonight's forecast ---------------- */
@@ -103,9 +109,10 @@ export function renderSyn() {
   synPrev = n;
   if (!el) return;
   /* 第一局前两夜：羁绊条只列凑到两张以上的元素，单张的不占地方 / the first run's first two nights: the synergy bar only lists elements with two or more cards */
-  const ts = (Object.keys(n) as Tag[]).filter((tg) => !fresh() || n[tg]! >= 2 || synLevel(tg, n[tg]!) > 0).sort((a, b) => n[b]! - n[a]!);
+  const ts = showSyn(n) ? (Object.keys(n) as Tag[]).filter((tg) => !fresh() || n[tg]! >= 2 || synLevel(tg, n[tg]!) > 0).sort((a, b) => n[b]! - n[a]!) : [];
+  if (fresh() && ts.length && G.phase === 'prep') tipOnce('synFirst', L.ui.tips.synFirst, 400);
   /* 风向一直挂着，提醒这局往哪边凑 / the wind chip stays up as a reminder of which way this run leans */
-  const wind = G.wind
+  const wind = G.wind && showWind()
     ? `<span class="sy-l">${L.ui.prep.wind}</span>` + [G.wind, G.wind2].filter((w): w is Tag => !!w).map((w) => `<span class="sy on wind" style="--tagc:${TAGC[w]}">${L.terms.tags[w]}</span>`).join('')
     : '';
   el.innerHTML = wind + (ts.length
@@ -578,7 +585,11 @@ function nextLine() {
 function wagerHtml() {
   const P = G.prep;
   if (G.round >= G.maxRound) return '';
+  /* 加码照常先抽好（抽签走的是对局的随机数，不能跳过，否则种子对不上），只是第一夜先不摆出来
+   * wagers are still rolled as usual (the roll uses the run's random stream; skipping it would break seeds), they just aren't shown on night one */
   if (!P.wagers) P.wagers = rollWagers();
+  if (!showWagers()) return '';
+  if (fresh()) tipOnce('wagerFirst', L.ui.tips.wagerFirst, 500);
   const on = bets();
   return `<div class="wagers"><div class="wg-t">${L.ui.prep.wager}<small>${L.ui.prep.wagerStack}</small></div>${P.wagers
     .map((k) => {
