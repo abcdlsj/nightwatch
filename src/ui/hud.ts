@@ -157,7 +157,8 @@ function nextTip(first?: boolean) {
     return;
   }
   /* 战报、结局页上不弹提示（会盖住标题或「收下」），等回到备战再说 / no tips over the report or ending (they would cover the title or the collect button); wait until prep */
-  if (G.phase === 'report' || G.phase === 'over') {
+  /* 成就弹窗也在顶上：等它收走再出提示 / the achievement popup also sits at the top: wait until it is gone */
+  if (G.phase === 'report' || G.phase === 'over' || document.querySelector('.achpop')) {
     tipEl!.className = '';
     tipT = setTimeout(() => nextTip(true), 800);
     return;

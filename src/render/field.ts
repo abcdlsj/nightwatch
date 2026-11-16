@@ -14,12 +14,16 @@ import { world, K, ex, ey, WALLY } from '../sim/world';
 import type { Enemy } from '../sim/types';
 import { spr } from './sprites';
 import { bayer, dotOn, ditherRect, drawDithered, crispText } from './dither';
+import type { Sprite } from './sprites';
 import { $ } from '../ui/dom';
 
 interface Part { x: number; y: number; vx: number; vy: number; life: number; max: number; col: string; sz: number }
 interface Num { x: number; y: number; str: string; col: string; s: number; life: number; max?: number; e?: Enemy; v?: number; pop?: number; crit?: boolean }
 /** 地上的焦痕：敌人碎掉的地方留一小块暗斑，慢慢褪掉 / scorch marks: a small dark blot where an enemy shattered, fading slowly */
 interface Mark { x: number; y: number; w: number; life: number; max: number }
+/** 死亡的前两帧：先整张闪白，再压扁成一半高，然后才碎（只在画面上，模拟里敌人已经没了）
+ * the first two death frames: a full white flash, then squashed to half height, and only then the shatter (render-only; the enemy is already gone from the sim) */
+interface Corpse { sp: Sprite; sc: number; x: number; y: number; t: number }
 /** 只在画面上的受击反应：击退几格，慢慢回位（不改模拟里的位置） / render-only hit reaction: knocked back a few cells, easing back (the sim position never changes) */
 const KB = new WeakMap<Enemy, number>();
 /** 设置里开了「减少动态效果」 / 'Reduce motion' is on in settings */
@@ -43,10 +47,15 @@ export const F = {
   groundR: 0,
   themeK: '',
   marks: [] as Mark[],
+  corpses: [] as Corpse[],
   /** 开战的幕布（1→0）、天亮（0→1）、城破 / the opening curtain (1→0), dawn (0→1), the breach */
   curtain: 0,
   dawn: -1,
   broken: false,
+  /** 幕布全黑的那一段还剩几秒、上面写的那行字 / how long the curtain stays fully dark, and the line written on it */
+  hold: 0,
+  title: '',
+  titleC: '#f4f4f4',
 };
 
 /** 命中停顿：只把真实时间扣下来不喂给模拟，模拟仍按定步长走，结果和种子无关 / hit-stop: withholds wall-clock time from the sim; the sim still runs in fixed steps, so results never depend on it */
@@ -89,13 +98,19 @@ export function clearFieldFx() {
   F.rings = [];
   F.bolts = [];
   F.marks = [];
+  F.corpses = [];
   F.dawn = -1;
   F.broken = false;
 }
 /** 开战：黑幕从上往下揭开，敌人从北边的黑里露出来 / battle start: a black curtain lifts from the top down, enemies revealed out of the northern dark */
-export function curtain() {
+export function curtain(title = '', col = '#f4f4f4') {
   F.curtain = calm() ? 0 : 1;
+  F.hold = title && F.curtain ? 0.7 : 0;
+  F.title = title;
+  F.titleC = col;
 }
+/** 幕布上写着字（开战时由它代替正中的大字横幅） / whether the curtain carries text (it replaces the big center banner at battle start) */
+export const curtainTitled = () => F.curtain > 0 && !!F.title;
 /** 守住：天边一点点亮起来 / held: the horizon slowly brightens */
 export function dawn() {
   F.dawn = 0;
@@ -371,9 +386,10 @@ const HITC: Record<string, [string, string]> = {
 export function hit(x: number, y: number, tag: string | null, crit: boolean, kill: boolean, e?: Enemy) {
   const [c0, c1] = HITC[tag || ''] || ['#ffffff', '#ffffff'];
   if (e && !e.d.boss && !e.d.fixed) KB.set(e, Math.max(KB.get(e) || 0, crit ? 3 : 1.5));
-  if (e && kill) shatter(e);
-  if (e && kill && (e.d.boss || e.d.elite)) hitstop(0.12);
-  else if (e && crit && kill) hitstop(0.05);
+  if (e && kill) die(e);
+  /* 命中定格：打死精英、首领 80 毫秒，暴击 40 毫秒（每 0.4 秒最多一次） / hit-stop: 80 ms on an elite or boss kill, 40 ms on a crit (at most once every 0.4 s) */
+  if (e && kill && (e.d.boss || e.d.elite)) hitstop(0.08);
+  else if (crit) hitstop(0.04);
   const k = (crit ? 1.6 : 1) * (kill ? 1.5 : 1);
   const n = Math.round(4 * k);
   switch (tag) {
@@ -421,11 +437,16 @@ export function hit(x: number, y: number, tag: string | null, crit: boolean, kil
   }
 }
 /** 敌人死亡：整张图碎成自己的像素块往外迸，地上留一块焦痕 / enemy death: the sprite breaks into its own pixels flying outward, leaving a scorch mark on the ground */
-function shatter(e: Enemy) {
-  const sp = spr(e.sprK || e.d.spr),
-    sc = e.d.sc;
-  const cx = ex(e),
-    feet = ey(e);
+function die(e: Enemy) {
+  const sp = spr(e.sprK || e.d.spr);
+  if (calm()) return shatter(sp, e.d.sc, ex(e), ey(e));
+  if (F.corpses.length > 24) {
+    const c = F.corpses.shift()!;
+    shatter(c.sp, c.sc, c.x, c.y);
+  }
+  F.corpses.push({ sp, sc: e.d.sc, x: ex(e), y: ey(e), t: 0 });
+}
+function shatter(sp: Sprite, sc: number, cx: number, feet: number) {
   const left = cx - (sp.w * sc) / 2,
     top = feet - sp.h * sc;
   const px = sp.pix;
@@ -519,6 +540,19 @@ export function drawField(dt: number) {
   x.fillRect(-4, -4, W + 8, H + 8);
   if (!F.ground || F.groundR !== G.round || F.themeK !== themeKey()) buildGround();
   if (F.ground) x.drawImage(F.ground, 0, 0);
+  /* 死亡帧：0~0.06 秒整张白，0.06~0.13 秒压扁成一半高、横向撑开一点，之后碎掉 / death frames: 0–0.06 s solid white, 0.06–0.13 s squashed to half height and a little wider, then shatter */
+  for (const c of F.corpses) {
+    c.t += dt;
+    const w = c.sp.w * c.sc,
+      h = c.sp.h * c.sc;
+    if (c.t < 0.06) x.drawImage(c.sp.white, Math.round(c.x - w / 2), Math.round(c.y - h), w, h);
+    else if (c.t < 0.13) {
+      const w2 = Math.round(w * 1.2),
+        h2 = Math.max(c.sc, Math.round(h * 0.5));
+      x.drawImage(c.sp.cv, Math.round(c.x - w2 / 2), Math.round(c.y - h2), w2, h2);
+    } else shatter(c.sp, c.sc, c.x, c.y);
+  }
+  F.corpses = F.corpses.filter((c) => c.t < 0.13);
   for (const m of F.marks) {
     m.life -= dt;
     ditherRect(x, Math.round(m.x - m.w / 2), Math.round(m.y) - 1, m.w, 2, '#05060c', 0.7 * Math.min(1, m.life / m.max * 2));
@@ -636,7 +670,8 @@ export function drawField(dt: number) {
   /* 开战的幕布：先是一片黑，从城墙往北一点点看清，黑幕的下沿是一条网点过渡
    * the opening curtain: all dark at first, sight reaching from the wall northward; the curtain's lower edge is a dotted transition band */
   if (F.curtain > 0) {
-    F.curtain = Math.max(0, F.curtain - dt / 1.1);
+    if (F.hold > 0) F.hold -= dt;
+    else F.curtain = Math.max(0, F.curtain - dt / 1.1);
     const k = F.curtain * (2 - F.curtain);
     const cover = Math.round((H + 18) * k) - 18;
     if (cover > 0) {
@@ -644,6 +679,13 @@ export function drawField(dt: number) {
       x.fillRect(0, 0, W, cover);
     }
     for (let i = 0; i < 6; i++) ditherRect(x, 0, cover + i * 3, W, 3, '#05060c', 1 - (i + 1) / 7);
+    /* 黑幕上的一行字：今晚是第几夜、叫什么；幕布揭过它就跟着消失 / the line on the curtain: which night and its name; it vanishes once the curtain lifts past it */
+    if (F.title) {
+      const img = crispText(F.title, "12px 'Fusion Pixel', sans-serif", F.titleC, '#05060c'),
+        z = img.width * 2 <= W - 8 ? 2 : 1,
+        ty = Math.round(H * 0.42);
+      if (cover > ty + img.height * z) x.drawImage(img, Math.round((W - img.width * z) / 2), ty, img.width * z, img.height * z);
+    }
   }
   for (const n of F.nums) {
     n.life -= dt;

@@ -25,7 +25,7 @@ import { B, startBattle as simStart, settleWin, clearBattle, setOnEnd } from '..
 import { world } from '../sim/world';
 import type { Battle } from '../sim/types';
 import { setScene } from '../render/background';
-import { F, resizeField, clearFieldFx, clientToFieldX, curtain, dawn, breach } from '../render/field';
+import { F, resizeField, clearFieldFx, clientToFieldX, curtain, curtainTitled, dawn, breach } from '../render/field';
 import { FX } from '../render/overlay';
 import { SFX } from '../audio/sfx';
 import { $, restart } from '../ui/dom';
@@ -242,9 +242,11 @@ export function startBattle() {
   updateHUD();
   const nk = nightKind(G.round);
   const hard = amb || nk === 'boss' || nk === 'hidden';
-  banner(amb ? t('battle.ambushTitle', { n: bd!.n }) : nightInfo(G.round).title, hard ? '#ff6b5b' : nk === 'elite' ? '#ffb37a' : '#fff');
+  const title = amb ? t('battle.ambushTitle', { n: bd!.n }) : nightInfo(G.round).title;
   SFX.play(hard || nk === 'elite' ? 'intent' : 'bell');
-  curtain();
+  /* 开战：夜名写在黑幕上，幕布揭开；关了动态效果没有幕布，照旧用正中的横幅 / battle start: the night's name is written on the curtain as it lifts; with reduced motion there is no curtain, so use the center banner as before */
+  curtain(title, hard ? '#e43b44' : nk === 'elite' ? '#ef7d57' : '#f4f4f4');
+  if (!curtainTitled()) banner(title, hard ? '#ff6b5b' : nk === 'elite' ? '#ffb37a' : '#fff');
   simStart({ wave, ambush: amb, wagers: amb ? [] : bets(), beats: amb ? [] : nightInfo(G.round).beats });
   updateHUD();
 }

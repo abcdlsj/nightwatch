@@ -56,3 +56,5 @@
 #tut .tut-bub small{display:block;font-size:var(--fs-small);letter-spacing:2px;color:#ffd166}
 #tut .tut-bub p{margin:3px 0 8px;font-family:var(--body);font-size:var(--fs-body);line-height:1.5;color:#eef3f4}
 #tut .tut-btns{display:flex;justify-content:flex-end;gap:8px}
+/* 提示已经在了、成就后弹出来：成就在的这几秒先把提示藏起来，不叠在一起 / a tip already up when an achievement pops: hide the tip for those few seconds so they never overlap */
+body:has(.achpop) #tipBub{visibility:hidden}
