@@ -11,6 +11,7 @@ import { G } from '../game/state';
 import { pickLine } from '../game/text';
 import { spr } from '../render/sprites';
 import { $, restart } from './dom';
+import { LANE, laneWait, laneTake } from './lane';
 
 const VO = { q: [] as { who: string; t: string; pri: number }[], until: 0, last: 0, timer: 0 as any };
 
@@ -37,7 +38,7 @@ export function say(who: string, text: Line, pri?: number) {
   if (!t) return;
   pri = pri || 1;
   const now = performance.now();
-  if (pri === 1 && (now - VO.last < 5500 || VO.q.length || now < VO.until)) return;
+  if (pri === 1 && (now - VO.last < 5500 || VO.q.length || now < VO.until || laneWait(LANE.bark) > 0)) return;
   VO.q.push({ who, t, pri });
   VO.q.sort((a, b) => b.pri - a.pri);
   if (VO.q.length > 5) VO.q.length = 5;
@@ -50,8 +51,16 @@ function pump() {
     VO.timer = setTimeout(pump, VO.until - now + 40);
     return;
   }
-  const it = VO.q.shift();
+  const it = VO.q[0];
   if (!it) return;
+  /* 喊话排在连招发现、横幅、敌人介绍卡后面；旁白是下沿的字幕，不用等 / shouts wait behind combo discoveries, banners and enemy cards; narration is a bottom subtitle and never waits */
+  const wait = it.who === 'narr' ? 0 : laneWait(LANE.bark);
+  if (wait > 0) {
+    clearTimeout(VO.timer);
+    VO.timer = setTimeout(pump, wait + 40);
+    return;
+  }
+  VO.q.shift();
   const dur = Math.min(5200, Math.max(2000, 900 + it.t.length * 85));
   const el = $('#bark');
   if (it.who === 'narr') {
@@ -63,6 +72,14 @@ function pump() {
     el.style.setProperty('--vc', w.c);
     el.innerHTML = `<img src="${w.img}" alt=""><div><b>${w.n}</b><p>${it.t}</p></div>`;
     if (it.who !== 'hero' && EN[it.who]) el.classList.add('foe');
+    /* 被更重要的消息打断：剧情、首领台词没讲到一半就放回队首，等会儿重讲 / cut off by something more important: story and boss lines cut before halfway go back to the front of the queue */
+    laneTake(LANE.bark, dur, () => {
+      if (it.pri >= 2 && performance.now() - now < dur / 2) VO.q.unshift(it);
+      el.className = 'bark';
+      VO.until = 0;
+      clearTimeout(VO.timer);
+      VO.timer = setTimeout(pump, 60);
+    });
   }
   el.style.setProperty('--dur', dur + 'ms');
   restart(el, 'show');
@@ -76,10 +93,29 @@ export function clearVO() {
   VO.until = 0;
   clearTimeout(VO.timer);
   $('#bark').className = 'bark';
+  clearFoe();
 }
 
-/** 本局第一次遇到某种敌人：右上角弹出介绍卡 / first time meeting an enemy this run: pop up an intro card in the top-right */
+/** 本局第一次遇到某种敌人：右上角弹出介绍卡。几种敌人一起出来时一张一张轮流出 / first time meeting an enemy this run: pop up an intro card in the top-right; when several arrive together they take turns */
+const FQ: [string, boolean][] = [];
+let fqT: ReturnType<typeof setTimeout> | null = null;
 export function foeCard(type: string, firstEver: boolean) {
+  if (FQ.length < 3) FQ.push([type, firstEver]);
+  pumpFoe();
+}
+function pumpFoe() {
+  if (fqT) return;
+  const wait = laneWait(LANE.foe);
+  if (wait > 0) {
+    fqT = setTimeout(() => {
+      fqT = null;
+      pumpFoe();
+    }, wait + 40);
+    return;
+  }
+  const nx = FQ.shift();
+  if (!nx) return;
+  const [type, firstEver] = nx;
   const d = EN[type];
   const el = $('#foeCard');
   el.style.setProperty('--fc', d.col || '#ff8a80');
@@ -89,4 +125,12 @@ export function foeCard(type: string, firstEver: boolean) {
   const fac = (L.terms.factions as Record<string, string>)[d.faction];
   el.innerHTML = `<img src="${spr(d.spr).fit(48)}" alt=""><div><small>${firstEver ? T.firstMeet : T.metAgain}${fac ? ' · ' + fac : ''}</small><b>${d.n}</b><p>${d.tip}</p></div>`;
   restart(el, 'show');
+  laneTake(LANE.foe, 3600, () => el.classList.remove('show'));
+  if (FQ.length) pumpFoe();
+}
+function clearFoe() {
+  FQ.length = 0;
+  if (fqT) clearTimeout(fqT);
+  fqT = null;
+  $('#foeCard').classList.remove('show');
 }

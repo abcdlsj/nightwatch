@@ -6,7 +6,6 @@ import { DIG } from '../data/art/hand';
 import { TUNE } from '../game/tuning';
 import { vr, vrnd } from '../core/rng';
 import { fmt } from '../core/util';
-import { RM } from '../platform/env';
 import { SETTINGS } from '../platform/settings';
 import { G } from '../game/state';
 import { nightKind } from '../game/plan';
@@ -23,6 +22,8 @@ interface Num { x: number; y: number; str: string; col: string; s: number; life:
 interface Mark { x: number; y: number; w: number; life: number; max: number }
 /** 只在画面上的受击反应：击退几格，慢慢回位（不改模拟里的位置） / render-only hit reaction: knocked back a few cells, easing back (the sim position never changes) */
 const KB = new WeakMap<Enemy, number>();
+/** 设置里开了「减少动态效果」 / 'Reduce motion' is on in settings */
+const calm = () => SETTINGS.calm;
 interface Ring { x: number; y: number; r0: number; r1: number; col: string; life: number; max: number }
 interface Bolt { segs: number[][]; col: string; life: number; max: number }
 
@@ -51,7 +52,7 @@ export const F = {
 /** 命中停顿：只把真实时间扣下来不喂给模拟，模拟仍按定步长走，结果和种子无关 / hit-stop: withholds wall-clock time from the sim; the sim still runs in fixed steps, so results never depend on it */
 export const HS = { t: 0, last: 0 };
 export function hitstop(sec: number) {
-  if (RM || !SETTINGS.shake || G.speed > 2) return;
+  if (calm() || !SETTINGS.shake || G.speed > 2) return;
   const now = performance.now();
   if (now - HS.last < 400) return;
   HS.last = now;
@@ -93,7 +94,7 @@ export function clearFieldFx() {
 }
 /** 开战：黑幕从上往下揭开，敌人从北边的黑里露出来 / battle start: a black curtain lifts from the top down, enemies revealed out of the northern dark */
 export function curtain() {
-  F.curtain = RM ? 0 : 1;
+  F.curtain = calm() ? 0 : 1;
 }
 /** 守住：天边一点点亮起来 / held: the horizon slowly brightens */
 export function dawn() {
@@ -247,7 +248,7 @@ function drawAmbient(x: CanvasRenderingContext2D, dt: number) {
     H = world.H,
     T = theme();
   const want = T.amb === 'snow' ? 70 : T.amb === 'ember' ? 30 : 18;
-  if (!RM && motes.length < want && vr() < (T.amb === 'snow' ? 0.9 : 0.35)) {
+  if (!calm() && motes.length < want && vr() < (T.amb === 'snow' ? 0.9 : 0.35)) {
     if (T.amb === 'snow') motes.push({ x: vr() * W, y: -2, vx: vrnd(-3, 3), vy: vrnd(7, 14), life: 9, max: 9, col: vr() < 0.7 ? '#f4f4f4' : '#94b0c2', ph: vr() * 6 });
     else if (T.amb === 'ember') motes.push({ x: vr() * W, y: H - 8 - vr() * H * 0.3, vx: vrnd(-4, 4), vy: -vrnd(6, 14), life: vrnd(2, 4), max: 4, col: vr() < 0.5 ? '#ef7d57' : '#ffcd75', ph: vr() * 6 });
     else if (T.amb === 'ash') motes.push({ x: vr() * W, y: -2, vx: vrnd(2, 6), vy: vrnd(3, 7), life: 10, max: 10, col: vr() < 0.6 ? '#566c86' : '#94b0c2', ph: vr() * 6 });
@@ -512,7 +513,7 @@ export function drawField(dt: number) {
   if (!x) return;
   x.setTransform(1, 0, 0, 1, 0, 0);
   x.clearRect(0, 0, W, H);
-  if (F.shake > 0 && !RM && SETTINGS.shake) x.translate(Math.round(vrnd(-1, 1) * F.shake), Math.round(vrnd(-1, 1) * F.shake));
+  if (F.shake > 0 && !calm() && SETTINGS.shake) x.translate(Math.round(vrnd(-1, 1) * F.shake), Math.round(vrnd(-1, 1) * F.shake));
   F.shake = Math.max(0, F.shake - dt * 18);
   x.fillStyle = '#0a0c14';
   x.fillRect(-4, -4, W + 8, H + 8);

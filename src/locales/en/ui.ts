@@ -490,6 +490,8 @@ export default {
     hapticsD: 'Buzz on merges and when the wall is hit',
     shake: 'Screen shake',
     shakeD: 'The field shakes on explosions and crits',
+    calm: 'Reduce motion',
+    calmD: 'No hit-stop, flashes, card bounces or opening curtain',
     nums: 'Damage numbers',
     numsD: 'Numbers that pop off enemies',
     big: 'Large text',

@@ -10,6 +10,8 @@ interface Song {
   arp?: string; av: number; at: OscillatorType; ao: number;
   lead?: string[][]; lv?: number; lt?: OscillatorType; box?: number;
   k?: string; s?: string; h?: string;
+  /** 首领夜：每小节一开头低八度的长音垫底，每两小节敲一下低音钟 / boss nights: a long low drone under each bar, a low bell toll every two bars */
+  drone?: number; toll?: number;
 }
 const RAW: Record<string, any> = {
   title: { bpm: 64, prog: [[45, 'm'], [41, 'M'], [48, 'M'], [43, 'M']], bass: 'x.......5.......', bv: 0.035, bt: 'triangle', arp: '0...1...2...1...', av: 0.016, at: 'triangle', ao: 24,
@@ -26,7 +28,7 @@ const RAW: Record<string, any> = {
     k: 'x.......x.......', s: '........x.......', h: '..x...x...x...x.' },
   boss: { bpm: 144, prog: [[38, 'm'], [46, 'M'], [43, 'm'], [45, 'M']], bass: 'xxo.xxo.xxo.xxo.', bv: 0.017, bt: 'sawtooth', arp: '0.1.2.1.0.1.2.1.', av: 0.006, at: 'square', ao: 24,
     lead: ['74 - - - 77 - - - 81 - - - 80 - 81 -', '82 - - - 81 - - - 77 - - - 74 - - -', '79 - - - 82 - - - 86 - - - 84 - 82 -', '81 - - - 85 - - - 88 - - - 85 - 81 -'], lv: 0.018, lt: 'triangle',
-    k: 'x...x...x...x...', s: '....x.......x.x.', h: '..x...x...x...x.' },
+    k: 'x...x...x...x...', s: '....x.......x.x.', h: '..x...x...x...x.', drone: 0.022, toll: 0.03 },
   over: { bpm: 58, prog: [[45, 'm'], [50, 'm'], [45, 'm'], [40, 'M']], bass: 'x...............', bv: 0.03, bt: 'triangle', arp: '0...1...2...1...', av: 0.014, at: 'sine', ao: 24 },
 };
 const SONGS: Record<string, Song> = {};
@@ -140,6 +142,13 @@ function playStep(a: AudioContext, S: Song, i: number, t: number) {
     note(a, 190, t, 0.06, 'triangle', 0.02);
   }
   if (S.h && S.h[s] === 'x') nz(a, t, 0.025, 0.02, hp!);
+  if (s === 0 && S.drone) {
+    note(a, mid(r - 12), t, sd * 16, 'sawtooth', S.drone * 0.5);
+    note(a, mid(r - 12) * 1.005, t, sd * 16, 'triangle', S.drone);
+  }
+  /* 钟：几个不成倍数的泛音，和开战那声钟同一副嗓子，只是低一个八度 / the bell: a few inharmonic partials, the same voice as the battle-start bell, an octave lower */
+  if (s === 0 && S.toll && bar % 2 === 0)
+    for (const [m, v, d] of [[1, 1, 2.4], [2, 0.45, 1.6], [2.76, 0.3, 1.1], [5.4, 0.12, 0.6]]) note(a, 196 * m, t, d, 'sine', S.toll * v);
 }
 function tick() {
   const a = SFX.ctx();

@@ -33,7 +33,8 @@
 @keyframes fireK{0%{transform:none}30%{transform:translateY(-7px) scale(1.05)}100%{transform:none}}
 @keyframes fireF{0%{opacity:.7}100%{opacity:0}}
 @keyframes fireR{0%{opacity:1;transform:scale(.96)}100%{opacity:0;transform:scale(1.14,1.1)}}
-@media (prefers-reduced-motion:reduce){.card.pop{animation:none}.card.pop::after{animation:none;opacity:0}}
+/* 设置里「减少动态效果」：不弹、不闪、不出光圈 / 'Reduce motion' in settings: no kick, no flash, no ring */
+html.calm .card.pop,html.calm .card.pop .flash{animation:none}html.calm .card.pop::after{animation:none;opacity:0}
 .card.land{animation:land .32s ease-out}
 .card.lifted{opacity:.25}
 .card .am{position:absolute;right:2px;bottom:24px;z-index:3;font-size:11px;line-height:1;padding:1px 3px;border-radius:2px;background:#1a1c2cdd;color:#ffd166;font-weight:700;pointer-events:none}
@@ -51,3 +52,8 @@
 .card.static{position:relative;top:0;left:auto;flex:none;height:84px;cursor:grab}
 .card.static.s1{width:46px}.card.static.s2{width:64px}.card.static.s3{width:82px;max-width:100%}
 @media (hover:hover){.card:not(.ghost):hover .inner{transform:translateY(-3px) scale(1.04);animation-play-state:paused}}
+/* 钩子生效：卡头上冒一颗 7×7 的小星，按 2px 一格往上跳两格再消失，不做淡出 / hook fired: a 7×7 star pops over the card, hopping up in 2px steps and vanishing without a fade */
+.card .hk{position:absolute;left:50%;top:-6px;width:14px;height:14px;margin-left:-7px;image-rendering:pixelated;pointer-events:none;z-index:4;animation:hkA .6s steps(1,end) forwards}
+@keyframes hkA{0%{transform:translateY(0)}20%{transform:translateY(-2px)}40%{transform:translateY(-4px)}85%{transform:translateY(-4px);visibility:visible}100%{transform:translateY(-4px);visibility:hidden}}
+html.calm .card .hk{animation:hkC .5s steps(1,end) forwards}
+@keyframes hkC{0%,90%{visibility:visible}100%{visibility:hidden}}

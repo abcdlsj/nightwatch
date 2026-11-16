@@ -12,11 +12,12 @@ import { apiOn } from '../platform/api';
 
 const VERSION = __APP_VERSION__;
 
-/* 大字、扫描线：挂在 <html> 的 class 上，样式见 base.css / large text and scanlines: classes on <html>, styled in base.css */
+/* 大字、扫描线、减少动态效果：挂在 <html> 的 class 上，样式见 base.css / large text, scanlines and reduced motion: classes on <html>, styled in base.css */
 function applyLook(st: Settings) {
   const c = document.documentElement.classList;
   c.toggle('big', st.big);
   c.toggle('no-crt', !st.crt);
+  c.toggle('calm', st.calm);
 }
 applyLook(SETTINGS);
 onSettings(applyLook);
@@ -25,7 +26,7 @@ onSettings(applyLook);
 export function openSettings(onReset?: () => void, onQuit?: () => void) {
   SFX.play('ui');
   const T = L.ui.settings;
-  const rows: (keyof Settings)[] = ['music', 'sfx', 'haptics', 'shake', 'nums', 'big', 'crt', 'tips', ...(apiOn() ? (['stats'] as const) : [])];
+  const rows: (keyof Settings)[] = ['music', 'sfx', 'haptics', 'shake', 'calm', 'nums', 'big', 'crt', 'tips', ...(apiOn() ? (['stats'] as const) : [])];
   const sh = sheetOpen(`<div class="sh" role="dialog" aria-label="${T.title}"><h3>${T.title}</h3>
     <div class="tlist set-list">${rows
       .map((k) => `<button class="trow set-row" data-k="${k}"><div><b>${(T as any)[k]}</b><span>${(T as any)[k + 'D']}</span></div><i class="tog${SETTINGS[k] ? ' on' : ''}" aria-hidden="true"></i></button>`)

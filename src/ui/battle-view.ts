@@ -11,12 +11,30 @@ import * as field from '../render/field';
 import { FX } from '../render/overlay';
 import { $, restart } from './dom';
 import { elOf, setAmmo, setNum } from './card-view';
-import { updateHUD, toast, banner, tipOnce, holdCenter } from './hud';
+import { updateHUD, toast, banner, tipOnce } from './hud';
+import { LANE, laneTake } from './lane';
 import { say, foeCard } from './voice';
 import { COMBO } from '../data/combos';
 import { ITEMS } from '../data/cards';
+import { Sprite } from '../render/sprites';
+import { SETTINGS } from '../platform/settings';
 
 let chainT = 0;
+
+/* 钩子生效的标记：卡头上冒一颗小星。出手时模拟层先给 bTrig 加一再喊 pop，钩子、连招带动的 pop 不加，靠这个分辨
+ * the hook marker: a small star pops over the card. On a real shot the sim bumps bTrig before calling pop; hook and streak pops don't, which tells them apart */
+const HOOK = new Sprite(['...k...', '..kYk..', '.kkYkk.', 'kYYwYYk', '.kkYkk.', '..kYk..', '...k...']);
+const TRIG = new WeakMap<Card, [unknown, number]>();
+function hookMark(c: Card) {
+  const el = elOf(c);
+  if (!el || el.querySelector('.hk')) return;
+  const i = document.createElement('img');
+  i.className = 'hk';
+  i.src = HOOK.url;
+  i.alt = '';
+  el.appendChild(i);
+  setTimeout(() => i.remove(), SETTINGS.calm ? 500 : 620);
+}
 
 export const domView: SimView = {
   part: field.part,
@@ -40,7 +58,12 @@ export const domView: SimView = {
   },
   cardFx(c, cls) {
     restart(elOf(c), cls);
-    if (cls === 'pop' && c.ox != null) field.muzzle(c.ox, ITEMS[c.key]?.tag || null);
+    if (cls !== 'pop') return;
+    const was = TRIG.get(c);
+    const shot = was && was[0] === B ? c.bTrig !== was[1] : c.bTrig > 0;
+    TRIG.set(c, [B, c.bTrig]);
+    if (!shot) hookMark(c);
+    else if (c.ox != null) field.muzzle(c.ox, ITEMS[c.key]?.tag || null);
   },
   cardFlag: (c, flag, on) => elOf(c)?.classList.toggle(flag, on),
   cardAmmo: setAmmo,
@@ -96,7 +119,8 @@ export const domView: SimView = {
     el.classList.toggle('first', firstEver);
     el.innerHTML = `<small>${firstEver ? L.ui.combo.newFound : L.ui.combo.again}</small><b>${T.n}</b><span>${T.d}</span>`;
     restart(el, 'show');
-    holdCenter(2200);
+    const de = el;
+    laneTake(LANE.discover, 2200, () => de.classList.remove('show'));
     field.hitstop(firstEver ? 0.16 : 0.08);
     SFX.play(firstEver ? 'win' : 'intent');
     buzz(firstEver ? [20, 40, 20] : 15);

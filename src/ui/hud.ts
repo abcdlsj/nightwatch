@@ -9,6 +9,7 @@ import { nightTitle } from '../game/nights';
 import { B } from '../sim/battle';
 import { SFX } from '../audio/sfx';
 import { SETTINGS } from '../platform/settings';
+import { LANE, laneWait, laneTake, laneClear } from './lane';
 import { $, $$, restart } from './dom';
 import { UI } from './state';
 
@@ -79,21 +80,17 @@ export function toast(msg: string) {
   el.classList.toggle('low', G.phase !== 'battle');
   restart(el, 'show');
 }
-/* 战场正中一次只讲一件事：连招报名、大字横幅排队轮流出，不叠在一起
- * the middle of the battlefield says one thing at a time: combo call-outs and banners queue up instead of stacking */
-let centerUntil = 0;
+/* 横幅排队：和连招发现、敌人介绍卡、喊话共用一条道（见 lane.ts），不叠在一起
+ * banners queue up, sharing one lane with combo discoveries, enemy intro cards and shouts (see lane.ts), so they never stack */
 const BQ: [string, string | undefined][] = [];
 let bqT: ReturnType<typeof setTimeout> | null = null;
-export function holdCenter(ms: number) {
-  centerUntil = Math.max(centerUntil, performance.now() + ms);
-}
 export function banner(msg: string, col?: string) {
   if (BQ.length < 2) BQ.push([msg, col]);
   pumpBanner();
 }
 function pumpBanner() {
   if (bqT) return;
-  const wait = centerUntil - performance.now();
+  const wait = laneWait(LANE.banner);
   if (wait > 0) {
     bqT = setTimeout(() => {
       bqT = null;
@@ -107,13 +104,13 @@ function pumpBanner() {
   b.textContent = it[0];
   b.style.color = it[1] || '#fff';
   restart(b, 'show');
-  holdCenter(1000);
+  laneTake(LANE.banner, 1100, () => b.classList.remove('show'));
   if (BQ.length) pumpBanner();
 }
 /** 换场景时清掉还没出的横幅 / drop queued banners when the scene changes */
 export function clearCenter() {
   BQ.length = 0;
-  centerUntil = 0;
+  laneClear();
   if (bqT) clearTimeout(bqT);
   bqT = null;
 }

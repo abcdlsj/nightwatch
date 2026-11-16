@@ -2,6 +2,22 @@
 import { vr, vrnd } from '../core/rng';
 import { $ } from '../ui/dom';
 import { spr } from './sprites';
+import { dotOn } from './dither';
+
+/** 界面层也按像素格画：一格约 3 个 CSS 像素（取整到物理像素），淡出用网点稀疏，不用半透明 / the overlay draws on a pixel grid too: about 3 CSS px per cell (rounded to device pixels), fading by thinning with the dot screen instead of alpha */
+let PX = 3;
+/** 在像素格 (gx, gy) 上点一格；a < 1 时按网点决定点不点 / plot one cell at grid (gx, gy); with a < 1 the dot screen decides */
+function cell(gx: number, gy: number, col: string, a = 1) {
+  if (a < 1 && !dotOn(gx, gy, a)) return;
+  x.fillStyle = col;
+  x.fillRect(gx * PX, gy * PX, PX, PX);
+}
+/** 两点之间按像素格连一条线 / a line between two points, stepped on the pixel grid */
+function gline(x0: number, y0: number, x1: number, y1: number, col: string, a: number) {
+  const g0 = Math.round(x0 / PX), h0 = Math.round(y0 / PX), g1 = Math.round(x1 / PX), h1 = Math.round(y1 / PX);
+  const n = Math.max(Math.abs(g1 - g0), Math.abs(h1 - h0), 1);
+  for (let i = 0; i <= n; i++) cell(Math.round(g0 + ((g1 - g0) * i) / n), Math.round(h0 + ((h1 - h0) * i) / n), col, a);
+}
 
 type Item =
   | { k: 'link'; pts: number[][]; col: string; life: number; max: number; hit?: boolean }
@@ -16,9 +32,12 @@ export function initOverlay() {
   cv = $('#fx') as HTMLCanvasElement;
   x = cv.getContext('2d')!;
   const size = () => {
-    const dpr = Math.min(2, devicePixelRatio || 1);
-    cv.width = innerWidth * dpr;
-    cv.height = innerHeight * dpr;
+    /* 按真实的设备像素比开画布，一格取整到整数个物理像素（DPR 2.625 这类屏上格子不会一宽一窄）
+     * size the canvas at the real device pixel ratio and round a cell to whole device pixels (cells stay even on DPR 2.625 screens) */
+    const dpr = devicePixelRatio || 1;
+    PX = Math.max(1, Math.round(3 * dpr)) / dpr;
+    cv.width = Math.round(innerWidth * dpr);
+    cv.height = Math.round(innerHeight * dpr);
     x.setTransform(dpr, 0, 0, dpr, 0, 0);
     x.imageSmoothingEnabled = false;
   };
@@ -48,7 +67,7 @@ export const FX = {
     for (let i = 0; i < n; i++) {
       const a = vr() * 6.28,
         s = vrnd(60, 200);
-      items.push({ k: 'p', x: cx, y: cy, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, col: vr() < 0.3 ? '#ffffff' : col, life: vrnd(0.35, 0.7), max: 0.7 });
+      items.push({ k: 'p', x: cx, y: cy, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, col: vr() < 0.3 ? '#f4f4f4' : col, life: vrnd(0.35, 0.7), max: 0.7 });
     }
   },
   /** 从元素中心迸溅 / burst from the element's center */
@@ -74,21 +93,13 @@ export const FX = {
         it.x += it.vx * dt;
         it.y += it.vy * dt;
         it.vy += 400 * dt;
-        x.globalAlpha = Math.max(0, it.life / it.max);
-        x.fillStyle = it.col;
-        x.fillRect(Math.round(it.x), Math.round(it.y), 4, 4);
+        cell(Math.round(it.x / PX), Math.round(it.y / PX), it.col, Math.max(0, (it.life / it.max) * 1.6));
       } else if (it.k === 'link') {
         it.life -= dt;
-        x.globalAlpha = Math.max(0, it.life / it.max);
-        x.strokeStyle = it.col;
-        x.lineWidth = 3;
-        x.lineJoin = 'miter';
-        x.beginPath();
-        it.pts.forEach((p, i) => (i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])));
-        x.stroke();
-        x.strokeStyle = '#fff';
-        x.lineWidth = 1;
-        x.stroke();
+        /* 线：元素色一格宽，前半段亮成白色再退回元素色，最后用网点稀疏掉 / the line: one cell of element color, white for the first moment, then thinned out by the dot screen */
+        const a = Math.min(1, (it.life / it.max) * 1.8),
+          col = 1 - it.life / it.max < 0.15 ? '#f4f4f4' : it.col;
+        for (let i = 1; i < it.pts.length; i++) gline(it.pts[i - 1][0], it.pts[i - 1][1], it.pts[i][0], it.pts[i][1], col, a);
         /* 光点沿线跑到接收的卡，在前 60% 的时间里跑完，到了迸一下 / a spark runs along the line to the receiving card, covering the first 60% of the time, then bursts on arrival */
         const k = Math.min(1, (1 - it.life / it.max) / 0.6);
         const f = k * (it.pts.length - 1),
@@ -99,11 +110,10 @@ export const FX = {
         const hx = ax + (bx - ax) * r,
           hy = ay + (by - ay) * r;
         if (k < 1) {
-          x.globalAlpha = 1;
-          x.fillStyle = it.col;
-          x.fillRect(Math.round(hx) - 4, Math.round(hy) - 4, 8, 8);
-          x.fillStyle = '#fff';
-          x.fillRect(Math.round(hx) - 2, Math.round(hy) - 2, 4, 4);
+          const gx = Math.round(hx / PX),
+            gy = Math.round(hy / PX);
+          for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) cell(gx + dx, gy + dy, it.col);
+          cell(gx, gy, '#f4f4f4');
         } else if (!it.hit) {
           it.hit = true;
           hits.push([hx, hy, it.col]);
@@ -115,12 +125,10 @@ export const FX = {
           e = k * k * (3 - 2 * k);
         const px = it.x0 + (it.x1 - it.x0) * e,
           py = it.y0 + (it.y1 - it.y0) * e - Math.sin(k * Math.PI) * 40;
-        x.globalAlpha = 1;
         x.drawImage(spr('coin').cv, Math.round(px - 8), Math.round(py - 8), 16, 16);
         it.life = k >= 1 ? -1 : 1;
       }
     }
-    x.globalAlpha = 1;
     for (const [hx, hy, col] of hits.splice(0)) this.burst(hx, hy, col, 6);
     items = items.filter((it) => (it.k === 'coin' ? it.t < 0 || (it.life ?? 1) > 0 : it.life > 0));
   },

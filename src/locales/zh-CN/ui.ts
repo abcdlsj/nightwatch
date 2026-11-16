@@ -490,6 +490,8 @@ export default {
     hapticsD: '合成、城墙挨打时手机震一下',
     shake: '震屏',
     shakeD: '爆炸、暴击时战场晃一下',
+    calm: '减少动态效果',
+    calmD: '关掉命中定格、闪光、卡牌弹跳和开战幕布',
     nums: '伤害数字',
     numsD: '战场上飘出来的伤害数字',
     big: '大字',

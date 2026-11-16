@@ -10,6 +10,4 @@
   .ifoe span{display:none}.ifoe{grid-template-rows:auto}.ifoe{grid-template-columns:16px auto 1fr}.ifoe img{grid-row:auto;width:16px;height:16px}.ready{gap:5px}
 }
 #prep.talking #preview{display:none}
-@media (prefers-reduced-motion: reduce){
-  .card .inner,.logo span,.card.t3 .holo{animation:none}
-}
+html.calm .card .inner,html.calm .logo span,html.calm .card.t3 .holo{animation:none}

@@ -1,5 +1,6 @@
 /* 玩家设置（存在 chain-settings）。旧版只有声音三档（chain-audio），第一次读时迁移过来 / Player settings (stored under chain-settings). The old version only had three sound levels (chain-audio); migrate on first read */
 import { store, KEYS } from './storage';
+import { RM } from './env';
 
 export interface Settings {
   music: boolean;
@@ -17,11 +18,13 @@ export interface Settings {
   big: boolean;
   /** 扫描线（屏幕上的横纹和暗角） / scanlines (horizontal lines and vignette over the screen) */
   crt: boolean;
+  /** 减少动态效果：关掉命中停顿、闪光、震屏、卡牌弹跳和幕布过场；默认跟系统的「减弱动态效果」 / reduce motion: no hit-stop, flashes, shake, card bounces or curtain transitions; defaults to the system's reduced-motion setting */
+  calm: boolean;
 }
 
 function load(): Settings {
   const old = +(store.get(KEYS.audio) || 0) || 0;
-  const d: Settings = { music: old === 0, sfx: old < 2, haptics: true, shake: true, nums: true, tips: true, stats: true, big: false, crt: true };
+  const d: Settings = { music: old === 0, sfx: old < 2, haptics: true, shake: true, nums: true, tips: true, stats: true, big: false, crt: true, calm: RM };
   return Object.assign(d, store.json<Partial<Settings>>(KEYS.settings, {}));
 }
 export const SETTINGS: Settings = load();
