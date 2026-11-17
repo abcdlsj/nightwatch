@@ -12,11 +12,11 @@ import { SETTINGS, onSettings } from '../platform/settings';
 
 /** 每档的目标字号（CSS 像素）；第二个数是开了「大字」时的目标 / each step's target size in CSS px; the second number is the target with Large text on */
 const STEPS: Record<string, [number, number]> = {
-  s: [12, 14], // 小字：角标、标签 / small: badges, labels
-  b: [14, 17], // 正文 / body
-  m: [17, 19], // 按钮、卡名旁的说明 / buttons, captions
-  l: [22, 22], // 小标题 / subheadings
-  xl: [28, 28], // 页面标题 / page titles
+  s: [12, 15], // 小字：角标、标签 / small: badges, labels
+  b: [15, 21], // 正文 / body
+  m: [18, 22], // 按钮、卡名旁的说明 / buttons, captions
+  l: [22, 25], // 小标题 / subheadings
+  xl: [28, 30], // 页面标题 / page titles
   h1: [38, 38], // 横幅大字 / banner type
   h2: [46, 46], // 连招发现 / combo discovery
   h3: [60, 60], // 英文标志 / English logo

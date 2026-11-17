@@ -6,15 +6,15 @@
 .layer[hidden]{display:none}
 #prep{background:#0c181b}
 
-#preview{background:#0a1316;padding:6px 8px;display:flex;flex-direction:column;gap:5px;flex:none}
+#preview{background:#0a1316;padding:7px 9px;display:flex;flex-direction:column;gap:6px;flex:none}
 #preview .ph{display:flex;align-items:baseline;gap:8px}
 #preview .ph span{font-size:var(--t-s);color:var(--muted)}
 #preview .ph b{font-size:var(--t-m);font-weight:400}
-#pvList{display:flex;flex-wrap:wrap;gap:4px;max-height:58px;overflow:hidden}
+#pvList{display:flex;flex-wrap:wrap;gap:4px;max-height:76px;overflow-y:auto}
 .pv{display:inline-flex;align-items:center;gap:2px;background:rgba(255,255,255,.07);border-radius:3px;padding:1px 6px 1px 1px;font-family:var(--px);font-size:var(--t-s)}
 .pv img{width:32px;height:32px;image-rendering:pixelated}
 .pv.elite{background:rgba(226,71,59,.35);box-shadow:inset 0 0 0 2px rgba(255,120,100,.5)}
-#pvNote{font-size:var(--t-b);color:#ffc3b8;line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+#pvNote{font-size:var(--t-b);color:#ffc3b8;line-height:1.45;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 #pvNote:empty{display:none}
 #pvNote b{color:#ffe0a8;font-weight:normal}
 #pvNote b.next{color:#9ad8ff}
@@ -22,15 +22,15 @@
 #shopHead{display:flex;align-items:center;gap:6px}
 #shopHead h2{margin:0;font-weight:400;font-size:var(--t-l);flex:1;text-shadow:0 2px 0 rgba(0,0,0,.5)}
 #offers{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;justify-content:center;min-height:0}
-.offer{position:relative;background:var(--panel2);border-radius:3px;padding:12px 4px 8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;
+.offer{position:relative;background:var(--panel2);border-radius:3px;padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;
   box-shadow:0 4px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.05);min-height:0}
-.offer .oname{font-size:var(--t-b);margin-top:2px}
+.offer .oname{font-size:var(--t-b);margin-top:2px;text-align:center}
 .offer .oname .fg{display:block;font-size:var(--t-s);color:#9ad8ff}
 .offer .oadj{font-size:var(--t-s);min-height:15px}
 .offer .osz{font-size:var(--t-s);color:var(--muted)}
 .offer .oflav{display:none}
 .price.free{color:#9bf0b8;background:#173a28}
-.offer .odesc{font-family:var(--body);font-size:var(--t-s);line-height:1.35;color:#c5d2d6;text-align:center;padding:0 2px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.offer .odesc{font-family:var(--body);font-size:var(--t-s);line-height:1.45;color:#dce5e8;text-align:center;padding:0 2px}
 /* 三张货并排时逐行对齐：卡图同高、名字同一行、价格贴底；卡图不缩放，像素保持清楚 / align rows when three items sit side by side: equal art height, names on one line, prices at the bottom; art is never scaled so pixels stay crisp */
 .offer .card.static{margin-bottom:6px}
 .offer .price{margin-top:auto}

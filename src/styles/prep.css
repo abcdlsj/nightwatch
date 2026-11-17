@@ -29,7 +29,7 @@
 .door div,.opt div{display:flex;flex-direction:column;gap:3px;min-width:0}
 .door b{font-weight:400;font-size:var(--t-l);color:var(--cc)}
 .door span{font-size:var(--t-b)}
-.door em,.ev-head em,.opt em,.flav{font-family:var(--body);font-size:var(--t-b);color:#8fa4ab;line-height:1.4}
+.door em,.ev-head em,.opt em,.flav{font-family:var(--body);font-size:var(--t-b);color:#a8bcc2;line-height:1.5}
 .nextstop{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:var(--t-s);color:var(--muted)}
 .nextstop i{font-style:normal;display:flex;align-items:center;gap:3px;color:var(--cc,#c9d4d8);background:rgba(0,0,0,.25);border-radius:3px;padding:2px 7px 2px 3px}
 .nextstop img{width:16px;height:16px;image-rendering:pixelated}
@@ -41,16 +41,16 @@
 .ev-btns{display:flex;gap:8px;margin-top:auto;padding-top:8px;position:sticky;bottom:0;background:#0c161a;box-shadow:0 -2px 0 #0c161a}.ev-btns .btn{flex:1}
 .ev-btns small{font-size:var(--t-s);opacity:.8}
 .opts{display:flex;flex-direction:column;gap:7px}
-.opt{display:flex;align-items:center;gap:10px;text-align:left;color:#fff;border:0;border-radius:3px;padding:6px 10px;background:var(--panel2);
+.opt{display:flex;align-items:center;gap:10px;text-align:left;color:#fff;border:0;border-radius:3px;padding:8px 10px;background:var(--panel2);
   box-shadow:0 4px 0 rgba(0,0,0,.5);cursor:pointer;animation:doorIn .3s backwards;min-height:56px;flex:none}
 .opt:active{transform:translateY(3px)}
 .opt .oc{flex:none;display:flex;justify-content:center;min-width:46px}
 .opt .oc .card.static{pointer-events:none;height:78px}
 .opt b{font-weight:400;font-size:var(--t-m)}
-.opt span{font-family:var(--body);font-size:var(--t-b);color:#c5d2d6;line-height:1.4}
+.opt span{font-family:var(--body);font-size:var(--t-b);color:#dce5e8;line-height:1.5}
 /* 图标都是 16 格，显示尺寸取整倍（32 / 48），不糊 / icons are all 16 cells; display sizes are integer multiples (32 / 48) to stay crisp */
 .ricon{width:44px;height:44px;image-rendering:pixelated;background:rgba(0,0,0,.3);border-radius:3px;padding:6px;flex:none;box-shadow:inset 0 0 0 2px var(--gc,transparent)}
-.mg,.mb{display:block;font-style:normal;font-family:var(--body);font-size:var(--t-b);line-height:1.45}
+.mg,.mb{display:block;font-style:normal;font-family:var(--body);font-size:var(--t-b);line-height:1.5}
 .mg{color:#8ff0b0}.mb{color:#ff8a80}
 .gt{font-size:var(--t-s);margin-left:6px;padding:1px 5px;border-radius:2px;background:rgba(255,255,255,.1);color:var(--gc,#c5d2d6);vertical-align:middle}
 .gt.fit{background:rgba(126,232,162,.18);color:#7ee8a2}
@@ -64,7 +64,7 @@
 .big-res small{font-size:var(--t-b);color:var(--muted)}
 .ready{margin:auto 0;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
 .rd-t{font-size:var(--t-h1);color:#9bf0b8;text-shadow:0 3px 0 rgba(0,0,0,.5);animation:doorIn .4s}
-.ready p{margin:0;font-size:var(--t-m)}.ready .muted{font-size:var(--t-s);color:var(--muted);max-width:300px;font-family:var(--body)}
+.ready p{margin:0;font-size:var(--t-m)}.ready .muted{font-size:var(--t-b);color:var(--muted);max-width:340px;line-height:1.45;font-family:var(--body)}
 .sh .flav{margin:0;padding:0 2px}
 #goBtn.bump{animation:bump .4s}
 @keyframes doorIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}

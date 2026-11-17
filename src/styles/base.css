@@ -8,7 +8,7 @@
 /* 箭头、音符：标题字体里没有，iOS 回退系统字体时会显示成空白，统一用缝合像素画 / arrows and note symbols: missing from the title font and blank when iOS falls back to system fonts, so draw them with Fusion Pixel */
 @font-face{font-family:'PixSym';src:url(/fonts/fusion.woff2) format('woff2');unicode-range:U+2190-21FF,U+2660-267F;font-weight:100 900;font-display:swap}
 :root{
-  --bg:#0f1c20; --panel:#1c2a30; --panel2:#25363d; --edge:#3a525c; --ink:#fbf7ee; --muted:#9fb3ba;
+  --bg:#0f1c20; --panel:#1c2a30; --panel2:#25363d; --edge:#3a525c; --ink:#fbf7ee; --muted:#adc0c7;
   --red:#e2473b; --blue:#2c8fe0; --gold:#f2a93b; --green:#35a86b; --purple:#8e5bd8;
   --card:#f0e4c7; --cink:#2a2130;
   --zh:'PixNum','PixSym','Pixelify Sans','Fusion Pixel','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif;

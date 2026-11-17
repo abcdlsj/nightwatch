@@ -2,6 +2,7 @@
 /* 顶栏高度固定 27px：战场高度由它决定，而战场尺寸会进模拟，换字体、换边框都不能让它变 / the top bar is pinned at 27px: it sets the battlefield height, which feeds the sim, so font or frame changes must not move it */
 #top{display:flex;gap:6px;align-items:stretch;height:27px;flex:none}
 #top .chip{padding-top:0;padding-bottom:0;font-size:var(--t-m)}
+#top .btn.sm{padding-top:0;padding-bottom:0}
 .chip{display:flex;align-items:center;gap:5px;background:var(--panel);border-radius:3px;padding:3px 9px;
   box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,255,255,.06);font-family:var(--px);font-size:var(--t-l);line-height:1}
 .chip .lbl{font-family:var(--zh);font-size:var(--t-s);color:var(--muted)}

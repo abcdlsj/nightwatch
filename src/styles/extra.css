@@ -22,7 +22,7 @@
 .hero.locked .por{filter:brightness(.4)}
 .hpaths{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
 .scr>.hpaths{justify-content:center}
-.hpaths span{font-size:var(--t-s);padding:2px 7px;border-radius:3px;background:rgba(255,255,255,.06);color:#7d8d93}
+.hpaths span{font-size:var(--t-s);padding:2px 7px;border-radius:3px;background:rgba(255,255,255,.06);color:#9fb3ba}
 .hpaths span.on{background:rgba(255,209,102,.16);color:#ffe79a}
 .hpaths small{margin-left:4px;font-size:var(--t-s);opacity:.8}
 
@@ -37,7 +37,7 @@
 .card.carry .inner{box-shadow:0 0 0 2px #ffd166,0 0 0 2px rgba(255,209,102,.55)}
 .card .cw{position:absolute;right:-5px;top:-7px;width:17px;height:17px;border-radius:2px;background:#ffd166;color:#1a1c2c;font-size:var(--t-s);line-height:17px;text-align:center;box-shadow:0 2px 0 rgba(0,0,0,.4);z-index:3}
 /* iOS Safari：装到主屏的提示 / iOS Safari: the add-to-home-screen hint */
-.ioshint{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:2px dashed var(--edge);border-radius:3px;background:rgba(15,28,32,.7);color:var(--muted);font-family:var(--body);font-size:var(--t-b);line-height:1.5;text-align:left}
+.ioshint{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:2px dashed var(--edge);border-radius:3px;background:rgba(15,28,32,.7);color:#c5d2d6;font-family:var(--body);font-size:var(--t-b);line-height:1.55;text-align:left}
 .ioshint span{flex:1}
 .ioshint .btn{flex:none;min-width:32px}
 /* 起手页顶上：完整游戏线 / top of the opening page: full game line */
@@ -61,7 +61,7 @@
 .daily-send input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--edge);border-radius:3px;background:rgba(0,0,0,.35);color:var(--ink);font:16px var(--body);user-select:text;-webkit-user-select:text}
 .daily-send .btn{flex:none}
 .dboard{max-height:50vh;overflow:auto;margin:8px 0;touch-action:pan-y;-webkit-overflow-scrolling:touch}
-.dboard table{width:100%;border-collapse:collapse;font:14px var(--body)}
+.dboard table{width:100%;border-collapse:collapse;font-family:var(--body);font-size:var(--t-b)}
 .dboard th{position:sticky;top:0;background:var(--panel);color:var(--muted);font-weight:400;text-align:left;padding:4px 6px}
 .dboard td{padding:4px 6px;border-top:1px solid rgba(255,255,255,.06);white-space:nowrap}
 .dboard td:nth-child(2){max-width:9em;overflow:hidden;text-overflow:ellipsis}
@@ -85,7 +85,7 @@ html.calm #discover.show{animation:discF 2.2s linear forwards}@keyframes discF{0
 /* 天性 / hero nature */
 .hsig{grid-column:1/-1;display:flex;flex-direction:column;gap:2px;text-align:left;margin:6px 0 2px;padding:6px 9px;border-radius:3px;background:rgba(0,0,0,.28);box-shadow:inset 0 0 0 1px var(--hc,#ffd166)}
 .hsig b{font-weight:400;font-size:var(--t-b);color:var(--hc,#ffd166)}
-.hsig span{font-size:var(--t-s);line-height:1.4}
+.hsig span{font-size:var(--t-b);line-height:1.45}
 .hsig-l{margin-bottom:8px}
 /* 模组世界的卡面角标：版本、增强、计分（子夜牌局） / mod-world card badges: edition, enhancement, scoring (Midnight Deal) */
 .card .wb{display:contents}

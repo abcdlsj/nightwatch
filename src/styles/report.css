@@ -9,7 +9,7 @@
 .rp-row .bar i{display:block;height:100%;background:var(--tagc);width:0;transition:width .6s cubic-bezier(.2,.9,.3,1)}
 .rp-row b{font-family:var(--px);font-size:var(--t-b);text-align:right;min-width:62px}
 .rp-row b small{color:var(--muted);font-size:var(--t-s);margin-left:3px;font-weight:400}
-.rp-src{grid-column:2/-1;margin-top:-3px;font-family:var(--body);font-size:var(--t-b);line-height:1.3;color:#9fb3ba}
+.rp-src{grid-column:2/-1;margin-top:-2px;font-family:var(--body);font-size:var(--t-b);line-height:1.4;color:#b8c8cd}
 .rp-row b em{font-style:normal;font-family:var(--zh);font-size:var(--t-s);color:#8ff0c8}
 .rp-meta{text-align:center;font-size:var(--t-b);color:var(--muted)}
 .rp-meta b{font-family:var(--px);color:#e0c8ff}
@@ -27,8 +27,8 @@
 .rp-legend{text-align:right;font-size:var(--t-s);color:var(--muted);margin-bottom:-2px}
 .rp-meta b small{font-size:var(--t-s);margin-left:2px;color:var(--muted)}
 /* 战报分页：按卡牌 / 今夜来源 / 整局来源 / report tabs: by card / tonight by source / run by source */
-.rp-tabs{display:flex;gap:4px;justify-content:center}
-.rp-tabs button{font-family:var(--zh);font-size:var(--t-s);color:var(--muted);background:rgba(255,255,255,.06);border:0;border-radius:3px;padding:4px 10px;cursor:pointer}
+.rp-tabs{display:flex;gap:6px;justify-content:center}
+.rp-tabs button{font-family:var(--zh);font-size:var(--t-b);color:var(--muted);background:rgba(255,255,255,.06);border:0;border-radius:3px;padding:6px 12px;cursor:pointer}
 .rp-tabs button.on{color:#1a1c2c;background:#ffd166}
 #report [data-for][hidden]{display:none}
 .rs-total{text-align:center;font-size:var(--t-s);color:var(--muted)}
@@ -39,7 +39,7 @@
 .rs-row .bar i{display:block;height:100%;background:var(--tagc);width:0;transition:width .6s cubic-bezier(.2,.9,.3,1)}
 .rs-row b{font-family:var(--px);font-size:var(--t-b);text-align:right;min-width:62px}
 .rs-row b small{color:var(--muted);font-size:var(--t-s);margin-left:4px;font-weight:400}
-.rs-cards{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:-2px;font-family:var(--body);font-size:var(--t-b);color:#9fb3ba}
+.rs-cards{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:-2px;font-family:var(--body);font-size:var(--t-b);line-height:1.4;color:#b8c8cd}
 .rs-cards span{display:flex;align-items:center;gap:3px}
 .rs-cards img{width:16px;height:16px;image-rendering:pixelated}
 .dmgsrc small{color:var(--muted);font-size:var(--t-s);align-self:center}

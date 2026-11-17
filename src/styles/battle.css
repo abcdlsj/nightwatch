@@ -44,7 +44,7 @@
 .achpop small{font-size:var(--t-s);color:#ffd166;letter-spacing:2px}.achpop b{font-weight:400;font-size:var(--t-m);color:#ffe79a}.achpop span{font-size:var(--t-s);color:#c9bda8;text-align:center}
 @keyframes achA{0%{opacity:0;transform:translate(-50%,-12px)}8%{opacity:1;transform:translate(-50%,0)}85%{opacity:1}100%{opacity:0}}
 #sheet.top{z-index:90}
-.trow.ach:not(.got){opacity:.6}.trow.ach span{font-size:var(--t-s);color:#c5d2d6}
+.trow.ach:not(.got){opacity:.78}.trow.ach span{font-size:var(--t-b);line-height:1.45;color:#cfd9dc}
 .heatsel{display:flex;align-items:center;gap:8px;width:100%;background:rgba(10,16,22,.75);border-radius:3px;padding:6px 8px;box-shadow:inset 0 0 0 2px rgba(255,138,91,.35)}
 .heatsel div{flex:1;display:flex;flex-direction:column;text-align:left}.heatsel b{font-weight:400;font-size:var(--t-m);color:#ff8a5b}
 .heatsel small{font-size:var(--t-b);color:#c9bda8;line-height:1.45}.heatsel i{font-style:normal;color:#ffd166;font-family:var(--px)}
