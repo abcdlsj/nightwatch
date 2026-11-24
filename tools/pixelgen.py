@@ -3184,9 +3184,10 @@ def card_art():
 
 # ---------------------------------------------------------------- 人物立绘 32×32
 # 主角 5 人 + 守卫逐像素手绘（32×32），再由 outline_rows() 统一补 1px 外描边 k；
-# 内部绝不留 '.'（避免自动外描边在脸/发/衣交界切出硬黑缝），统一左上主光源。
+# 全部严格对齐中轴 x=16（脸部 10..22，左眼 12..14，鼻梁 15..17，右眼 18..20），
+# 内部绝不留 '.'，统一左上主光源，杜绝五官错位或斜眼扭曲。
 HERO_PORTRAITS = {
-    # 艾拉：老兵守夜人——铜橙短发侧扎小马尾、剑眉伤疤、坚毅目光、厚红围巾、铆钉精钢护肩
+    # 艾拉：老兵守夜人——铜橙短发侧扎小马尾、剑眉斜疤、坚毅琥珀眼、厚红围巾、铆钉精钢护肩
     'p_ayla': (
         '................................',
         '...........OoyoOO...............',
@@ -3196,17 +3197,17 @@ HERO_PORTRAITS = {
         '......ooyoOOoOooOoOOoO..........',
         '......ooOoOOoOooOoOOoO..........',
         '.....oooOOiifffffFOOoOO.........',
-        '.....ooOOiifffFfFFOOoOOy........',
-        '.....OoOOiuuufFFuBOuOoOyyo......',
-        '.....OOOfifffFfffBFFOOoOooo.....',
-        '.....OOOiMMkFfffMMkBOOooOooo....',
-        '.....fOOifwkfffffwkBOOoOOoOo....',
-        '.....fFOiiffFFffFFBFOO.oOOoO....',
-        '.....yFOiiffFFffFFBFO..oOOoO....',
-        '......FO.iiffFFffBFO....OOo.....',
-        '.......F..iifSFFBFF......O......',
-        '..........iiffBSSFF.............',
-        '...........ffFFFFF..............',
+        '.....ooOOiiffffffFFOOoOOy.......',
+        '.....OoOOiifffffFFFOOoOyyo......',
+        '.....OOOiMuuufFFuuuBOoOoooo.....',
+        '.....OOOiiffffFFfffBOOoOoooo....',
+        '.....fOOifMwkfffwkMBFOOoOOoOo...',
+        '.....fFOiffOkfffOkfBFO..oOOoO...',
+        '.....yFOiifffFfffFfBFO..oOOoO...',
+        '......FOiifffFffffFBFO...OOo....',
+        '.......FOiiffFffffFFO.....O.....',
+        '.........iifBSSBFF..............',
+        '..........iifFFFF...............',
         '..........rRRFFSSrr.............',
         '.........oRRRRRRRRrru...........',
         '........oRRrRRRRRRrruu..........',
@@ -3221,180 +3222,180 @@ HERO_PORTRAITS = {
         '..HHHHHHssHHHssHrrRRruHHHHH.....',
         '..HHHHHHssHHHssHuuRRruHHHHH.....',
     ),
-    # 墨：流亡炼金师——深紫兜帽、额前黄铜青镜护目镜、凌乱暗发、青光锐眼与黑眼圈、歪嘴笑、胸前发光绿药瓶与气泡
+    # 墨：流亡炼金师——深紫兜帽、对称黄铜青镜护目镜、凌乱暗发、青光锐眼与倦容、歪嘴笑、胸前冒泡绿药瓶
     'p_mo': (
         '................................',
-        '............PQQp................',
-        '.........PPQQQppqq..............',
-        '.......PPQQppppppqqq............',
-        '......PQppqqMMMMqqpqq...........',
-        '.....PQpqMMaaAAaaMMpqq..........',
-        '....PQpqMaAAaaaaAaMMpqq.........',
-        '....PpqaAyyyyaayyyyAmpq.........',
-        '...PQpqaMywCyNMywCyMmpqq........',
-        '...PpqMaMyCcyyMyCcyMmpqq........',
-        '...PpqMaaMNNNaaMNNNaApqq........',
-        '...PpqMAaaiiffffFFaAMpqq........',
-        '...PpqMaaiMMkffMMkFaMpqq........',
-        '...PpqaMaiwCfffwCFaMMpqq........',
-        '...PpqMaaiFffFfFFfFaMpqq........',
-        '...ppqMaaaiifffFFfFFMpqq........',
-        '...ppqMaaaiffFFfFFFMMpqq........',
-        '....pqMaaaifffSSBFFMMpqq........',
-        '....qqMMaaafffffFFMMqqq.........',
-        '.....qqqMMaFFFSSFFMMqqq.........',
-        '.....qqqMMqqMyYyMqqMqqq.........',
-        '....PPQppqqqqMyMqqqqppqq........',
-        '...PPQQpppqqqHyHqqqpppqqq.......',
-        '..PPQQpppqqqHHgHHqqqpppqqq......',
-        '..PQQpppqqqHlHwHHqqqpppqqq......',
-        '.PPQpppqqqHHHwllHHlHqqppqqq.....',
-        '.PQpppqqqHHHwllGGHHHqqpppqq.....',
-        '.PQppqqqHHlHwllGGtHHqqpppqq.....',
-        '.QpqqqqHHHHHGllGtHlHHqqqqqq.....',
-        '.QppqqHHHHHHHtttHHHHHHqqqqq.....',
-        '.pqqqqHHHHHHHHHHHHHHHHqqqqq.....',
-        '.qqqqqHHHHHHHHHHHHHHHHqqqqq.....',
+        '.............PQQp...............',
+        '..........PPQQQppqq.............',
+        '........PPQQppppppqqq...........',
+        '.......PQppqqMMMMqqpqq..........',
+        '......PQpqMMaaAAaaMMpqq.........',
+        '.....PQpqMaAAaaaaAaMMpqq........',
+        '.....PpqaAyyyyaaayyyyAmpq.......',
+        '....PQpqaMywCyNMMywCyMmpqq......',
+        '....PpqMaMyCcyyMMyCcyMmpqq......',
+        '....PpqMaaMNNNaaaMNNNaApqq......',
+        '....PpqMAaaiifffffFFaAMpqq......',
+        '....PpqMaaiMwkffffwkMaMpqq......',
+        '....PpqaMaiiCkffffCkiMMpqq......',
+        '....PpqMaaiFFffFffFFFaMpqq......',
+        '....ppqMaaaiiffFfffFFFMpqq......',
+        '....ppqMaaaifffffBFFFFMpqq......',
+        '.....pqMaaaifffSSBFffMMpqq......',
+        '.....qqMMaaafffffFFFFMMqq.......',
+        '......qqqMMaFFFFSSFFMMqqq.......',
+        '......qqqMMqqMyYyMqqMMqq........',
+        '.....PPQppqqqqMyMqqqqppqq.......',
+        '....PPQQpppqqqHyHqqqpppqqq......',
+        '...PPQQpppqqqHHgHHqqqpppqqq.....',
+        '...PQQpppqqqHlHwHHqqqpppqqq.....',
+        '..PPQpppqqqHHHwllHHlHqqppqqq....',
+        '..PQpppqqqHHHwllGGHHHqqpppqq....',
+        '..PQppqqqHHlHwllGGtHHqqpppqq....',
+        '..QpqqqqHHHHHGllGtHlHHqqqqqq....',
+        '..QppqqHHHHHHHtttHHHHHHqqqqq....',
+        '..pqqqqHHHHHHHHHHHHHHHHqqqqq....',
+        '..qqqqqHHHHHHHHHHHHHHHHqqqqq....',
     ),
-    # 萤：灯匠学徒——墨蓝波波头、金色齿轮发簪（紧贴发侧）、大亮眼红颊甜笑、暖黄围巾、左下高提发光萤灯与暖光反照
+    # 萤：灯匠学徒——墨蓝波波头、紧贴发侧金色齿轮发簪、大亮暖瞳与红颊甜笑、暖黄围巾、左下高提发光萤灯
     'p_ying': (
         '................................',
-        '...........aAAaaaa..............',
-        '.........aAAAssAAaaa............',
-        '........aAAsAAAAaaaaay.Y........',
-        '.......aAAaaAAAAaaaayYYYy.......',
-        '......aAAaaaaaaaaaaYYaYYy.......',
-        '......aAaaaAAaaaAAaayYYYy.......',
-        '.....aAAaaAaaAAaaAaaay.Y........',
-        '.....aAaaaiifffffFFaaa..........',
-        '.....aAaaiifffFffffFaa..........',
-        '.....aAaaiSSafffaSSaaa..........',
-        '.....aAaiifMMkfffMMkFa..........',
-        '.....aAaiifwNffffwNFFa..........',
-        '.....aAaiifvNffffvNFFa..........',
-        '.....AaaiBifffFFffBFFa..........',
-        '.....vaaaifBffFFfBFFFa..........',
-        '.....vaaaiiffBSSBFFFaM..........',
-        '......vaaaaiifffffFaMM..........',
-        '......aaMMaafffFFFFMMM..........',
-        '.....sddMMvvYYYYyyNNMM..........',
-        '....d..svYYYYYYyyyNNn...........',
-        '...dsddsvYYyYYYYyyNNnn..........',
-        '..sddddsvYyyYYYYyyNNnnn.........',
-        '..dyYYydvNyyYYYYynNNnnnn........',
-        '.sdYwwYdvwwvYYYYvwwnnnnnn.......',
-        '.sdYwwYdvNwwvvvwwnnNnnnnn.......',
-        '.sdyYYydmNnnwwwwnnnNnnnnnn......',
-        '..sddddmmNnnwwwwnnnNnnnnnn......',
-        '...NNNNmmNnnwwwwnnnnNnnnnn......',
-        '...nnnnmmNnnwwwwnnnnnnmmmm......',
-        '...nnnnmmNnnwwwwnnnnnnmmmm......',
-        '...mmmmmmmnnwwwwnnnnmmmmmm......',
+        '............aAAaaaa.............',
+        '..........aAAAssAAaaa...........',
+        '.........aAAsAAAAaaaaay.Y.......',
+        '........aAAaaAAAAaaaayYYYy......',
+        '.......aAAaaaaaaaaaaYYaYYy......',
+        '.......aAaaaAAaaaAAaayYYYy......',
+        '......aAAaaAaaAAaaAaaay.Y.......',
+        '......aAaaaiifffffFFaaa.........',
+        '......aAaaiifffffffFFaa.........',
+        '......aAaaiSSafffaSSaaa.........',
+        '......aAaaiffffffffFFaa.........',
+        '......aAaifMwkffffwkMFFa........',
+        '......aAaiifnkffffnkFFFa........',
+        '......AaaiBffffFffffBFFa........',
+        '......vaaaiffffFffffFFFa........',
+        '......vaaaiifBfffBFFFFaM........',
+        '.......vaaaiffSSSFFFaaMM........',
+        '.......aaMMaaffFFFFFaMMM........',
+        '......sddMMvvYYYYyyNNMM.........',
+        '.....d..svYYYYYYyyyNNn..........',
+        '....dsddsvYYyYYYYyyNNnn.........',
+        '...sddddsvYyyYYYYyyNNnnn........',
+        '...dyYYydvNyyYYYYynNNnnnn.......',
+        '..sdYwwYdvwwvYYYYvwwnnnnnn......',
+        '..sdYwwYdvNwwvvvwwnnNnnnnn......',
+        '..sdyYYydmNnnwwwwnnnNnnnnnn.....',
+        '...sddddmmNnnwwwwnnnNnnnnnn.....',
+        '....NNNNmmNnnwwwwnnnnNnnnnn.....',
+        '....nnnnmmNnnwwwwnnnnnnmmmm.....',
+        '....nnnnmmNnnwwwwnnnnnnmmmm.....',
+        '....mmmmmmmnnwwwwnnnnmmmmmm.....',
     ),
-    # 石钧：城防匠——宽肩方脸、旧麻头巾飘带、浓眉稳目、短须、粗布工衣、铆钉皮围裙、肩扛重石锤
+    # 石钧：城防匠——居中宽肩方脸、旧麻头巾飘带、浓眉稳目、短须、粗布工衣、铆钉皮围裙、肩扛斜面重石锤
     'p_jun': (
         '................................',
         '................................',
-        '..........xmmxxxx...............',
-        '........xxmmmmmxxxx.............',
-        '.......xmxxmmmmmxxxx............',
-        '......xJJJJJJJJJJJNN............',
-        '......JvJJJJJJJJJNNNNNNn........',
-        '......JNNNNNNNNNNNNnNNNnn.......',
-        '......xnnnnnnnnnnnnx.Nnnx.......',
-        '......xxiiffffffFFxx............',
-        '......xxiMxxxffxxxx.....whhhg...',
-        '.....fxxifMMkffMMkx....hhggggs..',
-        '.....fFxifwmfffwmFx....ggggssd..',
-        '.....FFxiiffFFfFFFx....ggssssd..',
-        '......FxiiffSffFFFx....ssssddd..',
-        '......FximifSSfFFmx....sdddddH..',
-        '.......xmmmxSSxmmm......nN......',
-        '.......xmmSSBBSSmm.....nN.......',
-        '.......xmmmxxxxmmm.....nN.......',
-        '........xmmmmmmmx.....nN........',
-        '........FFmmmmmFF.....nN........',
-        '....hhg..FFFFFFF..gghnN.........',
-        '...hgggsgmNNNNNmgsgggnN.........',
-        '..hggggsgmnnnnNmgsggnNg.........',
-        '..ggssgsgmNNNNnmgsgnNgg.........',
-        '.hgsggssgmnYnnYmgssNNggs........',
-        '.ggssssdgmnnnnmmgssNsssd........',
-        '.gsssssdgmnxxmmngsdNsssd........',
-        '.ssssdddgmnggmnngddNsddd........',
-        '.ssssdddgmnxxmmngddNsddd........',
-        '.dddddddgmnnnnnngddNdddd........',
-        '.dddddddgmmmmmmmgddNdddd........',
+        '............xmmxxxx.............',
+        '..........xxmmmmmxxxx...........',
+        '.........xmxxmmmmmxxxx..........',
+        '........xJJJJJJJJJJJJNN.........',
+        '........JvJJJJJJJJJJNNNNNn......',
+        '........JNNNNNNNNNNNNnNNNnn.....',
+        '........xnnnnnnnnnnnnx.Nnnx.....',
+        '........xxiifffffffFFxx.........',
+        '........xxiMxxxfFxxxxFx..whhhg..',
+        '.......fxxiiffffffFFFxx.hhggggs.',
+        '.......fFxifMkMfffMkMfx.ggggssd.',
+        '.......FFxifwkfffffkwFx.ggssssd.',
+        '........FxiifffFffffFFx.ssssddd.',
+        '........FximiffSffffFmx.sdddddH.',
+        '.........xmmmmmmmFmmmm....nN....',
+        '.........xmmfSSSFmmmm....nN.....',
+        '.........xmmmmmmmmmmm....nN.....',
+        '..........xmmmmmmmmx....nN......',
+        '..........FFmmmmmmFF....nN......',
+        '.....hhg...FFFFFFF...gghnN......',
+        '....hgggsgmNNNNNNNmgsgggnN......',
+        '...hggggsgmnnnnnnNmgsggnNg......',
+        '...ggssgsgmNNNNNNnmgsgnNgg......',
+        '..hgsggssgmnYnnnYmgssNNggs......',
+        '..ggssssdgmnnnnnmmgssNsssd......',
+        '..gsssssdgmnxxxmmngsdNsssd......',
+        '..ssssdddgmngggmnngddNsddd......',
+        '..ssssdddgmnxxxmmngddNsddd......',
+        '..dddddddgmnnnnnnngddNdddd......',
+        '..dddddddgmmmmmmmmgddNdddd......',
     ),
-    # 星遥：观星者——垂肩银白长发、左上四角金星簪、静谧蓝青星瞳、深夜蓝星辰斗篷与领口星光扣
+    # 星遥：观星者——垂肩银白长发、左上四角金星簪、静谧对称蓝青星瞳、深夜蓝星辰斗篷与居中金星扣
     'p_li': (
         '................................',
-        '.....Y..........................',
-        '.....Y....whhhhgg...............',
-        '....yYy.wwhhhhhgggg.............',
-        '..YYwYYwhhhhghhggggs............',
-        '....yYywhhhgghghgggs............',
-        '.....Ywhhhgggggggggss...........',
-        '.....ywhhggifffffFggss..........',
-        '.....whhggiifffgfffggs..........',
-        '.....whhggissfgFssFggss.........',
-        '....whhggifMMkffMMkFggs.........',
-        '....whhggifwCffffwCFggs.........',
-        '....whhggifbcffffbcFggs.........',
-        '....whhggiffFFffFFFFggs.........',
-        '....whgggiBiffFFfBFFggs.........',
-        '....wggggiffFFffFFFFggs.........',
-        '....hgggggiifBBBFFgggss.........',
-        '....hgsggggiifFFFggggss.........',
-        '....hgsgggggFFSFFggggss.........',
-        '....hgsgggdFFFFFdggggss.........',
-        '....hgssgddHYYHddggggss.........',
-        '...hhgssdHHHbYYbHHHdggss........',
-        '..dhhgsHHHHbbwwbbHHHHggsd.......',
-        '.ddHggsHHYbbbYYbbbHHHgssHd......',
-        '.dHHHssHHHbbbYYbbbHHYssHHd......',
-        '.dHCHssHHHbbbdbbbbHHHsCHHd......',
-        'ddHHHssHHwbbbbbbbbHHHssHHdd.....',
-        'dHYHHssdHHbbdbdbbbHHdssHHYd.....',
-        'dHHHHssdHHbbbbbbbbHHdssHHHd.....',
-        'dHHHHHddHHbbbbbbbbHHddHHHHd.....',
-        'dHHwHHddHHbbbbbbbbHHddHHYHd.....',
-        'HHHHHHddHHbbbbbbbbHHddHHHHH.....',
+        '......Y.........................',
+        '......Y....whhhhgg..............',
+        '.....yYy.wwhhhhhgggg............',
+        '...YYwYYwhhhhghhggggs...........',
+        '.....yYywhhhgghghggggs..........',
+        '......Ywhhhggggggggggss.........',
+        '......ywhhggifffffFFggss........',
+        '......whhggiifffgfffFggs........',
+        '......whhggiffffgffffggs........',
+        '.....whhggifsssfffsssfggs.......',
+        '.....whhggiiffffffffFFggs.......',
+        '.....whhggifMwkfffwkMFggs.......',
+        '.....whhggiffCbfffCbfFggs.......',
+        '.....whgggiBffFfffFfBFggs.......',
+        '.....wggggifffFffffFFFggs.......',
+        '.....hgggggiiffFFffFFggss.......',
+        '.....hgsgggiifBSBFFggggss.......',
+        '.....hgsgggggiiFFFFggggss.......',
+        '.....hgsgggdFFFFFFdggggss.......',
+        '.....hgssgddHYYYHddggggss.......',
+        '....hhgssdHHHbYYbHHHdggss.......',
+        '...dhhgsHHHHbbwwbbHHHHggsd......',
+        '..ddHggsHHYbbbYYbbbHHHgssHd.....',
+        '..dHHHssHHHbbbYYbbbHHYssHHd.....',
+        '..dHCHssHHHbbbdbbbbHHHsCHHd.....',
+        '.ddHHHssHHwbbbbbbbbHHHssHHdd....',
+        '.dHYHHssdHHbbdbdbbbHHdssHHYd....',
+        '.dHHHHssdHHbbbbbbbbHHdssHHHd....',
+        '.dHHHHHddHHbbbbbbbbHHddHHHHd....',
+        '.dHHwHHddHHbbbbbbbbHHddHHYHd....',
+        '.HHHHHHddHHbbbbbbbbHHddHHHHH....',
     ),
-    # 城墙守卫：晨钟城夜哨——钢制锅盔、帽檐阴影下坚毅的双眼、短胡、深蓝守夜短甲、肩后铁枪尖
+    # 城墙守卫：晨钟城夜哨——钢制锅盔、帽檐阴影下坚毅双眼、短胡、深蓝守夜短甲、肩后铁枪尖
     'p_soldier': (
         '................................',
-        '..........................w.....',
-        '...........whhhg..........wg....',
-        '.........wwhhhhggs.......wggs...',
-        '........whhhgggsssd......wgsd...',
-        '.......whhhgggssssdd.....gsdd...',
-        '.......hggggggssssdd.....gsd....',
-        '......hggggggggsssddd....sdd....',
-        '.....hgggggggggssssdd.....N.....',
-        '.....dddddddddddddddd.....n.....',
-        '......smFFfffffFFFms......N.....',
-        '......mmMxxffffxxFmm......n.....',
-        '......mmfMMkfffMMkmm......N.....',
-        '......mmfwfffffwfFmm......n.....',
-        '......mmffffFFffFFmm......N.....',
-        '......mmifffSFFfFFmm......n.....',
-        '.......mmfmmmmmmFmm.......N.....',
-        '.......mmffSSSSFmmm.......n.....',
-        '........mmFFFFFmmm........N.....',
-        '.........mFFSSFmm.........n.....',
-        '......hgssggggggsshg......N.....',
-        '.....hggssddddddssggh.....n.....',
-        '....hgssddHbbbbHddssgh....N.....',
-        '...hgsddHHHbbbbHHHddsgh...n.....',
-        '..hgsddHHHHbYYbHHHHddsgh..N.....',
-        '..gsddHHHHbbYYbbHHHHddsg..n.....',
-        '..sddHHHHHbbbbbbHHHHHdds..N.....',
-        '..ddHHHHHbbbbbbbbHHHHHdd..n.....',
-        '..ddHHHHbbbbbbbbbbHHHHdd..N.....',
-        '..dHHHHHbbbbbbbbbbHHHHHd..n.....',
-        '..dHHHHHbbbbbbbbbbHHHHHd..N.....',
-        '..HHHHHHbbbbbbbbbbHHHHHH..n.....',
+        '...........................w....',
+        '............whhhg..........wg...',
+        '..........wwhhhhggs.......wggs..',
+        '.........whhhgggsssd......wgsd..',
+        '........whhhgggssssdd.....gsdd..',
+        '........hggggggssssdd.....gsd...',
+        '.......hggggggggsssddd....sdd...',
+        '......hgggggggggssssdd.....N....',
+        '......dddddddddddddddd.....n....',
+        '.......smFFffffffFFFms.....N....',
+        '.......mmfxxxfffxxxFmm.....n....',
+        '.......mmfMkMfffMkMFmm.....N....',
+        '.......mmfwkfffffkwFmm.....n....',
+        '.......mmfffffFffffFmm.....N....',
+        '.......mmiffffSffffFmm.....n....',
+        '........mmfmmmmmmmFmm......N....',
+        '........mmffSSSSFFmmm......n....',
+        '.........mmFFFFFFmmm.......N....',
+        '..........mFFFSSFmm........n....',
+        '.......hgssggggggsshg......N....',
+        '......hggssddddddssggh.....n....',
+        '.....hgssddHbbbbHddssgh....N....',
+        '....hgsddHHHbbbbHHHddsgh...n....',
+        '...hgsddHHHHbYYbHHHHddsgh..N....',
+        '...gsddHHHHbbYYbbHHHHddsg..n....',
+        '...sddHHHHHbbbbbbHHHHHdds..N....',
+        '...ddHHHHHbbbbbbbbHHHHHdd..n....',
+        '...ddHHHHbbbbbbbbbbHHHHdd..N....',
+        '...dHHHHHbbbbbbbbbbHHHHHd..n....',
+        '...dHHHHHbbbbbbbbbbHHHHHd..N....',
+        '...HHHHHHbbbbbbbbbbHHHHHH..n....',
     ),
 }
 
@@ -3412,9 +3413,8 @@ def portraits():
 # ---------------------------------------------------------------- 配角立绘 32×32：剧情里和守夜人说话的人
 def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', shade='F', eyes='open', age=0, beard=None, extra=None,
            face='oval', brow=None, mouth='flat', nose='dot', mark=None, iris='k'):
-    """配角通用的 32×32 精绘半身像：手控受光与阴影，不使用会破坏轮廓的自动倒角。"""
+    """配角通用的 32×32 精绘半身像：所有五官严格以 x=16 为对称轴，手控受光与阴影。"""
     c = Cv(32, 32)
-    # 辅助色阶：给布料和头发提供克制自然的明暗过渡（避免过亮导致半身异色）
     dark_cloth = SH.get(cloth, 'H' if cloth in 'dbs' else 'x' if cloth in 'mx' else 'm' if cloth in 'nNj' else 'q' if cloth in 'pPQ' else 'd')
     lite_cloth = {'g': 'h', 's': 'g', 'd': 's', 'H': 'd', 'b': 'c', 't': 'g', 'G': 't', 'n': 'N', 'N': 'J', 'm': 'n',
                   'p': 'Q', 'Q': 'P', 'R': 'o', 'r': 'R', 'y': 'Y'}.get(cloth, cloth)
@@ -3447,35 +3447,33 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
     c.line(24, 26, 25, 30, dark_cloth, 1, True)
 
     # 3. 脖子与下巴投影
-    c.rect(13, 18, 18, 22, shade)
-    c.rect(13, 18, 15, 21, skin)
-    c.line(13, 19, 18, 19, 'S', 1, True)
+    c.rect(13, 18, 19, 22, shade)
+    c.rect(13, 18, 16, 21, skin)
+    c.line(13, 19, 19, 19, 'S', 1, True)
     c.line(14, 20, 18, 20, shade, 1, True)
 
-    # 4. 脸型（下颌收窄 + 耳朵 + 立体受光）
-    rx, ry = {'oval': (6.2, 7.2), 'round': (6.8, 6.7), 'long': (5.7, 7.8), 'square': (6.6, 7.0)}[face]
+    # 4. 脸型（严格围绕 x=16 对称 + 对称耳朵 + 自然受光）
+    rx, ry = {'oval': (6.2, 7.2), 'round': (6.8, 6.7), 'long': (5.8, 7.7), 'square': (6.6, 7.0)}[face]
     cy = 13.4 if age < 2 else 13.8
     c.rect(9, 13, 9, 15, skin); c.px(9, 15, shade)
-    c.rect(22, 13, 22, 15, shade); c.px(22, 15, 'S')
+    c.rect(23, 13, 23, 15, shade); c.px(23, 15, 'S')
     c.ell(16, cy, rx, ry, skin)
     if face == 'square':
         c.rect(11, 16, 21, 19, skin)
-    elif face == 'oval':
-        c.px(10, 18, '.'); c.px(22, 18, '.')
     for y in range(7, 22):
         for x in range(9, 24):
             if c.get(x, y) != skin: continue
-            if x <= 13 and y <= 16 and (x - 12) ** 2 + (y - 12) ** 2 <= 14:
+            if x <= 14 and y <= 16 and (x - 13) ** 2 + (y - 12) ** 2 <= 12:
                 c.px(x, y, 'i')
-            elif x >= 19 or (x >= 18 and y >= 15) or y >= 19:
+            elif x >= 20 or (x >= 19 and y >= 16) or y >= 19:
                 c.px(x, y, shade)
-            if x >= 21 and y >= 14:
+            if x >= 21 and y >= 15:
                 c.px(x, y, 'S')
 
-    # 5. 发型与头饰（发际投影 + 高光弧 + 层次）
+    # 5. 发型与头饰
     if style in ('short', 'long', 'bun'):
         c.line(11, 8, 21, 8, shade, 1, True)
-        c.poly([(8.5, 12), (9, 5.5), (13, 2.5), (19, 2.5), (23.5, 5.5), (23.5, 12), (21, 8.2), (18, 7.2), (15, 8.6), (12, 7.6), (10, 9.5)], hair)
+        c.poly([(8.5, 12), (9, 5.5), (13, 2.5), (19, 2.5), (23.5, 5.5), (23.5, 12), (21, 8.2), (18, 7.2), (16, 8.6), (13, 7.4), (10, 9.5)], hair)
         c.line(11, 4, 15, 4, hl, 1, True); c.line(12, 5, 14, 5, hl, 1, True)
         c.line(21, 6, 23, 9, dark_hair, 1, True)
         if style == 'bun':
@@ -3484,7 +3482,7 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
             c.line(14, 4, 18, 4, dark_hair, 1, True)
     elif style == 'bald':
         c.rect(13, 8, 15, 9, 'i', True); c.px(14, 7, 'i', True); c.px(15, 7, 'i', True)
-        c.rect(9, 11, 9, 13, hair); c.rect(22, 11, 22, 13, dark_hair)
+        c.rect(9, 11, 9, 13, hair); c.rect(23, 11, 23, 13, dark_hair)
     elif style == 'cap':
         c.poly([(7.5, 10), (8, 5), (12, 2.5), (20, 2.5), (24, 5), (24.5, 10)], hair)
         c.line(10, 4, 16, 4, hl, 1, True)
@@ -3511,65 +3509,64 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
         c.line(16, 2, 16, 9, 'h', 1, True)
         c.line(10, 11, 22, 11, 'S', 1, True)
 
-    # 6. 眼睛（上睫毛、高光、下睑微影）
+    # 6. 眼睛（严格以 x=16 对称：左眼 12..14，鼻梁 15..17，右眼 18..20，眼白在两侧、瞳孔在中心）
     if eyes == 'closed':
-        c.line(11, 13, 13, 13, 'M', 1, True); c.line(18, 13, 20, 13, 'M', 1, True)
-        c.px(12, 14, shade, True); c.px(19, 14, shade, True)
+        c.line(12, 13, 14, 13, 'M', 1, True); c.line(18, 13, 20, 13, 'M', 1, True)
+        c.px(13, 14, shade, True); c.px(19, 14, shade, True)
     elif eyes == 'narrow':
-        c.line(11, 12, 13, 12, 'M', 1, True); c.line(18, 12, 20, 12, 'M', 1, True)
-        c.px(12, 13, iris, True); c.px(11, 13, 'w', True)
-        c.px(19, 13, iris, True); c.px(18, 13, 'w', True)
+        c.line(12, 12, 14, 12, 'M', 1, True); c.line(18, 12, 20, 12, 'M', 1, True)
+        c.px(12, 13, 'w', True); c.px(13, 13, iris, True)
+        c.px(19, 13, iris, True); c.px(20, 13, 'w', True)
     elif eyes == 'squint':
-        for x0 in (11, 18):
+        for x0 in (12, 18):
             c.px(x0, 13, 'M', True); c.px(x0 + 1, 12, 'M', True); c.px(x0 + 2, 13, 'M', True)
-            c.px(x0 + 1, 14, 'B', True)
     elif eyes == 'round':
-        for x0 in (11, 18):
-            c.line(x0, 11, x0 + 2, 11, 'M', 1, True)
-            c.rect(x0, 12, x0 + 2, 13, 'k', True)
-            c.px(x0, 12, 'w', True); c.px(x0 + 2, 13, 'S', True)
+        for lx, rx0 in ((12, 18),):
+            c.line(lx, 12, lx + 2, 12, 'M', 1, True); c.line(rx0, 12, rx0 + 2, 12, 'M', 1, True)
+            c.px(lx, 13, 'w', True); c.px(lx + 1, 13, 'k', True); c.px(lx + 2, 13, 'k', True)
+            c.px(rx0, 13, 'k', True); c.px(rx0 + 1, 13, 'k', True); c.px(rx0 + 2, 13, 'w', True)
+            c.px(lx + 1, 12, 'w', True); c.px(rx0 + 1, 12, 'w', True)
     else:
-        for x0 in (11, 18):
-            c.line(x0, 12, x0 + 2, 12, 'M', 1, True)
-            c.px(x0, 13, 'w', True); c.px(x0 + 1, 13, iris, True); c.px(x0 + 2, 13, 'k', True)
+        c.line(12, 12, 14, 12, 'M', 1, True); c.line(18, 12, 20, 12, 'M', 1, True)
+        c.px(12, 13, 'w', True); c.px(13, 13, iris, True); c.px(14, 13, 'k', True)
+        c.px(18, 13, 'k', True); c.px(19, 13, iris, True); c.px(20, 13, 'w', True)
         if eyes == 'glasses':
-            c.rect(10, 11, 14, 14, 's'); c.rect(17, 11, 21, 14, 's')
-            c.line(10, 11, 14, 11, 'h', 1, True); c.line(17, 11, 21, 11, 'h', 1, True)
-            c.rect(11, 12, 13, 13, 'c', True); c.rect(18, 12, 20, 13, 'c', True)
-            c.px(12, 13, 'k', True); c.px(19, 13, 'k', True)
-            c.px(11, 12, 'w', True); c.px(18, 12, 'w', True)
-            c.line(14, 12, 17, 12, 'g', 1, True)
+            c.rect(11, 11, 15, 14, 's'); c.rect(17, 11, 21, 14, 's')
+            c.line(11, 11, 15, 11, 'h', 1, True); c.line(17, 11, 21, 11, 'h', 1, True)
+            c.rect(12, 12, 14, 13, 'c', True); c.rect(18, 12, 20, 13, 'c', True)
+            c.px(13, 13, 'k', True); c.px(19, 13, 'k', True)
+            c.px(12, 12, 'w', True); c.px(18, 12, 'w', True)
+            c.px(16, 12, 'g', True)
 
-    # 7. 年龄纹理 & 眉毛
+    # 7. 年龄纹理（克制不干扰五官）& 对称眉毛（12..14 / 18..20）
     if age >= 1:
-        c.px(11, 14, shade, True); c.px(20, 14, shade, True)
+        c.px(12, 14, shade, True); c.px(20, 14, shade, True)
     if age >= 2:
-        c.px(10, 15, 'S', True); c.px(21, 15, 'S', True)
-        c.px(13, 17, shade, True); c.px(19, 17, shade, True)
+        c.px(11, 15, shade, True); c.px(21, 15, shade, True)
 
     bcol = 'x' if hair in 'xmnN' else 's' if hair in 'wg' else 'M'
     if brow == 'flat':
-        c.line(11, 10, 13, 10, bcol, 1, True); c.line(18, 10, 20, 10, bcol, 1, True)
+        c.line(12, 10, 14, 10, bcol, 1, True); c.line(18, 10, 20, 10, bcol, 1, True)
     elif brow == 'thick':
-        c.rect(10, 10, 13, 10, bcol, True); c.px(11, 9, bcol, True); c.px(12, 9, bcol, True)
-        c.rect(18, 10, 21, 10, bcol, True); c.px(19, 9, bcol, True); c.px(20, 9, bcol, True)
+        c.line(11, 10, 14, 10, bcol, 1, True); c.line(12, 9, 13, 9, bcol, 1, True)
+        c.line(18, 10, 21, 10, bcol, 1, True); c.line(19, 9, 20, 9, bcol, 1, True)
     elif brow == 'angry':
-        c.line(10, 9, 13, 10, bcol, 1, True); c.line(18, 10, 21, 9, bcol, 1, True)
+        c.line(11, 9, 14, 10, bcol, 1, True); c.line(18, 10, 21, 9, bcol, 1, True)
     elif brow == 'worried':
-        c.line(10, 10, 13, 9, bcol, 1, True); c.line(18, 9, 21, 10, bcol, 1, True)
+        c.line(11, 10, 14, 9, bcol, 1, True); c.line(18, 9, 21, 10, bcol, 1, True)
     elif brow == 'arched':
-        c.px(10, 10, bcol, True); c.line(11, 9, 12, 9, bcol, 1, True); c.px(13, 10, bcol, True)
+        c.px(11, 10, bcol, True); c.line(12, 9, 13, 9, bcol, 1, True); c.px(14, 10, bcol, True)
         c.px(18, 10, bcol, True); c.line(19, 9, 20, 9, bcol, 1, True); c.px(21, 10, bcol, True)
 
-    # 8. 鼻子
+    # 8. 鼻子（中轴 x=16）
     if nose == 'long':
-        c.line(16, 13, 16, 15, shade, 1, True); c.px(15, 15, 'S', True)
+        c.line(16, 13, 16, 15, shade, 1, True); c.px(16, 15, 'S', True)
     elif nose == 'broad':
         c.px(16, 14, shade, True); c.line(15, 15, 17, 15, 'S', 1, True)
     elif nose == 'dot':
         c.px(16, 15, 'S', True)
 
-    # 9. 嘴（自然唇影 S/B）
+    # 9. 嘴（自然唇影 S/B，严格居中 15..17）
     if mouth == 'smile':
         c.line(15, 17, 17, 17, 'S', 1, True); c.px(14, 16, 'B', True); c.px(18, 16, 'B', True)
     elif mouth in ('grin', 'gap'):
@@ -3578,7 +3575,7 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
     elif mouth == 'frown':
         c.line(15, 17, 17, 17, 'S', 1, True); c.px(14, 18, 'S', True); c.px(18, 18, 'S', True)
     elif mouth == 'small':
-        c.line(15, 17, 16, 17, 'B', 1, True)
+        c.line(15, 17, 17, 17, 'B', 1, True)
     elif mouth == 'open':
         c.rect(15, 17, 17, 18, 'e', True); c.line(15, 17, 17, 17, 'S', 1, True)
     else:
@@ -3586,15 +3583,15 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
     if mouth == 'gap':
         c.px(16, 17, 'M', True)
 
-    # 10. 脸部特征
+    # 10. 脸部特征（避开眼唇区）
     if mark == 'freckles':
-        for x, y in ((11, 15), (12, 16), (19, 16), (20, 15)): c.px(x, y, shade, True)
+        for x, y in ((11, 15), (12, 16), (20, 16), (21, 15)): c.px(x, y, shade, True)
     elif mark == 'mole':
-        c.px(19, 16, 'M', True)
+        c.px(20, 16, 'M', True)
     elif mark == 'scar':
-        c.line(19, 10, 21, 15, 'B', 1, True); c.px(20, 12, 'r', True)
+        c.line(20, 10, 21, 15, 'B', 1, True); c.px(20, 12, 'r', True)
     elif mark == 'dirt':
-        c.px(11, 15, 's', True); c.px(12, 16, 'j', True); c.px(20, 15, 'j', True)
+        c.px(11, 15, 's', True); c.px(12, 16, 'j', True); c.px(21, 15, 'j', True)
 
     # 11. 胡须
     if beard:
@@ -3605,7 +3602,7 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
                     c.px(x, y, bsh if (x >= 18 or y >= 20) else beard, True)
         c.line(13, 16, 19, 16, beard, 1, True)
         if mouth == 'flat':
-            c.line(14, 17, 18, 17, 'S', 1, True)
+            c.line(15, 17, 17, 17, 'S', 1, True)
 
     if extra:
         extra(c)
@@ -3617,20 +3614,20 @@ def cast():
     # 艾拉那边
     P['p_karl'] = person(hair='y', hl='Y', style='short', cloth='p', cloth2='Q', age=1, beard='N', face='square', brow='angry', eyes='narrow',
                          extra=lambda c: (
-                             c.line(13, 8, 15, 10, 'r', 1, True), c.px(14, 9, 'B', True),
+                             c.line(12, 7, 14, 9, 'r', 1, True), c.px(13, 8, 'B', True),
                              c.ell(5.5, 25.5, 4.2, 3.0, 's'), c.ell(5, 24.5, 3.2, 1.8, 'g'), c.line(3, 23, 6, 23, 'h', 1, True), c.px(5, 25, 'Y', True),
                              c.ell(26.5, 25.5, 4.2, 3.0, 'd'), c.ell(26, 24.5, 3.0, 1.8, 's'), c.line(25, 23, 28, 23, 'g', 1, True), c.px(26, 25, 'Y', True),
                          ))
     P['p_xiaoman'] = person(hair='n', hl='J', style='scarf', cloth='b', cloth2='c', face='round', eyes='round', mouth='smile', nose='none', mark='freckles',
                             extra=lambda c: (
-                                c.px(11, 15, 'B', True), c.px(20, 15, 'B', True),
+                                c.px(11, 14, 'B', True), c.px(21, 14, 'B', True),
                                 c.rect(24, 24, 28, 30, 'N'), c.line(24, 24, 24, 30, 'J', 1, True), c.line(28, 24, 28, 30, 'n', 1, True),
                                 c.rect(25, 22, 27, 23, 'n'), c.line(21, 21, 25, 24, 'm', 1, True),
                             ))
     P['p_chu'] = person(hair='g', hl='w', style='bald', cloth='d', cloth2='H', eyes='closed', age=2, beard='w', face='long', nose='long',
                         extra=lambda c: (
                             c.rect(7, 25, 10, 26, 'y'), c.px(7, 25, 'Y', True),
-                            c.line(11, 11, 13, 11, 'w', 1, True), c.line(18, 11, 20, 11, 'w', 1, True),
+                            c.line(12, 11, 14, 11, 'w', 1, True), c.line(18, 11, 20, 11, 'w', 1, True),
                             c.line(14, 22, 18, 22, 'y', 1, True),
                         ))
     # 墨那边
@@ -3642,6 +3639,7 @@ def cast():
                           ))
     P['p_shen'] = person(hair='b', hl='c', style='scarf', cloth='t', cloth2='g', age=2, skin='f', shade='F', face='round', eyes='squint', mouth='smile',
                          extra=lambda c: (
+                             c.px(11, 14, 'B', True), c.px(21, 14, 'B', True),
                              c.rect(4, 28, 8, 31, 'b'), c.line(5, 28, 7, 28, 'c', 1, True),
                              c.rect(24, 28, 28, 31, 'b'), c.line(25, 28, 27, 28, 'c', 1, True),
                          ))
@@ -3660,7 +3658,7 @@ def cast():
                         ))
     P['p_douzi'] = person(hair='a', hl='A', style='short', cloth='R', cloth2='o', face='round', eyes='round', mouth='gap', nose='none',
                           extra=lambda c: (
-                              c.px(11, 15, 'B', True), c.px(20, 15, 'B', True),
+                              c.px(11, 14, 'B', True), c.px(21, 14, 'B', True),
                               c.rect(3, 24, 8, 29, 'o'), c.rect(4, 25, 7, 28, 'Y', True),
                               c.px(5, 26, 'w', True), c.line(4, 23, 7, 23, 'n', 1, True), c.line(4, 30, 7, 30, 'n', 1, True),
                           ))
@@ -3673,17 +3671,17 @@ def cast():
     P['p_guizhi'] = person(hair='a', hl='A', style='bun', cloth='Q', cloth2='v', age=1, brow='arched', mouth='smile', mark='mole',
                            extra=lambda c: (
                                c.line(13, 2, 19, 3, 'y', 1, True), c.px(15, 2, 'Y', True),
-                               c.px(11, 15, 'B', True), c.px(20, 15, 'B', True),
+                               c.px(11, 14, 'B', True), c.px(21, 14, 'B', True),
                            ))
     P['p_shitou'] = person(hair='x', hl='n', style='short', cloth='N', cloth2='J', face='round', brow='angry', mouth='frown', mark='dirt',
                            extra=lambda c: (
-                               c.px(11, 15, 'B', True), c.px(20, 15, 'B', True),
+                               c.px(11, 14, 'B', True), c.px(21, 14, 'B', True),
                                c.rect(22, 24, 29, 29, 'r'), c.line(22, 24, 29, 24, 'o', 1, True),
                                c.line(22, 27, 29, 27, 'u', 1, True), c.px(25, 25, 'u', True),
                            ))
     P['p_hans'] = person(hair='g', hl='h', style='helm', cloth='s', cloth2='d', age=2, beard='g', face='square', eyes='narrow', mark='scar', iris='C',
                          extra=lambda c: (
-                             c.px(12, 13, 'C', True), c.px(19, 13, 'C', True),
+                             c.px(13, 13, 'C', True), c.px(19, 13, 'C', True),
                              c.line(8, 22, 24, 22, 'h', 1, True),
                          ))
     # 璃那边
