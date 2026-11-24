@@ -8,12 +8,13 @@ const arg = (k, d) => process.argv.find((a) => a.startsWith(`--${k}=`))?.slice(k
 const url = arg('url', 'http://localhost:4317/');
 const out = arg('out', 'shots');
 mkdirSync(out, { recursive: true });
-const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
+const b = await chromium.launch({ args: ['--mute-audio', '--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
 const pg = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
-/* 测试用存档：人物全部解锁 / test save: all heroes unlocked */
+/* 测试用存档：人物全部解锁、默认静音 / test save: all heroes unlocked, audio muted */
 await pg.addInitScript(() => {
   if (!localStorage.getItem('chain-meta-v1')) localStorage.setItem('chain-meta-v1', JSON.stringify({ heroes: { ayla: 1, mo: 1, ying: 1, jun: 1, li: 1 } }));
   if (!localStorage.getItem('chain-tips')) localStorage.setItem('chain-tips', JSON.stringify({ tutorial: 1 }));
+  localStorage.setItem('chain-settings', JSON.stringify({ music: false, sfx: false }));
 });
 const errs = [];
 pg.on('pageerror', (e) => errs.push(String(e)));

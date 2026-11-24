@@ -80,6 +80,34 @@ onBack(() => {
   if (UI.drawer) return setDrawer(false), true;
   return false;
 });
+/* 桌面端快捷键：Esc 关弹层/收背包，Space 备战就绪开战或战斗切倍速，B 开关背包 / desktop keyboard shortcuts: Esc closes sheet/bag, Space fights or cycles speed, B toggles bag */
+addEventListener('keydown', (e) => {
+  const tag = (e.target as HTMLElement | null)?.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if (e.key === 'Escape') {
+    if (!$('#sheet').hidden) closeSheet();
+    else if (UI.drawer) setDrawer(false);
+    return;
+  }
+  if (!$('#screen').hidden || !$('#sheet').hidden || !$('#story').hidden) return;
+  if (e.key === ' ') {
+    if (G.phase === 'prep' && G.prep.step >= prepStops()) {
+      e.preventDefault();
+      SFX.ensure();
+      startBattle();
+    } else if (G.phase === 'battle') {
+      e.preventDefault();
+      SFX.ensure();
+      SFX.play('ui');
+      G.speed = G.speed >= 3 ? 1 : G.speed + 1;
+      updateHUD();
+    }
+  } else if ((e.key === 'b' || e.key === 'B') && G.phase === 'prep') {
+    SFX.ensure();
+    SFX.play('ui');
+    setDrawer(!UI.drawer);
+  }
+});
 
 /* 成就解锁：右上角弹一下 / achievement unlocked: pop in the top-right */
 on('ach', (a: { n: string; d: string }) => {
@@ -108,7 +136,7 @@ function applyWide() {
   }
   const core = Math.round(clamp(innerHeight * 0.5, 440, 560));
   root.style.setProperty('--core', core + 'px');
-  root.style.setProperty('--side', Math.round(clamp(innerWidth - core - 60, 360, 480)) + 'px');
+  root.style.setProperty('--side', Math.round(clamp(innerWidth - core - 68, 400, 520)) + 'px');
   if (prep.parentElement !== $('#app')) $('#app').prepend(prep);
   return core;
 }

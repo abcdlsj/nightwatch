@@ -49,3 +49,31 @@ export function pickLine(t: Line): string {
   if (typeof t === 'object') return pickLine(t[G.hero]);
   return t;
 }
+
+/** 商店窄栏用的简短说明：只取第一句核心效果，避免四行长文被截断 / concise first-clause summary for narrow shop slots so cards stay scannable */
+export function shortDesc(d: string): string {
+  if (!d) return '';
+  const cut = d.search(/[。；;]|(?<=\D)\.(?:\s|$)/);
+  const first = cut > 0 ? d.slice(0, cut + (d[cut] === '。' || d[cut] === '.' ? 1 : 0)) : d;
+  return first.trim();
+}
+
+const escHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/** 正文语义高亮：独立乘区、数值、关键词、元素状态着不同色，便于小屏扫读 / inline semantic highlighting for multipliers, numbers, keywords and statuses */
+export function richText(raw: string): string {
+  if (!raw) return '';
+  const s = escHtml(raw);
+  return s.replace(
+    /(×\d+(?:\.\d+)?|【[^】]+】|[+-]?\d+(?:\.\d+)?(?:%|秒|s\b|层|格|发|只|个|次|金)?|灼烧|点燃|燃烧|冻结|减速|中毒|易伤|暴击|充能|加速|\b(?:Burn|Freeze|Frozen|Slow|Slowed|Poison|Poisoned|Crit|Charge|Haste)\b)/g,
+    (m) => {
+      if (m.startsWith('×')) return `<span class="rt-x">${m}</span>`;
+      if (m.startsWith('【')) return `<span class="rt-kw">${m}</span>`;
+      if (/^(?:灼烧|点燃|燃烧|Burn)$/.test(m)) return `<span class="rt-el-fire">${m}</span>`;
+      if (/^(?:冻结|减速|Freeze|Frozen|Slow|Slowed)$/.test(m)) return `<span class="rt-el-ice">${m}</span>`;
+      if (/^(?:中毒|Poison|Poisoned)$/.test(m)) return `<span class="rt-el-poison">${m}</span>`;
+      if (/^(?:暴击|充能|加速|易伤|Crit|Charge|Haste)$/.test(m)) return `<span class="rt-el-volt">${m}</span>`;
+      return `<span class="rt-n">${m}</span>`;
+    },
+  );
+}

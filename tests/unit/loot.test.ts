@@ -108,3 +108,20 @@ describe('流派轮换', () => {
     Object.assign(G, { rot: null });
   });
 });
+
+describe('前两夜概念隔离', () => {
+  it('第 1-2 夜非星遥人物不出外乡卡和 C 位专属卡，且首局第一夜不出词缀', () => {
+    setup('ying', HERO_ORDER);
+    G.round = 1;
+    G.rot = null;
+    G.omen = '';
+    META.runs = 0;
+    for (let i = 0; i < 300; i++) {
+      const of = makeOffer();
+      expect(isForeign(of.card.key)).toBe(false);
+      expect(ITEMS[of.card.key].chargeCarry).toBeFalsy();
+      expect(ITEMS[of.card.key].buffCarry).toBeFalsy();
+      expect(of.card.adj).toBeNull();
+    }
+  });
+});

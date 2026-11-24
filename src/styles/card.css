@@ -11,7 +11,9 @@
 .card .nm{font-size:var(--t-s);color:var(--cink);text-align:center;line-height:1;margin-top:2px;white-space:nowrap}
 .card .spr{display:block;width:32px;height:32px;margin:3px auto 0;image-rendering:pixelated}
 .card.s3 .spr{width:48px;height:48px;margin-top:0}
-.card .num{position:absolute;left:0;right:0;bottom:3px;text-align:center;font-family:'PixNum','Pixelify Sans',ui-monospace,monospace;font-weight:700;font-size:var(--t-b);color:var(--cink);line-height:1;letter-spacing:.5px}
+.card .num{position:absolute;left:1px;right:1px;bottom:3px;text-align:center;font-family:'PixNum','Pixelify Sans',ui-monospace,monospace;font-weight:700;font-size:var(--t-b);color:var(--cink);line-height:1;letter-spacing:.3px;overflow:hidden;white-space:nowrap}
+/* 1 格小卡在 390px 手机上内宽仅约 35px，用紧凑字号避免 +15% / 1.2k 被边框裁切 / compact digit size on 1-slot cards so +15% never clips on 390px phones */
+.card.s1 .num{font-size:var(--t-s);letter-spacing:0;bottom:4px}
 .card .num.txt{font-family:var(--zh);font-weight:400;font-size:var(--t-s);bottom:4px}/* 「装填」「齐奏」这类字，跟卡名一个字体 / words like 'Reload' and 'Chorus' use the same font as card names */
 .card .cdv{position:absolute;left:0;right:0;top:8px;bottom:0;background:rgba(24,14,40,.34);border-bottom:2px solid rgba(255,255,255,.55);transform-origin:top;transform:scaleY(var(--s,0))}
 .card .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}

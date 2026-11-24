@@ -1,15 +1,15 @@
 /* ---------- 电脑宽屏：左栏备战，右栏是原来那一列（html.wide 由 boot.ts 按窗口大小切换） ---------- / ---------- Desktop wide screens: prep on the left, the original column on the right (html.wide is toggled by boot.ts from the window size) ---------- */
-html.wide #app{max-width:none;width:calc(var(--side) + var(--core) + 30px);display:grid;grid-template-columns:var(--side) var(--core);
-  grid-template-rows:auto minmax(0,1fr) auto auto auto;column-gap:14px;row-gap:7px}
+html.wide #app{max-width:none;width:calc(var(--side) + var(--core) + 46px);padding:12px 14px;display:grid;grid-template-columns:var(--side) var(--core);
+  grid-template-rows:auto minmax(0,1fr) auto auto auto;column-gap:18px;row-gap:8px}
 html.wide #top{grid-column:2;grid-row:1}
 html.wide #stage{grid-column:2;grid-row:2}
 html.wide #stashRow{grid-column:2;grid-row:3}
 html.wide #boardRow{grid-column:2;grid-row:4}
 html.wide #actions{grid-column:2;grid-row:5}
-html.wide #app>#prep{grid-column:1;grid-row:1/-1;position:relative;inset:auto;min-height:0;border-radius:3px;padding:12px;
-  background:rgba(8,14,18,.55);box-shadow:inset 0 0 0 3px rgba(0,0,0,.35),0 4px 0 rgba(0,0,0,.4)}
-/* 开战后左栏不收起，只留今晚敌情 / once battle starts the left column stays, showing only tonight's enemies */
-html.wide #app>#prep[hidden]{display:flex;align-self:start}
+html.wide #app>#prep{grid-column:1;grid-row:1/-1;position:relative;inset:auto;min-height:0;border-radius:3px;padding:14px;
+  background:rgba(10,18,23,.82);box-shadow:inset 0 0 0 2px rgba(255,255,255,.06),0 6px 0 rgba(0,0,0,.45)}
+/* 开战后左栏不收起，只留今晚敌情，紧贴内容不留空壳 / once battle starts the left column stays compact, showing only tonight's enemies */
+html.wide #app>#prep[hidden]{display:flex;align-self:start;padding:10px}
 html.wide #app>#prep[hidden] #pbody{display:none}
 html.wide #pvList{max-height:none}
 html.wide #pvNote{-webkit-line-clamp:unset}
@@ -17,4 +17,20 @@ html.wide #pvNote{-webkit-line-clamp:unset}
 html.wide #field{display:block!important}
 /* 弹层改成居中弹窗 / sheets become centered dialogs */
 html.wide #sheet{align-items:center;padding:24px}
-html.wide .sh{max-width:480px;max-height:min(86vh,760px);border-radius:3px;padding-bottom:16px}
+html.wide .sh{max-width:500px;max-height:min(86vh,760px);border-radius:3px;padding:18px 20px}
+/* 宽屏整屏页：选人双列一屏总览、起手/结局舒展居中、隐藏移动端 Safari 安装条 / wide full-screen pages: 2-column hero select, roomier kits/ending, hide mobile iOS Safari install banner */
+html.wide #screen{padding:28px 24px}
+html.wide .scr-title{max-width:420px;gap:18px}
+html.wide .scr-heroes{max-width:820px;gap:16px}
+html.wide .scr-heroes .heroes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+html.wide .scr-heroes .hero{align-content:start}
+html.wide .scr-kits,html.wide .scr-end{max-width:500px}
+html.wide .scr-kits .kits,html.wide .scr-kits .fullbox{max-width:500px}
+html.wide .ioshint{display:none}
+/* 桌面悬停手感：人物卡、起手卡、商店货位、按钮给明确微反馈 / desktop hover affordances */
+@media (hover:hover){
+  html.wide .hero:not(.locked):hover,html.wide .kit:hover{filter:brightness(1.12);transform:translateY(-2px)}
+  html.wide .offer:not(.sold):hover{background:#2d4048}
+  html.wide .wg:hover{filter:brightness(1.12)}
+  html.wide .btn:not(:disabled):hover{filter:brightness(1.1)}
+}

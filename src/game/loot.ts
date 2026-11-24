@@ -7,13 +7,23 @@ import { rand, pick } from '../core/rng';
 import { G, heat, type Offer } from './state';
 import { basePrice, hasKind, hasTag, hasGrow, hasAmmo, hasBig } from './cards';
 import { cardOpen, heroUnlocked, pathOf } from './unlocks';
+import { META } from './meta';
 import { OMENS } from '../data/meta';
 import type { Tag } from '../data/types';
 import { mv } from './mods';
 import { inWorld, curWorld } from './world';
 
 /* ---------------- 卡牌 ---------------- / ---------------- Cards ---------------- */
+/** 需要 C 位机制才发挥作用的卡：前两夜还没定 C 位时不主动刷给非星遥人物 / cards tied to the Carry mechanic: don't surface on nights 1–2 before a carry exists (unless playing Li) */
+const CARRY_CARDS = new Set(['wishstar', 'starseed', 'moondial']);
+const needsCarry = (k: string) => {
+  const it = ITEMS[k];
+  return !!(it.chargeCarry || it.buffCarry || it.asCarry || CARRY_CARDS.has(k));
+};
+
 export function rollAdj(key: string, force?: boolean, exclude?: string | null, maxTier?: number) {
+  /* 首局第一夜不出随机词缀，先让新手读懂基础卡面 / skip random affixes on a brand-new player's first night */
+  if (!force && G.round <= 1 && !META.runs) return null;
   if (!force && rand() > 0.12) return null;
   const r = rand();
   const rare = 0.06 + 0.025 * G.round;
@@ -77,11 +87,16 @@ const OVER_CAP_W = 0.15;
  * soft：软上限（高出的卡降权） / soft: soft cap (cards above it get less weight) */
 export function rollItem(filter?: ItemFilter | null, cap: { maxT?: number; soft?: number } = {}) {
   const R = G.round;
+  const allowEarlyForeign = !!(G.rot || (G.omen && OMENS[G.omen].foreign));
+  const hasCarry = G.hero === 'li' || G.cards.some((c) => c.carry);
   let pool: [string, number][] = [];
   for (const k in ITEMS) {
     const it = ITEMS[k];
     const fg = isForeign(k);
     if (it.noPool || !inWorld(it, 'cards') || (fg ? !foreignOk(k) : !homeOk(k))) continue;
+    /* 前两夜概念隔离：不给新手塞外乡卡（除非开了轮换/外乡异象），也没立 C 位前不刷 C 位专属卡 / Early-night concept isolation: hide foreign cards on nights 1–2 (unless rotation/stranger omen) and hide carry-dependent cards before a carry exists */
+    if (R <= 2 && fg && !allowEarlyForeign) continue;
+    if (R <= 2 && !hasCarry && needsCarry(k)) continue;
     if (filter && !filter(it)) continue;
     if (it.t === 2 && R < 2) continue;
     const w =

@@ -30,7 +30,7 @@ import { FX } from '../render/overlay';
 import { SFX } from '../audio/sfx';
 import { $, restart } from '../ui/dom';
 import { elOf, renderOwned, repaint, clearCardEls, clearCharges } from '../ui/card-view';
-import { updateHUD, renderRelics, toast, banner, resetGoldBump, clearCenter } from '../ui/hud';
+import { updateHUD, renderRelics, toast, banner, resetGoldBump, clearCenter, hideTips } from '../ui/hud';
 import { say, clearVO } from '../ui/voice';
 import { closeSheet } from '../ui/sheets';
 import { playPrologue, playWin, playLose, playNoDawn, playQuiet, playTrueWin, playHiddenPre } from '../ui/story';
@@ -229,6 +229,7 @@ export function startBattle() {
   }
   clearVO();
   clearCenter();
+  hideTips();
   clearFieldFx();
   $('#prep').hidden = true;
   $('#report').hidden = true;

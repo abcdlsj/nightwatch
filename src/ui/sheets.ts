@@ -11,7 +11,7 @@ import { M } from '../game/mods';
 import { stats, chainOf, chargeAmt, buffAmt, maxAmmo, questN, sellValue } from '../game/cards';
 import { META, achCount } from '../game/meta';
 import { synCount, synPairs } from '../game/synergy';
-import { modText, plainMods } from '../game/text';
+import { modText, plainMods, richText } from '../game/text';
 import { icon, spr } from '../render/sprites';
 import { SFX } from '../audio/sfx';
 import { $ } from './dom';
@@ -98,10 +98,10 @@ export function openSheet(src: SheetSrc) {
   const sizeN = L.terms.sizes[c.size];
   show(`<div class="sh" role="dialog" aria-label="${it.n}"><div class="sh-top"><div id="shCard"></div><div><h3>${ad ? `<span style="color:${ad.c}">${t('sheet.adjOf', { a: ad.n })}</span>` : ''}${c.tier >= 3 && it.dn ? `<span class="dn">「${it.dn}」</span><small class="bn">${it.n}</small>` : it.n}</h3>
     <div class="tags"><span class="tag" style="background:${T.c}33;color:${T.c}">${t('sheet.tierTag', { t: T.n })}</span><span class="tag" style="background:${TAGC[it.tag]}33;color:${TAGC[it.tag]}">${L.terms.tags[it.tag]}</span>${it.kind ? `<span class="tag">${L.terms.kinds[it.kind]}</span>` : ''}<span class="tag">${t('sheet.sizeTag', { s: sizeN, n: c.size })}</span></div>
-    <p>${it.d}<br><small style="color:var(--muted)">${UPS[it.up].t}</small></p></div></div>
+    <p>${richText(it.d)}<br><small style="color:var(--muted)">${UPS[it.up].t}</small></p></div></div>
     <p class="flav">“${it.f}”</p>
     ${it.lore ? (c.tier >= 2 ? `<div class="lore${c.tier >= 3 ? ' dia' : ''}"><small>${S.lore}</small><p>${it.lore}</p>${c.tier >= 3 ? `<p class="dl">—— ${it.dl}</p>` : ''}</div>` : `<div class="lore locked"><small>${S.lore}</small><p>${S.loreLocked}</p></div>`) : ''}
-    ${ad ? `<div class="adjbox" style="--ac:${ad.c}"><b>${ad.n}</b><span>${ad.d}</span></div>` : ''}
+    ${ad ? `<div class="adjbox" style="--ac:${ad.c}"><b>${ad.n}</b><span>${richText(ad.d)}</span></div>` : ''}
     ${kwBox(it.d)}
     <div class="stat">${rows}</div>
     <div class="sh-btns" id="shBtns"></div></div>`);

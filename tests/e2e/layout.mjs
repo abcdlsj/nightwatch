@@ -15,12 +15,13 @@ const out = arg('out', 'shots/layout');
 const url = arg('url', 'http://localhost:4317/') + '?seed=7&safe=' + safe;
 mkdirSync(out, { recursive: true });
 const engine = arg('engine', 'webkit') === 'chromium' ? chromium : webkit;
-const b = await engine.launch();
+const b = await engine.launch(engine === chromium ? { args: ['--mute-audio'] } : undefined);
 const pg = await b.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 2, hasTouch: true });
-/* 测试用存档：人物全部解锁 / test save: all heroes unlocked */
+/* 测试用存档：人物全部解锁、默认静音 / test save: all heroes unlocked, audio muted */
 await pg.addInitScript(() => {
   if (!localStorage.getItem('chain-meta-v1')) localStorage.setItem('chain-meta-v1', JSON.stringify({ heroes: { ayla: 1, mo: 1, ying: 1, jun: 1, li: 1 } }));
   if (!localStorage.getItem('chain-tips')) localStorage.setItem('chain-tips', JSON.stringify({ tutorial: 1 }));
+  localStorage.setItem('chain-settings', JSON.stringify({ music: false, sfx: false }));
 });
 const errs = [];
 const problems = [];

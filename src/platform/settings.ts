@@ -24,8 +24,28 @@ export interface Settings {
 
 function load(): Settings {
   const old = +(store.get(KEYS.audio) || 0) || 0;
-  const d: Settings = { music: old === 0, sfx: old < 2, haptics: true, shake: true, nums: true, tips: true, stats: true, big: false, crt: true, calm: RM };
-  return Object.assign(d, store.json<Partial<Settings>>(KEYS.settings, {}));
+  /* 自动化浏览器（Playwright / WebDriver）或 ?mute=1 默认静音，避免跑测试和截图时外放打扰 / mute automatically under WebDriver/Playwright or ?mute=1 so automated checks never play audio */
+  const autoMute =
+    (typeof navigator !== 'undefined' && !!navigator.webdriver) ||
+    (typeof location !== 'undefined' && new URLSearchParams(location.search).get('mute') === '1');
+  const d: Settings = {
+    music: !autoMute && old === 0,
+    sfx: !autoMute && old < 2,
+    haptics: true,
+    shake: true,
+    nums: true,
+    tips: true,
+    stats: true,
+    big: false,
+    crt: false,
+    calm: RM,
+  };
+  const merged = Object.assign(d, store.json<Partial<Settings>>(KEYS.settings, {}));
+  if (autoMute) {
+    merged.music = false;
+    merged.sfx = false;
+  }
+  return merged;
 }
 export const SETTINGS: Settings = load();
 

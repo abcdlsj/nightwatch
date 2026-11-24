@@ -39,9 +39,8 @@ export function titleScreen() {
   /* 回到标题页就不在每日挑战里了（继续存档时会从存档读回来） / back on the title screen we're no longer in a daily (continuing a save reads it back) */
   G.daily = '';
   const sv = loadSave();
-  sc.innerHTML = `<div class="scr"><div class="logo" aria-label="${T.logoAria}">${(T.logo as string[]).map((c) => `<span>${c}</span>`).join('')}</div><div class="logo-sub">NIGHT WATCH</div>
+  sc.innerHTML = `<div class="scr scr-title"><div class="logo" aria-label="${T.logoAria}">${(T.logo as string[]).map((c) => `<span>${c}</span>`).join('')}</div><div class="logo-sub">NIGHT WATCH</div>
   <p class="tagline">${T.tagline}</p>
-  <div class="rules">${(T.rules as string[]).map((r, i) => `<div><i>${i + 1}</i><span>${r}</span></div>`).join('')}</div>
   ${sv && HEROES[sv.hero] ? `<button class="btn gold big" id="contBtn">${t('title.cont', { h: HEROES[sv.hero].n, r: sv.round })}</button>` : ''}
   <button class="btn ${sv ? 'alt' : 'red'} big" id="startBtn">${sv ? T.newRun : T.start}</button>
   <button class="btn alt t-daily" id="dailyBtn">${L.ui.daily.btn}</button>
@@ -155,20 +154,21 @@ export function heroSelect() {
   const T = L.ui.heroes;
   setScene('title');
   G.daily = '';
-  sc.innerHTML = `<div class="scr"><button class="btn alt sm hs-back" id="hsBack">‹ ${T.back}</button><h1 style="font-size:var(--t-xl)">${T.title}</h1><div class="heroes">${heroList()
+  const showMeta = META.runs > 0;
+  sc.innerHTML = `<div class="scr scr-heroes"><div class="hs-head"><button class="btn alt sm hs-back" id="hsBack">‹ ${T.back}</button><h1 style="font-size:var(--t-xl)">${T.title}</h1></div><div class="heroes">${heroList()
     .map((k) => {
       const H = HEROES[k];
       if (!heroUnlocked(k))
         return `<button class="hero locked" data-h="${k}" style="--hc:#56656b" disabled><img class="por" src="${spr(H.portrait).url}" alt=""><div class="hn"><b>${H.n}</b><small>${H.title}</small></div>
     <div class="htag">${T.locked}</div><p>${t('heroes.unlockBy', { h: HEROES[heroNeeds(k)].n })}</p></button>`;
       const hh = heatOf(k).max;
+      const lv = mastLv(k);
       return `<button class="hero" data-h="${k}" style="--hc:${H.col}"><img class="por" src="${spr(H.portrait).url}" alt=""><div class="hn"><b>${H.n}</b><small>${H.title}</small></div>
-    <div class="htag">${H.tag}</div>${H.world && WORLDS[H.world] ? `<div class="hworld">${t('heroes.world', { n: WORLDS[H.world].n })}</div>` : ''}<div class="hstat"><span>${T.wall} <b>${H.wall}</b></span><span>${T.gold} <b>${H.gold}</b></span>${mastHtml(k)}${hh ? `<span>${t('heroes.heat', { h: hh })}</span>` : ''}</div><p>${H.desc}</p>
-    ${H.sig ? `<div class="hsig"><b>${L.ui.heroes.sig} · ${H.sig}</b><span>${H.sigD}</span></div>` : ''}
-    ${pathsHtml(k)}
-    <em>“${H.intro}”</em></button>`;
+    <div class="htag">${H.tag}</div>${H.world && WORLDS[H.world] ? `<div class="hworld">${t('heroes.world', { n: WORLDS[H.world].n })}</div>` : ''}<div class="hstat"><span>${T.wall} <b>${H.wall}</b></span><span>${T.gold} <b>${H.gold}</b></span>${lv > 0 || showMeta ? mastHtml(k) : ''}${hh ? `<span>${t('heroes.heat', { h: hh })}</span>` : ''}</div>
+    ${H.sig ? `<div class="hsig"><b>${L.ui.heroes.sig} · ${H.sig}</b><span>${H.sigD}</span></div>` : `<p>${H.desc}</p>`}
+    ${lv > 0 || showMeta ? pathsHtml(k) : ''}</button>`;
     })
-    .join('')}</div><p class="mastline">${T.mastLine}${(L.meta.mastShort as string[]).map((p, i) => t('heroes.mastLv', { n: i + 1, p })).join(' · ')}</p><button class="btn alt sm" id="cdxBtn2">${T.codex}</button></div>`;
+    .join('')}</div>${showMeta ? `<p class="mastline">${T.mastLine}${(L.meta.mastShort as string[]).map((p, i) => t('heroes.mastLv', { n: i + 1, p })).join(' · ')}</p>` : ''}<button class="btn alt sm" id="cdxBtn2">${T.codex}</button></div>`;
   sc.hidden = false;
   $('#hsBack').onclick = () => {
     SFX.ensure();
@@ -265,7 +265,7 @@ export function pickKit(done: (k: KitDef, o: KitOpts) => void) {
   setScene('title');
   /* 每日挑战：难度定死，不出完整线、异象、轮换 / daily: fixed difficulty, no full line, omens or rotation */
   const daily = !!G.daily;
-  sc.innerHTML = `<div class="scr">${daily ? '' : fullBox(G.hero) + variantBoxes(G.hero)}<img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="font-size:var(--t-xl)">${T.title}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
+  sc.innerHTML = `<div class="scr scr-kits">${daily ? '' : fullBox(G.hero) + variantBoxes(G.hero)}<img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="font-size:var(--t-xl)">${T.title}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
   ${daily ? `<div class="logo-sub">${L.ui.daily.title} · ${G.daily} · ${G.heat ? t('heroes.heat', { h: G.heat }) : L.ui.daily.normal}</div>` : heatBar(G.hero)}
   <div class="kits">${list
     .map((k, i) => {
@@ -324,7 +324,7 @@ export function endScreen(win: boolean, quit = false) {
   const mastNote = mg
     ? `<div class="newheat">${t('end.mast', { h: H.n, n: mg.add })}${mg.up ? t('end.mastUp', { lv: mg.lv, p: (L.meta.mastPerk as string[])[mg.lv - 1] }) : t('end.mastLv', { lv: mg.lv })}</div>`
     : '';
-  sc.innerHTML = `<div class="scr"><img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="color:${win || endl ? '#ffe79a' : '#ff8a80'}">${win ? dawnTitle() : endl ? T.endless : T.lost}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
+  sc.innerHTML = `<div class="scr scr-end"><img class="por-big" src="${spr(H.portrait).url}" alt=""><h1 style="color:${win || endl ? '#ffe79a' : '#ff8a80'}">${win ? dawnTitle() : endl ? T.endless : T.lost}</h1><div class="logo-sub">${H.n} · ${H.title}</div>
   <div class="rules res">${row(T.reached, endl ? t('end.reachedEndless', { r: G.round }) : t('end.reachedR', { r: Math.min(G.round, lastNight()), m: lastNight() }))}
   ${G.heat ? row(T.heat, t('heroes.heat', { h: G.heat })) : ''}
   ${row(T.relicsTalents, t('end.relicsTalentsV', { r: G.relics.length, t: G.skills.length }))}

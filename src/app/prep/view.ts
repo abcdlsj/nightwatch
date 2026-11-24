@@ -1,5 +1,5 @@
 /* 备战界面：今晚预告、三站选门、各站内容、夜谈、准备好了、加码 / Prep screen: tonight's forecast, three door stops, each stop's content, night talks, ready, and modifiers */
-import { ITEMS, ADJ, TIERS, GT, TAGC } from '../../data/cards';
+import { ITEMS, ADJ, GT, TAGC } from '../../data/cards';
 import { EN } from '../../data/enemies';
 import { EVENTS } from '../../data/events';
 import { RELICS } from '../../data/relics';
@@ -15,7 +15,7 @@ import type { Tag } from '../../data/types';
 import { G, type Offer, type PrepStop } from '../../game/state';
 import { boardCards, fits } from '../../game/cards';
 import { synCount, synLevel, synPairs } from '../../game/synergy';
-import { modText, plainMods, pickLine } from '../../game/text';
+import { modText, plainMods, pickLine, shortDesc, richText } from '../../game/text';
 import { nightInfo } from '../../game/nights';
 import { afford } from '../../game/mods';
 import { curWorld } from '../../game/world';
@@ -385,7 +385,7 @@ function offerEl(of: Offer) {
   o.appendChild(cel);
   o.insertAdjacentHTML(
     'beforeend',
-    `<div class="oname">${it.n}${isForeign(c.key) ? `<small class="fg">${t('prep.foreign', { h: HEROES[it.hero!].n })}</small>` : ''}</div><div class="oadj"><span style="color:${TIERS[c.tier].c}">${TIERS[c.tier].n}</span>${ad ? ` · <span style="color:${ad.c}">${ad.n}</span>` : ''}</div><div class="odesc">${ad ? ad.d : it.d}</div><div class="oflav">${it.f}</div><div class="price${of.price === 0 ? ' free' : of.price > G.gold ? ' cant' : ''}" data-p="${of.price}">${of.price === 0 ? T.free : `<img class="ico" src="${spr('coin').url}" alt="${T.gold}">${of.price}`}</div>`,
+    `<div class="oname">${it.n}${isForeign(c.key) ? `<small class="fg">${t('prep.foreign', { h: HEROES[it.hero!].n })}</small>` : ''}</div>${ad ? `<div class="oadj"><span style="color:${ad.c}">${ad.n}</span></div>` : ''}<div class="odesc">${richText(shortDesc(ad ? ad.d : it.d))}</div><div class="oflav">${it.f}</div><div class="price${of.price === 0 ? ' free' : of.price > G.gold ? ' cant' : ''}" data-p="${of.price}">${of.price === 0 ? T.free : `<img class="ico" src="${spr('coin').url}" alt="${T.gold}">${of.price}`}</div>`,
   );
   if (!of.sold) cel.addEventListener('pointerdown', (e) => startDragOffer(e, of, cel));
   lockBtn(o, of, G.prep && G.prep.cur);
@@ -543,13 +543,17 @@ function renderGem(cur: PrepStop, body: HTMLElement) {
   body.appendChild(list);
 }
 
-/* ---------------- 准备好了：今晚情报 + 加码 ---------------- / ---------------- Ready: tonight's intel + modifiers ---------------- */
+/* ---------------- 准备好了：战前检查（不重复顶栏已有的敌情）+ 关键精英提示 + 加码 ---------------- / ---------------- Ready: pre-battle checks (without repeating top-bar threats) + key elite callouts + modifiers ---------------- */
 function readyHtml() {
   const P = G.prep;
   const T = L.ui.prep;
   const cnt: Record<string, number> = {};
   G.nextWave!.forEach((s) => (cnt[s.type] = (cnt[s.type] || 0) + 1));
-  const ks = Object.keys(cnt).sort((a, b) => (EN[b].boss || EN[b].elite ? 1 : 0) - (EN[a].boss || EN[a].elite ? 1 : 0) || cnt[b] - cnt[a]);
+  /* 顶栏 #preview 已经列过所有敌群和敌情，这里只挑出需要应对的精英、首领或有机制说明的怪 / top #preview already lists wave counts and threats; only highlight bosses, elites or foes with tactical tips here */
+  const notable = Object.keys(cnt)
+    .filter((k) => EN[k].boss || EN[k].elite || EN[k].tip)
+    .sort((a, b) => (EN[b].boss || EN[b].elite ? 1 : 0) - (EN[a].boss || EN[a].elite ? 1 : 0) || cnt[b] - cnt[a])
+    .slice(0, 3);
   const bc = boardCards();
   const used = bc.reduce((s, c) => s + c.size, 0);
   const bag = G.cards.filter((c) => c.loc === 'stash');
@@ -563,23 +567,19 @@ function readyHtml() {
   if (G.wall < G.wallMax * 0.4) warn.push(t('prep.warnWall', { n: Math.ceil(G.wall) }));
   const tips = L.meta.readyTips as string[];
   if (P.tipI == null) P.tipI = Math.floor(vr() * tips.length);
-  return `<div class="ready"><div class="rd-t">${T.ready}</div><p>${nightInfo(G.round).title}</p>
-    <div class="intel"><div class="il-h">${T.coming}</div>${(G.nextWave!.threats || [])
-      .map((k) => `<div class="ithreat"><b>${THREATS[k].n}</b><span>${THREATS[k].d}</span></div>`)
-      .join('')}${nextLine()}${ks
-      .map((k) => {
-        const d = EN[k];
-        return `<div class="ifoe${d.boss || d.elite ? ' elite' : ''}"><img src="${spr(d.spr).fit(32)}" alt=""><b>${d.n}</b><small>${d.boss ? T.boss : d.elite ? T.elite : '×' + cnt[k]}</small><span>${d.tip || T.minion}</span></div>`;
-      })
-      .join('')}</div>
+  return `<div class="ready"><div class="rd-t">${T.ready}</div>
     ${warn.length ? `<div class="iwarn">${warn.map((w) => `<span>${w}</span>`).join('')}</div>` : ''}
+    ${
+      notable.length
+        ? `<div class="intel">${notable
+            .map((k) => {
+              const d = EN[k];
+              return `<div class="ifoe${d.boss || d.elite ? ' elite' : ''}"><img src="${spr(d.spr).fit(32)}" alt=""><b>${d.n}</b><small>${d.boss ? T.boss : d.elite ? T.elite : '×' + cnt[k]}</small><span>${d.tip || T.minion}</span></div>`;
+            })
+            .join('')}</div>`
+        : ''
+    }
     <p class="muted">${T.tipPre}${tips[P.tipI]}</p></div>`;
-}
-
-/** 段末那夜：下一段的敌情 / on a segment's last night: the next segment's threats */
-function nextLine() {
-  const nx = nextSeg(G.round);
-  return nx ? `<div class="ithreat next"><b>${t('prep.threatsNext', { a: nx.from, b: nx.to, s: '' })}</b><span>${nx.ids.map((k) => `${THREATS[k].n}${L.ui.common.lp}${THREATS[k].d}${L.ui.common.rp}`).join(' · ')}</span></div>` : '';
 }
 
 function wagerHtml() {

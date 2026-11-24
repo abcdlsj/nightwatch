@@ -1,15 +1,19 @@
 /* ---------- 标题/结算屏 ---------- / ---------- Title / result screens ---------- */
-#screen{position:fixed;inset:0;z-index:85;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:calc(16px + var(--sat)) 16px calc(16px + var(--sab));background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23060a0e' d='M0 0h2v2H0zM2 2h2v2H2z'/%3E%3C/svg%3E") 0 0/4px 4px}
-/* 盖在夜景上的一层 2px 棋盘网点（一半格子是深色），代替半透明和模糊 / a 2px checkerboard dot screen over the night scene (half the cells dark), instead of translucency and blur */
+#screen{position:fixed;inset:0;z-index:85;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:calc(16px + var(--sat)) 16px calc(20px + var(--sab));
+  background:linear-gradient(to bottom,rgba(8,14,19,.52) 0%,rgba(8,14,19,.78) 42%,rgba(7,12,17,.92) 100%)}
+/* 全屏页打开时藏起底层棋盘和底栏，避免半透串影干扰视觉 / hide underlying board/bar when full-screen overlays are open so nothing bleeds through */
+body:has(#screen:not([hidden])) #app{visibility:hidden}
 #screen[hidden]{display:none}
-.scr{max-width:380px;width:100%;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.scr{max-width:380px;width:100%;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.scr-title{gap:16px;padding-top:18px}
+.scr-title .tagline{margin:2px 0 12px;font-family:var(--body);font-size:var(--t-b);color:#d7e3e7;line-height:1.6;text-wrap:balance;max-width:320px}
 .logo{display:flex;gap:4px;font-size:var(--t-h4);line-height:1}
 .logo span{display:inline-block;color:#fff;text-shadow:0 6px 0 #7a1f1a,0 10px 0 rgba(0,0,0,.5);animation:logoB 2.4s steps(3,jump-none) infinite}
 .logo span:nth-child(2){animation-delay:.25s;color:#ffd166;text-shadow:0 6px 0 #8a5a12,0 10px 0 rgba(0,0,0,.5)}
 .logo span:nth-child(3){animation-delay:.5s}
 .logo-sub{font-family:var(--px);letter-spacing:2px;text-wrap:balance;color:#ffe3b0;font-size:var(--t-m);text-shadow:0 2px 0 rgba(0,0,0,.6)}
-.rules{background:rgba(10,16,22,.75);border-radius:3px;padding:13px 15px;box-shadow:0 4px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.07);
-  display:flex;flex-direction:column;gap:9px;text-align:left;font-size:var(--t-m);line-height:1.55;width:100%}
+.rules{background:rgba(12,20,27,.86);border-radius:3px;padding:12px 14px;box-shadow:0 4px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.07);
+  display:flex;flex-direction:column;gap:8px;text-align:left;font-family:var(--body);font-size:var(--t-b);line-height:1.55;width:100%}
 .rules div{display:flex;gap:8px}
 .rules i{font-style:normal;color:#ffd166;font-family:var(--px)}
 .scr .btn.big{width:100%;flex:none}

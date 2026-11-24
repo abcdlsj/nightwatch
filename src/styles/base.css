@@ -13,7 +13,8 @@
   --card:#f0e4c7; --cink:#2a2130;
   --zh:'PixNum','PixSym','Pixelify Sans','Fusion Pixel','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif;
   --px:var(--zh);
-  --body:'Fusion Pixel','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif;
+  /* 正文脱离像素字：保留像素字给标题/数字/卡名，长段机制与剧情用高可读无衬线体，降低手机阅读负担 / Body text uses clean sans-serif while display/digits/card names stay pixel, reducing mobile reading load */
+  --body:system-ui,-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans CJK SC',sans-serif;
   --cw:46px; --ch:90px;
   /* 字号的默认值，ui/type.ts 启动时按 DPR 改写 / default type sizes, rewritten per DPR by ui/type.ts at boot */
   --t-s:12px; --t-b:12px; --t-m:18px; --t-l:24px; --t-xl:24px; --t-h1:36px; --t-h2:48px; --t-h3:60px; --t-h4:84px;
@@ -31,8 +32,16 @@
 /* 美术是暗色的：按钮等原生控件也按暗色配色画，嵌进浅色页面（如 B站 Toy 的 iframe）时默认文字才不会变成黑色
  * the art is dark: draw native controls such as buttons in the dark scheme too, so their default text doesn't turn black when embedded in a light page (e.g. the Bilibili Toy iframe) */
 html{height:100%;background:var(--bg);scroll-padding-top:var(--sat);color-scheme:dark}
-body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--zh);overflow:hidden;font-synthesis:none;-webkit-font-smoothing:none;
+body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--zh);overflow:hidden;-webkit-font-smoothing:antialiased;
   user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+/* 语义高亮：独立乘区（紫金）、数值（暖金）、关键词（冰青）、元素状态 / Semantic inline highlights for body descriptions */
+.rt-x{color:#e0b3ff;font-weight:700}
+.rt-n{color:#ffd166;font-weight:700}
+.rt-kw{color:#7ee8e2;font-weight:600}
+.rt-el-fire{color:#ff8a5b;font-weight:600}
+.rt-el-ice{color:#73eff7;font-weight:600}
+.rt-el-poison{color:#8ff080;font-weight:600}
+.rt-el-volt{color:#ffe066;font-weight:600}
 button{font-family:inherit}
 em,i{font-style:normal}/* 像素字体斜体会糊，一律不斜 / italic pixel fonts blur, so never italicize */
 #bg{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated;z-index:0}
@@ -43,6 +52,8 @@ html.no-crt #crt{display:none}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
 
 #app{position:relative;z-index:1;max-width:440px;height:100%;margin:0 auto;display:flex;flex-direction:column;gap:7px;padding:8px}
+/* 移动端所有可滚动容器恢复纵向触控滑动与防穿透 / restore smooth vertical touch scrolling inside scrollable containers while body locks touch-action */
+#screen,#pbody,.sh,.tlist,.cdx,.rp-list{touch-action:pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 /* 英文：标题字体换成带拉丁字母的像素字 / English: use a pixel font with Latin glyphs for display text */
 html[lang=en] .logo{flex-direction:column;align-items:center;gap:0;font-size:var(--t-h3)}
 html[lang=en] .logo + .logo-sub{display:none}

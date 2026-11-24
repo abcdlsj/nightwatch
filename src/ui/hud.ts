@@ -156,34 +156,50 @@ function nextTip(first?: boolean) {
     tipEl!.className = '';
     return;
   }
-  /* 战报、结局页上不弹提示（会盖住标题或「收下」），等回到备战再说 / no tips over the report or ending (they would cover the title or the collect button); wait until prep */
-  /* 成就弹窗也在顶上：等它收走再出提示 / the achievement popup also sits at the top: wait until it is gone */
-  if (G.phase === 'report' || G.phase === 'over' || document.querySelector('.achpop')) {
+  /* 战报、结局、弹层、全屏页、剧情、成就弹窗或背包抽屉打开时不弹提示 / never pop tips over reports, endings, sheets, screens, story, achievements or an open bag drawer */
+  if (
+    G.phase === 'report' ||
+    G.phase === 'over' ||
+    document.querySelector('.achpop') ||
+    !$('#sheet').hidden ||
+    !$('#screen').hidden ||
+    !$('#story').hidden ||
+    UI.drawer
+  ) {
     tipEl!.className = '';
     tipT = setTimeout(() => nextTip(true), 800);
     return;
   }
   /* 战斗中：提示和喊话共用战场下沿那一格，排在敌人介绍卡一档，喊话等它讲完 / in battle: tips share the bottom slot with shouts, ranked with enemy cards; shouts wait for it */
   const fight = G.phase === 'battle';
-  if (fight && laneWait(LANE.foe) > 0) {
+  if (fight && (laneWait(LANE.foe) > 0 || laneWait(LANE.banner) > 0)) {
     tipEl!.className = '';
-    tipT = setTimeout(() => nextTip(true), laneWait(LANE.foe) + 40);
+    tipT = setTimeout(() => nextTip(true), Math.max(laneWait(LANE.foe), laneWait(LANE.banner)) + 40);
     return;
   }
   const [l, h, ms] = TIPQ[0];
   tipEl!.innerHTML = `<small>${l}</small><p>${h}</p>`;
   tipEl!.className = '';
-  if (fight) {
-    /* 北边是敌人进场的地方，提示不放顶上，压在卡牌上方 / the north is where enemies come in, so the tip sits just above the cards instead of at the top */
-    const st = $('#stage').getBoundingClientRect();
-    tipEl!.style.top = `${Math.max(60, st.bottom - 52 - tipEl!.offsetHeight)}px`;
-    laneTake(LANE.foe, ms);
-  } else if (G.phase === 'prep') {
-    /* 备战：顶上是今晚标题和敌情，气泡放到下沿提示条上方 / prep: the night title and threats sit at the top, so the bubble goes above the bottom toast */
-    const st = $('#stage').getBoundingClientRect();
-    tipEl!.style.top = `${Math.max(60, st.bottom - 76 - tipEl!.offsetHeight)}px`;
+  const wide = document.documentElement.classList.contains('wide');
+  const st = $('#stage').getBoundingClientRect();
+  /* 宽屏把提示锚定在右栏舞台中心（不横跨左右栏，也不遮挡左栏商店/准备内容）；窄屏居中 / on wide desktop anchor inside the right stage column so it never crosses or covers left prep */
+  if (wide && st.width > 0) {
+    tipEl!.style.left = `${Math.round(st.left + st.width / 2)}px`;
+    tipEl!.style.maxWidth = `${Math.min(390, Math.round(st.width - 20))}px`;
   } else {
-    /* 首领血条和「下一招」在顶上时，气泡挪到它下面，别挡住 / when the boss bar and 'next move' sit up top, move tooltips below them so they are not covered */
+    tipEl!.style.left = '';
+    tipEl!.style.maxWidth = '';
+  }
+  if (fight || wide) {
+    /* 战斗中或宽屏右栏空城墙：放在舞台下沿城墙上方 / in battle or wide right stage: cleanly above the wall */
+    tipEl!.style.top = `${Math.max(60, Math.round(st.bottom - 52 - tipEl!.offsetHeight))}px`;
+    if (fight) laneTake(LANE.foe, ms);
+  } else if (G.phase === 'prep') {
+    /* 手机备战：放在舞台下方操作按钮之上，且不压住顶栏预告 / mobile prep: sit cleanly above the lower action buttons without covering the top night preview */
+    const pv = $('#preview').getBoundingClientRect();
+    const minTop = pv.height > 0 ? pv.bottom + 6 : st.top + 6;
+    tipEl!.style.top = `${Math.round(Math.max(minTop, st.bottom - 58 - tipEl!.offsetHeight))}px`;
+  } else {
     const bar = $('#bossbar');
     tipEl!.style.top = bar.hidden ? '' : `${bar.getBoundingClientRect().bottom + 6}px`;
   }

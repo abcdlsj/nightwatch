@@ -1,23 +1,26 @@
 /* ---------- 人物/剧情/天赋 ---------- / ---------- Hero / story / talents ---------- */
 .tagline{margin:0;color:#ffe3b0;font-size:var(--t-m);text-shadow:0 2px 0 rgba(0,0,0,.6)}
-.heroes{display:flex;flex-direction:column;gap:9px;width:100%}
-.hero{display:grid;grid-template-columns:56px 1fr;gap:3px 10px;text-align:left;color:#fff;border:0;border-radius:3px;padding:10px 12px;background:rgba(16,22,30,.88);cursor:pointer;
+.hs-head{position:relative;display:flex;align-items:center;justify-content:center;width:100%;min-height:36px;padding:0 96px}
+.hs-head .hs-back{position:absolute;left:0;top:50%;transform:translateY(-50%);white-space:nowrap;flex:none}
+.hs-head h1{margin:0;white-space:nowrap}
+.heroes{display:flex;flex-direction:column;gap:10px;width:100%}
+.hero{display:grid;grid-template-columns:64px 1fr;gap:4px 12px;text-align:left;color:#fff;border:0;border-radius:3px;padding:12px;background:rgba(16,24,31,.92);cursor:pointer;
   box-shadow:0 5px 0 rgba(0,0,0,.5),inset 0 0 0 2px var(--hc);animation:doorIn .35s backwards;transition:transform .1s}
 .hero:nth-child(2){animation-delay:.1s}.hero:active{transform:translateY(3px)}
 .hero .por{grid-row:span 3;width:64px;height:64px;image-rendering:pixelated;background:rgba(0,0,0,.35);border-radius:3px;box-shadow:inset 0 0 0 2px var(--hc)}
-.hero .hn b{font-weight:400;font-size:var(--t-l);color:var(--hc)}.hero .hn small{margin-left:8px;color:var(--muted);font-size:var(--t-b)}
-.htag{font-size:var(--t-b);color:var(--hc)}
+.hero .hn{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.hero .hn b{font-weight:400;font-size:var(--t-l);color:var(--hc)}.hero .hn small{font-family:var(--body);color:var(--muted);font-size:var(--t-s)}
+.htag{font-family:var(--body);font-weight:600;font-size:var(--t-b);color:var(--hc)}
 .hworld{display:inline-block;margin:2px 0;padding:1px 6px;font-size:var(--t-s);color:#1a1c2c;background:var(--hc);border-radius:2px}
 .hero p,.hero em{grid-column:1/-1}
 .hmeta{grid-column:1/-1;display:flex;align-items:center;gap:10px}
-.hero p{margin:2px 0 0;font-family:var(--body);font-size:var(--t-b);line-height:1.55;color:#e2eaec}
-.hstat{display:flex;gap:14px;font-size:var(--t-b);color:var(--muted)}.hstat b{font-family:var(--px);color:#fff}
+.hero p{margin:2px 0 0;font-family:var(--body);font-size:var(--t-b);line-height:1.55;color:#dce6e9}
+.hstat{display:flex;gap:12px;flex-wrap:wrap;font-family:var(--body);font-size:var(--t-s);color:var(--muted)}.hstat b{font-family:var(--px);font-weight:400;color:#fff}
 .hmast b{color:#ffd166}.hmast small{margin-left:4px;font-size:var(--t-s)}
-.mastline{margin:2px 0 0;font-size:var(--t-b);line-height:1.5;color:var(--muted);max-width:420px}
+.mastline{margin:2px 0 0;font-family:var(--body);font-size:var(--t-s);line-height:1.5;color:var(--muted);max-width:420px}
 .hcards{display:flex;gap:5px;margin-left:auto}.hcards img{width:26px;height:26px;image-rendering:pixelated;background:#efdfc8;border-radius:3px;padding:2px;box-shadow:0 0 0 2px #1b1224}
 .hcards img.ex{background:#2a2140;box-shadow:0 0 0 2px var(--hc)}
 .hero em{font-family:var(--body);font-size:var(--t-b);line-height:1.5;color:#a8bcc2}
-.hs-back{position:sticky;top:calc(6px + var(--sat));align-self:flex-start;z-index:2}
+.hs-back{align-self:flex-start}
 .por-big{width:96px;height:96px;image-rendering:pixelated}
 #story{position:fixed;inset:0;z-index:88;background:#05060f;cursor:pointer;overflow:hidden}
 #story.st-dawn{background:#1d1b3a}#story.st-fall{background:#0d0306}

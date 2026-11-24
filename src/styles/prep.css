@@ -28,8 +28,8 @@
 .door img{width:56px;height:56px;image-rendering:pixelated;flex:none;background:rgba(0,0,0,.28);border-radius:3px;padding:4px}
 .door div,.opt div{display:flex;flex-direction:column;gap:3px;min-width:0}
 .door b{font-weight:400;font-size:var(--t-l);color:var(--cc)}
-.door span{font-size:var(--t-b)}
-.door em,.ev-head em,.opt em,.flav{font-family:var(--body);font-size:var(--t-b);color:#a8bcc2;line-height:1.5}
+.door span{font-family:var(--body);font-size:var(--t-b);color:#e4ecef;line-height:1.45}
+.door em,.ev-head em,.opt em,.flav{font-family:var(--body);font-size:var(--t-s);color:#a8bcc2;line-height:1.5}
 .nextstop{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:var(--t-s);color:var(--muted)}
 .nextstop i{font-style:normal;display:flex;align-items:center;gap:3px;color:var(--cc,#c9d4d8);background:rgba(0,0,0,.25);border-radius:3px;padding:2px 7px 2px 3px}
 .nextstop img{width:16px;height:16px;image-rendering:pixelated}
