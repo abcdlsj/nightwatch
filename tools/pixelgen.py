@@ -3222,7 +3222,7 @@ HERO_PORTRAITS = {
         '..HHHHHHssHHHssHrrRRruHHHHH.....',
         '..HHHHHHssHHHssHuuRRruHHHHH.....',
     ),
-    # 墨：流亡炼金师——深紫兜帽、对称黄铜青镜护目镜、凌乱暗发、青光锐眼与倦容、清晰歪嘴笑、胸前冒泡绿药瓶
+    # 墨：流亡炼金师——深紫兜帽、对称黄铜青镜护目镜、凌乱暗发、青光锐眼与倦容、利落歪嘴笑、胸前冒泡绿药瓶
     'p_mo': (
         '................................',
         '.............PQQp...............',
@@ -3240,8 +3240,8 @@ HERO_PORTRAITS = {
         '....PpqaMaiiCkfffCkfFMMpqq......',
         '....PpqMaaiFFfffffFFFaMpqq......',
         '....ppqMaaaiiffFffffFFMpqq......',
-        '....ppqMaaaiffffffBffFMpqq......',
-        '.....pqMaaaifffSSSfffMMpqq......',
+        '....ppqMaaaifffffSfffFMpqq......',
+        '.....pqMaaaifffSSffffMMpqq......',
         '.....qqMMaaafffffffFFMMqq.......',
         '......qqqMMaFFFFSSFFMMqqq.......',
         '......qqqMMqqMyYyMqqMMqq........',
@@ -3257,7 +3257,7 @@ HERO_PORTRAITS = {
         '..pqqqqHHHHHHHHHHHHHHHHqqqqq....',
         '..qqqqqHHHHHHHHHHHHHHHHqqqqq....',
     ),
-    # 萤：灯匠学徒——墨蓝波波头、紧贴发侧金色齿轮发簪、大亮暖瞳与红颊甜笑、暖黄围巾、左下高提发光萤灯
+    # 萤：灯匠学徒——墨蓝波波头、紧贴发侧金色齿轮发簪、大亮暖瞳与精致小巧甜笑、暖黄围巾、左下高提发光萤灯
     'p_ying': (
         '................................',
         '............aAAaaaa.............',
@@ -3275,9 +3275,9 @@ HERO_PORTRAITS = {
         '......aAaiiffnkfffnkfFaa........',
         '......AaaiBfffffffffBFaa........',
         '......vaaaifffffFffffFaa........',
-        '......vaaaiifBfffBfffFaM........',
-        '.......vaaaiifSSSffffaMM........',
-        '.......aaMMaaffffffFaMMM........',
+        '......vaaaaiiffffffffFaM........',
+        '.......vaaaaiifSSSffFaMM........',
+        '.......aaMMaaafffffFaMMM........',
         '......sddMMvvYYYYyyNNMM.........',
         '.....d..svYYYYYYyyyNNn..........',
         '....dsddsvYYyYYYYyyNNnn.........',
@@ -3521,11 +3521,8 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
         for x0 in (12, 18):
             c.px(x0, 13, 'M', True); c.px(x0 + 1, 12, 'M', True); c.px(x0 + 2, 13, 'M', True)
     elif eyes == 'round':
-        for lx, rx0 in ((12, 18),):
-            c.line(lx, 12, lx + 2, 12, 'M', 1, True); c.line(rx0, 12, rx0 + 2, 12, 'M', 1, True)
-            c.px(lx, 13, 'w', True); c.px(lx + 1, 13, 'k', True); c.px(lx + 2, 13, 'k', True)
-            c.px(rx0, 13, 'k', True); c.px(rx0 + 1, 13, 'k', True); c.px(rx0 + 2, 13, 'w', True)
-            c.px(lx + 1, 12, 'w', True); c.px(rx0 + 1, 12, 'w', True)
+        c.rect(13, 12, 14, 13, 'k', True); c.px(13, 12, 'w', True)
+        c.rect(18, 12, 19, 13, 'k', True); c.px(18, 12, 'w', True)
     else:
         c.line(12, 12, 14, 12, 'M', 1, True); c.line(18, 12, 20, 12, 'M', 1, True)
         c.px(12, 13, 'w', True); c.px(13, 13, iris, True); c.px(14, 13, 'k', True)
@@ -3569,9 +3566,13 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
     # 9. 嘴（自然唇影 S/B，严格居中 15..17）
     if mouth == 'smile':
         c.line(15, 17, 17, 17, 'S', 1, True); c.px(14, 16, 'B', True); c.px(18, 16, 'B', True)
-    elif mouth in ('grin', 'gap'):
+    elif mouth == 'grin':
         c.line(15, 17, 17, 17, 'w', 1, True); c.line(15, 18, 17, 18, 'S', 1, True)
         c.px(14, 17, 'S', True); c.px(18, 17, 'S', True)
+    elif mouth == 'gap':
+        c.line(15, 17, 17, 17, 'w', 1, True); c.px(16, 17, 'r', True)
+        c.line(15, 18, 17, 18, 'S', 1, True)
+        c.px(14, 16, 'B', True); c.px(18, 16, 'B', True)
     elif mouth == 'frown':
         c.line(15, 17, 17, 17, 'S', 1, True); c.px(14, 18, 'S', True); c.px(18, 18, 'S', True)
     elif mouth == 'small':
@@ -3580,8 +3581,6 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
         c.rect(15, 17, 17, 18, 'e', True); c.line(15, 17, 17, 17, 'S', 1, True)
     else:
         c.line(15, 17, 17, 17, 'S', 1, True)
-    if mouth == 'gap':
-        c.px(16, 17, 'M', True)
 
     # 10. 脸部特征（避开眼唇区）
     if mark == 'freckles':
@@ -3656,7 +3655,7 @@ def cast():
                             c.rect(1, 24, 4, 29, 'N'), c.line(1, 26, 4, 26, 'x', 1, True), c.line(2, 22, 2, 24, 'm', 1, True),
                             c.rect(27, 24, 30, 29, 'N'), c.line(27, 26, 30, 26, 'x', 1, True), c.line(29, 22, 29, 24, 'm', 1, True),
                         ))
-    P['p_douzi'] = person(hair='a', hl='A', style='short', cloth='R', cloth2='o', face='round', eyes='round', mouth='gap', nose='none',
+    P['p_douzi'] = person(hair='a', hl='A', style='short', cloth='R', cloth2='o', face='round', eyes='round', brow='arched', mouth='gap', nose='dot',
                           extra=lambda c: (
                               c.px(11, 14, 'B', True), c.px(21, 14, 'B', True),
                               c.rect(3, 24, 8, 29, 'o'), c.rect(4, 25, 7, 28, 'Y', True),
