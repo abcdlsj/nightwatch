@@ -138,16 +138,55 @@ export function clientToFieldX(el: Element) {
   return (r.left + r.width / 2 - fr.left) / F.s;
 }
 
-/** 每夜的战场主题：地面色阶、远山、北边裂隙的光、空中飘的东西。前几夜萤火，中段落灰，后几夜和首领夜发红、飘火星，霜潮下雪
- * per-night battlefield theme: ground ramp, distant ridge, the rift glow in the north, what drifts in the air.
+/** 每夜的战场主题：地面色阶、古石路、远山雾气、北边裂隙的光、空中飘的东西。前几夜萤火，中段落灰，后几夜和首领夜发红、飘火星，霜潮下雪
+ * per-night battlefield theme: ground ramp, ancient road, distant ridge & mist, the rift glow in the north, what drifts in the air.
  * Early nights have fireflies, middle nights ash, late and boss nights turn red with embers, Frost Tide snows */
-interface Theme { ramp: [number, number, number][]; tuft: string; ridge: string; ridgeHi: string; rift: string; amb: 'fly' | 'ash' | 'ember' | 'snow' }
+interface Theme {
+  ramp: [number, number, number][];
+  road: string;
+  roadHi: string;
+  roadDark: string;
+  mist: string;
+  stone: string;
+  stoneHi: string;
+  tuft: string;
+  ridgeFar: string;
+  ridge: string;
+  ridgeHi: string;
+  rift: string;
+  amb: 'fly' | 'ash' | 'ember' | 'snow';
+}
 const THEMES: Record<string, Theme> = {
-  early: { ramp: [[10, 11, 22], [13, 14, 26], [16, 16, 29], [20, 19, 31], [24, 22, 33], [27, 24, 34]], tuft: '#2f5a48', ridge: '#07070f', ridgeHi: '#1c1c33', rift: '#5d275d', amb: 'fly' },
-  mid: { ramp: [[9, 11, 24], [12, 14, 29], [15, 17, 33], [18, 20, 36], [22, 23, 38], [25, 26, 40]], tuft: '#2a4a4a', ridge: '#06070f', ridgeHi: '#1a1f38', rift: '#29366f', amb: 'ash' },
-  late: { ramp: [[12, 8, 20], [16, 10, 24], [20, 12, 27], [25, 14, 30], [30, 16, 32], [34, 18, 34]], tuft: '#4a2a3a', ridge: '#0a0510', ridgeHi: '#2a1226', rift: '#b13e53', amb: 'ember' },
-  boss: { ramp: [[16, 6, 16], [21, 8, 19], [26, 10, 22], [31, 12, 25], [36, 14, 27], [40, 16, 29]], tuft: '#5a2430', ridge: '#0c0408', ridgeHi: '#3a1020', rift: '#e43b44', amb: 'ember' },
-  frost: { ramp: [[10, 14, 26], [13, 18, 32], [16, 22, 37], [20, 27, 42], [25, 32, 47], [30, 37, 52]], tuft: '#3a5a6a', ridge: '#070a14', ridgeHi: '#2a3a58', rift: '#41a6f6', amb: 'snow' },
+  early: {
+    ramp: [[9, 11, 20], [11, 13, 24], [14, 16, 27], [17, 19, 30], [20, 22, 33], [24, 24, 34]],
+    road: '#1b1f30', roadHi: '#272c40', roadDark: '#10121e', mist: '#1d243b',
+    stone: '#222638', stoneHi: '#373e57', tuft: '#24473b',
+    ridgeFar: '#0d1020', ridge: '#06070e', ridgeHi: '#212640', rift: '#5d275d', amb: 'fly',
+  },
+  mid: {
+    ramp: [[8, 11, 22], [10, 14, 26], [13, 17, 30], [16, 20, 34], [20, 23, 37], [23, 26, 39]],
+    road: '#1a2034', roadHi: '#262f48', roadDark: '#0f1322', mist: '#1c2842',
+    stone: '#21283c', stoneHi: '#37425e', tuft: '#213f42',
+    ridgeFar: '#0c1124', ridge: '#06070f', ridgeHi: '#202846', rift: '#3b5dc9', amb: 'ash',
+  },
+  late: {
+    ramp: [[11, 8, 18], [14, 10, 22], [18, 12, 25], [22, 14, 28], [26, 16, 30], [31, 18, 32]],
+    road: '#231829', roadHi: '#332236', roadDark: '#130b18', mist: '#2e1629',
+    stone: '#2a1c2d', stoneHi: '#422c42', tuft: '#402434',
+    ridgeFar: '#16091a', ridge: '#09040e', ridgeHi: '#35172e', rift: '#b13e53', amb: 'ember',
+  },
+  boss: {
+    ramp: [[14, 6, 14], [18, 8, 17], [22, 10, 20], [27, 12, 23], [32, 14, 25], [36, 16, 27]],
+    road: '#281520', roadHi: '#3a1f2c', roadDark: '#150810', mist: '#38121f',
+    stone: '#301924', stoneHi: '#4a2634', tuft: '#4c202a',
+    ridgeFar: '#1b0712', ridge: '#0b0308', ridgeHi: '#451424', rift: '#e43b44', amb: 'ember',
+  },
+  frost: {
+    ramp: [[9, 14, 25], [12, 18, 30], [15, 22, 35], [19, 26, 40], [23, 30, 45], [27, 34, 49]],
+    road: '#1f2b3f', roadHi: '#2f3f59', roadDark: '#121928', mist: '#283d59',
+    stone: '#25334a', stoneHi: '#3d5170', tuft: '#325263',
+    ridgeFar: '#111b2e', ridge: '#070b15', ridgeHi: '#334a6e', rift: '#41a6f6', amb: 'snow',
+  },
 };
 function themeKey() {
   if (G.foeSet === 'frost') return 'frost';
@@ -157,7 +196,10 @@ function themeKey() {
 const theme = () => THEMES[F.themeK] || THEMES.early;
 const toU32 = ([r, g, b]: [number, number, number]) => (255 << 24) | (b << 16) | (g << 8) | r;
 
-/** 地面：一次画好缓存，按夜数换主题；固定种子保证同一夜每次一样 / ground: drawn once and cached, themed per night; a fixed seed keeps a given night identical every time */
+/** 地面：一次画好缓存，按夜数换主题；固定种子保证同一夜每次一样。
+ * 通过克制的荒野古石路、北境远山与低雾过渡、两侧地形层次与城墙石阶，打破单调暗紫底，同时严控明度以免抢夺怪物和弹幕焦点。
+ * ground: drawn once and cached, themed per night with a fixed seed.
+ * Subtle weathered stone causeway, layered northern ridge & mist, restrained flank terrain and wall footing break up the flat backdrop while keeping enemies and projectiles prominent. */
 function buildGround() {
   const W = world.W,
     H = world.H;
@@ -168,16 +210,16 @@ function buildGround() {
   c.width = W;
   c.height = H;
   const x = c.getContext('2d')!;
-  /* 夜色地面：几级相近的色阶加 Bayer 网点，不用平滑渐变；北边偏冷，靠城墙一侧偏暖
-   * night ground: a few closely spaced tones with a Bayer screen instead of a smooth gradient; cooler to the north, warmer toward the wall */
+  /* 1. 克制低对比夜色地基：六档相近色阶 + Bayer 网点，北冷南暖 / low-contrast 6-step night ground with Bayer screen */
   const id = x.createImageData(W, H),
     px32 = new Uint32Array(id.data.buffer);
   const tones = T.ramp.map(toU32);
   for (let iy = 0; iy < H; iy++) {
-    const v = (iy / Math.max(1, H - 1)) * (tones.length - 1);
+    const v = Math.pow(iy / Math.max(1, H - 1), 1.08) * (tones.length - 1);
     for (let ix = 0; ix < W; ix++) px32[iy * W + ix] = tones[Math.min(tones.length - 1, Math.floor(v + bayer(ix, iy)))];
   }
   x.putImageData(id, 0, 0);
+
   let s = 7 + G.round * 97;
   const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
   const px = (col: string, X: number, Y: number, w = 1, h = 1) => {
@@ -185,75 +227,146 @@ function buildGround() {
     x.fillRect(Math.round(X), Math.round(Y), w, h);
   };
   const wy = H - 7;
-  /* 碎石：亮顶暗底，两三格大 / rocks: lit top, dark base, two or three cells */
-  for (let i = 0; i < W / 10; i++) {
-    const X = Math.floor(r() * W),
-      Y = Math.floor(H * 0.12 + r() * (wy - H * 0.12 - 12)),
-      w = 2 + Math.floor(r() * 2);
-    px('#05060c', X + 1, Y + 1, w, 2);
-    px('#2c2c40', X, Y, w, 2);
-    px('#4a4c66', X, Y, w - 1, 1);
+  const ridgeH = Math.max(10, Math.round(H * 0.055));
+
+  /* 2. 城外荒野古石路：从北边山口通向城门，带轻微透视变宽与残破石板缝，低对比不抢焦点 / weathered stone causeway from the north pass to the wall gate */
+  const roadTopY = ridgeH + 6;
+  const roadBotY = wy - 3;
+  const cxRoad = (y: number) => W * 0.5 + Math.sin(y * 0.045 + G.round * 0.6) * (W * 0.032);
+  const halfRoad = (y: number) => {
+    const t = Math.max(0, Math.min(1, (y - roadTopY) / Math.max(1, roadBotY - roadTopY)));
+    return W * (0.085 + 0.075 * t);
+  };
+  /* 路基暗边（微弱土辙） / faint earthen road verge */
+  for (let y = roadTopY; y < roadBotY; y += 2) {
+    const cx = cxRoad(y),
+      hw = halfRoad(y);
+    ditherRect(x, Math.round(cx - hw - 3), y, Math.round((hw + 3) * 2), 2, T.roadDark, 0.38);
+    ditherRect(x, Math.round(cx - hw), y, Math.round(hw * 2), 2, T.road, 0.42);
   }
-  /* 草丛 / grass tufts */
-  for (let i = 0; i < W / 5; i++) {
+  /* 错缝残破石板（低明度，仅在靠近中轴与城墙处更清晰） / broken staggered flagstones */
+  for (let row = 0, y = roadTopY + 3; y < roadBotY - 2; row++) {
+    const stepY = y < H * 0.4 ? 4 : 5;
+    const cx = cxRoad(y),
+      hw = halfRoad(y);
+    const left = Math.round(cx - hw + 1),
+      right = Math.round(cx + hw - 1);
+    let sx = left + (row % 2 ? 3 : 0);
+    while (sx < right - 3) {
+      const sw = 4 + Math.floor(r() * 5);
+      const sh = stepY - 1;
+      if (r() < 0.72) {
+        const w2 = Math.min(sw, right - sx);
+        if (w2 >= 3) {
+          px(T.roadDark, sx, y + sh, w2, 1);
+          px(T.road, sx, y, w2, sh);
+          if (r() < 0.45) px(T.roadHi, sx, y, Math.max(1, w2 - 1), 1);
+        }
+      }
+      sx += sw + 1 + (r() < 0.25 ? 1 : 0);
+    }
+    y += stepY;
+  }
+
+  /* 3. 两侧荒野浅土坡与边缘暗角：轻微收拢视觉重心到战场中段 / subtle earthen contour banks on far flanks */
+  for (let band = 0; band < 3; band++) {
+    const bw = Math.round(W * (0.14 - band * 0.035));
+    ditherRect(x, 0, ridgeH + 6, bw, wy - ridgeH - 12, '#05060c', 0.14 + band * 0.06);
+    ditherRect(x, W - bw, ridgeH + 6, bw, wy - ridgeH - 12, '#05060c', 0.14 + band * 0.06);
+  }
+
+  /* 4. 聚簇碎石（避开正中石路，用克制暗岩色，不混入亮白杂点） / clustered weathered rocks flanking the road */
+  for (let i = 0; i < W / 11; i++) {
     const X = Math.floor(r() * W),
-      Y = Math.floor(H * 0.25 + r() * (wy - H * 0.25 - 4));
+      Y = Math.floor(H * 0.16 + r() * (wy - H * 0.16 - 14));
+    if (Math.abs(X - cxRoad(Y)) < halfRoad(Y) - 2 && r() < 0.78) continue;
+    const w = 2 + Math.floor(r() * 3);
+    px('#06070e', X + 1, Y + 1, w, 2);
+    px(T.stone, X, Y, w, 2);
+    px(T.stoneHi, X, Y, Math.max(1, w - 1), 1);
+    if (r() < 0.35) px(T.stone, X + w, Y + 1, 1, 1);
+  }
+
+  /* 5. 沿路与石旁的低矮草丛（成小簇分布，比均匀撒点更有自然感） / small natural grass/moss clusters */
+  for (let i = 0; i < W / 7; i++) {
+    const X = Math.floor(r() * W),
+      Y = Math.floor(H * 0.22 + r() * (wy - H * 0.22 - 8));
+    if (Math.abs(X - cxRoad(Y)) < halfRoad(Y) - 3) continue;
     px(T.tuft, X, Y, 1, 2);
     px(T.tuft, X + 2, Y + 1);
-    px(T.tuft, X - 1, Y + 1);
+    if (r() < 0.6) px(T.tuft, X - 1, Y + 1);
   }
-  /* 零星白骨 / scattered bones */
-  for (let i = 0; i < W / 30; i++) {
-    const X = Math.floor(r() * W),
-      Y = Math.floor(H * 0.3 + r() * (wy - H * 0.35));
-    px('#94b0c2', X, Y, 2, 1);
-    px('#566c86', X + 2, Y);
-  }
-  /* 两边的枯树：只放在边上，不挡战场中间 / dead trees: only along the edges, never in the middle of the fight */
+
+  /* 6. 两侧边缘枯树：带微弱月光亮边，不挡中路战斗 / gnarled dead trees along the outer edges */
   for (let i = 0; i < 4; i++) {
-    const X = i % 2 ? W - 3 - Math.floor(r() * W * 0.1) : 2 + Math.floor(r() * W * 0.1),
-      Y = Math.floor(H * 0.2 + r() * H * 0.55),
-      h = 7 + Math.floor(r() * 6);
-    px('#05060c', X + 1, Y + 1, 3, 1);
-    px('#1a1420', X, Y - h, 1, h + 1);
+    const leftSide = i % 2 === 0;
+    const X = leftSide ? 3 + Math.floor(r() * W * 0.08) : W - 4 - Math.floor(r() * W * 0.08),
+      Y = Math.floor(H * 0.22 + r() * H * 0.5),
+      h = 8 + Math.floor(r() * 6);
+    px('#05060c', X, Y + 1, 4, 1);
+    px('#161321', X, Y - h, 2, h + 1);
+    px(T.stone, X, Y - h, 1, h);
     for (let b = 0; b < 3; b++) {
       const by = Y - h + 1 + b * 2 + Math.floor(r() * 2),
         d = b % 2 ? 1 : -1,
-        l = 1 + Math.floor(r() * 3);
-      for (let k = 1; k <= l; k++) px('#1a1420', X + d * k, by - Math.floor(k / 2));
+        l = 2 + Math.floor(r() * 3);
+      for (let k = 1; k <= l; k++) px('#161321', X + d * k, by - Math.floor(k / 2));
     }
   }
-  /* 北边远山和裂隙：天边一道锯齿剪影，正中透出一点裂隙的光 / the distant ridge and the rift: a jagged silhouette on the horizon, the rift's glow showing through in the middle */
-  const ridgeH = Math.max(10, Math.round(H * 0.05));
-  for (let gy = 0; gy < ridgeH + 6; gy += 2) ditherRect(x, 0, gy, W, 2, '#05060c', 0.85 * (1 - gy / (ridgeH + 6)));
+
+  /* 7. 北边双层远山、裂隙与山脚低雾过渡 / twin northern ridges, abyssal rift glow, and valley mist transition */
+  for (let gy = 0; gy < ridgeH + 14; gy += 2) {
+    const t = 1 - gy / (ridgeH + 14);
+    ditherRect(x, 0, gy, W, 2, '#05060c', 0.72 * t * t);
+  }
   {
     const cx = W / 2,
-      rw = W * 0.22;
-    for (let k = 0; k < 6; k++) {
-      const a = 0.5 * (1 - k / 6);
-      ditherRect(x, Math.round(cx - rw * (1 - k / 7)), k * 2, Math.round(2 * rw * (1 - k / 7)), 2, T.rift, a);
+      rw = W * 0.24;
+    for (let k = 0; k < 7; k++) {
+      const a = 0.42 * (1 - k / 7);
+      ditherRect(x, Math.round(cx - rw * (1 - k / 8)), k * 2, Math.round(2 * rw * (1 - k / 8)), 2, T.rift, a);
     }
   }
-  let h = ridgeH * 0.6;
+  /* 远层山脊 / far mountain silhouette */
+  let hf = ridgeH * 0.52;
   for (let X = 0; X < W; X++) {
-    h += (r() - 0.5) * 2.2;
-    h = Math.max(ridgeH * 0.25, Math.min(ridgeH, h));
-    const top = Math.round(h * (0.75 + 0.25 * Math.abs(Math.sin(X * 0.07))));
-    px(T.ridge, X, top, 1, ridgeH + 2 - top);
-    if (r() < 0.5) px(T.ridgeHi, X, top);
+    hf += (r() - 0.5) * 1.4;
+    hf = Math.max(ridgeH * 0.2, Math.min(ridgeH * 0.85, hf));
+    const top = Math.round(hf * (0.8 + 0.2 * Math.sin(X * 0.055)));
+    px(T.ridgeFar, X, top, 1, ridgeH + 4 - top);
   }
-  /* 拒马：城墙前一排削尖的木桩，中间留出几个口子 / chevaux-de-frise: a row of sharpened stakes in front of the wall, with a few gaps */
-  const sy = wy - 9;
-  for (let X = 3; X < W - 3; X += 7) {
-    if (r() < 0.22) continue;
-    px('#05060c', X + 2, sy + 5, 4, 1);
+  /* 近层锯齿山脊 / nearer jagged crag silhouette */
+  let h = ridgeH * 0.68;
+  for (let X = 0; X < W; X++) {
+    h += (r() - 0.5) * 2.0;
+    h = Math.max(ridgeH * 0.35, Math.min(ridgeH + 1, h));
+    const top = Math.round(h * (0.78 + 0.22 * Math.abs(Math.sin(X * 0.075 + 1.1))));
+    px(T.ridge, X, top, 1, ridgeH + 3 - top);
+    if (r() < 0.45) px(T.ridgeHi, X, top);
+  }
+  /* 山脚薄雾：几道柔和有序网点雾带，把远山自然融进荒野 / soft dithered valley mist hugging the northern foothills */
+  for (let my = 0; my < 14; my += 2) {
+    const cov = 0.26 * (1 - my / 14);
+    ditherRect(x, 0, ridgeH + 1 + my, W, 2, T.mist, cov);
+  }
+
+  /* 8. 城墙前石阶脚基与两侧拒马（中路古石道留出城门通道） / stone apron at the wall foot and flanking chevaux-de-frise */
+  ditherRect(x, 0, wy - 6, W, 4, T.road, 0.55);
+  px(T.roadDark, 0, wy - 3, W, 2);
+  const sy = wy - 10;
+  const gateCx = cxRoad(sy),
+    gateClear = Math.max(10, halfRoad(sy) * 0.62);
+  for (let X = 4; X < W - 5; X += 8) {
+    if (Math.abs(X + 2 - gateCx) < gateClear) continue;
+    if (r() < 0.18) continue;
+    px('#05060c', X + 1, sy + 5, 5, 1);
     for (let k = 0; k < 5; k++) {
-      px('#5a3a28', X + k, sy + 4 - k);
-      px('#5a3a28', X + 4 - k, sy + 4 - k);
+      px('#4f3324', X + k, sy + 4 - k);
+      px('#4f3324', X + 4 - k, sy + 4 - k);
     }
-    px('#c2a080', X, sy + 4);
-    px('#c2a080', X + 4, sy);
-    px('#8a5a40', X + 2, sy + 2);
+    px('#9e7e60', X, sy + 4);
+    px('#9e7e60', X + 4, sy);
+    px('#785038', X + 2, sy + 2);
   }
   F.ground = c;
 }
@@ -288,24 +401,42 @@ function drawAmbient(x: CanvasRenderingContext2D, dt: number) {
   for (let i = motes.length - 1; i >= 0; i--) if (motes[i].life <= 0 || motes[i].y > H || motes[i].y < -4) motes.splice(i, 1);
 }
 
-/** 城墙上的火把：火苗跳动，墙前地上照出一小团暖光 / torches on the wall: flickering flames and a small warm pool of light on the ground in front */
+/** 城墙上的铁火盆：以中路城门为轴对称排布，跳动火苗并在墙前石板与垛口边缘洒下克制的暖光倒影 / iron braziers symmetrically flanking the central gate: flickering flames casting soft warm pools and stone reflections */
 function drawTorches(x: CanvasRenderingContext2D, now: number) {
   const W = world.W,
-    wy = WALLY();
-  for (let tx = 14, i = 0; tx < W - 6; tx += 30, i++) {
-    const fl = 0.5 + 0.5 * Math.sin(now / 90 + i * 2.1) * Math.sin(now / 37 + i);
-    for (let k = 0; k < 4; k++) {
-      const rw = 22 - k * 5,
-        rh = 5 - k;
-      ditherRect(x, tx - rw / 2, wy - 3 - rh, rw, rh, k < 2 ? '#5a3a28' : '#8a5a40', (0.18 + 0.08 * fl) * (1 + k * 0.4));
-    }
-    x.fillStyle = '#3a2418';
-    x.fillRect(tx, wy - 4, 1, 4);
-    const h = 2 + Math.round(fl * 2);
+    wy = WALLY(),
+    gx = Math.round(W * 0.5);
+  const xs: number[] = [];
+  for (let off = 14; gx - off >= 8 || gx + off <= W - 9; off += 30) {
+    if (gx - off >= 8) xs.push(gx - off);
+    if (gx + off <= W - 9) xs.push(gx + off);
+  }
+  for (let i = 0; i < xs.length; i++) {
+    const tx = xs[i];
+    const fl = 0.5 + 0.5 * Math.sin(now / 110 + i * 2.1) * Math.sin(now / 47 + i);
+    /* 1. 墙前石板暖光倒影（外层暖暗棕光晕 → 中层暖琥珀 → 墙脚微亮石反光） / layered warm firelight pool spilling onto the flagstones */
+    ditherRect(x, tx - 14, wy - 13, 29, 9, '#3d2224', 0.18 + 0.06 * fl);
+    ditherRect(x, tx - 9, wy - 9, 19, 6, '#6e3a28', 0.22 + 0.08 * fl);
+    ditherRect(x, tx - 5, wy - 6, 11, 3, '#a65c36', 0.26 + 0.1 * fl);
+    /* 垛口边缘暖反光 / warm rim reflection on adjacent merlons */
+    ditherRect(x, tx - 6, wy - 3, 13, 2, '#c97a44', 0.25 + 0.12 * fl);
+    /* 2. 铸铁火盆座 / wrought-iron brazier stand and bowl */
+    x.fillStyle = '#181622';
+    x.fillRect(tx - 1, wy - 3, 3, 3);
+    x.fillStyle = '#474354';
+    x.fillRect(tx - 2, wy - 4, 5, 2);
+    x.fillStyle = '#736c80';
+    x.fillRect(tx - 2, wy - 4, 2, 1);
+    /* 3. 炭火与跳动火苗 / glowing embers and dancing flame core */
     x.fillStyle = '#b13e53';
-    x.fillRect(tx - 1, wy - 4 - h + 1, 3, h - 1);
+    x.fillRect(tx - 1, wy - 5, 3, 1);
+    const h = 2 + Math.round(fl * 2);
+    x.fillStyle = '#e43b44';
+    x.fillRect(tx - 1, wy - 5 - h + 1, 3, h);
     x.fillStyle = '#ef7d57';
-    x.fillRect(tx, wy - 4 - h, 1, h);
+    x.fillRect(tx, wy - 5 - h, 1, h);
+    x.fillStyle = '#ffcd75';
+    x.fillRect(tx - (fl > 0.65 ? 1 : 0), wy - 6, 2, 1);
     x.fillStyle = '#fee761';
     x.fillRect(tx, wy - 5, 1, 1);
   }
@@ -566,27 +697,43 @@ export function drawField(dt: number) {
   if (B) for (const e of B.en) if (e.y > 0.72) danger = Math.max(danger, (e.y - 0.72) / 0.28);
   if (danger > 0)
     for (let i = 0; i < 12; i++) ditherRect(x, 0, WALLY() - i * 3 - 3, W, 3, '#e43b44', 0.26 * danger * (1 - i / 12));
-  /* 城墙 / the wall */
+  /* 城墙：粗砺条石砌筑 + 中心城门石拱强化 + 倒角垛口与墙脚阴影 / the wall: weathered ashlar masonry, subtle central gate reinforcement, chamfered merlons and base shadow */
   const wy = WALLY();
-  x.fillStyle = '#2a2130';
+  x.fillStyle = '#1e1928';
   x.fillRect(0, wy, W, 7);
   for (let r = 0; r < 2; r++)
     for (let bx = r ? -4 : 0; bx < W; bx += 8) {
-      x.fillStyle = '#7d6a5a';
+      const shade = ((bx + r * 5) * 17) % 5 === 0;
+      x.fillStyle = shade ? '#62554e' : '#756458';
       x.fillRect(bx + 1, wy + 1 + r * 3, 7, 2);
-      x.fillStyle = '#9c8670';
-      x.fillRect(bx + 1, wy + 1 + r * 3, 7, 1);
+      x.fillStyle = shade ? '#7d6c62' : '#94806e';
+      x.fillRect(bx + 1, wy + 1 + r * 3, 6, 1);
+      x.fillStyle = '#473c3c';
+      x.fillRect(bx + 7, wy + 2 + r * 3, 1, 1);
     }
-  /* 垛口：受光一侧亮一格，背光一侧暗一格，脚下一道阴影 / merlons: one lit cell on the lit side, one dark cell on the shaded side, a shadow line at the foot */
-  x.fillStyle = '#05060c';
+  /* 居中城门铁栅门楣（与中路古石道对齐） / central gate lintel aligned with the stone causeway */
+  {
+    const gx = Math.round(W * 0.5);
+    x.fillStyle = '#3a3444';
+    x.fillRect(gx - 8, wy, 16, 7);
+    x.fillStyle = '#15121d';
+    x.fillRect(gx - 5, wy + 2, 10, 5);
+    x.fillStyle = '#5c5468';
+    for (let bar = gx - 4; bar <= gx + 4; bar += 2) x.fillRect(bar, wy + 2, 1, 5);
+    x.fillStyle = '#9e8c7a';
+    x.fillRect(gx - 8, wy, 16, 1);
+  }
+  /* 垛口：顶边冷月受光、右侧深影、垛口间射击缝压暗 / merlons: lit top coping, shaded right edge, dark embrasures */
+  x.fillStyle = '#070810';
   x.fillRect(0, wy - 1, W, 1);
   for (let bx = 1; bx < W; bx += 8) {
-    x.fillStyle = '#7d6a5a';
+    x.fillStyle = '#756458';
     x.fillRect(bx, wy - 3, 5, 3);
-    x.fillStyle = '#9c8670';
-    x.fillRect(bx, wy - 3, 5, 1);
-    x.fillRect(bx, wy - 3, 1, 3);
-    x.fillStyle = '#4a3c3a';
+    x.fillStyle = '#a3907c';
+    x.fillRect(bx, wy - 3, 4, 1);
+    x.fillStyle = '#8b7868';
+    x.fillRect(bx, wy - 2, 1, 2);
+    x.fillStyle = '#3f343a';
     x.fillRect(bx + 4, wy - 2, 1, 2);
   }
   drawTorches(x, performance.now());
