@@ -3222,42 +3222,42 @@ HERO_PORTRAITS = {
         '..HHHHHHssHHHssHrrRRruHHHHH.....',
         '..HHHHHHssHHHssHuuRRruHHHHH.....',
     ),
-    # 墨：流亡炼金师——深紫兜帽、对称黄铜青镜护目镜、凌乱暗发、青光锐眼与倦容、利落歪嘴笑、胸前冒泡绿药瓶
+    # 墨：流亡炼金师——深紫兜帽、对称黄铜青镜护目镜、凌乱暗发、青光锐眼、对称精致下颌与利落歪嘴笑、胸前冒泡绿药瓶
     'p_mo': (
         '................................',
-        '.............PQQp...............',
-        '..........PPQQQppqq.............',
-        '........PPQQppppppqqq...........',
-        '.......PQppqqMMMMqqpqq..........',
-        '......PQpqMMaaAAaaMMpqq.........',
-        '.....PQpqMaAAaaaaAaMMpqq........',
-        '.....PpqaAyyyyaaayyyyAmpq.......',
-        '....PQpqaMywCyNMMywCyMmpqq......',
-        '....PpqMaMyCcyyMMyCcyMmpqq......',
-        '....PpqMaaMNNNaaaMNNNaApqq......',
-        '....PpqMAaaiifffffFFaAMpqq......',
-        '....PpqMaaiMwkfffwkMFaMpqq......',
-        '....PpqaMaiiCkfffCkfFMMpqq......',
-        '....PpqMaaiFFfffffFFFaMpqq......',
-        '....ppqMaaaiiffFffffFFMpqq......',
-        '....ppqMaaaifffffSfffFMpqq......',
-        '.....pqMaaaifffSSffffMMpqq......',
-        '.....qqMMaaafffffffFFMMqq.......',
-        '......qqqMMaFFFFSSFFMMqqq.......',
-        '......qqqMMqqMyYyMqqMMqq........',
-        '.....PPQppqqqqMyMqqqqppqq.......',
-        '....PPQQpppqqqHyHqqqpppqqq......',
-        '...PPQQpppqqqHHgHHqqqpppqqq.....',
-        '...PQQpppqqqHlHwHHqqqpppqqq.....',
-        '..PPQpppqqqHHHwllHHlHqqppqqq....',
-        '..PQpppqqqHHHwllGGHHHqqpppqq....',
-        '..PQppqqqHHlHwllGGtHHqqpppqq....',
-        '..QpqqqqHHHHHGllGtHlHHqqqqqq....',
-        '..QppqqHHHHHHHtttHHHHHHqqqqq....',
-        '..pqqqqHHHHHHHHHHHHHHHHqqqqq....',
-        '..qqqqqHHHHHHHHHHHHHHHHqqqqq....',
+        '............PQQp................',
+        '.........PPQQQppqq..............',
+        '.......PPQQppppppqqq............',
+        '......PQppqqMMMMqqpqq...........',
+        '.....PQpqMMaaAAaaMMpqq..........',
+        '....PQpqMaAAaaaaAaMMpqq.........',
+        '....PpqaAyyyyaaayyyyAmpq........',
+        '...PQpqaMywCyNMMywCyMmpqq.......',
+        '...PpqMaMyCcyyMMyCcyMmpqq.......',
+        '...PpqMaaMNNNaaaMNNNaApqq.......',
+        '...PpqMAaaiifffffFFaAMpqq.......',
+        '...PpqMaaiMwkfffwkMFaMpqq.......',
+        '...PpqaMaiiCkfffCkfFMpqqq.......',
+        '...PpqMaaiFFfffffFFFaMpqq.......',
+        '...ppqMaaaiiffFffffFaMpqq.......',
+        '...ppqMaaaifffffSffFaMpqq.......',
+        '....pqMaaaaiffSSfffFMpqqq.......',
+        '....qqMMaaaafffffFFMMpqq........',
+        '.....qqqMMaaFFSSFFMMqqq.........',
+        '.....qqqMMqqqMyYyMqqMMq.........',
+        '....PPQppqqqqqMyMqqqqppq........',
+        '...PPQQpppqqqqHyHqqqqppqq.......',
+        '..PPQQpppqqqqHHgHHqqqqppqq......',
+        '..PQQpppqqqqHlHwHHqqqqppqq......',
+        '.PPQpppqqqqHHHwllHHlHqqppqq.....',
+        '.PQpppqqqqHHHwllGGHHHqqpppq.....',
+        '.PQppqqqqHHlHwllGGtHHqqpppq.....',
+        '.QpqqqqqHHHHHGllGtHlHHqqqqq.....',
+        '.QppqqqHHHHHHHtttHHHHHHqqqq.....',
+        '.pqqqqqHHHHHHHHHHHHHHHHqqqq.....',
+        '.qqqqqqHHHHHHHHHHHHHHHHqqqq.....',
     ),
-    # 萤：灯匠学徒——墨蓝波波头、紧贴发侧金色齿轮发簪、大亮暖瞳与精致小巧甜笑、暖黄围巾、左下高提发光萤灯
+    # 萤：灯匠学徒——墨蓝波波头、紧贴发侧金色齿轮发簪、大亮暖瞳、清秀瓜子下巴与甜笑、暖黄围巾、左下高提发光萤灯
     'p_ying': (
         '................................',
         '............aAAaaaa.............',
@@ -3275,10 +3275,10 @@ HERO_PORTRAITS = {
         '......aAaiiffnkfffnkfFaa........',
         '......AaaiBfffffffffBFaa........',
         '......vaaaifffffFffffFaa........',
-        '......vaaaaiiffffffffFaM........',
-        '.......vaaaaiifSSSffFaMM........',
-        '.......aaMMaaafffffFaMMM........',
-        '......sddMMvvYYYYyyNNMM.........',
+        '......vaaaaiiffSSSffFaaM........',
+        '.......vaaaaifffffffaaMM........',
+        '.......aaMMaaaFFSSFFaMMM........',
+        '......sddMMvvNYYYYNNnMM.........',
         '.....d..svYYYYYYyyyNNn..........',
         '....dsddsvYYyYYYYyyNNnn.........',
         '...sddddsvYyyYYYYyyNNnnn........',
@@ -3570,9 +3570,7 @@ def person(hair='a', hl='A', style='short', cloth='s', cloth2='g', skin='f', sha
         c.line(15, 17, 17, 17, 'w', 1, True); c.line(15, 18, 17, 18, 'S', 1, True)
         c.px(14, 17, 'S', True); c.px(18, 17, 'S', True)
     elif mouth == 'gap':
-        c.line(15, 17, 17, 17, 'w', 1, True); c.px(16, 17, 'r', True)
-        c.line(15, 18, 17, 18, 'S', 1, True)
-        c.px(14, 16, 'B', True); c.px(18, 16, 'B', True)
+        c.px(14, 17, 'S', True); c.px(15, 17, 'w', True); c.px(16, 17, 'S', True); c.px(17, 17, 'w', True); c.px(18, 17, 'S', True)
     elif mouth == 'frown':
         c.line(15, 17, 17, 17, 'S', 1, True); c.px(14, 18, 'S', True); c.px(18, 18, 'S', True)
     elif mouth == 'small':
@@ -3655,7 +3653,7 @@ def cast():
                             c.rect(1, 24, 4, 29, 'N'), c.line(1, 26, 4, 26, 'x', 1, True), c.line(2, 22, 2, 24, 'm', 1, True),
                             c.rect(27, 24, 30, 29, 'N'), c.line(27, 26, 30, 26, 'x', 1, True), c.line(29, 22, 29, 24, 'm', 1, True),
                         ))
-    P['p_douzi'] = person(hair='a', hl='A', style='short', cloth='R', cloth2='o', face='round', eyes='round', brow='arched', mouth='gap', nose='dot',
+    P['p_douzi'] = person(hair='a', hl='A', style='short', cloth='R', cloth2='o', face='round', eyes='round', brow='flat', mouth='gap', nose='none',
                           extra=lambda c: (
                               c.px(11, 14, 'B', True), c.px(21, 14, 'B', True),
                               c.rect(3, 24, 8, 29, 'o'), c.rect(4, 25, 7, 28, 'Y', True),
