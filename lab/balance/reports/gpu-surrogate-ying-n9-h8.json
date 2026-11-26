@@ -1,0 +1,995 @@
+{
+  "config": {
+    "hero": "ying",
+    "night": 9,
+    "heat": 8,
+    "tier": 2,
+    "carry_diamond": true,
+    "affix_budget": 2,
+    "rounds": 4,
+    "init_samples": 900,
+    "pool_per_round": 80000,
+    "acquire_per_round": 260,
+    "train_seeds": 8,
+    "verify_seeds": 36,
+    "out_dir": "lab/balance/reports",
+    "prefix": "gpu-surrogate"
+  },
+  "hero": "ying",
+  "totalGpuScreened": 195636,
+  "r2History": [
+    0.2606088186761977,
+    0.7493470452656088,
+    0.7558381020319648,
+    0.8160850851556825
+  ],
+  "orderSensitivity": 0.024731875988982036,
+  "nicheChamps": {
+    "support-carry": {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "sturdy"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "windup",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3497,
+        "p50Score": 3430,
+        "p90Score": 4281,
+        "avgDps": 1348,
+        "p90Dps": 2009,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 6.7
+      }
+    },
+    "mixed-hybrid": {
+      "build": {
+        "cards": [
+          {
+            "key": "venom",
+            "adj": "sturdy"
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3390,
+        "p50Score": 3280,
+        "p90Score": 3905,
+        "avgDps": 1265,
+        "p90Dps": 1704,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 6.5
+      }
+    },
+    "chain-echo": {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "echo"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3335,
+        "p50Score": 3175,
+        "p90Score": 4089,
+        "avgDps": 1244,
+        "p90Dps": 1857,
+        "avgWallLost": 1.1,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 7
+      }
+    },
+    "reaction-duo": {
+      "build": {
+        "cards": [
+          {
+            "key": "bolt",
+            "adj": "toxic"
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          },
+          {
+            "key": "bolt",
+            "adj": "frosty"
+          },
+          {
+            "key": "firecracker",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "resfork",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3106,
+        "p50Score": 3112,
+        "p90Score": 3466,
+        "avgDps": 1046,
+        "p90Dps": 1369,
+        "avgWallLost": 0.6,
+        "maxChain": 0,
+        "avgRx": 240.8,
+        "avgUlt": 3.3
+      }
+    },
+    "pure-elem": {
+      "build": {
+        "cards": [
+          {
+            "key": "bolt",
+            "adj": null
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          },
+          {
+            "key": "bolt",
+            "adj": "toxic"
+          },
+          {
+            "key": "bolt",
+            "adj": "frosty"
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          }
+        ],
+        "carryIdx": 5,
+        "ruleRelic": "resfork",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3091,
+        "p50Score": 3086,
+        "p90Score": 3419,
+        "avgDps": 1047,
+        "p90Dps": 1349,
+        "avgWallLost": 0.8,
+        "maxChain": 0,
+        "avgRx": 264.9,
+        "avgUlt": 3.5
+      }
+    }
+  },
+  "top15": [
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "sturdy"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "windup",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3497,
+        "p50Score": 3430,
+        "p90Score": 4281,
+        "avgDps": 1348,
+        "p90Dps": 2009,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 6.7
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "sturdy"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "clock",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3395,
+        "p50Score": 3379,
+        "p90Score": 4004,
+        "avgDps": 1276,
+        "p90Dps": 1793,
+        "avgWallLost": 0.1,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 7
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "venom",
+            "adj": "sturdy"
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3390,
+        "p50Score": 3280,
+        "p90Score": 3905,
+        "avgDps": 1265,
+        "p90Dps": 1704,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 6.5
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "venom",
+            "adj": "sturdy"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          }
+        ],
+        "carryIdx": 3,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3372,
+        "p50Score": 3282,
+        "p90Score": 3896,
+        "avgDps": 1252,
+        "p90Dps": 1698,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 6.7
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "sturdy"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "clock",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3369,
+        "p50Score": 3334,
+        "p90Score": 4013,
+        "avgDps": 1253,
+        "p90Dps": 1787,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 7
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "sturdy"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "gear",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3363,
+        "p50Score": 3268,
+        "p90Score": 4006,
+        "avgDps": 1244,
+        "p90Dps": 1782,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 6.8
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "sturdy"
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3357,
+        "p50Score": 3191,
+        "p90Score": 3861,
+        "avgDps": 1241,
+        "p90Dps": 1670,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 6.7
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "venom",
+            "adj": "sturdy"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3356,
+        "p50Score": 3220,
+        "p90Score": 3989,
+        "avgDps": 1242,
+        "p90Dps": 1775,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 6.8
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "sturdy"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3355,
+        "p50Score": 3253,
+        "p90Score": 3936,
+        "avgDps": 1240,
+        "p90Dps": 1730,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 6.7
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "sturdy"
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3346,
+        "p50Score": 3246,
+        "p90Score": 3969,
+        "avgDps": 1230,
+        "p90Dps": 1766,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 6.9
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "echo"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3335,
+        "p50Score": 3175,
+        "p90Score": 4089,
+        "avgDps": 1244,
+        "p90Dps": 1857,
+        "avgWallLost": 1.1,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 7
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "wickcut",
+            "adj": "echo"
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3313,
+        "p50Score": 3232,
+        "p90Score": 3861,
+        "avgDps": 1233,
+        "p90Dps": 1726,
+        "avgWallLost": 1.4,
+        "maxChain": 4,
+        "avgRx": 0,
+        "avgUlt": 7
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "sturdy"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          }
+        ],
+        "carryIdx": 3,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3312,
+        "p50Score": 3272,
+        "p90Score": 3972,
+        "avgDps": 1207,
+        "p90Dps": 1762,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 7.1
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "sturdy"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "firecracker",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3311,
+        "p50Score": 3218,
+        "p90Score": 3828,
+        "avgDps": 1205,
+        "p90Dps": 1651,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 33.7,
+        "avgUlt": 6.8
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "wickcut",
+            "adj": "sturdy"
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "wickcut",
+            "adj": null
+          },
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "beacon",
+            "adj": "echo"
+          }
+        ],
+        "carryIdx": 5,
+        "ruleRelic": "kiln",
+        "awaken": "ying_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3307,
+        "p50Score": 3164,
+        "p90Score": 3911,
+        "avgDps": 1196,
+        "p90Dps": 1714,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 6.6
+      }
+    }
+  ],
+  "dominance": {
+    "cards": [
+      [
+        "wickcut",
+        35
+      ],
+      [
+        "venom",
+        35
+      ],
+      [
+        "beacon",
+        15
+      ],
+      [
+        "clock",
+        2
+      ],
+      [
+        "windup",
+        1
+      ],
+      [
+        "gear",
+        1
+      ],
+      [
+        "firecracker",
+        1
+      ]
+    ],
+    "affixes": [
+      [
+        "echo",
+        17
+      ],
+      [
+        "sturdy",
+        13
+      ]
+    ],
+    "ruleRelics": [
+      [
+        "kiln",
+        15
+      ]
+    ]
+  }
+}

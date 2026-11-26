@@ -1,0 +1,1071 @@
+{
+  "config": {
+    "hero": "mo",
+    "night": 9,
+    "heat": 8,
+    "tier": 2,
+    "carry_diamond": true,
+    "affix_budget": 2,
+    "rounds": 4,
+    "init_samples": 900,
+    "pool_per_round": 80000,
+    "acquire_per_round": 260,
+    "train_seeds": 8,
+    "verify_seeds": 36,
+    "out_dir": "lab/balance/reports",
+    "prefix": "gpu-surrogate"
+  },
+  "hero": "mo",
+  "totalGpuScreened": 204287,
+  "r2History": [
+    0.25330066618227787,
+    0.7099249839210013,
+    0.8306476514711669,
+    0.8332551107560191
+  ],
+  "orderSensitivity": 0.014766113386505762,
+  "nicheChamps": {
+    "pure-elem": {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "quicklime",
+            "adj": "sturdy"
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "supersat",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3766,
+        "p50Score": 3832,
+        "p90Score": 4374,
+        "avgDps": 1599,
+        "p90Dps": 2216,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 10.4
+      }
+    },
+    "chain-echo": {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": "echo"
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3736,
+        "p50Score": 3826,
+        "p90Score": 4378,
+        "avgDps": 1599,
+        "p90Dps": 2212,
+        "avgWallLost": 1,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 12.3
+      }
+    },
+    "support-carry": {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "miasma",
+            "adj": "fiery"
+          },
+          {
+            "key": "jars",
+            "adj": null
+          },
+          {
+            "key": "resonate",
+            "adj": null
+          },
+          {
+            "key": "jars",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3719,
+        "p50Score": 3938,
+        "p90Score": 4376,
+        "avgDps": 1561,
+        "p90Dps": 2162,
+        "avgWallLost": 0.7,
+        "maxChain": 2,
+        "avgRx": 161.2,
+        "avgUlt": 9.9
+      }
+    },
+    "reaction-duo": {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "spark",
+            "adj": null
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": "heavy"
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3671,
+        "p50Score": 3607,
+        "p90Score": 4375,
+        "avgDps": 1530,
+        "p90Dps": 2166,
+        "avgWallLost": 1,
+        "maxChain": 2,
+        "avgRx": 23.2,
+        "avgUlt": 11.8
+      }
+    },
+    "mixed-hybrid": {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3662,
+        "p50Score": 3703,
+        "p90Score": 4376,
+        "avgDps": 1518,
+        "p90Dps": 2205,
+        "avgWallLost": 0.6,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 11.8
+      }
+    }
+  },
+  "top15": [
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "quicklime",
+            "adj": "sturdy"
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "supersat",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3766,
+        "p50Score": 3832,
+        "p90Score": 4374,
+        "avgDps": 1599,
+        "p90Dps": 2216,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 10.4
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "quicklime",
+            "adj": "sturdy"
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "supersat",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "supersat",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3740,
+        "p50Score": 3769,
+        "p90Score": 4376,
+        "avgDps": 1578,
+        "p90Dps": 2250,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 10.5
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": "echo"
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3736,
+        "p50Score": 3826,
+        "p90Score": 4378,
+        "avgDps": 1599,
+        "p90Dps": 2212,
+        "avgWallLost": 1,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 12.3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": null
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": "echo"
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "kiln",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3734,
+        "p50Score": 3842,
+        "p90Score": 4378,
+        "avgDps": 1597,
+        "p90Dps": 2229,
+        "avgWallLost": 1,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3728,
+        "p50Score": 3750,
+        "p90Score": 4378,
+        "avgDps": 1594,
+        "p90Dps": 2278,
+        "avgWallLost": 0.9,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 11.8
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "quicklime",
+            "adj": "sturdy"
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "supersat",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3722,
+        "p50Score": 3737,
+        "p90Score": 4374,
+        "avgDps": 1563,
+        "p90Dps": 2228,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 10.4
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "quicklime",
+            "adj": "sturdy"
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "supersat",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3722,
+        "p50Score": 3737,
+        "p90Score": 4374,
+        "avgDps": 1563,
+        "p90Dps": 2228,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 10.4
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "miasma",
+            "adj": "fiery"
+          },
+          {
+            "key": "jars",
+            "adj": null
+          },
+          {
+            "key": "resonate",
+            "adj": null
+          },
+          {
+            "key": "jars",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3719,
+        "p50Score": 3938,
+        "p90Score": 4376,
+        "avgDps": 1561,
+        "p90Dps": 2162,
+        "avgWallLost": 0.7,
+        "maxChain": 2,
+        "avgRx": 161.2,
+        "avgUlt": 9.9
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": "echo"
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3716,
+        "p50Score": 3704,
+        "p90Score": 4379,
+        "avgDps": 1587,
+        "p90Dps": 2296,
+        "avgWallLost": 0.6,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 12.1
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": "echo"
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3708,
+        "p50Score": 3753,
+        "p90Score": 4376,
+        "avgDps": 1567,
+        "p90Dps": 2172,
+        "avgWallLost": 1,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 12.3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": null
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": "golden"
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "kiln",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3700,
+        "p50Score": 3703,
+        "p90Score": 4378,
+        "avgDps": 1555,
+        "p90Dps": 2202,
+        "avgWallLost": 0.9,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": "echo"
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3697,
+        "p50Score": 3785,
+        "p90Score": 4377,
+        "avgDps": 1559,
+        "p90Dps": 2170,
+        "avgWallLost": 1,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 12.2
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": "fiery"
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3696,
+        "p50Score": 3735,
+        "p90Score": 4375,
+        "avgDps": 1565,
+        "p90Dps": 2254,
+        "avgWallLost": 0.9,
+        "maxChain": 2,
+        "avgRx": 23.4,
+        "avgUlt": 11.9
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "acidvial",
+            "adj": "echo"
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3696,
+        "p50Score": 3785,
+        "p90Score": 4376,
+        "avgDps": 1557,
+        "p90Dps": 2170,
+        "avgWallLost": 1,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 12.2
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "acidrain",
+            "adj": "echo"
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "snakekiss",
+            "adj": null
+          },
+          {
+            "key": "smokebomb",
+            "adj": null
+          },
+          {
+            "key": "midas",
+            "adj": null
+          },
+          {
+            "key": "needle",
+            "adj": null
+          },
+          {
+            "key": "needle",
+            "adj": null
+          }
+        ],
+        "carryIdx": 0,
+        "ruleRelic": "linkage",
+        "awaken": "mo_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 3695,
+        "p50Score": 3672,
+        "p90Score": 4378,
+        "avgDps": 1548,
+        "p90Dps": 2158,
+        "avgWallLost": 1,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 11.9
+      }
+    }
+  ],
+  "dominance": {
+    "cards": [
+      [
+        "snakekiss",
+        22
+      ],
+      [
+        "smokebomb",
+        17
+      ],
+      [
+        "acidrain",
+        15
+      ],
+      [
+        "acidvial",
+        14
+      ],
+      [
+        "needle",
+        12
+      ],
+      [
+        "midas",
+        10
+      ],
+      [
+        "supersat",
+        5
+      ],
+      [
+        "quicklime",
+        4
+      ],
+      [
+        "jars",
+        2
+      ],
+      [
+        "miasma",
+        1
+      ],
+      [
+        "resonate",
+        1
+      ]
+    ],
+    "affixes": [
+      [
+        "echo",
+        21
+      ],
+      [
+        "sturdy",
+        4
+      ],
+      [
+        "fiery",
+        2
+      ],
+      [
+        "golden",
+        1
+      ]
+    ],
+    "ruleRelics": [
+      [
+        "linkage",
+        13
+      ],
+      [
+        "kiln",
+        2
+      ]
+    ]
+  }
+}

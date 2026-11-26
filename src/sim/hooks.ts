@@ -140,7 +140,7 @@ export const CARD_HOOKS: Record<string, CardHook> = {
   pocketwatch: { on: { start: (c) => { for (const o of boardCards()) if (o !== c && o.size === 1) haste(o, 3, c); } } },
   /* 凤凰羽：燃烧的敌人倒下，本卡充能 / Phoenix Feather: when a burning enemy dies, charge this card */
   phoenix: { on: { kill: (c, x) => { if (x.burning) chargeCard(c, 0.08 + 0.02 * stepOf(c)); } } },
-  /* 瘟疫烧瓶：中毒的敌人倒下，把一半的毒传给身边最多 3 个 / Plague Flask: when a poisoned enemy dies, pass half its poison to up to 3 nearby */
+  /* 瘟疫烧瓶：中毒的敌人倒下，把一半的毒传给身边最多 3 个（单次传染设上限，避免双瓶指数爆炸） / Plague Flask: when a poisoned enemy dies, pass half its poison to up to 3 nearby (capped per spread to prevent exponential blowup) */
   plague: {
     on: {
       kill: (c, x) => {
@@ -149,9 +149,10 @@ export const CARD_HOOKS: Record<string, CardHook> = {
         const ns = near(e, 20 * K()).slice(0, 3);
         if (!ns.length) return;
         view.ring(ex(e), ey(e) - 5, 2, 20 * K(), '#7ddc5f', 0.25);
+        const add = Math.min(e.poisonD * (0.45 + 0.08 * stepOf(c)), 36 * dmgMul(c));
         for (const o of ns) {
           o.poisonT = Math.max(o.poisonT, 3);
-          o.poisonD += e.poisonD * (0.5 + 0.1 * stepOf(c));
+          o.poisonD += add;
           if (!o.poisonSrc) o.poisonSrc = c;
         }
       },
@@ -161,13 +162,13 @@ export const CARD_HOOKS: Record<string, CardHook> = {
   headxbow: { on: { kill: (c, x) => { if (x.src === c && x.elite) reload(c, 9, c); } } },
   /* 爆竹：亲手击杀时，相邻的火器充能 15% / Firecracker: on personally killing, charge adjacent firearms 15% */
   firecracker: { on: { kill: (c, x) => { if (x.src === c) for (const n of c.nb || []) if (kindOf(n) === 'firearm') chargeCard(n, 0.15 + 0.05 * stepOf(c), c); } } },
-  /* 星种：当 C 位时每击杀 10 个敌人，基础伤害永久 +1 / Star Seed: as the carry, +1 permanent base damage per 10 kills */
+  /* 星种：当 C 位时每击杀 8 个敌人，基础伤害永久 +1 / Star Seed: as the carry, +1 permanent base damage per 8 kills */
   starseed: {
     on: {
       kill: (c, x) => {
         if (x.src !== c || !c.carry) return;
         c.cnt = (c.cnt || 0) + 1;
-        if (c.cnt % 10 === 0) grow(c, 1);
+        if (c.cnt % 8 === 0) grow(c, 1);
       },
     },
   },
@@ -193,7 +194,7 @@ export const CARD_HOOKS: Record<string, CardHook> = {
         if (!x.src || !x.src.carry || c.lastT > b.t - 0.3) return;
         c.lastT = b.t;
         view.cardFx(c, 'pop');
-        for (const o of boardCards()) if (o !== c && o !== x.src) chargeCard(o, 0.08 + 0.03 * stepOf(c), c);
+        for (const o of boardCards()) if (o !== c && o !== x.src) chargeCard(o, 0.12 + 0.04 * stepOf(c), c);
       },
     },
   },
@@ -205,7 +206,7 @@ export const RELIC_HOOKS: Record<string, Record<string, (n: number, x: X) => voi
       const b = bt();
       if (b.flags.kindling) return;
       b.flags.kindling = 1;
-      for (const o of boardCards()) if (ITEMS[o.key].tag === 'fire') chargeCard(o, 0.3 * n, null);
+      for (const o of boardCards()) if (ITEMS[o.key].tag === 'fire') chargeCard(o, 0.45 * n, null);
     },
   },
   icechain: {
@@ -215,7 +216,7 @@ export const RELIC_HOOKS: Record<string, Record<string, (n: number, x: X) => voi
         Y = ey(x.e) - 4,
         R = 16 * K();
       view.ring(X, Y, 2, R, '#c2f4ff', 0.3);
-      later(0.03, () => around(X, Y, R, (o) => hurt(o, 8 * n, null, false, { k: 'relic.icechain' })));
+      later(0.03, () => around(X, Y, R, (o) => hurt(o, (12 + 4 * G.round) * n, null, false, { k: 'relic.icechain' })));
     },
   },
   chaingear: {
@@ -292,9 +293,10 @@ export const RELIC_HOOKS: Record<string, Record<string, (n: number, x: X) => voi
       const ns = near(e, 18 * K());
       if (!ns.length) return;
       view.ring(ex(e), ey(e) - 5, 2, 18 * K(), '#7ddc5f', 0.25);
+      const add = Math.min(e.poisonD * 0.4 * n, 30 * n);
       for (const o of ns.slice(0, 4)) {
         o.poisonT = Math.max(o.poisonT, 3);
-        o.poisonD += e.poisonD * 0.5 * n;
+        o.poisonD += add;
         if (!o.poisonSrc) o.poisonSrc = e.poisonSrc;
       }
     },

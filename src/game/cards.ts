@@ -276,7 +276,7 @@ export function stats(c: Card | (CardSpec & Partial<Card>), t: number | null): S
   if (a === 'swift') spd += 0.18 + (t != null && t < 5 ? 1 : 0);
   if (it.kind === 'potion' && c.loc === 'board') {
     const j = boardCards().filter((o) => ITEMS[o.key].kindHaste).length;
-    if (j) spd += 0.06 * j * countKind('potion');
+    if (j) spd += 0.1 * j * countKind('potion');
   }
   if (mv('t_last') && G.wall < G.wallMax * 0.35) spd += 0.25;
   if (mv('smallHaste') && it.size === 1 && c.loc === 'board') spd += mv('smallHaste') * smallN();

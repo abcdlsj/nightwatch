@@ -340,7 +340,7 @@ export const EN: Record<string, EnemyDef> = {
   "hp": 10,
   "spd": 0.085,
   "armor": 0,
-  "wall": 3,
+  "wall": 2,
   "spr": "f_beetle",
   "sc": 1,
   "col": "#41a6f6",
@@ -552,7 +552,7 @@ export const EN: Record<string, EnemyDef> = {
   "spr": "f_crow",
   "sc": 1,
   "col": "#c2f4ff",
-  "dive": 3.6,
+  "dive": 2.8,
   "faction": "frost"
  },
  "f_shell": {
@@ -607,7 +607,7 @@ export const EN: Record<string, EnemyDef> = {
  },
  "mutebell": {
   "final": 1,
-  "hp": 10000,
+  "hp": 11500,
   "spd": 0.012,
   "armor": 2,
   "wall": 99,

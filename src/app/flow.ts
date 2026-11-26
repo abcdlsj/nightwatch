@@ -105,12 +105,12 @@ function startRun(kit: KitDef, o: KitOpts) {
   const H = HEROES[G.hero];
   const hh = o.heat,
     full = o.full;
-  /* 长夜难度在起手页里选：第 4 档起城墙上限 -15% / Long Night difficulty is chosen on the opening page: from tier 4 the wall cap is -15% */
+  /* 长夜难度在起手页里选：第 4 档起城墙上限 -20% / Long Night difficulty is chosen on the opening page: from tier 4 the wall cap is -20% */
   G.heat = hh;
   G.kitPath = kit.path;
   G.full = full;
   G.maxRound = lastNight();
-  G.wall = G.wallMax = Math.round(H.wall * (hh >= 4 ? 0.85 : 1));
+  G.wall = G.wallMax = Math.round(H.wall * (hh >= 4 ? 0.8 : 1));
   placeKit(kit.cards);
   if (kit.gold) G.gold = Math.max(0, G.gold + kit.gold);
   mastStart();

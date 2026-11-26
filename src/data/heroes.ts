@@ -6,7 +6,7 @@ export const HEROES: Record<string, HeroDef> = {
   "col": "#f0a64b",
   "portrait": "p_ayla",
   "wall": 30,
-  "gold": 8,
+  "gold": 11,
   "start": [
    [
     "dagger",
@@ -41,8 +41,8 @@ export const HEROES: Record<string, HeroDef> = {
  "ying": {
   "col": "#ffd166",
   "portrait": "p_ying",
-  "wall": 26,
-  "gold": 10,
+  "wall": 24,
+  "gold": 9,
   "start": [
    [
     "firefly",
@@ -60,7 +60,7 @@ export const HEROES: Record<string, HeroDef> = {
   "col": "#c99a6b",
   "portrait": "p_jun",
   "wall": 34,
-  "gold": 8,
+  "gold": 10,
   "start": [
    [
     "turret",
@@ -310,7 +310,7 @@ export const KITS: Record<string, KitDef[]> = {
     ]
    ],
    "path": "turret",
-   "gold": -3
+   "gold": -1
   },
   {
    "cards": [
@@ -453,9 +453,9 @@ export const PATHS: Record<string, PathDef[]> = {
  *  jun  以墙为本：城墙上限越高伤害越高；墙完好两夜就攒满 / the wall comes first: higher max wall means more damage; two intact nights fill the mason
  *  li   众星拱月：C 位两边的卡出手，给 C 位充能 / stars around the moon: cards beside the carry charge it when they fire */
 export const SIGS: Record<string, Record<string, number>> = {
-  ayla: { vet: 0.06, vetCap: 6 },
-  mo: { rx: 0.4, rxCharge: 0.1 },
-  ying: { smallHaste: 0.03 },
+  ayla: { vet: 0.08, vetCap: 6 },
+  mo: { rx: 0.3, rxCharge: 0.1 },
+  ying: { smallHaste: 0.02 },
   jun: { wallDmg: 0.03, intactFast: 1 },
   li: { carryNb: 0.05 },
 };
@@ -463,23 +463,23 @@ export const SIGS: Record<string, Record<string, number>> = {
 /** 觉醒：第 6 夜备战开头二选一，把天性往两个方向推（文字在语言包 heroes.awaken） / Awakening: a pick of two at the start of night 6's prep, pushing the nature in one of two directions (text in locale heroes.awaken) */
 export const AWAKEN: Record<string, { id: string; m: Record<string, number> }[]> = {
   ayla: [
-    { id: 'ayla_a', m: { vetCap: 6 } },
-    { id: 'ayla_b', m: { vetCd: 0.04 } },
+    { id: 'ayla_a', m: { vetCap: 6, vet: 0.04 } },
+    { id: 'ayla_b', m: { vetCd: 0.03 } },
   ],
   mo: [
     { id: 'mo_a', m: { rxCharge: 0.15 } },
-    { id: 'mo_b', m: { rxQuick: 1 } },
+    { id: 'mo_b', m: { rxQuick: 1, rx: 0.35 } },
   ],
   ying: [
     { id: 'ying_a', m: { smallHaste: 0.02 } },
-    { id: 'ying_b', m: { smallDmg: 0.05 } },
+    { id: 'ying_b', m: { smallDmg: 0.04 } },
   ],
   jun: [
-    { id: 'jun_a', m: { wallDmg: 0.03 } },
-    { id: 'jun_b', m: { intactWall: 3 } },
+    { id: 'jun_a', m: { wallDmg: 0.04 } },
+    { id: 'jun_b', m: { intactWall: 4, shieldStart: 8 } },
   ],
   li: [
-    { id: 'li_a', m: { carryNb: 0.05 } },
+    { id: 'li_a', m: { carryNb: 0.08, xcarry: 0.12 } },
     { id: 'li_b', m: { carryGrow: 0.08 } },
   ],
 };

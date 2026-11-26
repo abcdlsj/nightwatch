@@ -301,7 +301,8 @@ export const SYN: Record<Tag, [number, Record<string, number>][]> = {
   [
    6,
    {
-    "spd": 0.15
+    "spd": 0.15,
+    "xtag_mech": 0.25
    }
   ]
  ],

@@ -41,14 +41,14 @@ export const RELICS: Record<string, RelicDef> = {
   "t": 0,
   "ico": "potion:y",
   "m": {
-   "interest": 2
+   "interest": 3
   }
  },
  "icepack": {
   "t": 0,
   "ico": "potion:C",
   "m": {
-   "tag_ice": 0.15
+   "tag_ice": 0.2
   }
  },
  "wire": {
@@ -62,7 +62,7 @@ export const RELICS: Record<string, RelicDef> = {
   "t": 0,
   "ico": "potion:N",
   "m": {
-   "tag_mech": 0.15
+   "tag_mech": 0.2
   }
  },
  "tinder": {
@@ -371,8 +371,8 @@ export const RELICS: Record<string, RelicDef> = {
   "ico": "badge:g",
   "hero": "ayla",
   "m": {
-   "tag_blade": 0.1,
-   "wall": 3
+   "tag_blade": 0.15,
+   "wall": 4
   }
  },
  "oathbook": {
@@ -482,8 +482,8 @@ export const RELICS: Record<string, RelicDef> = {
   "ico": "ring:y",
   "hero": "ying",
   "m": {
-   "tag_mech": 0.1,
-   "crit": 0.02
+   "tag_mech": 0.15,
+   "crit": 0.04
   }
  },
  "oilcan": {
@@ -638,7 +638,8 @@ export const RELICS: Record<string, RelicDef> = {
   "ico": "gem:C",
   "fit": 1,
   "m": {
-   "t_frostlens": 1
+   "t_frostlens": 1,
+   "tag_ice": 0.12
   }
  },
  "loader": {
@@ -698,8 +699,8 @@ export const RELICS: Record<string, RelicDef> = {
   "ico": "claw:N",
   "hero": "jun",
   "m": {
-   "tag_mech": 0.15,
-   "s2": 0.12
+   "tag_mech": 0.2,
+   "s2": 0.16
   }
  },
  "mortarboard": {

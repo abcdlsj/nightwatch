@@ -149,7 +149,7 @@ function afterReact(src: Card) {
     for (const n of src.nb || []) {
       if ((forkT.get(n) ?? -9) > b.t - 0.3) continue;
       forkT.set(n, b.t);
-      chargeCard(n, 0.2 * fork, src);
+      chargeCard(n, 0.25 * fork, src);
     }
   /* 试剂瓶：每次反应，所有元素的连招冷却 -0.5 秒 / Reagent Vial: each reaction cuts every element's combo cooldown by 0.5 s */
   if (mv('t_reagent')) {
@@ -170,9 +170,9 @@ export function streak(c: Card, st: Stats) {
   const cd: Record<string, number> = b.flags.stkCd || (b.flags.stkCd = {});
   const l = (log[tag] = (log[tag] || []).filter((h) => h.t > b.t - TUNE.streakWin));
   l.push({ t: b.t, c, d: ITEMS[c.key].dmg > 0 ? st.total : 0 });
-  /* 节拍器：要 6 次出手，冷却 8 秒 / Metronome: needs 6 hits, 8 s cooldown */
+  /* 节拍器：要 5 次出手，冷却 8 秒 / Metronome: needs 5 hits, 8 s cooldown */
   const metro = mv('t_metro') > 0;
-  if ((cd[tag] || -99) > b.t || l.length < (metro ? 6 : TUNE.streakN) || new Set(l.map((h) => h.c)).size < 2) return;
+  if ((cd[tag] || -99) > b.t || l.length < (metro ? 5 : TUNE.streakN) || new Set(l.map((h) => h.c)).size < 2) return;
   cd[tag] = b.t + (metro ? 8 : TUNE.streakCd);
   const ref = Math.max(...l.map((h) => h.d));
   log[tag] = [];

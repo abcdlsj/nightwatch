@@ -1,0 +1,883 @@
+{
+  "config": {
+    "hero": "jun",
+    "night": 9,
+    "heat": 8,
+    "tier": 2,
+    "carry_diamond": true,
+    "affix_budget": 2,
+    "rounds": 4,
+    "init_samples": 900,
+    "pool_per_round": 80000,
+    "acquire_per_round": 260,
+    "train_seeds": 8,
+    "verify_seeds": 36,
+    "out_dir": "lab/balance/reports",
+    "prefix": "gpu-surrogate"
+  },
+  "hero": "jun",
+  "totalGpuScreened": 188421,
+  "r2History": [
+    0.20475807342501018,
+    0.5831907391820093,
+    0.7161105337209563,
+    0.7682746061873694
+  ],
+  "orderSensitivity": 0.006276342312625901,
+  "nicheChamps": {
+    "pure-elem": {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": null
+          },
+          {
+            "key": "scaffold",
+            "adj": "ignite"
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4393,
+        "p50Score": 4394,
+        "p90Score": 4402,
+        "avgDps": 4450,
+        "p90Dps": 5873,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    "chain-echo": {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": null
+          },
+          {
+            "key": "gunner",
+            "adj": "echo"
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4391,
+        "p50Score": 4389,
+        "p90Score": 4399,
+        "avgDps": 5407,
+        "p90Dps": 6840,
+        "avgWallLost": 0,
+        "maxChain": 5,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    "support-carry": {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": null
+          },
+          {
+            "key": "scaffold",
+            "adj": "swift"
+          },
+          {
+            "key": "turret",
+            "adj": null
+          },
+          {
+            "key": "scaffold",
+            "adj": "twin"
+          },
+          {
+            "key": "mason",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4389,
+        "p50Score": 4385,
+        "p90Score": 4400,
+        "avgDps": 2831,
+        "p90Dps": 3259,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0,
+        "avgUlt": 3.2
+      }
+    },
+    "mixed-hybrid": {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": null
+          },
+          {
+            "key": "gunner",
+            "adj": null
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "crenel",
+            "adj": null
+          },
+          {
+            "key": "caltrop",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4389,
+        "p50Score": 4390,
+        "p90Score": 4400,
+        "avgDps": 4262,
+        "p90Dps": 5446,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 6.1
+      }
+    },
+    "reaction-duo": {
+      "build": {
+        "cards": [
+          {
+            "key": "anvil",
+            "adj": "swift"
+          },
+          {
+            "key": "bombard",
+            "adj": "echo"
+          },
+          {
+            "key": "icicle",
+            "adj": null
+          },
+          {
+            "key": "powderkeg",
+            "adj": null
+          },
+          {
+            "key": "icicle",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "duet",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4260,
+        "p50Score": 4381,
+        "p90Score": 4404,
+        "avgDps": 2385,
+        "p90Dps": 3018,
+        "avgWallLost": 0.6,
+        "maxChain": 2,
+        "avgRx": 9.1,
+        "avgUlt": 9.7
+      }
+    }
+  },
+  "top15": [
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": null
+          },
+          {
+            "key": "scaffold",
+            "adj": "ignite"
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4393,
+        "p50Score": 4394,
+        "p90Score": 4402,
+        "avgDps": 4450,
+        "p90Dps": 5873,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": "deadly"
+          },
+          {
+            "key": "scaffold",
+            "adj": null
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4393,
+        "p50Score": 4393,
+        "p90Score": 4401,
+        "avgDps": 4670,
+        "p90Dps": 6022,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": "resonance"
+          },
+          {
+            "key": "scaffold",
+            "adj": null
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4393,
+        "p50Score": 4392,
+        "p90Score": 4401,
+        "avgDps": 4548,
+        "p90Dps": 5775,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": "precise"
+          },
+          {
+            "key": "scaffold",
+            "adj": null
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4393,
+        "p50Score": 4393,
+        "p90Score": 4400,
+        "avgDps": 4590,
+        "p90Dps": 5750,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": "twin"
+          },
+          {
+            "key": "scaffold",
+            "adj": null
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4393,
+        "p50Score": 4394,
+        "p90Score": 4402,
+        "avgDps": 4252,
+        "p90Dps": 5499,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": null
+          },
+          {
+            "key": "scaffold",
+            "adj": "ignite"
+          },
+          {
+            "key": "turret",
+            "adj": null
+          },
+          {
+            "key": "anvil",
+            "adj": "swift"
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4393,
+        "p50Score": 4393,
+        "p90Score": 4402,
+        "avgDps": 4647,
+        "p90Dps": 6117,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": "precise"
+          },
+          {
+            "key": "scaffold",
+            "adj": "ignite"
+          },
+          {
+            "key": "turret",
+            "adj": null
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4393,
+        "p50Score": 4394,
+        "p90Score": 4402,
+        "avgDps": 4332,
+        "p90Dps": 5684,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": "frosty"
+          },
+          {
+            "key": "scaffold",
+            "adj": null
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4392,
+        "p50Score": 4394,
+        "p90Score": 4400,
+        "avgDps": 4583,
+        "p90Dps": 5928,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0.1,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": null
+          },
+          {
+            "key": "scaffold",
+            "adj": null
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4392,
+        "p50Score": 4393,
+        "p90Score": 4400,
+        "avgDps": 4498,
+        "p90Dps": 5648,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": "fiery"
+          },
+          {
+            "key": "scaffold",
+            "adj": null
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4392,
+        "p50Score": 4393,
+        "p90Score": 4400,
+        "avgDps": 4516,
+        "p90Dps": 5649,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": null
+          },
+          {
+            "key": "scaffold",
+            "adj": null
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": "golden"
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4392,
+        "p50Score": 4393,
+        "p90Score": 4400,
+        "avgDps": 4498,
+        "p90Dps": 5648,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": null
+          },
+          {
+            "key": "scaffold",
+            "adj": "twin"
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4392,
+        "p50Score": 4393,
+        "p90Score": 4401,
+        "avgDps": 4452,
+        "p90Dps": 5541,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3.1
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": null
+          },
+          {
+            "key": "scaffold",
+            "adj": null
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": "twin"
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4392,
+        "p50Score": 4393,
+        "p90Score": 4401,
+        "avgDps": 4034,
+        "p90Dps": 5011,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "bastion",
+            "adj": null
+          },
+          {
+            "key": "gunner",
+            "adj": "echo"
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "anvil",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "ringwall",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4391,
+        "p50Score": 4389,
+        "p90Score": 4399,
+        "avgDps": 5407,
+        "p90Dps": 6840,
+        "avgWallLost": 0,
+        "maxChain": 5,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "venom",
+            "adj": null
+          },
+          {
+            "key": "scaffold",
+            "adj": null
+          },
+          {
+            "key": "scaffold",
+            "adj": null
+          },
+          {
+            "key": "scaffold",
+            "adj": "echo"
+          },
+          {
+            "key": "turret",
+            "adj": "echo"
+          },
+          {
+            "key": "mason",
+            "adj": null
+          },
+          {
+            "key": "sling",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "metronome",
+        "awaken": "jun_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4391,
+        "p50Score": 4392,
+        "p90Score": 4400,
+        "avgDps": 4805,
+        "p90Dps": 5884,
+        "avgWallLost": 0,
+        "maxChain": 5,
+        "avgRx": 0,
+        "avgUlt": 5.6
+      }
+    }
+  ],
+  "dominance": {
+    "cards": [
+      [
+        "scaffold",
+        16
+      ],
+      [
+        "turret",
+        15
+      ],
+      [
+        "bastion",
+        14
+      ],
+      [
+        "anvil",
+        14
+      ],
+      [
+        "gunner",
+        1
+      ],
+      [
+        "venom",
+        1
+      ],
+      [
+        "mason",
+        1
+      ],
+      [
+        "sling",
+        1
+      ]
+    ],
+    "affixes": [
+      [
+        "echo",
+        15
+      ],
+      [
+        "ignite",
+        3
+      ],
+      [
+        "twin",
+        3
+      ],
+      [
+        "precise",
+        2
+      ],
+      [
+        "deadly",
+        1
+      ],
+      [
+        "resonance",
+        1
+      ],
+      [
+        "swift",
+        1
+      ],
+      [
+        "frosty",
+        1
+      ],
+      [
+        "fiery",
+        1
+      ],
+      [
+        "golden",
+        1
+      ]
+    ],
+    "ruleRelics": [
+      [
+        "ringwall",
+        14
+      ],
+      [
+        "metronome",
+        1
+      ]
+    ]
+  }
+}

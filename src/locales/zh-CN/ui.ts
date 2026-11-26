@@ -442,7 +442,7 @@ export default {
       ico: 'gear',
       hint: '改装一张小卡',
       pick: '改装 {n}',
-      pickSub: '升到{t}，再照着它做一张同流派的小卡',
+      pickSub: '升到{t}，并获得 3 金',
       pickMax: '已经是钻了：照着它再做一张同流派的小卡',
     },
     jun: {

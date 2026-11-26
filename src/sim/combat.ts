@@ -57,8 +57,8 @@ function fire(c: Card, depth: number) {
   const st = stats(c, b.t);
   const nb = c.nb || [];
   streak(c, st);
-  /* 连环扣：被带动的出手直接放这张卡元素的大招（按这个元素最强的卡算），不看冷却，每 4 秒最多一次 / Linked Clasp: a triggered hit unleashes its element's ultimate directly (based on that element's strongest card), ignoring cooldown, at most once every 4 s */
-  if (depth > 0 && mv('t_link') && it.dmg > 0 && !((b.flags.linkT ?? -99) > b.t - 4)) {
+  /* 连环扣：被带动的出手直接放这张卡元素的大招（按这个元素最强的卡算），不看冷却，每 3.5 秒最多一次 / Linked Clasp: a triggered hit unleashes its element's ultimate directly (based on that element's strongest card), ignoring cooldown, at most once every 3.5 s */
+  if (depth > 0 && mv('t_link') && it.dmg > 0 && !((b.flags.linkT ?? -99) > b.t - 3.5)) {
     b.flags.linkT = b.t;
     const r = refOf(it.tag);
     if (r) later(0.2, () => ultimate(it.tag, r.c, r.ref));
@@ -155,8 +155,8 @@ function fire(c: Card, depth: number) {
   if (it.prism)
     for (const n of nb) {
       if (!['fire', 'ice', 'volt'].includes(ITEMS[n.key].tag)) continue;
-      chargeCard(n, 0.25, c);
-      n.anvil = Math.max(n.anvil || 0, 0.5);
+      chargeCard(n, 0.35, c);
+      n.anvil = Math.max(n.anvil || 0, 0.65);
       c.bBf++;
       view.link(c, n, '#73eff7', 0.25);
     }
@@ -202,6 +202,11 @@ function fire(c: Card, depth: number) {
     later(0.12, () => {
       const d = depth + 1;
       if (B!.over || d > 10) return;
+      /* 回响限速：中/小卡每秒最多被带动 2 次，3 格大卡每秒最多 1 次，防止大炮变机枪 / Echo rate limit: small/medium cards at most 2/s, 3-slot large cards at most 1/s */
+      const cap = n.size >= 3 ? 1 : 2;
+      n.echoLog = (n.echoLog || []).filter((t) => t > B!.t - 1);
+      if (n.echoLog.length >= cap) return;
+      n.echoLog.push(B!.t);
       view.link(c, n, ADJ.echo.c);
       if (d + 1 > B!.maxChain) B!.maxChain = d + 1;
       showChain(d + 1, c);

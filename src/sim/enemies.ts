@@ -25,9 +25,15 @@ const wg = (k: string) => !!B && B.wagers.includes(k);
 export function spawn(type: string, x?: number | null, y?: number | null): Enemy {
   const b = bt();
   const d = EN[type];
-  let sc = d.fixed
+  const baseSc = d.fixed
     ? fixedScale(d.hidden ? G.round - TUNE.hiddenEase : G.round) * (d.boss ? TUNE.bossHp : 1)
-    : hpScale(G.round) * (G.round === 1 ? 0.5 : G.round === 2 ? 0.6 : 0.7) * (heat(1) ? 1.15 : 1) * (heat(2) && (d.boss || d.elite) ? 1.25 : 1) * (wg('iron') ? 1.3 : 1);
+    : hpScale(G.round) * (G.round === 1 ? 0.5 : G.round === 2 ? 0.6 : 0.7);
+  let sc =
+    baseSc *
+    (heat(1) ? 1.2 : 1) *
+    (heat(2) && (d.boss || d.elite) ? 1.4 : 1) *
+    (heat(8) ? 1.25 : 1) *
+    (wg('iron') ? 1.3 : 1);
   sc *= curWorld()?.hp?.(type, d) ?? 1;
   const e: Enemy = {
     d, type, x: x != null ? x : rnd(0.08, 0.92), y: y != null ? y : -0.04, x0: 0, hp: d.hp * sc, maxHp: d.hp * sc, armor: d.armor, shield: 0,
@@ -146,7 +152,7 @@ export function enemyStep(dt: number) {
         if (b.over) return;
       }
     }
-    let sp = e.d.spd * (1 - e.slowA) * (1 + mv('enemySpd') + (heat(7) ? 0.1 : 0) + (wg('rush') ? 0.2 : 0)) * (1 + e.hasteB);
+    let sp = e.d.spd * (1 - e.slowA) * (1 + mv('enemySpd') + (heat(7) ? 0.2 : 0) + (wg('rush') ? 0.2 : 0)) * (1 + e.hasteB);
     if (e.dashT > 0) {
       e.dashT -= dt;
       sp *= 3;

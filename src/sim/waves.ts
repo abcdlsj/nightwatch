@@ -32,7 +32,7 @@ export function makeWave(r: number): Wave {
   const S: Wave = [];
   const pack: Pack = (comp, n, t0, t1) => {
     /* 数量随夜数涨，第 11 夜封顶（再多手机上跑不动，后面靠血量涨） / counts grow per night and cap at night 11 (more would not run on phones; HP carries it after that) */
-    const DN = (1.15 + 0.1 * Math.min(r, 11)) * (heat(5) ? 1.15 : 1);
+    const DN = (1.15 + 0.1 * Math.min(r, 11)) * (heat(5) ? 1.25 : 1);
     n = Math.round(n * DN);
     comp = Object.fromEntries(
       Object.entries(comp).map(([k, v]) => [k, EN[k].aura || noScale(k) ? v : Math.round(v * (r >= 5 ? 1.45 : r >= 3 ? 1.3 : 1.1))]),

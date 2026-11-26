@@ -1,0 +1,1019 @@
+{
+  "config": {
+    "hero": "li",
+    "night": 9,
+    "heat": 8,
+    "tier": 2,
+    "carry_diamond": true,
+    "affix_budget": 2,
+    "rounds": 4,
+    "init_samples": 900,
+    "pool_per_round": 80000,
+    "acquire_per_round": 260,
+    "train_seeds": 8,
+    "verify_seeds": 36,
+    "out_dir": "lab/balance/reports",
+    "prefix": "gpu-surrogate"
+  },
+  "hero": "li",
+  "totalGpuScreened": 187764,
+  "r2History": [
+    0.35539404188497614,
+    0.7504944150894021,
+    0.7610659405834614,
+    0.8139399216057592
+  ],
+  "orderSensitivity": 0.000273360973165023,
+  "nicheChamps": {
+    "support-carry": {
+      "build": {
+        "cards": [
+          {
+            "key": "lens",
+            "adj": "sturdy"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "astrolabe",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "duet",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4391,
+        "p50Score": 4390,
+        "p90Score": 4400,
+        "avgDps": 7190,
+        "p90Dps": 8843,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0.3,
+        "avgUlt": 5
+      }
+    },
+    "chain-echo": {
+      "build": {
+        "cards": [
+          {
+            "key": "spyglass",
+            "adj": "echo"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "chartpage",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": null
+          },
+          {
+            "key": "astrolabe",
+            "adj": "echo"
+          },
+          {
+            "key": "spark",
+            "adj": null
+          }
+        ],
+        "carryIdx": 3,
+        "ruleRelic": "rallyhorn",
+        "awaken": "li_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4375,
+        "p50Score": 4386,
+        "p90Score": 4398,
+        "avgDps": 4182,
+        "p90Dps": 5120,
+        "avgWallLost": 0.7,
+        "maxChain": 2,
+        "avgRx": 0.6,
+        "avgUlt": 7.1
+      }
+    },
+    "mixed-hybrid": {
+      "build": {
+        "cards": [
+          {
+            "key": "astrolabe",
+            "adj": null
+          },
+          {
+            "key": "dagger",
+            "adj": "ignite"
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "icicle",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "duet",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4372,
+        "p50Score": 4387,
+        "p90Score": 4400,
+        "avgDps": 5748,
+        "p90Dps": 7125,
+        "avgWallLost": 0.8,
+        "maxChain": 0,
+        "avgRx": 11.7,
+        "avgUlt": 10.8
+      }
+    },
+    "reaction-duo": {
+      "build": {
+        "cards": [
+          {
+            "key": "stardust",
+            "adj": null
+          },
+          {
+            "key": "icicle",
+            "adj": "deadly"
+          },
+          {
+            "key": "glacier",
+            "adj": "echo"
+          },
+          {
+            "key": "starseed",
+            "adj": null
+          },
+          {
+            "key": "moondial",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "rallyhorn",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4371,
+        "p50Score": 4385,
+        "p90Score": 4399,
+        "avgDps": 4443,
+        "p90Dps": 5658,
+        "avgWallLost": 0.8,
+        "maxChain": 2,
+        "avgRx": 18.8,
+        "avgUlt": 5.4
+      }
+    },
+    "pure-elem": {
+      "build": {
+        "cards": [
+          {
+            "key": "moondial",
+            "adj": null
+          },
+          {
+            "key": "icicle",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "echo"
+          },
+          {
+            "key": "spyglass",
+            "adj": "ignite"
+          },
+          {
+            "key": "starseed",
+            "adj": null
+          },
+          {
+            "key": "starseed",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "rallyhorn",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4370,
+        "p50Score": 4385,
+        "p90Score": 4397,
+        "avgDps": 4417,
+        "p90Dps": 5596,
+        "avgWallLost": 0.8,
+        "maxChain": 2,
+        "avgRx": 0.7,
+        "avgUlt": 5.1
+      }
+    }
+  },
+  "top15": [
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "lens",
+            "adj": "sturdy"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "astrolabe",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "duet",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4391,
+        "p50Score": 4390,
+        "p90Score": 4400,
+        "avgDps": 7190,
+        "p90Dps": 8843,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0.3,
+        "avgUlt": 5
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "astrolabe",
+            "adj": "sturdy"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "lens",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "duet",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4390,
+        "p50Score": 4390,
+        "p90Score": 4400,
+        "avgDps": 7150,
+        "p90Dps": 8599,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0.3,
+        "avgUlt": 5.1
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "astrolabe",
+            "adj": "sturdy"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "dagger",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "duet",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4390,
+        "p50Score": 4389,
+        "p90Score": 4399,
+        "avgDps": 5666,
+        "p90Dps": 7230,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0,
+        "avgUlt": 5.1
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "chartpage",
+            "adj": "sturdy"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "rimeglass",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "lens",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "kiln",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4385,
+        "p50Score": 4385,
+        "p90Score": 4393,
+        "avgDps": 11596,
+        "p90Dps": 14538,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0,
+        "avgUlt": 3.3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "chartpage",
+            "adj": "sturdy"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "dagger",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "duet",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4384,
+        "p50Score": 4384,
+        "p90Score": 4396,
+        "avgDps": 9559,
+        "p90Dps": 12080,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0,
+        "avgUlt": 5.1
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "chartpage",
+            "adj": "sturdy"
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "lens",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "none",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4381,
+        "p50Score": 4383,
+        "p90Score": 4396,
+        "avgDps": 11640,
+        "p90Dps": 15431,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0,
+        "avgUlt": 3.1
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "chartpage",
+            "adj": "sturdy"
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "lens",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "none",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4380,
+        "p50Score": 4384,
+        "p90Score": 4393,
+        "avgDps": 11473,
+        "p90Dps": 14825,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0,
+        "avgUlt": 3.4
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "chartpage",
+            "adj": "sturdy"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "lens",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "metronome",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4379,
+        "p50Score": 4383,
+        "p90Score": 4392,
+        "avgDps": 11672,
+        "p90Dps": 14967,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0,
+        "avgUlt": 5.3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "chartpage",
+            "adj": "sturdy"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "lens",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "duet",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4379,
+        "p50Score": 4381,
+        "p90Score": 4392,
+        "avgDps": 11658,
+        "p90Dps": 14737,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0.1,
+        "avgUlt": 5.1
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "chartpage",
+            "adj": "sturdy"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "metronome",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4378,
+        "p50Score": 4382,
+        "p90Score": 4397,
+        "avgDps": 9635,
+        "p90Dps": 12645,
+        "avgWallLost": 0,
+        "maxChain": 0,
+        "avgRx": 0,
+        "avgUlt": 5.3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "astrolabe",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": "ignite"
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "duet",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4375,
+        "p50Score": 4387,
+        "p90Score": 4398,
+        "avgDps": 6014,
+        "p90Dps": 7921,
+        "avgWallLost": 0.7,
+        "maxChain": 0,
+        "avgRx": 11.7,
+        "avgUlt": 5
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "chartpage",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": "ignite"
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "astrolabe",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "duet",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4375,
+        "p50Score": 4388,
+        "p90Score": 4400,
+        "avgDps": 8402,
+        "p90Dps": 10792,
+        "avgWallLost": 0.7,
+        "maxChain": 0,
+        "avgRx": 0.3,
+        "avgUlt": 5
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "spyglass",
+            "adj": "echo"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "chartpage",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": null
+          },
+          {
+            "key": "astrolabe",
+            "adj": "echo"
+          },
+          {
+            "key": "spark",
+            "adj": null
+          }
+        ],
+        "carryIdx": 3,
+        "ruleRelic": "rallyhorn",
+        "awaken": "li_a"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4375,
+        "p50Score": 4386,
+        "p90Score": 4398,
+        "avgDps": 4182,
+        "p90Dps": 5120,
+        "avgWallLost": 0.7,
+        "maxChain": 2,
+        "avgRx": 0.6,
+        "avgUlt": 7.1
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "astrolabe",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": "ignite"
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "bolt",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "duet",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4374,
+        "p50Score": 4388,
+        "p90Score": 4398,
+        "avgDps": 5799,
+        "p90Dps": 7026,
+        "avgWallLost": 0.7,
+        "maxChain": 0,
+        "avgRx": 11.3,
+        "avgUlt": 4.9
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "astrolabe",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": "ignite"
+          },
+          {
+            "key": "spyglass",
+            "adj": null
+          },
+          {
+            "key": "wishstar",
+            "adj": null
+          },
+          {
+            "key": "glacier",
+            "adj": "deadly"
+          },
+          {
+            "key": "stardust",
+            "adj": null
+          }
+        ],
+        "carryIdx": 4,
+        "ruleRelic": "duet",
+        "awaken": "li_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4373,
+        "p50Score": 4388,
+        "p90Score": 4396,
+        "avgDps": 5909,
+        "p90Dps": 7191,
+        "avgWallLost": 0.7,
+        "maxChain": 0,
+        "avgRx": 14.1,
+        "avgUlt": 4.9
+      }
+    }
+  ],
+  "dominance": {
+    "cards": [
+      [
+        "wishstar",
+        26
+      ],
+      [
+        "spyglass",
+        18
+      ],
+      [
+        "glacier",
+        15
+      ],
+      [
+        "chartpage",
+        9
+      ],
+      [
+        "astrolabe",
+        8
+      ],
+      [
+        "lens",
+        7
+      ],
+      [
+        "dagger",
+        2
+      ],
+      [
+        "bolt",
+        2
+      ],
+      [
+        "rimeglass",
+        1
+      ],
+      [
+        "spark",
+        1
+      ],
+      [
+        "stardust",
+        1
+      ]
+    ],
+    "affixes": [
+      [
+        "deadly",
+        14
+      ],
+      [
+        "sturdy",
+        10
+      ],
+      [
+        "ignite",
+        4
+      ],
+      [
+        "echo",
+        2
+      ]
+    ],
+    "ruleRelics": [
+      [
+        "duet",
+        9
+      ],
+      [
+        "none",
+        2
+      ],
+      [
+        "metronome",
+        2
+      ],
+      [
+        "kiln",
+        1
+      ],
+      [
+        "rallyhorn",
+        1
+      ]
+    ]
+  }
+}

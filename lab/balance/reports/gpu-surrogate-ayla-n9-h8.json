@@ -1,0 +1,1003 @@
+{
+  "config": {
+    "hero": "ayla",
+    "night": 9,
+    "heat": 8,
+    "tier": 2,
+    "carry_diamond": true,
+    "affix_budget": 2,
+    "rounds": 4,
+    "init_samples": 900,
+    "pool_per_round": 80000,
+    "acquire_per_round": 260,
+    "train_seeds": 8,
+    "verify_seeds": 36,
+    "out_dir": "lab/balance/reports",
+    "prefix": "gpu-surrogate"
+  },
+  "hero": "ayla",
+  "totalGpuScreened": 195637,
+  "r2History": [
+    0.34899477356971964,
+    0.4770551642281907,
+    0.49038772677769527,
+    0.7371416045654694
+  ],
+  "orderSensitivity": 0.0028364900722846636,
+  "nicheChamps": {
+    "mixed-hybrid": {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "dagger",
+            "adj": null
+          },
+          {
+            "key": "dagger",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4384,
+        "p50Score": 4392,
+        "p90Score": 4404,
+        "avgDps": 3495,
+        "p90Dps": 4335,
+        "avgWallLost": 0.4,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 5.9
+      }
+    },
+    "pure-elem": {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "cinder",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4382,
+        "p50Score": 4394,
+        "p90Score": 4404,
+        "avgDps": 3369,
+        "p90Dps": 4354,
+        "avgWallLost": 0.5,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    "chain-echo": {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": null
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "emberblade",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": "echo"
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4380,
+        "p50Score": 4387,
+        "p90Score": 4403,
+        "avgDps": 3137,
+        "p90Dps": 3931,
+        "avgWallLost": 0.6,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    "reaction-duo": {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "icicle",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4376,
+        "p50Score": 4387,
+        "p90Score": 4403,
+        "avgDps": 3318,
+        "p90Dps": 4029,
+        "avgWallLost": 0.6,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    "support-carry": {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": null
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "oilflask",
+            "adj": "sturdy"
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4375,
+        "p50Score": 4381,
+        "p90Score": 4400,
+        "avgDps": 3008,
+        "p90Dps": 3619,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3.4
+      }
+    }
+  },
+  "top15": [
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "dagger",
+            "adj": null
+          },
+          {
+            "key": "dagger",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4384,
+        "p50Score": 4392,
+        "p90Score": 4404,
+        "avgDps": 3495,
+        "p90Dps": 4335,
+        "avgWallLost": 0.4,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 5.9
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "dagger",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "dagger",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4384,
+        "p50Score": 4392,
+        "p90Score": 4404,
+        "avgDps": 3740,
+        "p90Dps": 4704,
+        "avgWallLost": 0.4,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 5.8
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "cinder",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4382,
+        "p50Score": 4394,
+        "p90Score": 4404,
+        "avgDps": 3369,
+        "p90Dps": 4354,
+        "avgWallLost": 0.5,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "sparkwick",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4381,
+        "p50Score": 4391,
+        "p90Score": 4404,
+        "avgDps": 3246,
+        "p90Dps": 4213,
+        "avgWallLost": 0.6,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": null
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "sparkwick",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": "thunder"
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4381,
+        "p50Score": 4390,
+        "p90Score": 4404,
+        "avgDps": 3258,
+        "p90Dps": 4145,
+        "avgWallLost": 0.6,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": null
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "sparkwick",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": "thunder"
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4381,
+        "p50Score": 4390,
+        "p90Score": 4404,
+        "avgDps": 3267,
+        "p90Dps": 4145,
+        "avgWallLost": 0.6,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": null
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "emberblade",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": "echo"
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4380,
+        "p50Score": 4387,
+        "p90Score": 4403,
+        "avgDps": 3137,
+        "p90Dps": 3931,
+        "avgWallLost": 0.6,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "sparkwick",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4380,
+        "p50Score": 4389,
+        "p90Score": 4404,
+        "avgDps": 3348,
+        "p90Dps": 4477,
+        "avgWallLost": 0.6,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "dagger",
+            "adj": null
+          },
+          {
+            "key": "javelin",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4379,
+        "p50Score": 4390,
+        "p90Score": 4403,
+        "avgDps": 3619,
+        "p90Dps": 4308,
+        "avgWallLost": 0.7,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 5.4
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "dagger",
+            "adj": null
+          },
+          {
+            "key": "emberblade",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4378,
+        "p50Score": 4385,
+        "p90Score": 4404,
+        "avgDps": 3087,
+        "p90Dps": 3838,
+        "avgWallLost": 0.5,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": null
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "emberblade",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "spark",
+            "adj": "ignite"
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4377,
+        "p50Score": 4385,
+        "p90Score": 4401,
+        "avgDps": 3195,
+        "p90Dps": 4135,
+        "avgWallLost": 0.5,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3.1
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "emberblade",
+            "adj": null
+          },
+          {
+            "key": "emberblade",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "emberblade",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4376,
+        "p50Score": 4386,
+        "p90Score": 4402,
+        "avgDps": 3331,
+        "p90Dps": 4168,
+        "avgWallLost": 0.7,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "emberblade",
+            "adj": null
+          },
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          }
+        ],
+        "carryIdx": 2,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4376,
+        "p50Score": 4388,
+        "p90Score": 4400,
+        "avgDps": 3249,
+        "p90Dps": 4010,
+        "avgWallLost": 0.7,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": "ignite"
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "icicle",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4376,
+        "p50Score": 4387,
+        "p90Score": 4403,
+        "avgDps": 3318,
+        "p90Dps": 4029,
+        "avgWallLost": 0.6,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3
+      }
+    },
+    {
+      "build": {
+        "cards": [
+          {
+            "key": "oiltrap",
+            "adj": null
+          },
+          {
+            "key": "oilpit",
+            "adj": "echo"
+          },
+          {
+            "key": "oilflask",
+            "adj": "sturdy"
+          },
+          {
+            "key": "oilflask",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          },
+          {
+            "key": "detonate",
+            "adj": null
+          }
+        ],
+        "carryIdx": 1,
+        "ruleRelic": "reagent",
+        "awaken": "ayla_b"
+      },
+      "metrics": {
+        "winRate": 1,
+        "avgScore": 4375,
+        "p50Score": 4381,
+        "p90Score": 4400,
+        "avgDps": 3008,
+        "p90Dps": 3619,
+        "avgWallLost": 0,
+        "maxChain": 2,
+        "avgRx": 0,
+        "avgUlt": 3.4
+      }
+    }
+  ],
+  "dominance": {
+    "cards": [
+      [
+        "oilflask",
+        25
+      ],
+      [
+        "oiltrap",
+        15
+      ],
+      [
+        "oilpit",
+        15
+      ],
+      [
+        "detonate",
+        14
+      ],
+      [
+        "emberblade",
+        7
+      ],
+      [
+        "dagger",
+        6
+      ],
+      [
+        "sparkwick",
+        4
+      ],
+      [
+        "cinder",
+        1
+      ],
+      [
+        "javelin",
+        1
+      ],
+      [
+        "spark",
+        1
+      ],
+      [
+        "icicle",
+        1
+      ]
+    ],
+    "affixes": [
+      [
+        "echo",
+        16
+      ],
+      [
+        "ignite",
+        11
+      ],
+      [
+        "thunder",
+        2
+      ],
+      [
+        "sturdy",
+        1
+      ]
+    ],
+    "ruleRelics": [
+      [
+        "reagent",
+        15
+      ]
+    ]
+  }
+}

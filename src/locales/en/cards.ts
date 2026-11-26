@@ -18,7 +18,7 @@ export default {
  },
  "icicle": {
   "n": "Icicle",
-  "d": "On hit, Slows by 25% for 2s.",
+  "d": "On hit, Slows by 30% for 2s.",
   "f": "Grew under the North Tower's eaves for three winters.",
   "lore": "The watchers say the North Tower's icicles are dead sentries' tears, frozen in place. They don't melt in summer either.",
   "dn": "Sentry's Tear",
@@ -82,7 +82,7 @@ export default {
  },
  "anvil": {
   "n": "Anvil",
-  "d": "On trigger, adjacent cards' next attack deals +50% damage.",
+  "d": "On trigger, adjacent cards' next attack deals +100% damage.",
   "f": "Doesn't fight. Just keeps everyone else's blades sharp.",
   "lore": "The old smith kept this anvil forty years. On the day he left, the last thing on it was Ayla's Oath Sword.",
   "dn": "Forty-Year Anvil",
@@ -112,7 +112,7 @@ export default {
  "oathsword": {
   "questT": "Kill enemies with it",
   "n": "Oath Sword",
-  "d": "Slashes the target and one enemy beside it. 【Quest】 Kill 40 enemies with it to become \"Nightwatch Sword.\"",
+  "d": "Slashes the target and one enemy beside it. 【Quest】 Kill 16 enemies with it to become \"Nightwatch Sword.\"",
   "f": "Seven names on the blade; the eighth spot is empty. Karl's was forged from the same iron.",
   "lore": "Karl and Ayla swore the oath on the same day, two swords from one iron. Karl's will return on Night 4.",
   "dn": "Eighth Name",
@@ -144,7 +144,7 @@ export default {
  },
  "prism": {
   "n": "Prism",
-  "d": "Charges adjacent 【Fire】【Ice】【Volt】 cards by 25% and gives their next hit +50%.",
+  "d": "Charges adjacent 【Fire】【Ice】【Volt】 cards by 35% and gives their next hit +65%.",
   "f": "Light goes in one color, comes out three.",
   "lore": "Mo melted down the Academy hall's stained glass to grind this prism. It was Greyrobe's favorite window.",
   "dn": "Lightsplitter",
@@ -195,7 +195,7 @@ export default {
  },
  "cleaver": {
   "n": "Cleaver",
-  "d": "A heavy chop that ignores armor; +8% damage per point of target armor. Made for shells.",
+  "d": "A heavy chop that ignores armor; +12% damage per point of target armor. Made for shells.",
   "f": "Used to chop ribs. Different ribs now."
  },
  "arrowrain": {
@@ -215,7 +215,7 @@ export default {
  },
  "flamethrower": {
   "n": "Flamethrower",
-  "d": "Sprays fire, dealing area damage and igniting. +8% damage per burning enemy in range.",
+  "d": "Sprays fire, dealing area damage and igniting. +10% damage per burning enemy in range.",
   "f": "Before pulling the trigger, check the Wind."
  },
  "phoenix": {
@@ -230,7 +230,7 @@ export default {
  },
  "cinder": {
   "n": "Cinder",
-  "d": "A tiny spark with a very short cooldown. Burn stacks: each hit adds +1 Burn per second.",
+  "d": "A tiny spark with a very short cooldown. Burn stacks: each hit adds +1.5 Burn per second.",
   "f": "A single spark can start a wildfire. She checked."
  },
  "executioner": {
@@ -331,7 +331,7 @@ export default {
  },
  "pendulum": {
   "n": "Great Pendulum",
-  "d": "Sweeps all enemies in the target's row. Swings harder over time: +20% damage and +8% cooldown each time it attacks this battle (max 10).",
+  "d": "Sweeps all enemies in the target's row. Swings harder over time: +20% damage and +6% cooldown each time it attacks this battle (max 10).",
   "f": "The day the bell tower stopped, she took the pendulum down.",
   "lore": "The great clock swung for seven hundred years. The night it stopped, Ying climbed up, took the pendulum down, and hauled it to the Wall.",
   "dn": "The Night It Stopped",
@@ -354,7 +354,7 @@ export default {
  },
  "gear": {
   "n": "Flying Gear",
-  "d": "Throws a razor-sharp gear. ×2 damage when attacking under 【Haste】.",
+  "d": "Throws a razor-sharp gear. +75% damage when attacking under 【Haste】.",
   "f": "Spare parts from Master's clocks."
  },
  "windup": {
@@ -440,22 +440,22 @@ export default {
  "appwand": {
   "questT": "Lightning bounces",
   "n": "Apprentice Wand",
-  "d": "Lightning bounces to 1 extra enemy. 【Quest】 After 150 total lightning bounces, becomes \"Thunder King.\"",
+  "d": "Lightning bounces to 1 extra enemy. 【Quest】 After 180 total lightning bounces, becomes \"Thunder King.\"",
   "f": "An Academy practice wand. Rumor says someone split the dean's desk with it."
  },
  "thunderking": {
   "n": "Thunder King",
-  "d": "Lightning bounces to 4 extra enemies (decaying per bounce). +1 damage per trigger this battle.",
+  "d": "Lightning bounces to 3 extra enemies (decaying per bounce). +1 damage per trigger this battle.",
   "f": "The dean split the desk himself. The name came later."
  },
  "headxbow": {
   "n": "Bounty Bow",
-  "d": "【Ammo 3】 Prioritizes elites and bosses; pierces 3 enemies behind. Killing an elite or boss refills Ammo.",
+  "d": "【Ammo 4】 Prioritizes elites and bosses; pierces 3 enemies behind. Killing an elite or boss refills Ammo.",
   "f": "One bolt costs one ox. Bounty hunters never waste a shot."
  },
  "armorer": {
   "n": "Armorer",
-  "d": "【Reload】 1 for adjacent Ammo cards; charges non-Ammo neighbors 10%.",
+  "d": "【Reload】 2 for adjacent Ammo cards; charges non-Ammo neighbors 20%.",
   "f": "He knows every arrow in the city. Including the ones that never came back."
  },
  "volley": {
@@ -490,7 +490,7 @@ export default {
  },
  "javelin": {
   "n": "Javelineer",
-  "d": "【Ammo 2】 Heavy javelins. When an adjacent card crits, 【Reload】 1.",
+  "d": "【Ammo 4】 Heavy javelins piercing 1 enemy behind. When an adjacent card crits, 【Reload】 1.",
   "f": "He carries only two. The third, he pulls from an enemy."
  },
  "oiltrap": {
@@ -505,7 +505,7 @@ export default {
  },
  "nightsword": {
   "n": "Nightwatch Sword",
-  "d": "Slashes the target and enemies beside it; 【Execute】 enemies below 15% HP.",
+  "d": "Slashes the target and enemies beside it; 【Execute】 enemies below 18% HP.",
   "f": "The eighth name is carved now. Her own."
  },
  "crucible": {
@@ -530,7 +530,7 @@ export default {
  },
  "jars": {
   "n": "Jars & Bottles",
-  "d": "No damage. Each 【Potion】 card reduces all Potion cards' cooldown by 6%.",
+  "d": "No damage. Each 【Potion】 card reduces all Potion cards' cooldown by 10%.",
   "f": "The messier the shelf, the faster she finds things. She insists it's a system."
  },
  "supersat": {
@@ -616,12 +616,12 @@ export default {
  },
  "scaffold": {
   "n": "Scaffold",
-  "d": "On trigger, charges adjacent cards by 20%, doubled for Large cards; more at higher tiers.",
+  "d": "On trigger, charges adjacent cards by 25%, doubled for Large cards; more at higher tiers.",
   "f": "Scaffold first. Then the big stuff."
  },
  "bigcannon": {
   "n": "Wall Cannon",
-  "d": "A ground-shaking shot that wrecks a large group. 【Position】 ×1.6 damage when both neighbors are support cards.",
+  "d": "A ground-shaking shot that wrecks a large group. 【Position】 ×1.7 damage when both neighbors are support cards.",
   "f": "Three men to load. One shot clears half a street."
  },
  "mortar": {
@@ -686,7 +686,7 @@ export default {
  },
  "starseed": {
   "n": "Starseed",
-  "d": "On hit, Slows by 25%. 【Grow】 As Carry, permanently +1 base damage per 10 kills.",
+  "d": "On hit, Slows by 25%. 【Grow】 As Carry, permanently +1 base damage per 8 kills.",
   "f": "A star that hasn't lit up yet."
  },
  "orrery": {
@@ -696,7 +696,7 @@ export default {
  },
  "frostar": {
   "n": "Frost Star",
-  "d": "On hit, Slows by 30% and applies 【Freeze】 for 0.4s.",
+  "d": "On hit, Slows by 25% and applies 【Freeze】 for 0.5s.",
   "f": "The coldest star in the north."
  },
  "glacier": {
@@ -706,7 +706,7 @@ export default {
  },
  "rimelance": {
   "n": "Rime Lance",
-  "d": "Pierces 2 enemies behind the target; ×1.25 damage to 【Freeze】 enemies. Killing a Frozen enemy shatters it, hurting those nearby.",
+  "d": "Pierces 2 enemies behind the target; ×1.5 damage to 【Freeze】 enemies. Killing a Frozen enemy shatters it, hurting those nearby.",
   "f": "The tip is frosted. Cold before it even goes in."
  },
  "stardust": {
@@ -721,7 +721,7 @@ export default {
  },
  "pulsar": {
   "n": "Pulsar",
-  "d": "Lightning bounces 3 times. As Carry, ×1.5 damage.",
+  "d": "Lightning bounces 3 times. As Carry, ×1.35 damage.",
   "f": "It blinks on and off, like it's counting."
  },
  "gunner": {
@@ -771,7 +771,7 @@ export default {
  },
  "spyglass": {
   "n": "Spyglass",
-  "d": "On trigger, the Carry's next hit is a guaranteed crit.",
+  "d": "On trigger, the Carry's next hit is a guaranteed crit with +25% damage.",
   "f": "Look first. Then shoot."
  },
  "wishstar": {
@@ -791,7 +791,7 @@ export default {
  },
  "aurora": {
   "n": "Aurora",
-  "d": "The aurora sweeps all enemies in range, Slowing 30% and applying 【Freeze】 for 0.5s. +3% damage per enemy in range (max 12).",
+  "d": "The aurora sweeps all enemies in range, Slowing 30% and applying 【Freeze】 for 0.4s. +3% damage per enemy in range (max 12).",
   "f": "The northern sky catches fire. Cold fire."
  },
  "icemoon": {
@@ -816,7 +816,7 @@ export default {
  },
  "chartpage": {
   "n": "Star Chart Page",
-  "d": "On trigger, the Carry gets +2 damage this battle (stacks, resets after the night); more at higher tiers.",
+  "d": "On trigger, the Carry gets +1.5 damage this battle (stacks, resets after the night); more at higher tiers.",
   "f": "Granny says the missing page of the star chart is yours to fill in.",
   "lore": "The year the observatory fell, the wind took a few pages of the star chart. One caught in a crenel on the Wall, a child's name on the back.",
   "dn": "The Mended Page",
@@ -832,7 +832,7 @@ export default {
  },
  "moondial": {
   "n": "Moondial",
-  "d": "No cooldown. Each Carry crit charges other cards by 8% (max once per 0.3s); more at higher tiers.",
+  "d": "No cooldown. Each Carry crit charges other cards by 12% (max once per 0.3s); more at higher tiers.",
   "f": "By day, watch the sun. By night, the moon. Now there's only this.",
   "lore": "A sundial is useless in the Long Night, so someone ground it into a moondial. The moon rarely shows, so mostly it's just a stone.",
   "dn": "When the Moon Shows",
@@ -840,7 +840,7 @@ export default {
  },
  "tent": {
   "n": "Command Tent",
-  "d": "No cooldown. In the center (slots 4-5), all 【Position】 multipliers +0.2; more at higher tiers. 【Position】",
+  "d": "No cooldown. In the center (slots 4-5), all 【Position】 multipliers +0.3; more at higher tiers. 【Position】",
   "f": "Where the tent goes up, the battle starts.",
   "lore": "Shi Jun's father pitched this tent. The pole is an old beam from the Wall, still bearing his measuring marks.",
   "dn": "The Old Beam",

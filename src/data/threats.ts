@@ -17,7 +17,7 @@ export interface ThreatDef {
 
 export const THREATS: Record<string, ThreatDef> = {
   /* 蜂群：又多又软 / Swarm: many and soft */
-  swarm: { comps: [{ slime: 6 }, { bug: 3, slime: 4 }, { slime: 6, bug: 3, mimic: 1 }], w: 1, pw: 1.35 },
+  swarm: { comps: [{ slime: 6 }, { bug: 3, slime: 4 }, { slime: 6, bug: 3, mimic: 1 }], w: 1, pw: 1.42 },
   /* 空袭：快，冲到墙下就炸 / Air raid: fast, explodes at the wall */
   air: { comps: [{ bat: 5 }, { bat: 4, bomber: 2 }, { bat: 5, bomber: 3 }], w: 1, pw: 0.75 },
   /* 重甲：护甲厚，怕穿甲、怕毒 / Heavy armor: thick armor, weak to pierce and poison */
@@ -29,7 +29,7 @@ export const THREATS: Record<string, ThreatDef> = {
   /* 雾魂：从半路的雾里冒出来 / Mist: they rise out of the fog midway */
   mist: { comps: [{ ghost: 2 }, { ghost: 3, bat: 2 }, { ghost: 4, bomber: 1 }], w: 0.9, pw: 1.15 },
   /* 巫祝：萨满给身边的回血 / Rite: shamans heal those nearby */
-  rite: { comps: [null, { skel: 3, shaman: 1 }, { golem: 1, shaman: 1, skel: 2 }], w: 0.9, pw: 0.9 },
+  rite: { comps: [null, { skel: 3, shaman: 1 }, { golem: 1, shaman: 1, skel: 2 }], w: 0.9, pw: 0.85 },
   /* 火药：炸弹鼠成群 / Powder: bomb rats in packs */
-  blast: { comps: [{ bomber: 3 }, { bomber: 3, bug: 2 }, { bomber: 4, berserker: 1 }], w: 0.8, pw: 0.55 },
+  blast: { comps: [{ bomber: 3 }, { bomber: 3, bug: 2 }, { bomber: 4, berserker: 1 }], w: 0.8, pw: 0.62 },
 } as never;

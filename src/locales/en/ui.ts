@@ -442,7 +442,7 @@ export default {
       ico: 'gear',
       hint: 'Modify a small card',
       pick: 'Modify {n}',
-      pickSub: 'Upgrade to {t}, then build another small card of the same school from it',
+      pickSub: 'Upgrade to {t} and gain 3 gold',
       pickMax: 'Already Diamond: build another small card of the same school from it',
     },
     jun: {

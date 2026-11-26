@@ -119,21 +119,22 @@ export const TALENTS: Record<string, TalentDef> = {
   "r": 2,
   "m": {
    "t_echo": 1,
-   "chain": 1
+   "chain": 1,
+   "spd": 0.06
   }
  },
  "thrift": {
   "cat": "eco",
   "r": 0,
   "m": {
-   "interest": 3
+   "interest": 4
   }
  },
  "wage": {
   "cat": "eco",
   "r": 0,
   "m": {
-   "winGold": 2
+   "winGold": 3
   }
  },
  "loot": {
@@ -504,7 +505,7 @@ export const TALENTS: Record<string, TalentDef> = {
   "cat": "atk",
   "r": 1,
   "m": {
-   "slowVuln": 0.3
+   "slowVuln": 0.4
   },
   "hero": "li"
  },

@@ -184,14 +184,14 @@ export default {
  },
  "heats": [
   "Normal difficulty",
-  "Enemy health +15%",
-  "Elite and boss health +25% more",
+  "All enemy health +20%",
+  "Elite and boss health +40% more",
   "Shop cards cost 1 more gold",
-  "Max Wall -15%",
-  "15% more enemies per wave",
+  "Max Wall -20%",
+  "25% more enemies per wave",
   "1 less gold pay per night",
-  "Enemy move speed +10%",
-  "Night Talk offers only two choices"
+  "Enemy move speed +20%",
+  "Night Talk offers two choices; enemy health +25% more"
  ],
  "wagers": {
   "horde": {
